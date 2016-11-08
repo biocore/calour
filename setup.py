@@ -40,7 +40,7 @@ classifiers = [
 
 description = 'CALOUR: exploratory and interactive microbiome analyses based on heatmap'
 
-with open('README.org') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 keywords = 'microbiome heatmap analysis bioinformatics',
