@@ -26,4 +26,4 @@ pep8:
 html:
 	make -C doc clean html
 
-all: pep8 html test
+all: test pep8 html

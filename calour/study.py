@@ -34,14 +34,14 @@ class Study:
     feature_metadata : ``pandas.DataFrame``
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
-                 description='', sparse=False):
+                 description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
         self.feature_metadata = feature_metadata
         self.description = description
 
     @staticmethod
-    def _read_biom(fp, transpose=True, sparse=False):
+    def _read_biom(fp, transpose=True, sparse=True):
         '''Read in a biom table file.
 
         Parameters
@@ -59,7 +59,7 @@ class Study:
         if sparse:
             data = scipy.sparse.csr_matrix(table.matrix_data)
         else:
-            data = table.matrix_data.todense().A
+            data = table.matrix_data.toarray()
 
         feature_md = _get_md_from_biom(table)
 
@@ -98,7 +98,7 @@ class Study:
 
     @classmethod
     def read(cls, data, sample_metadata=None, feature_metadata=None,
-             description='', sparse=False):
+             description='', sparse=True):
         '''Read the files for the study.
 
         Parameters
