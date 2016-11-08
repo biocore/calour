@@ -1,0 +1,11 @@
+nose
+pep8
+flake8
+sphinx
+click
+numpy
+scipy
+pandas
+matplotlib
+scikit-learn
+biom-format
