@@ -11,25 +11,25 @@ def save(study, filename, format=''):
 	'''
 
 
-def save_biom(study, filename, format):
+def save_biom(exp, filename, format):
 	'''
 	save to biom table (format is txt or json or hdf5)
 	'''
 
 
-def save_map(study, filename):
+def save_map(exp, filename):
 	'''
 	save the mapping file
 	'''
 
 
-def save_commands(study, filename):
+def save_commands(exp, filename):
 	'''
-	save the commands used to generate the study
+	save the commands used to generate the exp
 	'''
 
 
-def save_fasta(study, filename):
+def save_fasta(exp, filename):
 	'''
 	'''
 

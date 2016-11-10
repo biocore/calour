@@ -18,8 +18,8 @@ import biom
 logger = getLogger(__name__)
 
 
-class Study:
-    '''This class contains the data for a study or a meta study.
+class Experiment:
+    '''This class contains the data for a experiment or a meta experiment.
 
     The data set includes a data table (otu table, gene table,
     metabolomic table, or all those tables combined), a sample
@@ -102,7 +102,7 @@ class Study:
     @classmethod
     def read(cls, data, sample_metadata=None, feature_metadata=None,
              description='', sparse=True):
-        '''Read the files for the study.
+        '''Read the files for the experiment.
 
         Parameters
         ----------
@@ -113,11 +113,11 @@ class Study:
         feature_metadata : str
             file path to the feature metadata.
         description : str
-            description of the study
+            description of the experiment
         sparse : bool
             read the biom table into sparse or dense array
         '''
-        logger.info('Reading the study files...')
+        logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata))
         sid, oid, data, md = cls._read_biom(data)
         if sample_metadata is not None:
             # reorder the sample id to align with biom
@@ -133,7 +133,7 @@ class Study:
                    description=description, sparse=sparse)
 
     def save(self, f):
-        '''Save the study data to disk.
+        '''Save the experiment data to disk.
         Parameters
         ----------
         f : str
@@ -143,27 +143,27 @@ class Study:
 
 def reorder_samples(exp, neworder, inplace=False):
     '''
-    reroder the samples in the study according to indices in neworder
+    reroder the samples in the experiment according to indices in neworder
     note that we can also drop samples in neworder
 
     output:
-    newexp : Study with reordered samples
+    newexp : Experiment with reordered samples
     '''
 
 
 def reorder_obs(exp, neworder, inplace=False):
     '''
-    reroder the observations in the study according to indices in neworder
+    reroder the observations in the experiment according to indices in neworder
     note that we can also drop samples in neworder
 
     output:
-    newexp : Study with reordered samples
+    newexp : Experiment with reordered samples
     '''
 
 
-def copy_study(exp):
+def copy_exp(exp):
     '''
-    create a new copy of Study
+    create a new copy of Experiment
     '''
 
 
@@ -176,9 +176,9 @@ def add_history():
 
 def join_studies(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
     '''
-    join two Studies into one study
+    join two Experiments into one experiment
     if suffix is not none, add suffix to each sampleid (suffix is a list of 2 values i.e. ('_1','_2'))
-    if same observation id in both studies, use values, otherwise put 0 in values of study where the observation in not present
+    if same observation id in both studies, use values, otherwise put 0 in values of experiment where the observation in not present
     '''
 
 
@@ -206,5 +206,5 @@ def merge_samples(exp, field, method='mean'):
 
 def add_observation(exp, obs_id, data=None):
     '''
-    add an observation to the study. fill the data with 0 if values is none, or with the values of data
+    add an observation to the experiment. fill the data with 0 if values is none, or with the values of data
     '''

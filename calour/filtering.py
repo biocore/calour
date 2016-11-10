@@ -4,7 +4,7 @@
 
 def filter_samples(exp, field, values, exclude=False, inplace=False):
 	'''
-	filter samples from the study keeping only samples where the value in field
+	filter samples from the experiment keeping only samples where the value in field
 	is in values
 	if exclude is true - remove the matching samples instead of filtering them
 	'''
