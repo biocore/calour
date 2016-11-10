@@ -49,13 +49,6 @@ class Experiment:
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
 
-    def filter_samples(self, field, values, exclude=False, inplace=False):
-        '''
-        example how to link outside functions to inside ones
-        call the function
-        '''
-        ca.filter_samples(self, field, values, exclude=False, inplace=False)
-
 
 def reorder_samples(exp, neworder, inplace=False):
     '''
@@ -90,7 +83,7 @@ def add_history():
     '''
 
 
-def join_studies(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
+def join_experiments(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
     '''
     join two Experiments into one experiment
     if suffix is not none, add suffix to each sampleid (suffix is a list of 2 values i.e. ('_1','_2'))
@@ -104,9 +97,15 @@ def join_fields(exp, field1, field2, newfield):
     '''
 
 
-def merge_obs_tax(exp, tax_level=3):
+def merge_obs_tax(exp, tax_level=3, method='sum'):
     '''
     merge all observations with identical taxonomy (at level tax_level) by summing the values per sample
+    '''
+
+
+def _collapse_obs(exp, groups, method='sum'):
+    '''
+    collapse the observations based on values in groups (list of lists)
     '''
 
 
@@ -124,3 +123,7 @@ def add_observation(exp, obs_id, data=None):
     '''
     add an observation to the experiment. fill the data with 0 if values is none, or with the values of data
     '''
+
+
+# populate the class functions
+Experiment.filter_samples = ca.filter_samples
