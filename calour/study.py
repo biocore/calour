@@ -43,102 +43,18 @@ class Experiment:
         # the command history list
         self.commands = []
 
-    @staticmethod
-    def _read_biom(fp, transpose=True, sparse=True):
-        '''Read in a biom table file.
-
-        Parameters
-        ----------
-        fp : str
-            file path to the biom table
-        transpose : bool
-            Transpose the table or not. The OTU table has samples in
-            column while sklearn and other packages require samples in
-            row. So you should transpose the data table.
-        '''
-        table = biom.load_table(fp)
-        sid = table.ids(axis='sample')
-        oid = table.ids(axis='observation')
-        if sparse:
-            data = scipy.sparse.csr_matrix(table.matrix_data)
-        else:
-            data = table.matrix_data.toarray()
-
-        feature_md = _get_md_from_biom(table)
-
-        if transpose:
-            data = data.transpose()
-
-        return sid, oid, data, feature_md
-
-    @staticmethod
-    def _get_md_from_biom(table):
-        '''Get the metadata of last column in the biom table.
-
-        Return
-        ------
-        pandas.DataFrame
-        '''
-
-        return md
-
-    @staticmethod
-    def _read_table(f):
-        '''Read tab-delimited table file.
-
-        It is used to read sample metadata (mapping) file and feature
-        metadata file
-
-        '''
-        table = pd.read_table(f, sep='\t', index_col=0)
-        # make sure the sample ID is string-type
-        table.index = table.index.astype(np.str)
-        return table
-
     def __repr__(self):
-        '''Representation of this object.'''
-
-
-    @classmethod
-    def read(cls, data, sample_metadata=None, feature_metadata=None,
-             description='', sparse=True):
-        '''Read the files for the experiment.
-
-        Parameters
-        ----------
-        data : str
-            file path to the biom table.
-        sample_metadata : str
-            file path to the sample metadata (aka mapping file in QIIME)
-        feature_metadata : str
-            file path to the feature metadata.
-        description : str
-            description of the experiment
-        sparse : bool
-            read the biom table into sparse or dense array
         '''
-        logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata))
-        sid, oid, data, md = cls._read_biom(data)
-        if sample_metadata is not None:
-            # reorder the sample id to align with biom
-            sample_metadata = cls._read_table(sample_metadata).loc[sid, ]
-        if feature_metadata is not None:
-            # reorder the feature id to align with that from biom table
-            fm = cls._read_table(feature_metadata).loc[oid, ]
-            # combine it with the metadata from biom
-            feature_metadata = pd.concat([fm, md], axis=1)
-        else:
-            feature_metadata = md
-        return cls(data, sample_metadata, feature_metadata,
-                   description=description, sparse=sparse)
-
-    def save(self, f):
-        '''Save the experiment data to disk.
-        Parameters
-        ----------
-        f : str
-            file path to save to.
+        print the information about the experiment
+        should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
+
+    def filter_samples(self, field, values, exclude=False, inplace=False):
+        '''
+        example how to link outside functions to inside ones
+        call the function
+        '''
+        ca.filter_samples(self, field, values, exclude=False, inplace=False)
 
 
 def reorder_samples(exp, neworder, inplace=False):
