@@ -40,6 +40,9 @@ class Study:
         self.feature_metadata = feature_metadata
         self.description = description
 
+        # the command history list
+        self.commands = []
+
     @staticmethod
     def _read_biom(fp, transpose=True, sparse=True):
         '''Read in a biom table file.
@@ -136,3 +139,72 @@ class Study:
         f : str
             file path to save to.
         '''
+
+
+def reorder_samples(exp, neworder, inplace=False):
+    '''
+    reroder the samples in the study according to indices in neworder
+    note that we can also drop samples in neworder
+
+    output:
+    newexp : Study with reordered samples
+    '''
+
+
+def reorder_obs(exp, neworder, inplace=False):
+    '''
+    reroder the observations in the study according to indices in neworder
+    note that we can also drop samples in neworder
+
+    output:
+    newexp : Study with reordered samples
+    '''
+
+
+def copy_study(exp):
+    '''
+    create a new copy of Study
+    '''
+
+
+def add_history():
+    '''
+    the decorator to add the history of each command to the experiment
+    (how do we do it?)
+    '''
+
+
+def join_studies(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
+    '''
+    join two Studies into one study
+    if suffix is not none, add suffix to each sampleid (suffix is a list of 2 values i.e. ('_1','_2'))
+    if same observation id in both studies, use values, otherwise put 0 in values of study where the observation in not present
+    '''
+
+
+def join_fields(exp, field1, field2, newfield):
+    '''
+    create a new sample metadata field by concatenating the values in the two fields specified
+    '''
+
+
+def merge_obs_tax(exp, tax_level=3):
+    '''
+    merge all observations with identical taxonomy (at level tax_level) by summing the values per sample
+    '''
+
+
+def merge_samples(exp, field, method='mean'):
+    '''
+    merge all samples that have the same value in field
+    methods for merge (value for each observation) are:
+    'mean' : the mean of all samples
+    'random' : a random sample out of the group (same sample for all observations)
+    'sum' : the sum of values in all the samples
+    '''
+
+
+def add_observation(exp, obs_id, data=None):
+    '''
+    add an observation to the study. fill the data with 0 if values is none, or with the values of data
+    '''
