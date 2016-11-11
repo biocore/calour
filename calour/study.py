@@ -8,6 +8,7 @@
 
 from logging import getLogger
 from os.path import join
+from copy import copy, deepcopy
 
 import pandas as pd
 import numpy as np
@@ -49,31 +50,45 @@ class Experiment:
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
 
+    def __copy__(self):
+        '''Create a copy of Experiment
+        '''
 
-def reorder_samples(exp, neworder, inplace=False):
+    def __deepcopy__(self):
+        '''Create a deep copy of Experiment
+        '''
+
+
+def reorder(exp, new_order, axis=0, inplace=False):
+    '''Reorder according to indices in the new order.
+
+    Note that we can also drop samples in new order.
+
+    Parameters
+    ----------
+    exp : Experiment
+        Experiment object to operate on.
+    new_order : Iterable of int
+        the order of new indices
+    axis : 0 or 1
+    inplace : bool
+        reorder in place.
+
+    Returns
+    -------
+    Experiment
+        new experiment with reordered samples
     '''
-    reroder the samples in the experiment according to indices in neworder
-    note that we can also drop samples in neworder
-
-    output:
-    newexp : Experiment with reordered samples
-    '''
-
-
-def reorder_obs(exp, neworder, inplace=False):
-    '''
-    reroder the observations in the experiment according to indices in neworder
-    note that we can also drop samples in neworder
-
-    output:
-    newexp : Experiment with reordered samples
-    '''
-
-
-def copy_exp(exp):
-    '''
-    create a new copy of Experiment
-    '''
+    if inplace is False:
+        exp = deepcopy(exp)
+    if axis == 0:
+        exp.data = exp.data[new_order, ]
+        exp.sample_metadata.iloc[new_order, ]
+    elif axis == 1:
+        exp.data = exp.data[, new_order]
+        exp.sample_metadata.iloc[, new_order]
+    if inplace is False:
+        return exp
 
 
 def add_history():
