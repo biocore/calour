@@ -15,6 +15,8 @@ import numpy as np
 import scipy
 import biom
 
+import calour as ca
+
 
 logger = getLogger(__name__)
 
@@ -44,19 +46,33 @@ class Experiment:
         # the command history list
         self.commands = []
 
+        # flag if data array is sparse (True) or dense (False)
+        self.sparse = sparse
+
     def __repr__(self):
         '''
         print the information about the experiment
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
+        return('Experiment %s with %d samples, %d features' % (self.description,self.data.shape[0],self.data.shape[1]))
 
     def __copy__(self):
         '''Create a copy of Experiment
         '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         '''Create a deep copy of Experiment
         '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
 
 
 def reorder(exp, new_order, axis=0, inplace=False):
@@ -83,12 +99,11 @@ def reorder(exp, new_order, axis=0, inplace=False):
         exp = deepcopy(exp)
     if axis == 0:
         exp.data = exp.data[new_order, :]
-        exp.sample_metadata.iloc[new_order, :]
+        exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
     elif axis == 1:
         exp.data = exp.data[:, new_order]
-        exp.sample_metadata.iloc[:, new_order]
-    if inplace is False:
-        return exp
+        exp.feature_metadata = exp.feature_metadata.iloc[:, new_order]
+    return exp
 
 
 def add_history():
@@ -141,4 +156,4 @@ def add_observation(exp, obs_id, data=None):
 
 
 # populate the class functions
-Experiment.filter_samples = ca.filter_samples
+# Experiment.filter_samples = ca.filter_samples

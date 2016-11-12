@@ -1,6 +1,8 @@
 # calour functions for filtering samples/observations
 # functions should call reorder_samples() / reorder_obs()
 
+import calour as ca
+
 
 def filter_samples(exp, field, values, exclude=False, inplace=False):
 	'''

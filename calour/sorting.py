@@ -1,6 +1,8 @@
 # calour functions for sorting samples/observations
 # functions should call reorder_samples() / reorder_obs()
 
+import calour as ca
+
 
 def sort_taxonomy(exp, inplace=False):
 	'''
