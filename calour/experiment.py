@@ -82,11 +82,11 @@ def reorder(exp, new_order, axis=0, inplace=False):
     if inplace is False:
         exp = deepcopy(exp)
     if axis == 0:
-        exp.data = exp.data[new_order, ]
-        exp.sample_metadata.iloc[new_order, ]
+        exp.data = exp.data[new_order, :]
+        exp.sample_metadata.iloc[new_order, :]
     elif axis == 1:
-        exp.data = exp.data[, new_order]
-        exp.sample_metadata.iloc[, new_order]
+        exp.data = exp.data[:, new_order]
+        exp.sample_metadata.iloc[:, new_order]
     if inplace is False:
         return exp
 

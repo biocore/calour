@@ -58,3 +58,9 @@ def sort_samples_by_seqs(exp, seqs, reverse=False, inplace=False):
 	'''
 	sort the samples based on the frequencies of sequences in seqs
 	'''
+
+
+def sort_niche(exp, field):
+	'''
+	sort by niches - jamie
+	'''
