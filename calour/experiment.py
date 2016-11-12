@@ -9,6 +9,8 @@
 from logging import getLogger
 from os.path import join
 from copy import copy, deepcopy
+from importlib import import_module
+import inspect
 
 import pandas as pd
 import numpy as np
@@ -26,7 +28,7 @@ class Experiment:
     metabolomic table, or all those tables combined), a sample
     metadata table, and a feature metadata.
 
-    Parameters
+    Attributes
     ----------
     data : ``numpy.array`` or ``scipy.sparse``
 
@@ -41,8 +43,10 @@ class Experiment:
         self.feature_metadata = feature_metadata
         self.description = description
 
-        # the command history list
-        self.commands = []
+        # the function calling history list
+        self._call_history = []
+        # whether to log to history
+        self._log = True
 
     def __repr__(self):
         '''
@@ -58,44 +62,75 @@ class Experiment:
         '''Create a deep copy of Experiment
         '''
 
+    @classmethod
+    def _record_sig(func):
+        '''Record the function calls to history. '''
+        fn = func.__qualname__
+        @wraps(func)
+        def inner(*args, **kwargs):
+            # this extra code here is to prevent recording func call
+            # if the method is called inside another method.
+            exp = args[0]
+            log = exp._log
+            if exp._log is True:
+                args_1 = ', '.join(args)
+                args_2 = ', '.join('%s=%r' % (k, v) in kwargs.items)
+                exp._call_history.append(
+                    '{0}({1}, {2})'.format(fn, args_1, args_2))
+                exp._log = False
+            out = func(*args, **kwargs)
+            # set log status back
+            exp._log = log
+            return out
 
-def reorder(exp, new_order, axis=0, inplace=False):
-    '''Reorder according to indices in the new order.
+        return inner
 
-    Note that we can also drop samples in new order.
+    def reorder(self, new_order, axis=0, inplace=False):
+        '''Reorder according to indices in the new order.
 
-    Parameters
-    ----------
-    exp : Experiment
-        Experiment object to operate on.
-    new_order : Iterable of int
-        the order of new indices
-    axis : 0 or 1
-    inplace : bool
-        reorder in place.
+        Note that we can also drop samples in new order.
 
-    Returns
-    -------
-    Experiment
-        new experiment with reordered samples
-    '''
-    if inplace is False:
-        exp = deepcopy(exp)
-    if axis == 0:
-        exp.data = exp.data[new_order, ]
-        exp.sample_metadata.iloc[new_order, ]
-    elif axis == 1:
-        exp.data = exp.data[, new_order]
-        exp.sample_metadata.iloc[, new_order]
-    if inplace is False:
+        Parameters
+        ----------
+        new_order : Iterable of int
+            the order of new indices
+        axis : 0 or 1
+        inplace : bool
+            reorder in place.
+
+        Returns
+        -------
+        Experiment
+            experiment with reordered samples
+        '''
+        if inplace is False:
+            exp = deepcopy(self)
+        else:
+            exp = self
+        if axis == 0:
+            exp.data = exp.data[new_order, :]
+            exp.sample_metadata.iloc[new_order, :]
+        elif axis == 1:
+            exp.data = exp.data[:, new_order]
+            exp.sample_metadata.iloc[:, new_order]
+
         return exp
 
 
-def add_history():
-    '''
-    the decorator to add the history of each command to the experiment
-    (how do we do it?)
-    '''
+def add_functions(cls, modules=['.io', '.sorting', '.filtering']):
+    '''Dynamically add functions to the class as methods.'''
+    for module_name in modules:
+        module = import_module(module_name, 'calour')
+        functions = inspect.getmembers(module, inspect.isfunction)
+        # import ipdb; ipdb.set_trace()
+        for fn, f in functions:
+            # skip private functions
+            if not fn.startswith('_'):
+                setattr(cls, fn, f)
+
+
+add_functions(Experiment)
+
 
 
 def join_experiments(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
@@ -138,7 +173,3 @@ def add_observation(exp, obs_id, data=None):
     '''
     add an observation to the experiment. fill the data with 0 if values is none, or with the values of data
     '''
-
-
-# populate the class functions
-Experiment.filter_samples = ca.filter_samples
