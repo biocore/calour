@@ -50,8 +50,9 @@ def _get_md_from_biom(table):
     ------
     pandas.DataFrame
     '''
-    md = None
-    return md
+    md = table.ids(axis='observation')
+    md_df = pd.DataFrame(data=md, index=md, columns=['sequence'])
+    return md_df
 
 
 def _read_table(f):
@@ -67,7 +68,7 @@ def _read_table(f):
     return table
 
 
-def read(data, sample_metadata=None, feature_metadata=None,
+def read(data, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True):
     '''Read the files for the experiment.
 
@@ -75,23 +76,23 @@ def read(data, sample_metadata=None, feature_metadata=None,
     ----------
     data : str
         file path to the biom table.
-    sample_metadata : str
+    sample_metadata_file : str
         file path to the sample metadata (aka mapping file in QIIME)
-    feature_metadata : str
+    feature_metadata_file : str
         file path to the feature metadata.
     description : str
         description of the experiment
     sparse : bool
         read the biom table into sparse or dense array
     '''
-    logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata))
-    sid, oid, data, md = _read_biom(data)
-    if sample_metadata is not None:
+    logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata_file))
+    sid, oid, data, md = _read_biom(data, sparse=sparse)
+    if sample_metadata_file is not None:
         # reorder the sample id to align with biom
-        sample_metadata = _read_table(sample_metadata).loc[sid, ]
-    if feature_metadata is not None:
+        sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
+    if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
-        fm = _read_table(feature_metadata).loc[oid, ]
+        fm = _read_table(feature_metadata_file).loc[oid, ]
         # combine it with the metadata from biom
         feature_metadata = pd.concat([fm, md], axis=1)
     else:
