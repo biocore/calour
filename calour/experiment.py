@@ -126,7 +126,7 @@ class Experiment:
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
         elif axis == 1:
             exp.data = exp.data[:, new_order]
-            exp.feature_metadata = exp.feature_metadata.iloc[:, new_order]
+            exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
 
         return exp
 
