@@ -9,13 +9,14 @@
 from statistics import mean
 from heapq import nlargest
 from logging import getLogger
-
+from .experiment import Experiment
 import numpy as np
 
 
 logger = getLogger(__name__)
 
 
+# @Experiment._record_sig
 def down_sample(exp, field, axis=0, inplace=False):
     '''Down sample the data set.
 
@@ -75,15 +76,13 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False, 
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def filter_by_data(exp, predicate, value, axis=0, negate=False, inplace=False):
+def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
     '''Filter samples or features by data.
 
     Parameters
     ----------
     predicate : str or callable
         It accepts a list of numeric and return a bool.
-    value : float
-        The value for the predicate
     axis : 0 or 1
         Apply predicate on row (samples) (0) or column (features) (1)
     negate : bool
