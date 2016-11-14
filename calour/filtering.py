@@ -17,7 +17,7 @@ from .experiment import Experiment
 logger = getLogger(__name__)
 
 
-# @Experiment._record_sig
+@Experiment._record_sig
 def down_sample(exp, field, axis=0, inplace=False):
     '''Down sample the data set.
 
@@ -33,7 +33,7 @@ def down_sample(exp, field, axis=0, inplace=False):
 
     Returns
     -------
-
+    Experiment
     '''
     if axis == 0:
         x = exp.sample_metadata
@@ -54,8 +54,17 @@ def down_sample(exp, field, axis=0, inplace=False):
     return exp.reorder(np.concatenate(indices), axis=axis, inplace=inplace)
 
 
-def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False, substring=False):
+@Experiment._record_sig
+def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
+
+    Parameters
+    ----------
+    field : str
+        the column name or sample or feature metadata
+    values : list, tuple, or numeric/str
+    axis : 0 or 1
+        the column name is on samples (0) or features (1) metadata
     '''
     logger.info('')
 
@@ -66,17 +75,14 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False, 
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
-    if substring:
-        select = np.zeros(x.shape[0], dtype=bool)
-        for cval in values:
-            select += x[field].str.contains(cval).values
-    else:
-        select = x[field].isin(values).values
+
+    select = x[field].isin(values).values
     if negate is True:
         select = ~ select
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
+@Experiment._record_sig
 def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
 
