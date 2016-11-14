@@ -9,6 +9,8 @@
 import unittest
 from os.path import join, dirname, abspath
 
+import numpy as np
+import numpy.testing as npt
 import calour as ca
 
 
@@ -53,6 +55,19 @@ class TestExperiment(unittest.TestCase):
         self.assertEqual(newexp.data[0,0],6)
         self.assertEqual(newexp.data[1,0],5)
 
+        # test double permuting of big dataset
+        exp = self.complex
+        rand_perm_samples = np.random.permutation(exp.data.shape[0])
+        rand_perm_features = np.random.permutation(exp.data.shape[1])
+        rev_perm_samples = np.argsort(rand_perm_samples)
+        rev_perm_features = np.argsort(rand_perm_features)
+        newexp = exp.reorder(rand_perm_features, axis=1)
+        newexp = newexp.reorder(rand_perm_samples, axis=0, inplace=True)
+        newexp = newexp.reorder(rev_perm_features, axis=1, inplace=True)
+        newexp = newexp.reorder(rev_perm_samples, axis=0)
+        self.assertEqual(0, np.sum(newexp.data!=exp.data))
+        self.assertTrue(newexp.sample_metadata.equals(exp.sample_metadata))
+        self.assertTrue(newexp.feature_metadata.equals(exp.feature_metadata))
 
 if __name__ == "__main__":
     unittest.main()

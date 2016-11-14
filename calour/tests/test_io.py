@@ -38,7 +38,7 @@ class TestIO(unittest.TestCase):
         seqpos = exp.feature_metadata.index.get_loc(sseq)
         self.assertEqual(exp.data[samplepos, seqpos], 6)
         # test the taxonomy is loaded correctly
-        self.assertIn('g__Janthinobacterium',exp.feature_metadata['taxonomy'][seqpos])
+        self.assertIn('g__Janthinobacterium', exp.feature_metadata['taxonomy'][seqpos])
         # test the sample metadata is loaded correctly
         self.assertEqual(exp.sample_metadata['id'][samplepos],6)
 
