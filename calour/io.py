@@ -5,7 +5,7 @@ import scipy
 import biom
 from logging import getLogger
 
-import calour as ca
+from calour.experiment import Experiment
 
 logger = getLogger(__name__)
 
@@ -50,8 +50,12 @@ def _get_md_from_biom(table):
     ------
     pandas.DataFrame
     '''
-    md = table.ids(axis='observation')
-    md_df = pd.DataFrame(data=md, index=md, columns=['sequence'])
+    ids = table.ids(axis='observation')
+    metadata = table.metadata(axis='observation')
+    metadata = [dict(tmd) for tmd in metadata]
+    md_df = pd.DataFrame(metadata, index=ids)
+    # md_df['sequence']=ids
+    md_df.index.name = 'sequence'
     return md_df
 
 
@@ -97,7 +101,7 @@ def read(data, sample_metadata_file=None, feature_metadata_file=None,
         feature_metadata = pd.concat([fm, md], axis=1)
     else:
         feature_metadata = md
-    return ca.Experiment(data, sample_metadata, feature_metadata, description=description, sparse=sparse)
+    return Experiment(data, sample_metadata, feature_metadata, description=description, sparse=sparse)
 
 
 def save(self, filename, format=''):
