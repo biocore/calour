@@ -80,8 +80,9 @@ def read(data, sample_metadata_file=None, feature_metadata_file=None,
     ----------
     data : str
         file path to the biom table.
-    sample_metadata_file : str
-        file path to the sample metadata (aka mapping file in QIIME)
+    sample_metadata_file : None or str (optional)
+        None (default) to just use samplenames (no additional metadata).
+        if not None, file path to the sample metadata (aka mapping file in QIIME).
     feature_metadata_file : str
         file path to the feature metadata.
     description : str
@@ -94,6 +95,8 @@ def read(data, sample_metadata_file=None, feature_metadata_file=None,
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
         sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
+    else:
+        sample_metadata = pd.DataFrame(index=sid)
     if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
         fm = _read_table(feature_metadata_file).loc[oid, ]
