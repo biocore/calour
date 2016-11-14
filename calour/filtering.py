@@ -9,13 +9,14 @@
 from statistics import mean
 from heapq import nlargest
 from logging import getLogger
-
+from .experiment import Experiment
 import numpy as np
 
 
 logger = getLogger(__name__)
 
 
+# @Experiment._record_sig
 def down_sample(exp, field, axis=0, inplace=False):
     '''Down sample the data set.
 
@@ -52,15 +53,24 @@ def down_sample(exp, field, axis=0, inplace=False):
     return exp.reorder(np.concatenate(indices), axis=axis, inplace=inplace)
 
 
-def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
+def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False, substring=False):
     '''Filter samples or features by metadata.
     '''
     logger.info('')
+
+    if not isinstance(values,(list,tuple)):
+        values=[values]
+
     if axis == 0:
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
-    select = x[field].isin(values).values()
+    if substring:
+        select = np.zeros(x.shape[0], dtype=bool)
+        for cval in values:
+            select += x[field].str.contains(cval).values
+    else:
+        select = x[field].isin(values).values
     if negate is True:
         select = ~ select
     return exp.reorder(select, axis=axis, inplace=inplace)
@@ -74,11 +84,10 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
     predicate : str or callable
         It accepts a list of numeric and return a bool.
     axis : 0 or 1
-        Apply predicate on row or column
+        Apply predicate on row (samples) (0) or column (features) (1)
     negate : bool
         negate the predicate for selection
     '''
-    logger.info('')
     func = {'min_abundance': _min_abundance,
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
@@ -86,17 +95,11 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
             'presence_fraction': _presence_fraction}
     if isinstance(predicate, str):
         predicate = func[predicate]
-    select = np.apply_along_axis(predicate, axis, exp.data)
+    select = np.apply_along_axis(predicate, 1 - axis, exp.data)
     if negate is True:
         select = ~ select
+    logger.info('%s remaining' % np.sum(select))
     return exp.reorder(select, axis=axis, inplace=inplace)
-
-
-def filter_taxonomy(exp, taxonomy, exact=False, negate=False, inplace=False):
-    '''
-    filter keeping only observations with taxonomy string matching taxonomy
-    if exact=True, look for partial match instead of identity
-    '''
 
 
 def _min_abundance(x, cutoff=10):
@@ -190,3 +193,37 @@ def _freq_ratio(x, ratio=2):
     max_1, max_2 = nlargest(2, counts)
     return max_1 / max_2 <= ratio
 
+
+def filter_samples(exp, field, values, negate=False, inplace=False, substring=False):
+    '''
+    shortcut for filtering samples
+    '''
+    return filter_by_metadata(exp, field=field, values=values, negate=negate, inplace=inplace, substring=substring)
+
+
+def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
+    '''
+    filter keeping only observations with taxonomy string matching taxonomy
+    if substring=True, look for partial match instead of identity
+    '''
+    if 'taxonomy' not in exp.feature_metadata.columns:
+        logger.warn('No taxonomy field in experiment')
+        return None
+
+    if not isinstance(values,(list,tuple)):
+        values=[values]
+
+    taxstr=[';'.join(x).lower() for x in exp.feature_metadata['taxonomy']]
+
+    select = np.zeros(len(taxstr), dtype=bool)
+    for cval in values:
+        if substring:
+            select += [cval.lower() in ctax for ctax in taxstr]
+        else:
+            select += [cval.lower() == ctax for ctax in taxstr]
+
+    if negate is True:
+        select = ~ select
+
+    logger.warn('%s remaining' % np.sum(select))
+    return exp.reorder(select, axis=1, inplace=inplace)

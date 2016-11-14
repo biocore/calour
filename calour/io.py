@@ -5,6 +5,7 @@ import scipy
 import biom
 from logging import getLogger
 
+from calour.experiment import Experiment
 
 logger = getLogger(__name__)
 
@@ -25,7 +26,7 @@ def _read_biom(fp, transpose=True, sparse=True):
     table = biom.load_table(fp)
     sid = table.ids(axis='sample')
     oid = table.ids(axis='observation')
-    logger.debug('loaded %d samples, %d observations' % (len(sid),len(oid)))
+    logger.info('loaded %d samples, %d observations' % (len(sid),len(oid)))
     if sparse:
         logger.debug('storing as sparse matrix')
         data = scipy.sparse.csr_matrix(table.matrix_data)
@@ -49,8 +50,13 @@ def _get_md_from_biom(table):
     ------
     pandas.DataFrame
     '''
-
-    return md
+    ids = table.ids(axis='observation')
+    metadata = table.metadata(axis='observation')
+    metadata = [dict(tmd) for tmd in metadata]
+    md_df = pd.DataFrame(metadata, index=ids)
+    # md_df['sequence']=ids
+    md_df.index.name = 'sequence'
+    return md_df
 
 
 def _read_table(f):
@@ -66,7 +72,7 @@ def _read_table(f):
     return table
 
 
-def read(cls, data, sample_metadata=None, feature_metadata=None,
+def read(data, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True):
     '''Read the files for the experiment.
 
@@ -74,29 +80,28 @@ def read(cls, data, sample_metadata=None, feature_metadata=None,
     ----------
     data : str
         file path to the biom table.
-    sample_metadata : str
+    sample_metadata_file : str
         file path to the sample metadata (aka mapping file in QIIME)
-    feature_metadata : str
+    feature_metadata_file : str
         file path to the feature metadata.
     description : str
         description of the experiment
     sparse : bool
         read the biom table into sparse or dense array
     '''
-    logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata))
-    sid, oid, data, md = cls._read_biom(data)
-    if sample_metadata is not None:
+    logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata_file))
+    sid, oid, data, md = _read_biom(data, sparse=sparse)
+    if sample_metadata_file is not None:
         # reorder the sample id to align with biom
-        sample_metadata = cls._read_table(sample_metadata).loc[sid, ]
-    if feature_metadata is not None:
+        sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
+    if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
-        fm = cls._read_table(feature_metadata).loc[oid, ]
+        fm = _read_table(feature_metadata_file).loc[oid, ]
         # combine it with the metadata from biom
         feature_metadata = pd.concat([fm, md], axis=1)
     else:
         feature_metadata = md
-    return cls(data, sample_metadata, feature_metadata,
-               description=description, sparse=sparse)
+    return Experiment(data, sample_metadata, feature_metadata, description=description, sparse=sparse)
 
 
 def save(self, filename, format=''):
