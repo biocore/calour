@@ -9,7 +9,8 @@
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
 __version__ = "0.1.0.dev0"
 
-from calour.experiment import *
-from calour.io import *
-from calour.filtering import *
-from calour.sorting import *
+# from calour.experiment import Experiment
+# from calour.experiment import *
+# from calour.io import *
+# from calour.filtering import *
+# from calour.sorting import *

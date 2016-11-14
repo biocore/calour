@@ -123,15 +123,15 @@ class Experiment:
             exp = self
         if axis == 0:
             exp.data = exp.data[new_order, :]
-            exp.sample_metadata.iloc[new_order, :]
+            exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
         elif axis == 1:
             exp.data = exp.data[:, new_order]
-            exp.sample_metadata.iloc[:, new_order]
+            exp.feature_metadata = exp.feature_metadata.iloc[:, new_order]
 
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering']):
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.utils']):
     '''Dynamically add functions to the class as methods.'''
     for module_name in modules:
         module = import_module(module_name, 'calour')
