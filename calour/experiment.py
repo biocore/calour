@@ -11,6 +11,7 @@ from os.path import join
 from copy import copy, deepcopy
 from importlib import import_module
 import inspect
+from functools import wraps
 
 import pandas as pd
 import numpy as np
@@ -76,7 +77,7 @@ class Experiment:
             setattr(result, k, deepcopy(v, memo))
         return result
 
-    @classmethod
+    @staticmethod
     def _record_sig(func):
         '''Record the function calls to history. '''
         fn = func.__qualname__
