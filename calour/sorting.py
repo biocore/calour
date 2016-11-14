@@ -44,23 +44,23 @@ def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normaliz
     Parameters
     ----------
     min_abundance : None or float (optional)
-        None (default) to not remove any features
-        float to remove all features with total reads < float (to make clustering faster)
+        None (default) to not remove any features.
+        float to remove all features with total reads < float (to make clustering faster).
     lgoit : bool (optional)
-        True (default) to log transform the data before clustering
-        False to not log transform
+        True (default) to log transform the data before clustering.
+        False to not log transform.
     log_cutoff : float (optional)
         if logit, this is the minimal read threshold for the log transform
     normalize : bool (optional)
-        True (default) to normalize each feature to sum 1 std 1
-        False to not normalize each feature
+        True (default) to normalize each feature to sum 1 std 1.
+        False to not normalize each feature.
     inplace : bool (optional)
-        False (default) to create a copy
-        True to Replace data in exp
+        False (default) to create a copy.
+        True to Replace data in exp.
     Returns
     -------
     exp : Experiment
-        With features filtered (if minreads is not None) and clsutered (reordered)
+        With features filtered (if min_abundance is not None) and clsutered (reordered)
     '''
     # filter low-freq features
     if min_abundance is not None:
