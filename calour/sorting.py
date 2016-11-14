@@ -3,11 +3,14 @@
 
 from logging import getLogger
 
-import calour as ca
-import numpy as np
 from copy import copy
+
+import numpy as np
+from scipy import cluster,spatial
 from sklearn.preprocessing import scale
-from scipy import cluster,spatial,stats
+
+import calour as ca
+
 
 logger = getLogger(__name__)
 
@@ -34,20 +37,20 @@ def sort_taxonomy(exp, inplace=False):
     return exp
 
 
-def cluster_features(exp, minreads=None, use_log=True, log_cutoff=1, normalize=True, inplace=False):
+def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normalize=True, inplace=False):
     '''Cluster the features (similar features close to each other)
     Reorder the features so that ones with similar behavior (pattern across samples) are close to each other
 
     Parameters
     ----------
-    minreads : None or float (optional)
+    min_abundance : None or float (optional)
         None (default) to not remove any features
         float to remove all features with total reads < float (to make clustering faster)
-    use_log : bool (optional)
+    lgoit : bool (optional)
         True (default) to log transform the data before clustering
         False to not log transform
     log_cutoff : float (optional)
-        if use_log, this is the minimal read threshold for the log transform
+        if logit, this is the minimal read threshold for the log transform
     normalize : bool (optional)
         True (default) to normalize each feature to sum 1 std 1
         False to not normalize each feature
@@ -60,13 +63,13 @@ def cluster_features(exp, minreads=None, use_log=True, log_cutoff=1, normalize=T
         With features filtered (if minreads is not None) and clsutered (reordered)
     '''
     # filter low-freq features
-    if minreads is not None:
-        exp = exp.filter_sum(minreads, inplace=inplace)
+    if min_abundance is not None:
+        exp = exp.filter_sum(min_abundance, inplace=inplace)
 
     # NEED TO CONVERT SPARSE MATRIX????
     # normalize each feature to sum 1
     data = copy(exp.data).transpose()
-    if use_log:
+    if logit:
         data[data < log_cutoff] = log_cutoff
         data=np.log2(data)
     if normalize:
@@ -110,17 +113,17 @@ def sort_samples(exp, field, inplace=False):
     return exp
 
 
-def sort_freq(exp, use_log=True, log_cutoff = 1, sample_subset=None, inplace=False):
+def sort_freq(exp, logit=True, log_cutoff = 1, sample_subset=None, inplace=False):
     '''Sort features based on their mean frequency
     Sort the features based on their mean (log) frequency (optional in a subgroup of samples).
 
     Parameters
     ----------
-    use_log : bool (optional)
+    logit : bool (optional)
         True (default) to calculate mean of the log2 transformed data (useful for reducing outlier effect)
         False to not log transform before mean calculation
     log_cutoff : float (optional)
-        The minimal number of reads for the log trasnform (if logscale=True)
+        The minimal number of reads for the log trasnform (if logit=True)
     sample_subset : None or Experiment (optional)
         None (default) to sort based on mean in all samples in experiment
         Experiment (non-none) to sort based only on data in the sample_subset experiment
@@ -138,7 +141,7 @@ def sort_freq(exp, use_log=True, log_cutoff = 1, sample_subset=None, inplace=Fal
         if not sample_subset.feature_metadata.index.equals(exp.feature_metadata.index):
             raise ValueError('sample_subset features are different from sorting experiment features')
 
-    if use_log:
+    if logit:
         data = sample_subset.data.copy()
         data[data < log_cutoff] = log_cutoff
         data = np.log2(data)

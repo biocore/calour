@@ -144,10 +144,6 @@ def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.utils', '.nor
                 setattr(cls, fn, f)
 
 
-add_functions(Experiment)
-
-
-
 def join_experiments(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
     '''
     join two Experiments into one experiment

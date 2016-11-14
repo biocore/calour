@@ -16,3 +16,5 @@ from calour.io import read
 # from calour.sorting import *
 from calour.utils import _get_taxonomy_string
 from calour.normalization import normalize
+
+add_functions(Experiment)
