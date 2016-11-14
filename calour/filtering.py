@@ -9,8 +9,9 @@
 from statistics import mean
 from heapq import nlargest
 from logging import getLogger
-from .experiment import Experiment
 import numpy as np
+
+from .experiment import Experiment
 
 
 logger = getLogger(__name__)
@@ -58,7 +59,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False, 
     '''
     logger.info('')
 
-    if not isinstance(values,(list,tuple)):
+    if not isinstance(values, (list, tuple)):
         values=[values]
 
     if axis == 0:
@@ -76,7 +77,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False, 
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
+def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
 
     Parameters
@@ -87,32 +88,36 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
         Apply predicate on row (samples) (0) or column (features) (1)
     negate : bool
         negate the predicate for selection
+    kwargs : dict
+        keyword argument passing to predicate function
     '''
-    func = {'min_abundance': _min_abundance,
+    func = {'sum_abundance': _sum_abundance,
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
             'mean_abundance': _mean_abundance,
             'presence_fraction': _presence_fraction}
     if isinstance(predicate, str):
         predicate = func[predicate]
-    select = np.apply_along_axis(predicate, 1 - axis, exp.data)
+
+    select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
+
     if negate is True:
         select = ~ select
     logger.info('%s remaining' % np.sum(select))
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def _min_abundance(x, cutoff=10):
-    '''Check if the min abundance larger than cutoff.
+def _sum_abundance(x, cutoff=10):
+    '''Check if the sum abundance larger than cutoff.
 
     It can be used filter features with at least "cutoff" abundance
     total over all samples
 
     Examples
     --------
-    >>> _min_abundance([0, 1, 1], 2)
+    >>> _sum_abundance([0, 1, 1], 2)
     True
-    >>> _min_abundance([0, 1, 1], 2.01)
+    >>> _sum_abundance([0, 1, 1], 2.01)
     False
 
     '''
