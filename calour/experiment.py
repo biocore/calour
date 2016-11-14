@@ -48,19 +48,33 @@ class Experiment:
         # whether to log to history
         self._log = True
 
+        # flag if data array is sparse (True) or dense (False)
+        self.sparse = sparse
+
     def __repr__(self):
         '''
         print the information about the experiment
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
+        return('Experiment %s with %d samples, %d features' % (self.description,self.data.shape[0],self.data.shape[1]))
 
     def __copy__(self):
         '''Create a copy of Experiment
         '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         '''Create a deep copy of Experiment
         '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
 
     @classmethod
     def _record_sig(func):
@@ -109,15 +123,15 @@ class Experiment:
             exp = self
         if axis == 0:
             exp.data = exp.data[new_order, :]
-            exp.sample_metadata.iloc[new_order, :]
+            exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
         elif axis == 1:
             exp.data = exp.data[:, new_order]
-            exp.sample_metadata.iloc[:, new_order]
+            exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
 
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering']):
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.utils', '.normalization']):
     '''Dynamically add functions to the class as methods.'''
     for module_name in modules:
         module = import_module(module_name, 'calour')

@@ -1,6 +1,8 @@
 # calour functions for sorting samples/observations
 # functions should call reorder_samples() / reorder_obs()
 
+import calour as ca
+
 
 def sort_taxonomy(exp, inplace=False):
 	'''
@@ -57,4 +59,10 @@ def reverse_obs(exp, inplace=False):
 def sort_samples_by_seqs(exp, seqs, reverse=False, inplace=False):
 	'''
 	sort the samples based on the frequencies of sequences in seqs
+	'''
+
+
+def sort_niche(exp, field):
+	'''
+	sort by niches - jamie
 	'''
