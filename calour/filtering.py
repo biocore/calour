@@ -60,21 +60,23 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
-    select = x[field].isin(values).values()
+    select = x[field].isin(values).values
     if negate is True:
         select = ~ select
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
+def filter_by_data(exp, predicate, value, axis=0, negate=False, inplace=False):
     '''Filter samples or features by data.
 
     Parameters
     ----------
     predicate : str or callable
         It accepts a list of numeric and return a bool.
+    value : float
+        The value for the predicate
     axis : 0 or 1
-        Apply predicate on row or column
+        Apply predicate on row (samples) (0) or column (features) (1)
     negate : bool
         negate the predicate for selection
     '''
@@ -86,7 +88,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False):
             'presence_fraction': _presence_fraction}
     if isinstance(predicate, str):
         predicate = func[predicate]
-    select = np.apply_along_axis(predicate, axis, exp.data)
+    select = np.apply_along_axis(predicate, 1 - axis, exp.data)
     if negate is True:
         select = ~ select
     return exp.reorder(select, axis=axis, inplace=inplace)
