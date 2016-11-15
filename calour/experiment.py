@@ -102,8 +102,8 @@ class Experiment:
             exp = args[0]
             log = exp._log
             if exp._log is True:
-                args_1 = ', '.join(args)
-                args_2 = ', '.join('%s=%r' % (k, v) in kwargs.items)
+                args_1 = ', '.join('%r' % i for i in args[1:])
+                args_2 = ', '.join('%r=%r' % (k, v) for k, v in kwargs.items())
                 exp._call_history.append(
                     '{0}({1}, {2})'.format(fn, args_1, args_2))
                 exp._log = False
