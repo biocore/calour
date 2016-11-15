@@ -9,12 +9,10 @@
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
 __version__ = "0.1.0.dev0"
 
-# from calour.experiment import Experiment
+
 from calour.experiment import Experiment, add_functions
 from calour.io import read
-# from calour.filtering import *
-# from calour.sorting import *
-from calour.utils import _get_taxonomy_string
+from calour.util import _get_taxonomy_string
 from calour.normalization import normalize
 
 add_functions(Experiment)

@@ -7,11 +7,22 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from unittest import TestCase, main
+from os.path import join, dirname, abspath
 
 import numpy as np
 
 
 logger = getLogger(__name__)
+
+
+class Tests(TestCase):
+    def setUp(self):
+        test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
+        self.simple_table = join(test_data_dir, 'test1.biom')
+        self.simple_map = join(test_data_dir, 'test1.map.txt')
+        self.complex_table = join(test_data_dir, 'timeseries.biom')
+        self.complex_map = join(test_data_dir, 'timeseries.map.txt')
 
 
 def get_fields(exp):

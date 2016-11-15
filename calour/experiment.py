@@ -132,7 +132,7 @@ class Experiment:
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.utils', '.normalization']):
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.normalization']):
     '''Dynamically add functions to the class as methods.'''
     for module_name in modules:
         module = import_module(module_name, 'calour')

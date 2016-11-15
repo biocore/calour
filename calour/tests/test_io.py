@@ -7,18 +7,12 @@
 # ----------------------------------------------------------------------------
 
 import unittest
-from os.path import join, dirname, abspath
 
 import calour as ca
+from calour.util import Tests
 
 
-class TestIO(unittest.TestCase):
-    def setUp(self):
-        self.test_data_dir = join(dirname(abspath(__file__)), 'data')
-        self.test_simple_table = join(self.test_data_dir, 'test1.biom')
-        self.test_simple_map = join(self.test_data_dir, 'test1.map.txt')
-        self.test_complex_table = join(self.test_data_dir, 'timeseries.biom')
-        self.test_complex_map = join(self.test_data_dir, 'timeseries.map.txt')
+class TestIO(Tests):
 
     def validate_read(self, exp, validate_sample_metadata=True):
         '''Validate the simple experiment was loaded correctly'''
@@ -46,15 +40,15 @@ class TestIO(unittest.TestCase):
 
     def test_read(self):
         # load the simple dataset as sparse
-        exp = ca.read(self.test_simple_table, self.test_simple_map)
+        exp = ca.read(self.simple_table, self.simple_map)
         self.validate_read(exp)
 
         # load the simple dataset as dense
-        exp = ca.read(self.test_simple_table, self.test_simple_map, sparse=False)
+        exp = ca.read(self.simple_table, self.simple_map, sparse=False)
         self.validate_read(exp)
 
         # test loading without a mapping file
-        exp = ca.read(self.test_simple_table)
+        exp = ca.read(self.simple_table)
         self.validate_read(exp, validate_sample_metadata=False)
 
 
