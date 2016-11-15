@@ -18,7 +18,7 @@ def _read_biom(fp, transpose=True, sparse=True):
     fp : str
         file path to the biom table
     transpose : bool
-        Transpose the table or not. The OTU table has samples in
+        Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
     '''
@@ -52,7 +52,10 @@ def _get_md_from_biom(table):
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
-    metadata = [dict(tmd) for tmd in metadata]
+    if metadata is None:
+        logger.info('No metadata associated with features in biom table')
+    else:
+        metadata = [dict(tmd) for tmd in metadata]
     md_df = pd.DataFrame(metadata, index=ids)
     # md_df['sequence']=ids
     md_df.index.name = 'sequence'
@@ -119,10 +122,38 @@ def save(self, filename, format=''):
     '''
 
 
-def save_biom(exp, filename, format):
+def save_biom(exp, filename, fileformat='hdf5', addtax=True):
+    '''Save experiment to biom format
+
+    Parameters
+    ----------
+    filename : str
+        the filename to save to
+    format : str (optional)
+        the output biom table format. options are:
+        'hdf5' (default) save to hdf5 biom table.
+        'json' same to json biom table.
+        'txt' save to text (tsv) biom table.
+    addtax : bool (optional)
+        True (default) to save taxonomy of features.
+        False to not save taxonomy
     '''
-    save to biom table (format is txt or json or hdf5)
-    '''
+    logger.debug('save biom table to file %s format %s' % (filename, fileformat))
+    tab=_create_biom_table_from_exp(exp,addtax=addtax)
+    if fileformat=='hdf5':
+        with biom.util.biom_open(filename, 'w') as f:
+            tab.to_hdf5(f, "heatsequer")
+    elif fileformat=='json':
+        with open(filename,'w') as f:
+            tab.to_json("heatsequer",f)
+    elif fileformat=='txt':
+        s=tab.to_tsv()
+        with open(filename,'w') as f:
+            f.write(s)
+    else:
+        raise ValueError('Unknwon file format %s for save' % fileformat)
+    logger.debug('biom table saved to file %s' % filename)
+    return
 
 
 def save_map(exp, filename):
@@ -142,3 +173,29 @@ def save_fasta(exp, filename):
     '''
 
 
+def _create_biom_table_from_exp(exp, addtax=True):
+    '''Create a biom table from an experiment
+
+    Parameters
+    ----------
+    input:
+    expdat : Experiment
+    addtax : bool (optional)
+        True (default) to add taxonomy metadata.
+        False to not add taxonomy
+
+    Returns
+    -------
+    table : biom_table
+        the biom table representation of the experiment
+    '''
+
+    # init the table
+    features = exp.feature_metadata.index
+    samples = exp.sample_metadata.index
+    table=biom.table.Table(exp.data.transpose(), features, samples, type="OTU table")
+    # and add metabolite name as taxonomy:
+    if addtax:
+        taxdict = exp.feature_metadata.T.to_dict()
+        table.add_metadata(taxdict, axis='observation')
+    return table
