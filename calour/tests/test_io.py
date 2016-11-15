@@ -20,9 +20,9 @@ class TestIO(unittest.TestCase):
         self.test_complex_table = join(self.test_data_dir, 'timeseries.biom')
         self.test_complex_map = join(self.test_data_dir, 'timeseries.map.txt')
 
-    def test_read(self):
-        # load the simple dataset as sparse
-        exp = ca.read(self.test_simple_table, self.test_simple_map)
+    def validate_read(self, exp, validate_sample_metadata=True):
+        '''Validate the simple experiment was loaded correctly
+        '''
         # number of bacteria is 12
         self.assertEqual(exp.data.shape[1],12)
         # number of samples is 20 (should not read the samples only in map or only in biom table)
@@ -41,50 +41,21 @@ class TestIO(unittest.TestCase):
         # test the taxonomy is loaded correctly
         self.assertIn('g__Janthinobacterium', exp.feature_metadata['taxonomy'][seqpos])
         # test the sample metadata is loaded correctly
-        self.assertEqual(exp.sample_metadata['id'][samplepos],6)
+        if validate_sample_metadata:
+            self.assertEqual(exp.sample_metadata['id'][samplepos],6)
+
+    def test_read(self):
+        # load the simple dataset as sparse
+        exp = ca.read(self.test_simple_table, self.test_simple_map)
+        self.validate_read(exp)
 
         # load the simple dataset as dense
         exp = ca.read(self.test_simple_table, self.test_simple_map, sparse=False)
-        # number of bacteria is 12
-        self.assertEqual(exp.data.shape[1],12)
-        # number of samples is 20 (should not read the samples only in map or only in biom table)
-        # self.assertEqual(exp.data.shape[0],20)
-        # test an OTU/sample to see it is in the right place
-        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCC'
-                'CCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
-        ssample = 'S6'
-        # test sample and sequence are in the table
-        self.assertIn(sseq, exp.feature_metadata.index)
-        self.assertIn(ssample, exp.sample_metadata.index)
-        # test the location in the sample/feature metadata corresponds to the data
-        samplepos = exp.sample_metadata.index.get_loc(ssample)
-        seqpos = exp.feature_metadata.index.get_loc(sseq)
-        self.assertEqual(exp.data[samplepos, seqpos], 6)
-        # test the taxonomy is loaded correctly
-        self.assertIn('g__Janthinobacterium',exp.feature_metadata['taxonomy'][seqpos])
-        # test the sample metadata is loaded correctly
-        self.assertEqual(exp.sample_metadata['id'][samplepos],6)
+        self.validate_read(exp)
 
         # test loading without a mapping file
-        # load the simple dataset as dense
         exp = ca.read(self.test_simple_table)
-        # number of bacteria is 12
-        self.assertEqual(exp.data.shape[1],12)
-        # number of samples is 20 (should not read the samples only in map or only in biom table)
-        # self.assertEqual(exp.data.shape[0],20)
-        # test an OTU/sample to see it is in the right place
-        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCC'
-                'CCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
-        ssample = 'S6'
-        # test sample and sequence are in the table
-        self.assertIn(sseq, exp.feature_metadata.index)
-        self.assertIn(ssample, exp.sample_metadata.index)
-        # test the location in the sample/feature metadata corresponds to the data
-        samplepos = exp.sample_metadata.index.get_loc(ssample)
-        seqpos = exp.feature_metadata.index.get_loc(sseq)
-        self.assertEqual(exp.data[samplepos, seqpos], 6)
-        # test the taxonomy is loaded correctly
-        self.assertIn('g__Janthinobacterium',exp.feature_metadata['taxonomy'][seqpos])
+        self.validate_read(exp, validate_sample_metadata=False)
 
 if __name__ == "__main__":
     unittest.main()
