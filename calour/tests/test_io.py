@@ -28,7 +28,8 @@ class TestIO(unittest.TestCase):
         # number of samples is 20 (should not read the samples only in map or only in biom table)
         # self.assertEqual(exp.data.shape[0],20)
         # test an OTU/sample to see it is in the right place
-        sseq = 'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG'
+        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCC'
+                'CCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
         ssample = 'S6'
         # test sample and sequence are in the table
         self.assertIn(sseq, exp.feature_metadata.index)
@@ -49,7 +50,8 @@ class TestIO(unittest.TestCase):
         # number of samples is 20 (should not read the samples only in map or only in biom table)
         # self.assertEqual(exp.data.shape[0],20)
         # test an OTU/sample to see it is in the right place
-        sseq = 'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG'
+        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCC'
+                'CCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
         ssample = 'S6'
         # test sample and sequence are in the table
         self.assertIn(sseq, exp.feature_metadata.index)
@@ -71,7 +73,8 @@ class TestIO(unittest.TestCase):
         # number of samples is 20 (should not read the samples only in map or only in biom table)
         # self.assertEqual(exp.data.shape[0],20)
         # test an OTU/sample to see it is in the right place
-        sseq = 'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG'
+        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCC'
+                'CCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
         ssample = 'S6'
         # test sample and sequence are in the table
         self.assertIn(sseq, exp.feature_metadata.index)
