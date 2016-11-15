@@ -1,9 +1,10 @@
 # calour functions for input output
+from logging import getLogger
+
 import pandas as pd
 import numpy as np
 import scipy
 import biom
-from logging import getLogger
 
 from calour.experiment import Experiment
 
@@ -156,10 +157,13 @@ def save_biom(exp, filename, fileformat='hdf5', addtax=True):
     return
 
 
-def save_map(exp, filename):
-    '''
-    save the mapping file
-    '''
+def save_sample_metadata(exp, filename):
+    '''save the sample metadata file '''
+    exp.sample_metadata.to_csv(filename, sep='\t')
+
+
+def save_feature_metadata(exp, filename):
+    exp.feature_metadata.to_csv(filename, sep='\t')
 
 
 def save_commands(exp, filename):

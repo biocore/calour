@@ -32,10 +32,12 @@ class Experiment:
     Attributes
     ----------
     data : ``numpy.array`` or ``scipy.sparse``
-
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
     sample_metadata : ``pandas.DataFrame``
-
+        The metadata on the samples
     feature_metadata : ``pandas.DataFrame``
+        The metadata on the features
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  description='', sparse=True):
@@ -59,9 +61,17 @@ class Experiment:
         '''
         return('Experiment %s with %d samples, %d features' % (self.description,self.data.shape[0],self.data.shape[1]))
 
-    def __copy__(self):
-        '''Create a copy of Experiment
+    def __eq__(self, other):
+        '''Check equality.
+
+        Need to check sparsity and do the conversion if needed first.
         '''
+        (self.data == other.data and
+         self.feature_metadata == other.feature_metadata and
+         self.sample_metadata == other.sample_metadata)
+
+    def __copy__(self):
+        '''Create a copy of Experiment'''
         cls = self.__class__
         result = cls.__new__(cls)
         result.__dict__.update(self.__dict__)
@@ -69,6 +79,10 @@ class Experiment:
 
     def __deepcopy__(self, memo):
         '''Create a deep copy of Experiment
+
+        Parameters
+        ----------
+        memo :
         '''
         cls = self.__class__
         result = cls.__new__(cls)
