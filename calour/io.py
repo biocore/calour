@@ -76,13 +76,13 @@ def _read_table(f):
     return table
 
 
-def read(data, sample_metadata_file=None, feature_metadata_file=None,
+def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True):
     '''Read the files for the experiment.
 
     Parameters
     ----------
-    data : str
+    data_file : str
         file path to the biom table.
     sample_metadata_file : None or str (optional)
         None (default) to just use samplenames (no additional metadata).
@@ -94,8 +94,8 @@ def read(data, sample_metadata_file=None, feature_metadata_file=None,
     sparse : bool
         read the biom table into sparse or dense array
     '''
-    logger.info('Reading experiment (biom table %s, map file %s)' % (data, sample_metadata_file))
-    sid, oid, data, md = _read_biom(data, sparse=sparse)
+    logger.info('Reading experiment (biom table %s, map file %s)' % (data_file, sample_metadata_file))
+    sid, oid, data, md = _read_biom(data_file, sparse=sparse)
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
         sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
@@ -123,14 +123,14 @@ def save(self, filename, format=''):
     '''
 
 
-def save_biom(exp, filename, fileformat='hdf5', addtax=True):
+def save_biom(exp, filename, fmt='hdf5', addtax=True):
     '''Save experiment to biom format
 
     Parameters
     ----------
     filename : str
         the filename to save to
-    format : str (optional)
+    fmt : str (optional)
         the output biom table format. options are:
         'hdf5' (default) save to hdf5 biom table.
         'json' same to json biom table.
@@ -139,22 +139,21 @@ def save_biom(exp, filename, fileformat='hdf5', addtax=True):
         True (default) to save taxonomy of features.
         False to not save taxonomy
     '''
-    logger.debug('save biom table to file %s format %s' % (filename, fileformat))
+    logger.debug('save biom table to file %s format %s' % (filename, fmt))
     tab=_create_biom_table_from_exp(exp,addtax=addtax)
-    if fileformat=='hdf5':
+    if fmt=='hdf5':
         with biom.util.biom_open(filename, 'w') as f:
-            tab.to_hdf5(f, "heatsequer")
-    elif fileformat=='json':
+            tab.to_hdf5(f, "calour")
+    elif fmt=='json':
         with open(filename,'w') as f:
-            tab.to_json("heatsequer",f)
-    elif fileformat=='txt':
+            tab.to_json("calour",f)
+    elif fmt=='txt':
         s=tab.to_tsv()
         with open(filename,'w') as f:
             f.write(s)
     else:
-        raise ValueError('Unknwon file format %s for save' % fileformat)
+        raise ValueError('Unknwon file format %s for save' % fmt)
     logger.debug('biom table saved to file %s' % filename)
-    return
 
 
 def save_sample_metadata(exp, filename):
