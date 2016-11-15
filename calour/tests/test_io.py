@@ -15,21 +15,21 @@ import calour as ca
 class TestIO(unittest.TestCase):
     def setUp(self):
         self.test_data_dir = join(dirname(abspath(__file__)), 'data')
-        self.test_simple_table = join(self.test_data_dir, 'test1.biom.txt')
+        self.test_simple_table = join(self.test_data_dir, 'test1.biom')
         self.test_simple_map = join(self.test_data_dir, 'test1.map.txt')
         self.test_complex_table = join(self.test_data_dir, 'timeseries.biom')
         self.test_complex_map = join(self.test_data_dir, 'timeseries.map.txt')
 
     def validate_read(self, exp, validate_sample_metadata=True):
-        '''Validate the simple experiment was loaded correctly
-        '''
+        '''Validate the simple experiment was loaded correctly'''
         # number of bacteria is 12
         self.assertEqual(exp.data.shape[1],12)
         # number of samples is 20 (should not read the samples only in map or only in biom table)
         # self.assertEqual(exp.data.shape[0],20)
         # test an OTU/sample to see it is in the right place
-        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCC'
-                'CCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
+        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCA'
+                'GGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTG'
+                'CATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
         ssample = 'S6'
         # test sample and sequence are in the table
         self.assertIn(sseq, exp.feature_metadata.index)
@@ -56,6 +56,7 @@ class TestIO(unittest.TestCase):
         # test loading without a mapping file
         exp = ca.read(self.test_simple_table)
         self.validate_read(exp, validate_sample_metadata=False)
+
 
 if __name__ == "__main__":
     unittest.main()

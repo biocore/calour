@@ -17,17 +17,17 @@ import calour as ca
 class TestExperiment(unittest.TestCase):
     def setUp(self):
         self.test_data_dir = join(dirname(abspath(__file__)), 'data')
-        self.test_simple_table = join(self.test_data_dir, 'test1.biom.txt')
+        self.test_simple_table = join(self.test_data_dir, 'test1.biom')
         self.test_simple_map = join(self.test_data_dir, 'test1.map.txt')
         # load the simple experiment as sparse
-        self.simple = ca.read(self.test_simple_table,self.test_simple_map)
+        self.simple = ca.read(self.test_simple_table, self.test_simple_map)
         # load the simple experiment as dense
-        self.simple_dense = ca.read(self.test_simple_table,self.test_simple_map,sparse=False)
+        self.simple_dense = ca.read(self.test_simple_table, self.test_simple_map,sparse=False)
 
         self.test_complex_table = join(self.test_data_dir, 'timeseries.biom')
         self.test_complex_map = join(self.test_data_dir, 'timeseries.map.txt')
         # load the complex experiment as sparse
-        self.complex = ca.read(self.test_complex_table,self.test_complex_map)
+        self.complex = ca.read(self.test_complex_table, self.test_complex_map)
 
     def test_reorder(self):
         exp = self.simple
