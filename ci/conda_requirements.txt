@@ -8,4 +8,5 @@ scipy
 pandas
 matplotlib
 scikit-learn
+scikit-bio
 biom-format
