@@ -1,4 +1,11 @@
-# calour functions for input output
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
+
 from logging import getLogger
 
 import pandas as pd
@@ -111,25 +118,32 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     return Experiment(data, sample_metadata, feature_metadata, description=description, sparse=sparse)
 
 
-def save(self, filename, format=''):
+def serialize(exp, f):
+    '''Serialize the Experiment object to disk.'''
+
+
+def save(exp, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
-    save a biom table and mapping file and observation file and history
+
     Parameters
     ----------
-    filename : str
+    prefix : str
         file path to save to.
-    format : str
+    fmt : str
         'biom','txt' etc.
     '''
+    exp.save_biom('%s.biom' % prefix, fmt=fmt)
+    exp.save_sample_metadata('%s_sample.txt' % prefix)
+    exp.save_feature_metadata('%s_feature.txt' % prefix)
 
 
-def save_biom(exp, filename, fmt='hdf5', addtax=True):
+def save_biom(exp, f, fmt='hdf5', addtax=True):
     '''Save experiment to biom format
 
     Parameters
     ----------
-    filename : str
-        the filename to save to
+    f : str
+        the f to save to
     fmt : str (optional)
         the output biom table format. options are:
         'hdf5' (default) save to hdf5 biom table.
@@ -139,39 +153,39 @@ def save_biom(exp, filename, fmt='hdf5', addtax=True):
         True (default) to save taxonomy of features.
         False to not save taxonomy
     '''
-    logger.debug('save biom table to file %s format %s' % (filename, fmt))
+    logger.debug('save biom table to file %s format %s' % (f, fmt))
     tab=_create_biom_table_from_exp(exp,addtax=addtax)
     if fmt=='hdf5':
-        with biom.util.biom_open(filename, 'w') as f:
+        with biom.util.biom_open(f, 'w') as f:
             tab.to_hdf5(f, "calour")
     elif fmt=='json':
-        with open(filename,'w') as f:
+        with open(f,'w') as f:
             tab.to_json("calour",f)
     elif fmt=='txt':
         s=tab.to_tsv()
-        with open(filename,'w') as f:
+        with open(f,'w') as f:
             f.write(s)
     else:
         raise ValueError('Unknwon file format %s for save' % fmt)
-    logger.debug('biom table saved to file %s' % filename)
+    logger.debug('biom table saved to file %s' % f)
 
 
-def save_sample_metadata(exp, filename):
+def save_sample_metadata(exp, f):
     '''save the sample metadata file '''
-    exp.sample_metadata.to_csv(filename, sep='\t')
+    exp.sample_metadata.to_csv(f, sep='\t')
 
 
-def save_feature_metadata(exp, filename):
-    exp.feature_metadata.to_csv(filename, sep='\t')
+def save_feature_metadata(exp, f):
+    exp.feature_metadata.to_csv(f, sep='\t')
 
 
-def save_commands(exp, filename):
+def save_commands(exp, f):
     '''
     save the commands used to generate the exp
     '''
 
 
-def save_fasta(exp, filename):
+def save_fasta(exp, f):
     '''
     '''
 
