@@ -101,15 +101,15 @@ class Experiment:
             # if the method is called inside another method.
             exp = args[0]
             log = exp._log
-            if exp._log is True:
-                args_1 = ', '.join('%r' % i for i in args[1:])
-                args_2 = ', '.join('%r=%r' % (k, v) for k, v in kwargs.items())
-                exp._call_history.append(
-                    '{0}({1}, {2})'.format(fn, args_1, args_2))
-                exp._log = False
-            out = func(*args, **kwargs)
-            # set log status back
-            exp._log = log
+            try:
+                out = func(*args, **kwargs)
+                if exp._log is True:
+                    param = ['%r' % i for i in args[1:]] + ['%r=%r' % (k, v) for k, v in kwargs.items()]
+                    exp._call_history.append('{0}({1})'.format(fn, param))
+                    exp._log = False
+            finally:
+                # set log status back
+                exp._log = log
             return out
 
         return inner
