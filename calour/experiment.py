@@ -102,15 +102,16 @@ class Experiment:
             exp = args[0]
             log = exp._log
             try:
-                out = func(*args, **kwargs)
+                new_exp = func(*args, **kwargs)
                 if exp._log is True:
-                    param = ['%r' % i for i in args[1:]] + ['%r=%r' % (k, v) for k, v in kwargs.items()]
-                    exp._call_history.append('{0}({1})'.format(fn, param))
+                    param = ['%r' % i for i in args[1:]] + ['%s=%r' % (k, v) for k, v in kwargs.items()]
+                    param = ', '.join(param)
+                    new_exp._call_history.append('{0}({1})'.format(fn, param))
                     exp._log = False
             finally:
                 # set log status back
                 exp._log = log
-            return out
+            return new_exp
 
         return inner
 
