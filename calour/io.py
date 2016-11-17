@@ -7,6 +7,7 @@ import scipy
 import biom
 
 from calour.experiment import Experiment
+from calour.util import _get_taxonomy_string
 
 logger = getLogger(__name__)
 
@@ -76,6 +77,11 @@ def _read_table(f):
     return table
 
 
+def read_bacteria(*kargs, **kwargs):
+    exp = read(*kargs, **kwargs)
+    return exp
+
+
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True):
     '''Read the files for the experiment.
@@ -91,6 +97,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         file path to the feature metadata.
     description : str
         description of the experiment
+    type : str (optional)
     sparse : bool
         read the biom table into sparse or dense array
     '''
