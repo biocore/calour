@@ -14,5 +14,6 @@ from calour.experiment import Experiment, add_functions
 from calour.io import read
 from calour.util import _get_taxonomy_string
 from calour.normalization import normalize
+from calour.heatmap import plot
 
 add_functions(Experiment)
