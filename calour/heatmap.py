@@ -120,7 +120,7 @@ def _transition_index(l):
             yield i
 
 
-def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=[0,10], xlabel_rotation=45, cmap=None, title=None):
+def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0,10), xlabel_rotation=45, cmap=None, title=None):
     '''Plot an experiment heatmap
 
     Plot an interactive heatmap for the experiment
