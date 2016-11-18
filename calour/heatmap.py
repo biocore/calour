@@ -7,36 +7,97 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-
+import importlib
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from matplotlib.ticker import MaxNLocator, FuncFormatter
 import scipy.sparse
 import numpy as np
 
+
 logger = getLogger(__name__)
 
 
-class HeatmapInteractor(object):
-    '''A heatmap editor
+def _class_for_name(module_name, class_name):
+    '''Load a class from a module and return it
+
+    Parameters
+    ----------
+    module_name : str
+        Name of the module containing the class
+    class_name : str
+        Name of the class to load
+
+    Returns
+    -------
+    c : class
+        the class imported from the module
     '''
-    def __init__(self, fig, exp, zoom_scale=2, scroll_offset=0):
-        canvas = fig.canvas
-        canvas.mpl_connect('scroll_event', lambda f: scroll_callback(f, hdat=self))
-        canvas.mpl_connect('key_press_event', lambda f: key_press_callback(f, hdat=self))
-        canvas.mpl_connect('button_press_event', lambda f: button_press_callback(f, hdat=self))
+    try:
+        m = importlib.import_module(module_name)
+    except:
+        raise ValueError('gui module %s not found' % module_name)
+    # get the class
+    try:
+        c = getattr(m, class_name)
+    except:
+        raise ValueError('class %s not found in module %s. Is it a GUI module?' % class_name)
+    return c
+
+
+
+class PlotGUI:
+    '''The base class for heatmap GUI
+
+    Various gui classes inherit this class
+    '''
+    def __init__(self, exp, zoom_scale=2, scroll_offset=0):
+        '''Init the gui windows class
+
+        Store the experiment and the gui
+        '''
         self.exp = exp
         self.zoom_scale = zoom_scale
         self.scroll_offset = scroll_offset
 
+    def get_figure(self, newfig=None):
+        ''' Get the figure to plot the heatmap into
 
-def button_press_callback(event, hdat):
+        newfig: None or mpl.figure or False (optional)
+            if None (default) create a new mpl figure.
+            if mpl.figure use this figure to plot into.
+            if False, use current figure to plot into.
+        '''
+        if newfig is None:
+            fig = plt.figure()
+        elif isinstance(newfig, mpl.figure.Figure):
+            fig = newfig
+        else:
+            fig = plt.gcf()
+        return fig
+
+    def connect_functions(self, fig):
+        '''Connect to the matplotlib callbacks for key and mouse
+        '''
+        self.canvas = fig.canvas
+        self.canvas.mpl_connect('scroll_event', lambda f: _scroll_callback(f, hdat=self))
+        self.canvas.mpl_connect('key_press_event', lambda f: _key_press_callback(f, hdat=self))
+        self.canvas.mpl_connect('button_press_event', lambda f: _button_press_callback(f, hdat=self))
+
+    def update_info(self):
+        '''Update info when a new feature/sample is selected
+        '''
+        pass
+
+
+def _button_press_callback(event, hdat):
     rx = int(round(event.xdata))
     ry = int(round(event.ydata))
     print("row: %d    column: %d" % (rx, ry))
-    print(hdat.exp.data.shape[0])
+    hdat.update_info(hdat.exp.feature_metadata['taxonomy'][ry])
 
 
-def key_press_callback(event, hdat):
+def _key_press_callback(event, hdat):
     ax = event.inaxes
     ylim_lower, ylim_upper = ax.get_ylim()
     xlim_lower, xlim_upper = ax.get_xlim()
@@ -49,19 +110,19 @@ def key_press_callback(event, hdat):
         x_offset = xlim_upper - xlim_lower
         y_offset = ylim_upper - ylim_lower
 
-    if event.key == '[':
+    if event.key == 'shift+up':
         ax.set_ylim(
             ylim_lower,
             ylim_lower + (ylim_upper - ylim_lower) / hdat.zoom_scale)
-    elif event.key == ']':
+    elif event.key == 'shift+down':
         ax.set_ylim(
             ylim_lower,
             ylim_lower + (ylim_upper - ylim_lower) * hdat.zoom_scale)
-    elif event.key == '{':
+    elif event.key == 'shift+right':
         ax.set_xlim(
             xlim_lower,
             xlim_lower + (xlim_upper - xlim_lower) / hdat.zoom_scale)
-    elif event.key == '}':
+    elif event.key == 'shift+left':
         ax.set_xlim(
             xlim_lower,
             xlim_lower + (xlim_upper - xlim_lower) * hdat.zoom_scale)
@@ -69,19 +130,18 @@ def key_press_callback(event, hdat):
         ax.set_ylim(ylim_lower - y_offset, ylim_upper - y_offset)
     elif event.key == 'up':
         ax.set_ylim(ylim_lower + y_offset, ylim_upper + y_offset)
-    elif event.key == 'right':
-        ax.set_xlim(xlim_lower - x_offset, xlim_upper - x_offset)
     elif event.key == 'left':
+        ax.set_xlim(xlim_lower - x_offset, xlim_upper - x_offset)
+    elif event.key == 'right':
         ax.set_xlim(xlim_lower + x_offset, xlim_upper + x_offset)
     else:
-        print('Unknown key: %s' % event.key)
         return
 
-    # plt.tight_layout()
-    plt.draw()
+#    plt.tight_layout()
+    hdat.canvas.draw()
 
 
-def scroll_callback(event, hdat):
+def _scroll_callback(event, hdat):
     ax = event.inaxes
     cur_xlim = ax.get_xlim()
     cur_ylim = ax.get_ylim()
@@ -110,6 +170,7 @@ def scroll_callback(event, hdat):
 
 def _transition_index(l):
     '''Return the transition index of the list.
+
     Parameters
     ----------
     l : list, 1-D array, pd.Series
@@ -120,7 +181,7 @@ def _transition_index(l):
             yield i
 
 
-def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0,10), xlabel_rotation=45, cmap=None, title=None):
+def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0,10), xlabel_rotation=45, cmap=None, title=None, gui='PlotGUI_CLI'):
     '''Plot an experiment heatmap
 
     Plot an interactive heatmap for the experiment
@@ -148,6 +209,8 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         None (default) to use mpl default color map. str to use colormap named str.
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
+    gui : str (optional)
+        Name of the gui module to use for displaying the heatmap
     '''
     logger.debug('plot experiment')
     if scipy.sparse.issparse(exp.data):
@@ -166,8 +229,14 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
 
+    # load the appropriate gui module to handle gui events
+    GUIClass = _class_for_name('calour.' + gui, gui)
+    # init the figure
+    hdat = GUIClass(exp)
+    fig = hdat.get_figure()
+    ax = fig.gca()
+
     # plot the heatmap
-    fig, ax = plt.subplots()
     ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
 
     # plot vertical lines and add x labels for the field
@@ -208,7 +277,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         ax.set_title(title)
 
     # link the interactive plot functions
-    HeatmapInteractor(fig, exp)
+    hdat.connect_functions(fig)
 
     plt.show()
 
