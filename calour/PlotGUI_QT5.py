@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 
 from calour.heatmap import PlotGUI
 
+
 app_ref=set()
 
 
@@ -22,7 +23,7 @@ class PlotGUI_QT5(PlotGUI):
         self.aw.show()
         return self.aw.plotfigure
 
-    def update_info(self,taxname):
+    def update_info(self, taxname):
         self.aw.taxaLabel.setText(taxname)
 
 
@@ -51,7 +52,7 @@ class ApplicationWindow(QMainWindow):
         cancelButton = QPushButton("Cancel")
         self.taxaLabel = QLabel()
         self.taxaLabel.setText('NA')
-        self.taxaLabel.setFixedSize(200,15)
+        self.taxaLabel.setFixedSize(200, 15)
         l2.addWidget(okButton)
         l2.addWidget(cancelButton)
         l2.addWidget(self.taxaLabel)
@@ -61,7 +62,7 @@ class ApplicationWindow(QMainWindow):
         l.addWidget(sc)
         l.addLayout(l2)
 
-        sc.setFocusPolicy( QtCore.Qt.ClickFocus )
+        sc.setFocusPolicy(QtCore.Qt.ClickFocus)
         sc.setFocus()
 
         self.plotaxes = sc.axes

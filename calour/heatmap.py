@@ -45,7 +45,6 @@ def _class_for_name(module_name, class_name):
     return c
 
 
-
 class PlotGUI:
     '''The base class for heatmap GUI
 
@@ -181,7 +180,7 @@ def _transition_index(l):
             yield i
 
 
-def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0,10), xlabel_rotation=45, cmap=None, title=None, gui='PlotGUI_CLI'):
+def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='PlotGUI_CLI'):
     '''Plot an experiment heatmap
 
     Plot an interactive heatmap for the experiment
@@ -243,14 +242,14 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     if xfield is not None:
         if xfield not in exp.sample_metadata:
             raise ValueError('Sample field %s not in sample metadata' % xfield)
-        x_values=[exp.sample_metadata[xfield][0]]
+        x_values = [exp.sample_metadata[xfield][0]]
         x_pos = [0]
         for transition_pos in _transition_index(exp.sample_metadata[xfield]):
             x_pos.append(transition_pos)
             x_values.append(exp.sample_metadata[xfield][transition_pos])
             ax.axvline(x=transition_pos, color='white')
         x_pos.append(exp.data.shape[0])
-        x_pos=np.array(x_pos)
+        x_pos = np.array(x_pos)
         ax.set_xticks(x_pos[:-1]+(x_pos[1:]-x_pos[:-1])/2)
         ax.set_xticklabels(x_values, rotation=xlabel_rotation, ha='center')
 
@@ -259,7 +258,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         if feature_field not in exp.feature_metadata:
             raise ValueError('Feature field %s not in feature metadata' % feature_field)
         labels = [x for x in exp.feature_metadata[feature_field]]
-        xs=np.arange(len(labels))
+        xs = np.arange(len(labels))
 
         # display only when zoomed enough
         def format_fn(tick_val, tick_pos):
@@ -280,4 +279,3 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     hdat.connect_functions(fig)
 
     plt.show()
-
