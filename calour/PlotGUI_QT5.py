@@ -1,14 +1,14 @@
 import matplotlib
 matplotlib.use("Qt5Agg")
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy, QWidget, QPushButton, QLabel
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter, QFrame, QComboBox, QScrollArea
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from calour.heatmap import PlotGUI
 
 
-app_ref=set()
+# app_ref=set()
 
 
 class PlotGUI_QT5(PlotGUI):
@@ -17,14 +17,19 @@ class PlotGUI_QT5(PlotGUI):
     We open the figure as a widget inside the qt5 window
     '''
     def get_figure(self, newfig=None):
-        self.aw = ApplicationWindow()
-        app_ref.add(self.aw)
+        self.aw = ApplicationWindow(self.exp)
+#        app_ref.add(self.aw)
         self.aw.setWindowTitle("Calour")
         self.aw.show()
         return self.aw.plotfigure
 
-    def update_info(self, taxname):
-        self.aw.taxaLabel.setText(taxname)
+    def update_info(self):
+        taxname = self.exp.feature_metadata['taxonomy'][self.select_feature]
+        self.aw.w_taxonomy.setText(taxname)
+        self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.select_sample, self.select_feature]))
+        self.aw.w_dblist.addItem(taxname)
+        csample_field = str(self.aw.w_field.currentText())
+        self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.select_sample]))
 
 
 class MyMplCanvas(FigureCanvas):
@@ -40,33 +45,74 @@ class MyMplCanvas(FigureCanvas):
 
 
 class ApplicationWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, exp):
         QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
 
         self.main_widget = QWidget(self)
 
-        l2 = QVBoxLayout()
-        okButton = QPushButton("OK")
-        cancelButton = QPushButton("Cancel")
-        self.taxaLabel = QLabel()
-        self.taxaLabel.setText('NA')
-        self.taxaLabel.setFixedSize(200, 15)
-        l2.addWidget(okButton)
-        l2.addWidget(cancelButton)
-        l2.addWidget(self.taxaLabel)
+        # set the GUI widgets
+        # the left side (right side is the heatmap)
+        userside = QVBoxLayout()
+        # field to display
+        lbox_field = QHBoxLayout()
+        self.w_field = QComboBox()
+        self.w_field_val = QLabel()
+        self.w_field_val.setText('NA')
+        lbox_field.addWidget(self.w_field)
+        lbox_field.addWidget(self.w_field_val)
+        userside.addLayout(lbox_field)
+        # taxonomy
+        lbox_tax = QHBoxLayout()
+        taxlabel = QLabel(text='tax:')
+        taxscroll = QScrollArea()
+        taxscroll.setFixedHeight(18)
+        self.w_taxonomy = QLabel(text='NA')
+        taxscroll.setWidget(self.w_taxonomy)
+        self.w_taxonomy.setMinimumWidth(800)
+        lbox_tax.addWidget(taxlabel)
+        lbox_tax.addWidget(taxscroll)
+        userside.addLayout(lbox_tax)
+        # reads
+        lbox_reads = QHBoxLayout()
+        readslabel = QLabel(text='reads:')
+        self.w_reads = QLabel(text='?')
+        lbox_reads.addWidget(readslabel)
+        lbox_reads.addWidget(self.w_reads)
+        userside.addLayout(lbox_reads)
+        # buttons
+        lbox_buttons = QHBoxLayout()
+        self.w_sequence = QPushButton(text='Sequence')
+        lbox_buttons.addWidget(self.w_sequence)
+        self.w_info = QPushButton(text='Info')
+        lbox_buttons.addWidget(self.w_info)
+        self.w_annotate = QPushButton(text='Annotate')
+        lbox_buttons.addWidget(self.w_annotate)
+        userside.addLayout(lbox_buttons)
+        # db annotations list
+        self.w_dblist = QListWidget()
+        userside.addWidget(self.w_dblist)
 
-        l = QHBoxLayout(self.main_widget)
-        sc = MyMplCanvas(self.main_widget, width=5, height=4, dpi=100)
-        l.addWidget(sc)
-        l.addLayout(l2)
+        layout = QHBoxLayout(self.main_widget)
+        heatmap = MyMplCanvas(self.main_widget, width=5, height=4, dpi=100)
+        frame = QFrame()
+        splitter = QSplitter(QtCore.Qt.Horizontal, self.main_widget)
+        splitter.addWidget(heatmap)
+        frame.setLayout(userside)
+        splitter.addWidget(frame)
+        layout.addWidget(splitter)
 
-        sc.setFocusPolicy(QtCore.Qt.ClickFocus)
-        sc.setFocus()
+        # fill the values for the gui
+        # add the sample field combobox values
+        for cfield in exp.sample_metadata.columns:
+            self.w_field.addItem(cfield)
 
-        self.plotaxes = sc.axes
-        self.plotfigure = sc.figure
+        heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
+        heatmap.setFocus()
+
+        self.plotaxes = heatmap.axes
+        self.plotfigure = heatmap.figure
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)

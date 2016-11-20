@@ -147,16 +147,6 @@ class Experiment:
                 return self.data.toarray()
             return self.data
 
-    def get_sample_md(self):
-        '''Get the sample metadata pandas dataframe
-        '''
-        return self.sample_metadata
-
-    def get_feature_md(self):
-        '''Get the feature metadata pandas dataframe
-        '''
-        return self.feature_metadata
-
     def get_num_samples(self):
         '''Get the number of samples in the experiment
         '''

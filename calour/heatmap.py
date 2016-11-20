@@ -92,8 +92,9 @@ class PlotGUI:
 def _button_press_callback(event, hdat):
     rx = int(round(event.xdata))
     ry = int(round(event.ydata))
-    print("row: %d    column: %d" % (rx, ry))
-    hdat.update_info(hdat.exp.feature_metadata['taxonomy'][ry])
+    hdat.select_feature = ry
+    hdat.select_sample = rx
+    hdat.update_info()
 
 
 def _key_press_callback(event, hdat):
@@ -109,19 +110,19 @@ def _key_press_callback(event, hdat):
         x_offset = xlim_upper - xlim_lower
         y_offset = ylim_upper - ylim_lower
 
-    if event.key == 'shift+up':
+    if event.key == 'shift+up' or event.key == '=':
         ax.set_ylim(
             ylim_lower,
             ylim_lower + (ylim_upper - ylim_lower) / hdat.zoom_scale)
-    elif event.key == 'shift+down':
+    elif event.key == 'shift+down' or event.key == '-':
         ax.set_ylim(
             ylim_lower,
             ylim_lower + (ylim_upper - ylim_lower) * hdat.zoom_scale)
-    elif event.key == 'shift+right':
+    elif event.key == 'shift+right' or event.key == '+':
         ax.set_xlim(
             xlim_lower,
             xlim_lower + (xlim_upper - xlim_lower) / hdat.zoom_scale)
-    elif event.key == 'shift+left':
+    elif event.key == 'shift+left' or event.key == '_':
         ax.set_xlim(
             xlim_lower,
             xlim_lower + (xlim_upper - xlim_lower) * hdat.zoom_scale)
@@ -212,16 +213,12 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         Name of the gui module to use for displaying the heatmap
     '''
     logger.debug('plot experiment')
-    if scipy.sparse.issparse(exp.data):
-        logger.debug('converting from sparse')
-        data = exp.data.toarray()
-    else:
-        data = exp.data.copy()
+    data = exp.get_data(sparse=False, getcopy=True)
 
     if logit:
         # log transform if needed
         logger.debug('log2 transforming cutoff %f' % log_cutoff)
-        data[data<log_cutoff] = log_cutoff
+        data[data < log_cutoff] = log_cutoff
         data = np.log2(data)
 
     # init the default colormap
@@ -236,7 +233,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     ax = fig.gca()
 
     # plot the heatmap
-    ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
 
     # plot vertical lines and add x labels for the field
     if xfield is not None:
@@ -245,10 +242,11 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         x_values = [exp.sample_metadata[xfield][0]]
         x_pos = [0]
         for transition_pos in _transition_index(exp.sample_metadata[xfield]):
-            x_pos.append(transition_pos)
+            # samples start -0.5 before and go to 0.5 after
+            x_pos.append(transition_pos - 0.5)
             x_values.append(exp.sample_metadata[xfield][transition_pos])
-            ax.axvline(x=transition_pos, color='white')
-        x_pos.append(exp.data.shape[0])
+            ax.axvline(x=transition_pos - 0.5, color='white')
+        x_pos.append(exp.get_num_samples())
         x_pos = np.array(x_pos)
         ax.set_xticks(x_pos[:-1]+(x_pos[1:]-x_pos[:-1])/2)
         ax.set_xticklabels(x_values, rotation=xlabel_rotation, ha='center')
@@ -269,6 +267,16 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         ax.yaxis.set_major_formatter(FuncFormatter(format_fn))
         ax.yaxis.set_major_locator(MaxNLocator(max_features, integer=True))
 
+        class Formatter(object):
+            def __init__(self, im):
+                self.im = im
+
+            def __call__(self, x, y):
+                z = self.im.get_array()[int(y), int(x)]
+                if logit:
+                    z = np.power(2, z)
+                return 'reads:{:.01f}'.format(z)
+        ax.format_coord = Formatter(image)
     # set the title
     if title is None:
         title = exp.description

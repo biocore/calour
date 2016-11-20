@@ -110,9 +110,9 @@ def sort_samples(exp, field, inplace=False):
         With samples sorted by values in sample_metadata field
     '''
     logger.debug('sorting samples by field %s' % field)
-    if field not in exp.get_sample_md().columns:
+    if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not found in sample metadata' % field)
-    sort_pos = np.argsort(exp.get_sample_md()[field])
+    sort_pos = np.argsort(exp.sample_metadata[field])
     exp = exp.reorder(sort_pos, axis=0, inplace=inplace)
     return exp
 
@@ -142,7 +142,7 @@ def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
     if sample_subset is None:
         sample_subset = exp
     else:
-        if not sample_subset.get_feature_md().index.equals(exp.get_feature_md().index):
+        if not sample_subset.feature_metadata.index.equals(exp.feature_metadata.index):
             raise ValueError('sample_subset features are different from sorting experiment features')
 
     if logit:

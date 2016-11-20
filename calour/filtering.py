@@ -69,7 +69,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
     logger.info('')
 
     if not isinstance(values, (list, tuple)):
-        values=[values]
+        values = [values]
 
     if axis == 0:
         x = exp.sample_metadata
@@ -105,6 +105,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     if isinstance(predicate, str):
         predicate = func[predicate]
 
+    # BUG: DOES NOT WORK ON SPARSE MATRIX!!!
     select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
 
     if negate is True:
@@ -128,7 +129,7 @@ def _sum_abundance(x, cutoff=10):
 
     '''
     logger.debug('')
-    return sum(x) >= cutoff
+    return x.sum() >= cutoff
 
 
 def _mean_abundance(x, cutoff=0.01):

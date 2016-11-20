@@ -37,7 +37,7 @@ def normalize(exp, reads=10000, axis=1, inplace=False):
         exp = deepcopy(exp)
 
     normfactor = reads / np.sum(exp.data, axis=axis)
-    if axis==0:
+    if axis == 0:
         exp.data = exp.data * normfactor[None, :]
     else:
         exp.data = exp.data * normfactor[:, None]
