@@ -181,7 +181,7 @@ def _transition_index(l):
             yield i
 
 
-def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='PlotGUI_CLI'):
+def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='PlotGUI_CLI', axis=None):
     '''Plot an experiment heatmap
 
     Plot an interactive heatmap for the experiment
@@ -196,6 +196,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         Name of the field to display on the y-axis (features) or None not to display names
     max_features : int (optional)
         The maximal number of feature names to display in the plot (when zoomed out)
+        0 to show all labels
     logit : bool (optional)
         True (default) to calculate mean of the log2 transformed data (useful for reducing outlier effect)
         False to not log transform before mean calculation
@@ -211,6 +212,8 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         None (default) to show experiment description field as title. str to set title to str.
     gui : str (optional)
         Name of the gui module to use for displaying the heatmap
+    axis : matplotlib axis or None (optional)
+        None (default) to create a new figure, axis to plot heatmap into the axis
     '''
     logger.debug('plot experiment')
     data = exp.get_data(sparse=False, getcopy=True)
@@ -227,10 +230,15 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
 
     # load the appropriate gui module to handle gui events
     GUIClass = _class_for_name('calour.' + gui, gui)
-    # init the figure
     hdat = GUIClass(exp)
-    fig = hdat.get_figure()
-    ax = fig.gca()
+
+    # init the figure
+    if axis is None:
+        fig = hdat.get_figure()
+        ax = fig.gca()
+    else:
+        fig = axis.get_figure()
+        ax = axis
 
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
@@ -249,7 +257,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         x_pos.append(exp.get_num_samples())
         x_pos = np.array(x_pos)
         ax.set_xticks(x_pos[:-1]+(x_pos[1:]-x_pos[:-1])/2)
-        ax.set_xticklabels(x_values, rotation=xlabel_rotation, ha='center')
+        ax.set_xticklabels(x_values, rotation=xlabel_rotation, ha='right')
 
     # set feature ticks and labels
     if feature_field is not None:
@@ -264,19 +272,27 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
                 return labels[int(tick_val)]
             else:
                 return ''
-        ax.yaxis.set_major_formatter(FuncFormatter(format_fn))
-        ax.yaxis.set_major_locator(MaxNLocator(max_features, integer=True))
+        if max_features > 0:
+            # set the maximal number of feature lables
+            ax.yaxis.set_major_formatter(FuncFormatter(format_fn))
+            ax.yaxis.set_major_locator(MaxNLocator(max_features, integer=True))
+        else:
+            # otherwise show all labels
+            ax.set_yticks(xs)
+            ax.set_yticklabels(labels)
+        ax.tick_params(axis='y', which='major', labelsize=8)
 
-        class Formatter(object):
-            def __init__(self, im):
-                self.im = im
+    # set the mouse hover string to number of reads
+    class Formatter(object):
+        def __init__(self, im):
+            self.im = im
 
-            def __call__(self, x, y):
-                z = self.im.get_array()[int(y), int(x)]
-                if logit:
-                    z = np.power(2, z)
-                return 'reads:{:.01f}'.format(z)
-        ax.format_coord = Formatter(image)
+        def __call__(self, x, y):
+            z = self.im.get_array()[int(y), int(x)]
+            if logit:
+                z = np.power(2, z)
+            return 'reads:{:.01f}'.format(z)
+    ax.format_coord = Formatter(image)
     # set the title
     if title is None:
         title = exp.description

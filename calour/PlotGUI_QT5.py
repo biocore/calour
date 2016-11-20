@@ -1,10 +1,11 @@
 import matplotlib
 matplotlib.use("Qt5Agg")
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter, QFrame, QComboBox, QScrollArea
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter, QFrame, QComboBox, QScrollArea, QListWidgetItem
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
+from calour.bactdb import BactDB
 from calour.heatmap import PlotGUI
 
 
@@ -16,6 +17,10 @@ class PlotGUI_QT5(PlotGUI):
 
     We open the figure as a widget inside the qt5 window
     '''
+    def __init__(self, *kargs, **kwargs):
+        PlotGUI.__init__(self, *kargs, **kwargs)
+        self.bactdb = BactDB()
+
     def get_figure(self, newfig=None):
         self.aw = ApplicationWindow(self.exp)
 #        app_ref.add(self.aw)
@@ -25,11 +30,37 @@ class PlotGUI_QT5(PlotGUI):
 
     def update_info(self):
         taxname = self.exp.feature_metadata['taxonomy'][self.select_feature]
+        sequence = self.exp.feature_metadata.index[self.select_feature]
         self.aw.w_taxonomy.setText(taxname)
         self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.select_sample, self.select_feature]))
-        self.aw.w_dblist.addItem(taxname)
+        # self.aw.w_dblist.addItem(taxname)
         csample_field = str(self.aw.w_field.currentText())
         self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.select_sample]))
+
+        self.aw.w_dblist.clear()
+        info = self.bactdb.getannotationstrings(sequence)
+        self.addtocdblist(info)
+
+    def addtocdblist(self, info):
+        """
+        add to cdb list without clearing
+        """
+        for cinfo in info:
+            details = cinfo[0]
+            newitem = QListWidgetItem(cinfo[1])
+            newitem.setData(QtCore.Qt.UserRole, details)
+            if details['annotationtype'] == 'diffexp':
+                ccolor = QtGui.QColor(0, 0, 200)
+            elif details['annotationtype'] == 'contamination':
+                ccolor = QtGui.QColor(200, 0, 0)
+            elif details['annotationtype'] == 'common':
+                ccolor = QtGui.QColor(0, 200, 0)
+            elif details['annotationtype'] == 'highfreq':
+                ccolor = QtGui.QColor(0, 200, 0)
+            else:
+                ccolor = QtGui.QColor(0, 0, 0)
+            newitem.setForeground(ccolor)
+            self.aw.w_dblist.addItem(newitem)
 
 
 class MyMplCanvas(FigureCanvas):
@@ -122,3 +153,4 @@ class ApplicationWindow(QMainWindow):
 
     def closeEvent(self, ce):
         self.fileQuit()
+
