@@ -140,11 +140,15 @@ class Experiment:
             raise ValueError('Cannot get original data when transforming to sparse/dense')
         if sparse:
             if scipy.sparse.issparse(self.data):
+                if copy:
+                    return self.data.copy()
                 return self.data
             return scipy.sparse.csr_matrix(self.data)
         else:
             if scipy.sparse.issparse(self.data):
                 return self.data.toarray()
+            if copy:
+                return self.data.copy()
             return self.data
 
     def get_num_samples(self):

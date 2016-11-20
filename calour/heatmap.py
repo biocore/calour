@@ -165,7 +165,7 @@ def _scroll_callback(event, hdat):
     ax.set_ylim([ydata - y_top * scale_factor,
                  ydata + y_bottom * scale_factor])
 
-    plt.draw()  # force re-draw
+    hdat.canvas.draw()  # force re-draw
 
 
 def _transition_index(l):
