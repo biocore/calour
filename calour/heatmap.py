@@ -73,6 +73,7 @@ class PlotGUI:
             fig = newfig
         else:
             fig = plt.gcf()
+        self.fig = fig
         return fig
 
     def connect_functions(self, fig):

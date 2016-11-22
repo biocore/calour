@@ -112,7 +112,7 @@ def sort_samples(exp, field, inplace=False):
     logger.debug('sorting samples by field %s' % field)
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not found in sample metadata' % field)
-    sort_pos = np.argsort(exp.sample_metadata[field])
+    sort_pos = np.argsort(exp.sample_metadata[field], kind='mergesort')
     exp = exp.reorder(sort_pos, axis=0, inplace=inplace)
     return exp
 
