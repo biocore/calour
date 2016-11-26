@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from calour.bactdb import BactDB
-from calour.heatmap import PlotGUI
+from calour.gui.plotgui import PlotGUI
 
 
 # app_ref=set()

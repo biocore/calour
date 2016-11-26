@@ -6,7 +6,6 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from statistics import mean
 from heapq import nlargest
 from logging import getLogger
 import numpy as np
@@ -147,7 +146,7 @@ def _mean_abundance(x, cutoff=0.01):
 
     '''
     logger.debug('')
-    return mean(x) >= cutoff
+    return x.mean() >= cutoff
 
 
 def _presence_fraction(x, fraction=0.5, cutoff=0):

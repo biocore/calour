@@ -1,4 +1,4 @@
-from calour.heatmap import PlotGUI
+from calour.gui.plotgui import PlotGUI
 
 
 class PlotGUI_CLI(PlotGUI):
