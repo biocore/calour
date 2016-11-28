@@ -8,9 +8,6 @@ from calour.bactdb import BactDB
 from calour.gui.plotgui import PlotGUI
 
 
-# app_ref=set()
-
-
 class PlotGUI_Jupyter(PlotGUI):
     '''QT5 version of plot winfow GUI
 

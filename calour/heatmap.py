@@ -156,7 +156,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     # set the title
     if title is None:
         title = exp.description
-    if title != '':
+    else:
         ax.set_title(title)
 
     # link the interactive plot functions

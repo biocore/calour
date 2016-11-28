@@ -11,6 +11,7 @@ from scipy import cluster, spatial
 from sklearn.preprocessing import scale
 
 import calour as ca
+from calour import Experiment
 
 
 logger = getLogger(__name__)
@@ -38,6 +39,7 @@ def sort_taxonomy(exp, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normalize=True, inplace=False):
     '''Cluster the features (similar features close to each other)
     Reorder the features so that ones with similar behavior (pattern across samples) are close to each other
