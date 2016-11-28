@@ -9,8 +9,6 @@
 from logging import getLogger
 from copy import deepcopy
 
-import numpy as np
-
 
 logger = getLogger(__name__)
 
@@ -36,8 +34,8 @@ def normalize(exp, reads=10000, axis=1, inplace=False):
     if not inplace:
         exp = deepcopy(exp)
 
-    normfactor = reads / np.sum(exp.data, axis=axis)
-    if axis==0:
+    normfactor = reads / exp.data.sum(axis=axis)
+    if axis == 0:
         exp.data = exp.data * normfactor[None, :]
     else:
         exp.data = exp.data * normfactor[:, None]

@@ -6,10 +6,12 @@ from logging import getLogger
 from copy import copy
 
 import numpy as np
-from scipy import cluster,spatial
+import scipy.sparse
+from scipy import cluster, spatial
 from sklearn.preprocessing import scale
 
 import calour as ca
+from calour import Experiment
 
 
 logger = getLogger(__name__)
@@ -37,6 +39,7 @@ def sort_taxonomy(exp, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normalize=True, inplace=False):
     '''Cluster the features (similar features close to each other)
     Reorder the features so that ones with similar behavior (pattern across samples) are close to each other
@@ -64,23 +67,26 @@ def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normaliz
     '''
     # filter low-freq features
     if min_abundance is not None:
-        exp = exp.filter_sum(min_abundance, inplace=inplace)
+        logger.debug('filtering min abundance %d' % min_abundance)
+        exp = exp.filter_by_data('sum_abundance', axis=1, inplace=inplace, cutoff=min_abundance)
 
-    # NEED TO CONVERT SPARSE MATRIX????
-    # normalize each feature to sum 1
-    data = copy(exp.data).transpose()
+    data = exp.get_data(sparse=False, getcopy=True)
+
+    data = data.transpose()
+
     if logit:
         data[data < log_cutoff] = log_cutoff
-        data=np.log2(data)
+        data = np.log2(data)
+
     if normalize:
-        data = scale(data,axis=1,copy=False)
+        data = scale(data, axis=1, copy=False)
 
     # cluster
     dist_mat = spatial.distance.pdist(data, metric='euclidean')
     linkage = cluster.hierarchy.single(dist_mat)
     sort_order = cluster.hierarchy.leaves_list(linkage)
 
-    exp = exp.reorder(sort_order, axis=1)
+    exp = exp.reorder(sort_order, axis=1, inplace=inplace)
     return exp
 
 
@@ -108,12 +114,12 @@ def sort_samples(exp, field, inplace=False):
     logger.debug('sorting samples by field %s' % field)
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not found in sample metadata' % field)
-    sort_pos = np.argsort(exp.sample_metadata[field])
+    sort_pos = np.argsort(exp.sample_metadata[field], kind='mergesort')
     exp = exp.reorder(sort_pos, axis=0, inplace=inplace)
     return exp
 
 
-def sort_freq(exp, logit=True, log_cutoff = 1, sample_subset=None, inplace=False):
+def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
     '''Sort features based on their mean frequency
     Sort the features based on their mean (log) frequency (optional in a subgroup of samples).
 
@@ -142,18 +148,18 @@ def sort_freq(exp, logit=True, log_cutoff = 1, sample_subset=None, inplace=False
             raise ValueError('sample_subset features are different from sorting experiment features')
 
     if logit:
-        data = sample_subset.data.copy()
+        data = sample_subset.get_data(getcopy=True)
         data[data < log_cutoff] = log_cutoff
         data = np.log2(data)
     else:
-        data = sample_subset.data
+        data = sample_subset.get_data()
 
     sort_pos = np.argsort(data.mean(axis=0))
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
 
 
-def sort_obs_center_mass(exp,field=None, numeric=True, uselog=True,inplace=False):
+def sort_obs_center_mass(exp, field=None, numeric=True, uselog=True, inplace=False):
     '''
     sort observations based on center of mass after sorting samples by field (or None not to pre sort)
     '''

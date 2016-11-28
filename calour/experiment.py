@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+import scipy.sparse
 from os.path import join
 from copy import copy, deepcopy
 from importlib import import_module
@@ -59,7 +60,7 @@ class Experiment:
         print the information about the experiment
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
-        return('Experiment %s with %d samples, %d features' % (self.description,self.data.shape[0],self.data.shape[1]))
+        return('Experiment %s with %d samples, %d features' % (self.description, self.data.shape[0], self.data.shape[1]))
 
     def __eq__(self, other):
         '''Check equality.
@@ -95,6 +96,7 @@ class Experiment:
     def _record_sig(func):
         '''Record the function calls to history. '''
         fn = func.__qualname__
+
         @wraps(func)
         def inner(*args, **kwargs):
             # this extra code here is to prevent recording func call
@@ -114,6 +116,51 @@ class Experiment:
             return new_exp
 
         return inner
+
+    def get_data(self, sparse=None, getcopy=False):
+        '''Get the data 2d array
+
+        Get the data 2d array (each column is a feature, row is a sample)
+
+        Parameters
+        ----------
+        sparse : None or bool (optional)
+            None (default) to pass original data format (sparse or dense).
+            True to get as sparse.
+            False to get as dense
+        getcopy : bool (optional)
+            True (default) to get a copy of the data
+            False to get the original data (for inplace)
+        '''
+        if sparse is None:
+            if getcopy:
+                return self.data.copy()
+            else:
+                return self.data
+        if getcopy is False:
+            raise ValueError('Cannot get original data when transforming to sparse/dense')
+        if sparse:
+            if scipy.sparse.issparse(self.data):
+                if copy:
+                    return self.data.copy()
+                return self.data
+            return scipy.sparse.csr_matrix(self.data)
+        else:
+            if scipy.sparse.issparse(self.data):
+                return self.data.toarray()
+            if copy:
+                return self.data.copy()
+            return self.data
+
+    def get_num_samples(self):
+        '''Get the number of samples in the experiment
+        '''
+        return self.get_data().shape[0]
+
+    def get_num_features(self):
+        '''Get the number of features in the experiment
+        '''
+        return self.get_data().shape[1]
 
     def reorder(self, new_order, axis=0, inplace=False):
         '''Reorder according to indices in the new order.
@@ -147,7 +194,7 @@ class Experiment:
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.normalization','.heatmap']):
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.normalization', '.heatmap']):
     '''Dynamically add functions to the class as methods.'''
     for module_name in modules:
         module = import_module(module_name, 'calour')
