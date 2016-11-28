@@ -56,20 +56,21 @@ class Experiment:
         self.sparse = sparse
 
     def __repr__(self):
-        '''
-        print the information about the experiment
+        '''Return a string representation of this object.
+
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
-        return('Experiment %s with %d samples, %d features' % (self.description, self.data.shape[0], self.data.shape[1]))
+        return 'Experiment %s with %d samples, %d features' % (
+            self.description, self.data.shape[0], self.data.shape[1])
 
     def __eq__(self, other):
         '''Check equality.
 
         Need to check sparsity and do the conversion if needed first.
         '''
-        (self.data == other.data and
-         self.feature_metadata == other.feature_metadata and
-         self.sample_metadata == other.sample_metadata)
+        return (self.data == other.data and
+                self.feature_metadata == other.feature_metadata and
+                self.sample_metadata == other.sample_metadata)
 
     def __copy__(self):
         '''Create a copy of Experiment'''
@@ -137,20 +138,22 @@ class Experiment:
                 return self.data.copy()
             else:
                 return self.data
-        if getcopy is False:
-            raise ValueError('Cannot get original data when transforming to sparse/dense')
-        if sparse:
+        elif sparse:
             if scipy.sparse.issparse(self.data):
-                if copy:
+                if getcopy:
                     return self.data.copy()
-                return self.data
-            return scipy.sparse.csr_matrix(self.data)
+                else:
+                    return self.data
+            else:
+                return scipy.sparse.csr_matrix(self.data)
         else:
             if scipy.sparse.issparse(self.data):
                 return self.data.toarray()
-            if copy:
-                return self.data.copy()
-            return self.data
+            else:
+                if getcopy:
+                    return self.data.copy()
+                else:
+                    return self.data
 
     def get_num_samples(self):
         '''Get the number of samples in the experiment
