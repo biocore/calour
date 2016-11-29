@@ -148,7 +148,7 @@ def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
             raise ValueError('sample_subset features are different from sorting experiment features')
 
     if logit:
-        data = sample_subset.get_data(getcopy=True)
+        data = sample_subset.get_data(sparse=False, getcopy=True)
         data[data < log_cutoff] = log_cutoff
         data = np.log2(data)
     else:

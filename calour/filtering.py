@@ -104,8 +104,17 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     if isinstance(predicate, str):
         predicate = func[predicate]
 
-    # BUG: DOES NOT WORK ON SPARSE MATRIX!!!
-    select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
+    if exp.sparse:
+        n = exp.data.shape[1 - axis]
+        select = np.ones(n, dtype=bool)
+        if axis == 0:
+            for row in range(n):
+                select[row] = predicate(exp.data[row, :], **kwargs)
+        elif axis == 1:
+            for col in range(n):
+                select[col] = predicate(exp.data[:, col], **kwargs)
+    else:
+        select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
 
     if negate is True:
         select = ~ select
@@ -121,9 +130,9 @@ def _sum_abundance(x, cutoff=10):
 
     Examples
     --------
-    >>> _sum_abundance([0, 1, 1], 2)
+    >>> _sum_abundance(np.array([0, 1, 1]), 2)
     True
-    >>> _sum_abundance([0, 1, 1], 2.01)
+    >>> _sum_abundance(np.array([0, 1, 1]), 2.01)
     False
 
     '''
@@ -139,9 +148,9 @@ def _mean_abundance(x, cutoff=0.01):
 
     Examples
     --------
-    >>> _mean_abundance([0, 0, 1, 1], 0.51)
+    >>> _mean_abundance(np.array([0, 0, 1, 1]), 0.51)
     False
-    >>> _mean_abundance([0, 0, 1, 1], 0.5)
+    >>> _mean_abundance(np.array([0, 0, 1, 1]), 0.5)
     True
 
     '''
@@ -156,15 +165,15 @@ def _presence_fraction(x, fraction=0.5, cutoff=0):
 
     Examples
     --------
-    >>> _presence_fraction([0, 1])
+    >>> _presence_fraction(np.array([0, 1]))
     True
-    >>> _presence_fraction([0, 1, 2, 3], 0.5, 2)
+    >>> _presence_fraction(np.array([0, 1, 2, 3]), 0.5, 2)
     True
-    >>> _presence_fraction([0, 1, 2], 0.51, 2)
+    >>> _presence_fraction(np.array([0, 1, 2]), 0.51, 2)
     False
     '''
     logger.debug('')
-    frac = sum(i >= cutoff for i in x) / len(x)
+    frac = np.sum(i >= cutoff for i in x) / len(x)
     return frac >= fraction
 
 
@@ -209,7 +218,8 @@ def filter_samples(exp, field, values, negate=False, inplace=False, substring=Fa
     '''
     shortcut for filtering samples
     '''
-    return filter_by_metadata(exp, field=field, values=values, negate=negate, inplace=inplace, substring=substring)
+    return filter_by_metadata(exp, field=field, values=values,
+                              negate=negate, inplace=inplace, substring=substring)
 
 
 def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):

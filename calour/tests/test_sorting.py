@@ -46,7 +46,14 @@ class TestSorting(Tests):
         newexp.sort_samples(field='DAY', inplace=True)
         expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
         assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
+        # also test first and last samples are ok
+        self.assertEqual(newexp.sample_metadata['MF_SAMPLE_NUMBER'][0], 1)
+        self.assertEqual(newexp.sample_metadata['MF_SAMPLE_NUMBER'][-1], 96)
 
+    def test_sort_freq(self):
+        newexp = self.complex_sort_freq()
+        expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
+        assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
 
 
 if __name__ == "__main__":
