@@ -39,6 +39,15 @@ class TestSorting(Tests):
         expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.clustered.features.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
         assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
 
+    def test_sort_samples(self):
+        # test sorting inplace and various fields (keeping the order)
+        newexp = self.complex.sort_samples(field='MINUTES')
+        newexp = newexp.sort_samples(field='HOUR')
+        newexp.sort_samples(field='DAY', inplace=True)
+        expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
+        assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
+
+
 
 if __name__ == "__main__":
     unittest.main()
