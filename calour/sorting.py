@@ -34,7 +34,7 @@ def sort_taxonomy(exp, inplace=False):
     '''
     logger.debug('sorting by taxonomies')
     taxonomy = ca._get_taxonomy_string(exp, remove_underscore=True)
-    sort_pos = np.argsort(taxonomy)
+    sort_pos = np.argsort(taxonomy, kind='mergesort')
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
 
@@ -130,9 +130,9 @@ def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
         False to not log transform before mean calculation
     log_cutoff : float (optional)
         The minimal number of reads for the log trasnform (if logit=True)
-    sample_subset : None or Experiment (optional)
+    sample_subset : None or iterable of sample indices (optional)
         None (default) to sort based on mean in all samples in experiment
-        Experiment (non-none) to sort based only on data in the sample_subset experiment
+        (non-none) to sort based only on data from samples in the sample_subset
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
@@ -148,7 +148,7 @@ def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
             raise ValueError('sample_subset features are different from sorting experiment features')
 
     if logit:
-        data = sample_subset.get_data(getcopy=True)
+        data = sample_subset.get_data(sparse=False, getcopy=True)
         data[data < log_cutoff] = log_cutoff
         data = np.log2(data)
     else:

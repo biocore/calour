@@ -16,15 +16,6 @@ import numpy as np
 logger = getLogger(__name__)
 
 
-class Tests(TestCase):
-    def setUp(self):
-        test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
-        self.simple_table = join(test_data_dir, 'test1.biom')
-        self.simple_map = join(test_data_dir, 'test1.map.txt')
-        self.complex_table = join(test_data_dir, 'timeseries.biom')
-        self.complex_map = join(test_data_dir, 'timeseries.map.txt')
-
-
 def get_fields(exp):
     '''
     return the sample fields of an experiment
@@ -32,7 +23,7 @@ def get_fields(exp):
     return list(exp.sample_metadata.columns)
 
 
-def get_field_vals(exp,field,unique=True):
+def get_field_vals(exp, field, unique=True):
     '''
     return the values in sample field (unique or all)
     '''
@@ -70,12 +61,13 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
         raise ValueError('No taxonomy field in experiment')
 
     if not remove_underscore:
-        taxonomy=[separator.join(x) for x in exp.feature_metadata['taxonomy']]
+        taxonomy = [separator.join(x) for x in exp.feature_metadata['taxonomy']]
     else:
         taxonomy = []
         for ctax in exp.feature_metadata['taxonomy']:
             taxstr = ''
-            for clevel in ctax:
+            for clevel in ctax.split(';'):
+                clevel = clevel.strip()
                 if len(clevel) > 3:
                     if clevel[1:3] == '__':
                         clevel = clevel[3:]
@@ -85,5 +77,5 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
             taxonomy.append(taxstr)
 
     if to_lower:
-        taxonomy=[x.lower() for x in taxonomy]
+        taxonomy = [x.lower() for x in taxonomy]
     return taxonomy

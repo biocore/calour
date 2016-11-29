@@ -9,7 +9,7 @@
 import unittest
 
 import calour as ca
-from calour.util import Tests
+from calour.testing import Tests
 
 
 class TestIO(Tests):
@@ -17,7 +17,7 @@ class TestIO(Tests):
     def validate_read(self, exp, validate_sample_metadata=True):
         '''Validate the simple experiment was loaded correctly'''
         # number of bacteria is 12
-        self.assertEqual(exp.data.shape[1],12)
+        self.assertEqual(exp.data.shape[1], 12)
         # number of samples is 20 (should not read the samples only in map or only in biom table)
         # self.assertEqual(exp.data.shape[0],20)
         # test an OTU/sample to see it is in the right place
@@ -36,7 +36,7 @@ class TestIO(Tests):
         self.assertIn('g__Janthinobacterium', exp.feature_metadata['taxonomy'][seqpos])
         # test the sample metadata is loaded correctly
         if validate_sample_metadata:
-            self.assertEqual(exp.sample_metadata['id'][samplepos],6)
+            self.assertEqual(exp.sample_metadata['id'][samplepos], 6)
 
     def test_read(self):
         # load the simple dataset as sparse
