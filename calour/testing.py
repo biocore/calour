@@ -9,6 +9,7 @@
 from logging import getLogger
 from unittest import TestCase, main
 from os.path import join, dirname, abspath
+
 import pandas.util.testing as pdt
 import numpy.testing as npt
 import numpy as np
@@ -39,7 +40,7 @@ def assertIsInstance(obj, cls, msg=''):
         raise AssertionError(err_msg.format(msg, cls, type(obj)))
 
 
-def assert_experiment_equal(exp1, exp2, check_history=True, almost_equal=False):
+def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True):
     '''Test if two experiments are equal
 
     Parameters
@@ -47,9 +48,9 @@ def assert_experiment_equal(exp1, exp2, check_history=True, almost_equal=False):
     exp1 : Experiment
     exp2 : Experiment
     check_history : bool (optional)
-        True (default) to compare also the command history, False to skip testing the command history
+        False (default) to skip testing the command history, True to compare also the command history
     almost_equal : bool (optional)
-        False (default) to test the data matrix for exact identity, True to test for almost identical
+        True (default) to test for almost identical, False to test the data matrix for exact identity
     '''
     assertIsInstance(exp1, ca.Experiment, 'exp1 not a calour Experiment class')
     assertIsInstance(exp2, ca.Experiment, 'exp2 not a calour Experiment class')

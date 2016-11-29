@@ -130,9 +130,9 @@ def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
         False to not log transform before mean calculation
     log_cutoff : float (optional)
         The minimal number of reads for the log trasnform (if logit=True)
-    sample_subset : None or Experiment (optional)
+    sample_subset : None or iterable of sample indices (optional)
         None (default) to sort based on mean in all samples in experiment
-        Experiment (non-none) to sort based only on data in the sample_subset experiment
+        (non-none) to sort based only on data from samples in the sample_subset
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
