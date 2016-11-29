@@ -105,7 +105,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
         predicate = func[predicate]
 
     if exp.sparse:
-        n = exp.data.shape[1 - axis]
+        n = exp.data.shape[axis]
         select = np.ones(n, dtype=bool)
         if axis == 0:
             for row in range(n):
@@ -215,16 +215,14 @@ def _freq_ratio(x, ratio=2):
 
 
 def filter_samples(exp, field, values, negate=False, inplace=False, substring=False):
-    '''
-    shortcut for filtering samples
-    '''
+    '''Shortcut for filtering samples.'''
     return filter_by_metadata(exp, field=field, values=values,
                               negate=negate, inplace=inplace, substring=substring)
 
 
 def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
-    '''
-    filter keeping only observations with taxonomy string matching taxonomy
+    '''filter keeping only observations with taxonomy string matching taxonomy
+
     if substring=True, look for partial match instead of identity
     '''
     if 'taxonomy' not in exp.feature_metadata.columns:

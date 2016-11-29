@@ -6,7 +6,6 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from logging import getLogger
 from unittest import TestCase, main
 from os.path import join, dirname, abspath
 
@@ -15,9 +14,6 @@ import numpy.testing as npt
 import numpy as np
 
 import calour as ca
-
-
-logger = getLogger(__name__)
 
 
 class Tests(TestCase):

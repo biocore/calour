@@ -68,9 +68,12 @@ class Experiment:
 
         Need to check sparsity and do the conversion if needed first.
         '''
-        return (self.data == other.data and
-                self.feature_metadata == other.feature_metadata and
-                self.sample_metadata == other.sample_metadata)
+        return (np.array_equal(self.data, other.data) and
+                pd.DataFrame.equals(self.feature_metadata, other.feature_metadata) and
+                pd.DataFrame.equals(self.sample_metadata, other.sample_metadata))
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def __copy__(self):
         '''Create a copy of Experiment'''

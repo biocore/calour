@@ -66,5 +66,9 @@ class TestExperiment(Tests):
         self.assertTrue(newexp.sample_metadata.equals(exp.sample_metadata))
         self.assertTrue(newexp.feature_metadata.equals(exp.feature_metadata))
 
+    def test_eq(self):
+
+
+
 if __name__ == "__main__":
     unittest.main()
