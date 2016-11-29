@@ -7,10 +7,12 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+import scipy.sparse
 from os.path import join
 from copy import copy, deepcopy
 from importlib import import_module
 import inspect
+from functools import wraps
 
 import pandas as pd
 import numpy as np
@@ -31,10 +33,12 @@ class Experiment:
     Attributes
     ----------
     data : ``numpy.array`` or ``scipy.sparse``
-
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
     sample_metadata : ``pandas.DataFrame``
-
+        The metadata on the samples
     feature_metadata : ``pandas.DataFrame``
+        The metadata on the features
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  description='', sparse=True):
@@ -48,24 +52,51 @@ class Experiment:
         # whether to log to history
         self._log = True
 
+        # flag if data array is sparse (True) or dense (False)
+        self.sparse = sparse
+
     def __repr__(self):
         '''
         print the information about the experiment
         should have number of samples, observations, first 3 sequences and first 3 samples?
         '''
+        return('Experiment %s with %d samples, %d features' % (self.description, self.data.shape[0], self.data.shape[1]))
+
+    def __eq__(self, other):
+        '''Check equality.
+
+        Need to check sparsity and do the conversion if needed first.
+        '''
+        (self.data == other.data and
+         self.feature_metadata == other.feature_metadata and
+         self.sample_metadata == other.sample_metadata)
 
     def __copy__(self):
-        '''Create a copy of Experiment
-        '''
+        '''Create a copy of Experiment'''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         '''Create a deep copy of Experiment
-        '''
 
-    @classmethod
+        Parameters
+        ----------
+        memo :
+        '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
+    @staticmethod
     def _record_sig(func):
         '''Record the function calls to history. '''
         fn = func.__qualname__
+
         @wraps(func)
         def inner(*args, **kwargs):
             # this extra code here is to prevent recording func call
@@ -73,8 +104,8 @@ class Experiment:
             exp = args[0]
             log = exp._log
             if exp._log is True:
-                args_1 = ', '.join(args)
-                args_2 = ', '.join('%s=%r' % (k, v) in kwargs.items)
+                args_1 = ', '.join('%r' % i for i in args[1:])
+                args_2 = ', '.join('%r=%r' % (k, v) for k, v in kwargs.items())
                 exp._call_history.append(
                     '{0}({1}, {2})'.format(fn, args_1, args_2))
                 exp._log = False
@@ -84,6 +115,51 @@ class Experiment:
             return out
 
         return inner
+
+    def get_data(self, sparse=None, getcopy=False):
+        '''Get the data 2d array
+
+        Get the data 2d array (each column is a feature, row is a sample)
+
+        Parameters
+        ----------
+        sparse : None or bool (optional)
+            None (default) to pass original data format (sparse or dense).
+            True to get as sparse.
+            False to get as dense
+        getcopy : bool (optional)
+            True (default) to get a copy of the data
+            False to get the original data (for inplace)
+        '''
+        if sparse is None:
+            if getcopy:
+                return self.data.copy()
+            else:
+                return self.data
+        if getcopy is False:
+            raise ValueError('Cannot get original data when transforming to sparse/dense')
+        if sparse:
+            if scipy.sparse.issparse(self.data):
+                if copy:
+                    return self.data.copy()
+                return self.data
+            return scipy.sparse.csr_matrix(self.data)
+        else:
+            if scipy.sparse.issparse(self.data):
+                return self.data.toarray()
+            if copy:
+                return self.data.copy()
+            return self.data
+
+    def get_num_samples(self):
+        '''Get the number of samples in the experiment
+        '''
+        return self.get_data().shape[0]
+
+    def get_num_features(self):
+        '''Get the number of features in the experiment
+        '''
+        return self.get_data().shape[1]
 
     def reorder(self, new_order, axis=0, inplace=False):
         '''Reorder according to indices in the new order.
@@ -109,15 +185,15 @@ class Experiment:
             exp = self
         if axis == 0:
             exp.data = exp.data[new_order, :]
-            exp.sample_metadata.iloc[new_order, :]
+            exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
         elif axis == 1:
             exp.data = exp.data[:, new_order]
-            exp.sample_metadata.iloc[:, new_order]
+            exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
 
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering']):
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.normalization', '.heatmap']):
     '''Dynamically add functions to the class as methods.'''
     for module_name in modules:
         module = import_module(module_name, 'calour')
@@ -127,10 +203,6 @@ def add_functions(cls, modules=['.io', '.sorting', '.filtering']):
             # skip private functions
             if not fn.startswith('_'):
                 setattr(cls, fn, f)
-
-
-add_functions(Experiment)
-
 
 
 def join_experiments(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
