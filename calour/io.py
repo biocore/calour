@@ -28,7 +28,7 @@ def _read_biom(fp, transpose=True, sparse=True):
     table = biom.load_table(fp)
     sid = table.ids(axis='sample')
     oid = table.ids(axis='observation')
-    logger.info('loaded %d samples, %d observations' % (len(sid),len(oid)))
+    logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
     if sparse:
         logger.debug('storing as sparse matrix')
         data = scipy.sparse.csr_matrix(table.matrix_data)
@@ -54,6 +54,7 @@ def _get_md_from_biom(table):
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
+    # print(metadata)
     if metadata is None:
         logger.info('No metadata associated with features in biom table')
     else:
@@ -147,16 +148,16 @@ def save_biom(exp, filename, fmt='hdf5', addtax=True):
         False to not save taxonomy
     '''
     logger.debug('save biom table to file %s format %s' % (filename, fmt))
-    tab=_create_biom_table_from_exp(exp,addtax=addtax)
-    if fmt=='hdf5':
+    tab = _create_biom_table_from_exp(exp, addtax=addtax)
+    if fmt == 'hdf5':
         with biom.util.biom_open(filename, 'w') as f:
             tab.to_hdf5(f, "calour")
-    elif fmt=='json':
-        with open(filename,'w') as f:
-            tab.to_json("calour",f)
-    elif fmt=='txt':
-        s=tab.to_tsv()
-        with open(filename,'w') as f:
+    elif fmt == 'json':
+        with open(filename, 'w') as f:
+            tab.to_json("calour", f)
+    elif fmt == 'txt':
+        s = tab.to_tsv()
+        with open(filename, 'w') as f:
             f.write(s)
     else:
         raise ValueError('Unknwon file format %s for save' % fmt)
@@ -203,9 +204,11 @@ def _create_biom_table_from_exp(exp, addtax=True):
     # init the table
     features = exp.feature_metadata.index
     samples = exp.sample_metadata.index
-    table=biom.table.Table(exp.data.transpose(), features, samples, type="OTU table")
+    table = biom.table.Table(exp.data.transpose(), features, samples, type="OTU table")
     # and add metabolite name as taxonomy:
     if addtax:
         taxdict = exp.feature_metadata.T.to_dict()
         table.add_metadata(taxdict, axis='observation')
+        # metadata = table.metadata(axis='observation')
+        # print(metadata)
     return table

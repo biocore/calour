@@ -34,7 +34,7 @@ def sort_taxonomy(exp, inplace=False):
     '''
     logger.debug('sorting by taxonomies')
     taxonomy = ca._get_taxonomy_string(exp, remove_underscore=True)
-    sort_pos = np.argsort(taxonomy)
+    sort_pos = np.argsort(taxonomy, kind='mergesort')
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
 
