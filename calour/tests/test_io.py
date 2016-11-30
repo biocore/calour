@@ -9,7 +9,7 @@
 import unittest
 
 import calour as ca
-from calour.testing import Tests
+from calour._testing import Tests
 
 
 class TestIO(Tests):

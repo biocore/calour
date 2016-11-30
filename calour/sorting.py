@@ -120,7 +120,8 @@ def sort_samples(exp, field, inplace=False):
 
 
 def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
-    '''Sort features based on their mean frequency
+    '''Sort features based on their mean frequency.
+
     Sort the features based on their mean (log) frequency (optional in a subgroup of samples).
 
     Parameters
