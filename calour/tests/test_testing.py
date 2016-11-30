@@ -12,7 +12,7 @@ from os.path import join
 import pandas.util.testing as pdt
 
 import calour as ca
-from calour.testing import Tests, assert_experiment_equal
+from calour._testing import Tests, assert_experiment_equal
 
 
 class TestTesting(Tests):

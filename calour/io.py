@@ -211,11 +211,9 @@ def _create_biom_table_from_exp(exp, addtax=True):
 
     Returns
     -------
-    table : biom_table
+    biom_table
         the biom table representation of the experiment
     '''
-
-    # init the table
     features = exp.feature_metadata.index
     samples = exp.sample_metadata.index
     table = biom.table.Table(exp.data.transpose(), features, samples, type="OTU table")
