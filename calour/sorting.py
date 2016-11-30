@@ -146,6 +146,7 @@ def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
     else:
         if not sample_subset.feature_metadata.index.equals(exp.feature_metadata.index):
             raise ValueError('sample_subset features are different from sorting experiment features')
+        sample_subset = exp.filter_samples()
 
     if logit:
         data = sample_subset.get_data(sparse=False, getcopy=True)

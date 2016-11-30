@@ -38,12 +38,12 @@ class PlotGUI_Jupyter(PlotGUI):
         return fig
 
     def update_info(self):
-        taxname = self.exp.feature_metadata['taxonomy'][self.select_feature]
-        sampname = self.exp.sample_metadata.index[self.select_sample]
-        sequence = self.exp.feature_metadata.index[self.select_feature]
+        taxname = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
+        sampname = self.exp.sample_metadata.index[self.last_select_sample]
+        sequence = self.exp.feature_metadata.index[self.last_select_feature]
         self.labtax.value = 'Feature: %s' % taxname
         self.labsamp.value = 'Sample: %s' % sampname
-        self.labreads.value = 'Reads:{:.01f}'.format(self.exp.get_data()[self.select_sample, self.select_feature])
+        self.labreads.value = 'Reads:{:.01f}'.format(self.exp.get_data()[self.last_select_sample, self.last_select_feature])
         info = self.bactdb.getannotationstrings(sequence)
         idata = ''
         for cinfo in info:

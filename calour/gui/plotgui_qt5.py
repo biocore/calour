@@ -29,13 +29,13 @@ class PlotGUI_QT5(PlotGUI):
         return self.aw.plotfigure
 
     def update_info(self):
-        taxname = self.exp.feature_metadata['taxonomy'][self.select_feature]
-        sequence = self.exp.feature_metadata.index[self.select_feature]
+        taxname = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
+        sequence = self.exp.feature_metadata.index[self.last_select_feature]
         self.aw.w_taxonomy.setText(taxname)
-        self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.select_sample, self.select_feature]))
+        self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.last_select_sample, self.last_select_feature]))
         # self.aw.w_dblist.addItem(taxname)
         csample_field = str(self.aw.w_field.currentText())
-        self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.select_sample]))
+        self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.last_select_sample]))
 
         self.aw.w_dblist.clear()
         info = self.bactdb.getannotationstrings(sequence)

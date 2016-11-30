@@ -1,4 +1,5 @@
 import importlib
+import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from logging import getLogger
@@ -31,9 +32,20 @@ class PlotGUI:
 
         Store the experiment and the gui
         '''
+        # the Experiment being plotted
         self.exp = exp
+
+        # how much zooming in on key press
         self.zoom_scale = zoom_scale
+
+        # how much to scroll on key press
         self.scroll_offset = scroll_offset
+
+        # list of selected features
+        self.selected_features = {}
+
+        # list of selected samples
+        self.selected_samples = {}
 
     def get_figure(self, newfig=None):
         ''' Get the figure to plot the heatmap into
@@ -49,7 +61,6 @@ class PlotGUI:
             fig = newfig
         else:
             fig = plt.gcf()
-        self.fig = fig
         return fig
 
     def connect_functions(self, fig):
@@ -65,12 +76,68 @@ class PlotGUI:
         '''
         pass
 
+    def clear_selection(self):
+        '''
+        delete all shown selction lines
+        '''
+        for cline in self.selected_samples.values():
+            self.axis.lines.remove(cline)
+        self.selected_samples = {}
+        for cline in self.selected_features.values():
+            self.axis.lines.remove(cline)
+        self.selected_features = {}
+
+    def update_selection(self, samplepos=[], featurepos=[], toggle=True):
+        '''Update the selection lines displayed
+
+        Parameters
+        ----------
+        samplepos : list of int (optional)
+            positions of samples to be added
+        featurepos : list of int (optional)
+            positions of features to be added
+        toggle: bool (optional)
+            True (default) to remove lines in the lists that are already selected, False to ignore
+        '''
+        for cpos in samplepos:
+            if cpos not in self.selected_samples:
+                self.selected_samples[cpos] = self.axis.axvline(x=cpos, color='white', linestyle='dotted')
+            else:
+                if toggle:
+                    self.axis.lines.remove(self.selected_samples[cpos])
+                    del self.selected_samples[cpos]
+        for cpos in featurepos:
+            if cpos not in self.selected_features:
+                self.selected_features[cpos] = self.axis.axhline(y=cpos, color='white', linestyle='dotted')
+            else:
+                if toggle:
+                    self.axis.lines.remove(self.selected_features[cpos])
+                    del self.selected_features[cpos]
+        self.canvas.draw()
+
 
 def _button_press_callback(event, hdat):
     rx = int(round(event.xdata))
     ry = int(round(event.ydata))
-    hdat.select_feature = ry
-    hdat.select_sample = rx
+
+    if event.key is None:
+        # add selection to list
+        hdat.clear_selection()
+        hdat.update_selection(samplepos=[rx], featurepos=[ry])
+    elif event.key == 'shift':
+        if hdat.last_select_feature > ry:
+            newbact = np.arange(hdat.last_select_feature, ry - 1, -1)
+        else:
+            newbact = np.arange(hdat.last_select_feature, ry + 1, 1)
+        hdat.clear_selection()
+        hdat.update_selection(featurepos=newbact)
+    elif event.key == 'super':
+        hdat.update_selection(featurepos=[ry])
+
+    # store the latest selected feature/sample
+    hdat.last_select_feature = ry
+    hdat.last_select_sample = rx
+    # and update the selected info
     hdat.update_info()
 
 
@@ -111,6 +178,27 @@ def _key_press_callback(event, hdat):
         ax.set_xlim(xlim_lower - x_offset, xlim_upper - x_offset)
     elif event.key == 'right':
         ax.set_xlim(xlim_lower + x_offset, xlim_upper + x_offset)
+    elif event.key == '.':
+        hdat.last_select_feature += 1
+        hdat.clear_selection()
+        hdat.update_selection(samplepos=hdat.selected_samples, featurepos=[hdat.last_select_feature])
+        hdat.update_info()
+    elif event.key == ',':
+        hdat.last_select_feature -= 1
+        hdat.clear_selection()
+        hdat.update_selection(samplepos=hdat.selected_samples, featurepos=[hdat.last_select_feature])
+        hdat.update_info()
+    elif event.key == '>':
+        hdat.last_select_sample += 1
+        hdat.clear_selection()
+        hdat.update_selection(featurepos=hdat.selected_features, samplepos=[hdat.last_select_sample])
+        hdat.update_info()
+    elif event.key == '<':
+        hdat.last_select_sample -= 1
+        hdat.clear_selection()
+        hdat.update_selection(featurepos=hdat.selected_features, samplepos=[hdat.last_select_sample])
+        hdat.update_info()
+
     else:
         return
 
