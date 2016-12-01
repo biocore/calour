@@ -30,6 +30,20 @@ class Experiment:
     metabolomic table, or all those tables combined), a sample
     metadata table, and a feature metadata.
 
+    Parameters
+    ----------
+    data : ``numpy.array`` or ``scipy.sparse``
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : ``pandas.DataFrame``
+        The metadata on the samples
+    feature_metadata : ``pandas.DataFrame``
+        The metadata on the features
+    description : str
+        Text describe the experiment
+    sparse : bool
+        Is data array in sparse or dense matrix
+
     Attributes
     ----------
     data : ``numpy.array`` or ``scipy.sparse``
