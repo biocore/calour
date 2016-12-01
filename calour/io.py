@@ -173,7 +173,7 @@ def save_biom(exp, f, fmt='hdf5', addtax=True):
     Parameters
     ----------
     f : str
-        the f to save to
+        the file to save to
     fmt : str (optional)
         the output biom table format. options are:
         'hdf5' (default) save to hdf5 biom table.
