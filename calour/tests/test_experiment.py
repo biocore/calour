@@ -12,7 +12,7 @@ from os.path import join, dirname, abspath
 import numpy as np
 import numpy.testing as npt
 
-from calour.testing import Tests
+from calour._testing import Tests
 import calour as ca
 
 
@@ -65,10 +65,6 @@ class TestExperiment(Tests):
         self.assertEqual(0, np.sum(newexp.data != exp.data))
         self.assertTrue(newexp.sample_metadata.equals(exp.sample_metadata))
         self.assertTrue(newexp.feature_metadata.equals(exp.feature_metadata))
-
-    def test_eq(self):
-
-
 
 if __name__ == "__main__":
     unittest.main()

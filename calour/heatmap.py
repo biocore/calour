@@ -84,7 +84,7 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     # load the appropriate gui module to handle gui events
     if gui == 'qt5':
         gui = 'PlotGUI_QT5'
-    elif gui =='cli':
+    elif gui == 'cli':
         gui = 'PlotGUI_CLI'
     elif gui == 'jupyter':
         gui = 'PlotGUI_Jupyter'
@@ -99,6 +99,9 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     else:
         fig = axis.get_figure()
         ax = axis
+
+    hdat.axis = ax
+    hdat.fig = fig
 
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
