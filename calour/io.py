@@ -85,8 +85,30 @@ def _read_table(f):
     return table
 
 
-def read_bacteria(*kargs, **kwargs):
-    exp = read(*kargs, **kwargs)
+def read_bacteria(data_file, sample_metadata_file=None, filter_orig_reads=1000, normalize=True, **kwargs):
+    '''Load a 16S experiment biom table
+
+    Fix taxonomy and normalize if needed.
+    This is a convenience function of read()
+
+    Parameters
+    ----------
+    filter_orig_reads : int or None (optional)
+        int (default) to remove all samples with < filter_orig_reads total reads. None to not filter
+    normalize : bool (optional)
+        True (default) to normalize each sample to 10000 reads
+    Returns
+    -------
+    exp : Experiment
+    '''
+    exp = read(data_file, sample_metadata_file, **kwargs)
+    if 'taxonomy' in exp.feature_metadata.columns:
+        exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp)
+
+    if filter_orig_reads is not None:
+        exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
+    if normalize:
+        exp.normalize(inplace=True)
     return exp
 
 

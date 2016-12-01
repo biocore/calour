@@ -60,13 +60,17 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
     if 'taxonomy' not in exp.feature_metadata.columns:
         raise ValueError('No taxonomy field in experiment')
 
+    # if it is not a list - just return it
+    if not isinstance(exp.feature_metadata['taxonomy'][0], list):
+        return exp.feature_metadata['taxonomy']
+
     if not remove_underscore:
         taxonomy = [separator.join(x) for x in exp.feature_metadata['taxonomy']]
     else:
         taxonomy = []
         for ctax in exp.feature_metadata['taxonomy']:
             taxstr = ''
-            for clevel in ctax.split(';'):
+            for clevel in ctax:
                 clevel = clevel.strip()
                 if len(clevel) > 3:
                     if clevel[1:3] == '__':

@@ -162,6 +162,11 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     else:
         ax.set_title(title)
 
+    try:
+        fig.tight_layout()
+    except:
+        pass
+
     # link the interactive plot functions
     hdat.connect_functions(fig)
 
