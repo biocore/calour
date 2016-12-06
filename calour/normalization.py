@@ -8,6 +8,7 @@
 
 from logging import getLogger
 from copy import deepcopy
+import sklearn.preprocessing
 
 
 logger = getLogger(__name__)
@@ -34,10 +35,6 @@ def normalize(exp, reads=10000, axis=1, inplace=False):
     if not inplace:
         exp = deepcopy(exp)
 
-    normfactor = reads / exp.data.sum(axis=axis)
-    if axis == 0:
-        exp.data = exp.data * normfactor[None, :]
-    else:
-        exp.data = exp.data * normfactor[:, None]
+    exp.data = sklearn.preprocessing.normalize(exp.data, 'l1', axis=axis) * reads
 
     return exp

@@ -229,10 +229,10 @@ def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
         logger.warn('No taxonomy field in experiment')
         return None
 
-    if not isinstance(values,(list,tuple)):
-        values=[values]
+    if not isinstance(values, (list, tuple)):
+        values = [values]
 
-    taxstr=[';'.join(x).lower() for x in exp.feature_metadata['taxonomy']]
+    taxstr = [';'.join(x).lower() for x in exp.feature_metadata['taxonomy']]
 
     select = np.zeros(len(taxstr), dtype=bool)
     for cval in values:
