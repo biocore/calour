@@ -22,6 +22,13 @@ class FilteringTests(Tests):
         self.exp2 = ca.read(*[get_data_path(i) for i in [
             'filter.1.biom', 'filter.1_sample.txt']], sparse=False)
 
+    def test_down_sample(self):
+        obs = self.exp1.down_sample('group')
+        sid = obs.sample_metadata.index.tolist()
+        all_sid = self.exp1.sample_metadata.index.tolist()
+        exp = self.exp1.reorder([all_sid.index(i) for i in sid])
+        self.assertEqual(obs, exp)
+
     def test_filter_by_metadata_sample(self):
         obs = self.exp1.filter_by_metadata('group', 1)
         exp = ca.read(*[get_data_path(i) for i in [

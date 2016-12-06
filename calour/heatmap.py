@@ -11,8 +11,6 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, FuncFormatter
 import numpy as np
 
-from .gui.plotgui import class_for_name
-
 
 logger = getLogger(__name__)
 

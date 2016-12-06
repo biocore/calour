@@ -82,7 +82,15 @@ class Experiment:
 
         Need to check sparsity and do the conversion if needed first.
         '''
-        return (np.array_equal(self.data, other.data) and
+        if self.sparse is True:
+            data = self.data.toarray()
+        else:
+            data = self.data
+        if other.sparse is True:
+            other_data = other.data.toarray()
+        else:
+            other_data = other.data
+        return (np.array_equal(data, other_data) and
                 pd.DataFrame.equals(self.feature_metadata, other.feature_metadata) and
                 pd.DataFrame.equals(self.sample_metadata, other.sample_metadata))
 
