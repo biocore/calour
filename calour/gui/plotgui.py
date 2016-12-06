@@ -1,25 +1,11 @@
-import importlib
+from logging import getLogger
+
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from logging import getLogger
 
 
 logger = getLogger(__name__)
-
-
-def class_for_name(module_name, class_name):
-    # load the gui module
-    try:
-        m = importlib.import_module(module_name)
-    except:
-        raise ValueError('gui module %s not found' % module_name)
-    # get the class
-    try:
-        c = getattr(m, class_name)
-    except:
-        raise ValueError('class %s not found in module %s. Is it a GUI module?' % class_name)
-    return c
 
 
 class PlotGUI:
@@ -64,22 +50,18 @@ class PlotGUI:
         return fig
 
     def connect_functions(self, fig):
-        '''Connect to the matplotlib callbacks for key and mouse
-        '''
+        '''Connect to the matplotlib callbacks for key and mouse '''
         self.canvas = fig.canvas
         self.canvas.mpl_connect('scroll_event', lambda f: _scroll_callback(f, hdat=self))
         self.canvas.mpl_connect('key_press_event', lambda f: _key_press_callback(f, hdat=self))
         self.canvas.mpl_connect('button_press_event', lambda f: _button_press_callback(f, hdat=self))
 
     def update_info(self):
-        '''Update info when a new feature/sample is selected
-        '''
-        pass
+        '''Update info when a new feature/sample is selected'''
+        raise NotImplemented()
 
     def clear_selection(self):
-        '''
-        delete all shown selction lines
-        '''
+        ''' Delete all shown selection lines '''
         for cline in self.selected_samples.values():
             self.axis.lines.remove(cline)
         self.selected_samples = {}

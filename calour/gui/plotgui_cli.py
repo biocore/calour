@@ -1,9 +1,8 @@
-from calour.gui.plotgui import PlotGUI
+from .plotgui import PlotGUI
 
 
 class PlotGUI_CLI(PlotGUI):
-    '''CLI version of plot window GUI using print() to show info
-    '''
+    '''CLI version of plot window GUI using print() to show info '''
     def update_info(self):
         tax_name = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
         # sample_name = self.exp.sample_metadata['#SampleID'][self.select_sample]

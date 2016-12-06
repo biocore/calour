@@ -11,33 +11,43 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, FuncFormatter
 import numpy as np
 
-from calour.gui.plotgui import class_for_name
+from .gui.plotgui import class_for_name
 
 
 logger = getLogger(__name__)
 
 
 def _transition_index(l):
-    '''Return the transition index of the list.
+    '''Return the transition index and current value of the list.
+
+    Examples
+    -------
+    >>> l = ['a', 'a', 'b']
+    >>> list(_transition_index(l))
+    [(0, 'a'), (2, 'b')]
 
     Parameters
     ----------
     l : list, 1-D array, pd.Series
         l should have method of len and [
     '''
+    cur = l[0]
+    yield 0, cur
     for i in range(1, len(l)):
-        if l[i] != l[i-1]:
-            yield i
+        if l[i] != cur:
+            yield i, l[i]
+            cur = l[i]
 
 
-def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='PlotGUI_CLI', axis=None):
+def plot(exp, sample_field=None, feature_field=None, max_features=1000,
+         logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='cli', axis=None):
     '''Plot an experiment heatmap
 
     Plot an interactive heatmap for the experiment
 
     Parameters
     ----------
-    xfield : str or None (optional)
+    sample_field : str or None (optional)
         The field to display on the x-axis (sample):
         None (default) to not show x labels.
         str to display field values for this field
@@ -51,10 +61,10 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         False to not log transform before mean calculation
     log_cutoff : float (optional)
         The minimal number of reads for the log trasnform (if logit=True)
-    clim : tuple of (float,float) or None (optional)
+    clim : tuple of (float, float) or None (optional)
         the min and max values for the heatmap or None to use all range
     xlabel_rotation : float (optional)
-        The rotation angle for the x labels (if xfield is supplied)
+        The rotation angle for the x labels (if sample_field is supplied)
     colormap : None or str (optional)
         None (default) to use mpl default color map. str to use colormap named str.
     title : None or str (optional)
@@ -88,8 +98,12 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
         gui = 'PlotGUI_CLI'
     elif gui == 'jupyter':
         gui = 'PlotGUI_Jupyter'
+    else:
+        raise ValueError('Unknown GUI specified: %r' % gui)
     gui_module_name = 'calour.gui.' + gui.lower()
-    GUIClass = class_for_name(gui_module_name, gui)
+    gui_module = importlib.import_module(gui_module_name)
+    # get the class
+    GUIClass = getattr(gui_module, gui)
     hdat = GUIClass(exp)
 
     # init the figure
@@ -106,66 +120,40 @@ def plot(exp, xfield=None, feature_field='taxonomy', max_features=40, logit=True
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
 
-    # plot vertical lines and add x labels for the field
-    if xfield is not None:
-        if xfield not in exp.sample_metadata:
-            raise ValueError('Sample field %s not in sample metadata' % xfield)
-        x_values = [exp.sample_metadata[xfield][0]]
-        x_pos = [0]
-        for transition_pos in _transition_index(exp.sample_metadata[xfield]):
-            # samples start -0.5 before and go to 0.5 after
-            x_pos.append(transition_pos - 0.5)
-            x_values.append(exp.sample_metadata[xfield][transition_pos])
-            ax.axvline(x=transition_pos - 0.5, color='white')
-        x_pos.append(exp.get_num_samples())
+    # plot vertical lines between sample groups and add x labels for the field
+    if sample_field is not None:
+        x_pos, x_val = zip(*[(pos, val) for pos, val in _transition_index(
+            exp.sample_metadata[sample_field])])
+        # samples start - 0.5 before and go to 0.5 after
+        for pos in x_pos[1:]:
+            ax.axvline(x=pos - 0.5, color='white')
+        x_pos = list(x_pos)
+        x_pos.append(exp.data.shape[0])
         x_pos = np.array(x_pos)
-        ax.set_xticks(x_pos[:-1]+(x_pos[1:]-x_pos[:-1])/2)
-        ax.set_xticklabels(x_values, rotation=xlabel_rotation, ha='right')
+        ax.set_xticks(x_pos[:-1] + (x_pos[1:] - x_pos[:-1]) / 2)
+        ax.set_xticklabels(x_val, rotation=xlabel_rotation, ha='right')
 
-    # set feature ticks and labels
+    # plot y ticks and labels
     if feature_field is not None:
-        if feature_field not in exp.feature_metadata:
-            raise ValueError('Feature field %s not in feature metadata' % feature_field)
-        labels = [x for x in exp.feature_metadata[feature_field]]
-        xs = np.arange(len(labels))
-
-        # display only when zoomed enough
-        def format_fn(tick_val, tick_pos):
-            if int(tick_val) in xs:
-                return labels[int(tick_val)]
-            else:
-                return ''
-        if max_features > 0:
-            # set the maximal number of feature lables
-            ax.yaxis.set_major_formatter(FuncFormatter(format_fn))
-            ax.yaxis.set_major_locator(MaxNLocator(max_features, integer=True))
-        else:
-            # otherwise show all labels
-            ax.set_yticks(xs)
+        labels = exp.feature_metadata[feature_field]
+        size = len(labels)
+        if size <= max_features:
+            ax.set_yticks(range(size))
             ax.set_yticklabels(labels)
-        ax.tick_params(axis='y', which='major', labelsize=8)
 
-    # set the mouse hover string to number of reads
-    class Formatter(object):
-        def __init__(self, im):
-            self.im = im
+    # set the mouse hover string to the value of abundance
+    def x_y_info(x, y):
+        z = image.get_array()[int(y), int(x)]
+        if logit:
+            z = np.power(2, z)
+        return '{0:.01f}'.format(z)
+    ax.format_coord = x_y_info
 
-        def __call__(self, x, y):
-            z = self.im.get_array()[int(y), int(x)]
-            if logit:
-                z = np.power(2, z)
-            return 'reads:{:.01f}'.format(z)
-    ax.format_coord = Formatter(image)
     # set the title
     if title is None:
         title = exp.description
     else:
         ax.set_title(title)
-
-    try:
-        fig.tight_layout()
-    except:
-        pass
 
     # link the interactive plot functions
     hdat.connect_functions(fig)
