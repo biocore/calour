@@ -39,10 +39,8 @@ def sort_taxonomy(exp, inplace=False):
     return exp
 
 
-@Experiment._record_sig
-def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normalize=True, inplace=False):
-    '''Cluster the features (similar features close to each other)
-    Reorder the features so that ones with similar behavior (pattern across samples) are close to each other
+def _transform(data, axis=1, min_abundance=None, logit=1, normalize=True):
+    '''transform the data array.
 
     Parameters
     ----------
@@ -52,52 +50,60 @@ def cluster_features(exp, min_abundance=None, logit=True, log_cutoff=1, normaliz
     lgoit : bool (optional)
         True (default) to log transform the data before clustering.
         False to not log transform.
-    log_cutoff : float (optional)
-        if logit, this is the minimal read threshold for the log transform
     normalize : bool (optional)
         True (default) to normalize each feature to sum 1 std 1.
         False to not normalize each feature.
+
+    '''
+    if scipy.sparse.issparse(data):
+        new = data.toarray()
+    # filter low-freq features
+    if min_abundance is not None:
+        logger.debug('filtering min abundance %d' % min_abundance)
+        exp = exp.filter_by_data(
+            'sum_abundance', axis=axis, inplace=inplace, cutoff=min_abundance)
+
+    if normalize:
+        # center and normalize
+        new = scale(new, axis=axis, copy=False)
+
+    if logit is not None:
+        new[new < logit] = logit
+        new = np.log2(new)
+
+    return new
+
+@Experiment._record_sig
+def cluster_data(exp, axis=0, transform=None, metric='euclidean', inplace=False, **kwargs):
+    '''Cluster the samples/features.
+
+    Reorder the features/samples so that ones with similar behavior (pattern
+    across samples/features) are close to each other
+
+    Parameters
+    ----------
     inplace : bool (optional)
         False (default) to create a copy.
         True to Replace data in exp.
+
     Returns
     -------
     exp : Experiment
         With features filtered (if min_abundance is not None) and clsutered (reordered)
+
     '''
-    # filter low-freq features
-    if min_abundance is not None:
-        logger.debug('filtering min abundance %d' % min_abundance)
-        exp = exp.filter_by_data('sum_abundance', axis=1, inplace=inplace, cutoff=min_abundance)
-
-    data = exp.get_data(sparse=False, getcopy=True)
-
-    data = data.transpose()
-
-    if logit:
-        data[data < log_cutoff] = log_cutoff
-        data = np.log2(data)
-
-    if normalize:
-        data = scale(data, axis=1, copy=False)
+    data = transform(exp.data, axis=axis, **kwargs)
 
     # cluster
-    dist_mat = spatial.distance.pdist(data, metric='euclidean')
+    dist_mat = spatial.distance.pdist(data, metric=metric)
     linkage = cluster.hierarchy.single(dist_mat)
     sort_order = cluster.hierarchy.leaves_list(linkage)
 
-    exp = exp.reorder(sort_order, axis=1, inplace=inplace)
-    return exp
+    return exp.reorder(sort_order, axis=1, inplace=inplace)
 
 
-def cluster_samples(exp, inplace=False):
-    '''
-    reorder samples by clustering similar samples
-    '''
-
-
-def sort_samples(exp, field, inplace=False):
-    '''Sort samples based on sample metadata values in field
+def sort_by_metadata(exp, field, axis=0, inplace=False):
+    '''Sort samples or features based on metadata values in the field.
 
     Parameters
     ----------
@@ -106,20 +112,22 @@ def sort_samples(exp, field, inplace=False):
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
+
     Returns
     -------
     exp : Experiment
-        With samples sorted by values in sample_metadata field
     '''
-    logger.debug('sorting samples by field %s' % field)
-    if field not in exp.sample_metadata.columns:
-        raise ValueError('Field %s not found in sample metadata' % field)
-    sort_pos = np.argsort(exp.sample_metadata[field], kind='mergesort')
-    exp = exp.reorder(sort_pos, axis=0, inplace=inplace)
-    return exp
+    logger.info('sorting samples by field %s' % field)
+    if axis == 0:
+        x = exp.sample_metadata
+    elif axis == 1:
+        x = exp.feature_metadata
+    idx = np.argsort(x[field], kind='mergesort')
+    return exp.reorder(idx, axis=axis, inplace=inplace)
 
 
-def sort_freq(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
+
+def sort_by_data(exp, logit=True, log_cutoff=1, sample_subset=None, inplace=False):
     '''Sort features based on their mean frequency.
 
     Sort the features based on their mean (log) frequency (optional in a subgroup of samples).

@@ -7,8 +7,9 @@
 # ----------------------------------------------------------------------------
 
 import unittest
-import pandas as pd
 from os.path import join
+
+import pandas as pd
 import pandas.util.testing as pdt
 
 import calour as ca
