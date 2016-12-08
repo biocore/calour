@@ -7,8 +7,9 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+import importlib
+
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator, FuncFormatter
 import numpy as np
 
 
@@ -77,7 +78,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         None (default) to create a new figure, axis to plot heatmap into the axis
     '''
     logger.debug('plot experiment')
-    data = exp.get_data(sparse=False, getcopy=True)
+    data = exp.data.toarray()
 
     if logit:
         # log transform if needed
