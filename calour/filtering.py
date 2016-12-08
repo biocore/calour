@@ -8,6 +8,8 @@
 
 from heapq import nlargest
 from logging import getLogger
+
+import scipy
 import numpy as np
 
 from .experiment import Experiment
@@ -82,7 +84,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
 
 
 @Experiment._record_sig
-def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs):
+def filter_by_data(exp, predicate, axis=0, subset=None, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
 
     Parameters
@@ -95,7 +97,18 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
         negate the predicate for selection
     kwargs : dict
         keyword argument passing to predicate function
+
+    Returns
+    -------
+    exp : Experiment
+
     '''
+    select = _filter_by_data(exp.data, predicate, axis, subset, negate, **kwargs)
+    logger.info('%s remaining' % np.sum(select))
+    return exp.reorder(select, axis=axis, inplace=inplace)
+
+
+def _filter_by_data(data, predicate, axis=0, subset=None, negate=False, **kwargs):
     func = {'sum_abundance': _sum_abundance,
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
@@ -104,23 +117,22 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     if isinstance(predicate, str):
         predicate = func[predicate]
 
-    if exp.sparse:
-        n = exp.data.shape[axis]
+    if scipy.sparse.issparse(data):
+        n = data.shape[axis]
         select = np.ones(n, dtype=bool)
         if axis == 0:
             for row in range(n):
-                select[row] = predicate(exp.data[row, :], **kwargs)
+                select[row] = predicate(data[row, :], **kwargs)
         elif axis == 1:
             for col in range(n):
-                select[col] = predicate(exp.data[:, col], **kwargs)
+                select[col] = predicate(data[:, col], **kwargs)
     else:
-        select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
+        select = np.apply_along_axis(predicate, 1 - axis, data, **kwargs)
 
     if negate is True:
         select = ~ select
-    logger.info('%s remaining' % np.sum(select))
-    return exp.reorder(select, axis=axis, inplace=inplace)
 
+    return select
 
 def _sum_abundance(x, cutoff=10):
     '''Check if the sum abundance larger than cutoff.
@@ -158,7 +170,7 @@ def _mean_abundance(x, cutoff=0.01):
     return x.mean() >= cutoff
 
 
-def _presence_fraction(x, fraction=0.5, cutoff=0):
+def _prevalence(x, cutoff=0, fraction=0.5):
     '''Check the presence fraction.
 
     present (abundance >= cutoff) in at least "fraction" of samples
