@@ -25,36 +25,36 @@ class TestSorting(Tests):
         self.complex = ca.read(self.complex_table, self.complex_map)
 
     def test_sort_taxonomy(self):
-        newexp = self.simple.sort_taxonomy()
+        obs = self.simple.sort_taxonomy()
         expected_taxonomy = pd.Series.from_csv(join(self.test_data_dir, 'test1.sorted.taxonomy.csv'))
-        pdt.assert_series_equal(newexp.feature_metadata['taxonomy'], expected_taxonomy, check_names=False)
+        pdt.assert_series_equal(obs.feature_metadata['taxonomy'], expected_taxonomy, check_names=False)
 
-    def test_cluster_features(self):
+    def test_cluster_data(self):
         # no minimal filtering
         # simple experiment
-        newexp = self.simple.cluster_features()
-        expected_experiment = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'), join(self.test_data_dir, 'test1.map.txt'))
-        assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
+        obs = self.simple.cluster_data()
+        exp = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'), join(self.test_data_dir, 'test1.map.txt'))
+        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
         # complex experiment (timeseries)
-        newexp = self.complex.cluster_features()
-        expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.clustered.features.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
-        assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
+        obs = self.complex.cluster_data()
+        exp = ca.read(join(self.test_data_dir, 'timeseries.clustered.features.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
+        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
 
-    def test_sort_samples(self):
+    def test_sort_by_metadata(self):
         # test sorting inplace and various fields (keeping the order)
-        newexp = self.complex.sort_samples(field='MINUTES')
-        newexp = newexp.sort_samples(field='HOUR')
-        newexp.sort_samples(field='DAY', inplace=True)
-        expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
-        assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
+        obs = self.complex.sort_by_metadata(field='MINUTES')
+        obs = obs.sort_by_metadata(field='HOUR')
+        obs.sort_by_metadata(field='DAY', inplace=True)
+        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
+        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
         # also test first and last samples are ok
-        self.assertEqual(newexp.sample_metadata['MF_SAMPLE_NUMBER'][0], 1)
-        self.assertEqual(newexp.sample_metadata['MF_SAMPLE_NUMBER'][-1], 96)
+        self.assertEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'][0], 1)
+        self.assertEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'][-1], 96)
 
-    def test_sort_freq(self):
-        newexp = self.complex.sort_freq()
-        expected_experiment = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
-        assert_experiment_equal(newexp, expected_experiment, check_history=False, almost_equal=True)
+    def test_sort_by_data(self):
+        obs = self.complex.sort_by_data(axis=1)
+        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
+        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
 
 
 if __name__ == "__main__":

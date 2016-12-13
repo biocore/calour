@@ -134,11 +134,24 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
 
     # plot y ticks and labels
     if feature_field is not None:
-        labels = exp.feature_metadata[feature_field]
-        size = len(labels)
-        if size <= max_features:
-            ax.set_yticks(range(size))
-            ax.set_yticklabels(labels)
+        if feature_field not in exp.feature_metadata:
+            raise ValueError('Feature field %s not in feature metadata' % feature_field)
+        labels = [x for x in exp.feature_metadata[feature_field]]
+        xs = np.arange(len(labels))
+
+        # display only when zoomed enough
+        def format_fn(tick_val, tick_pos):
+            if int(tick_val) in xs:
+                return labels[int(tick_val)]
+            else:
+                return ''
+        if max_features > 0:
+            # set the maximal number of feature lables
+            ax.yaxis.set_major_formatter(FuncFormatter(format_fn))
+            ax.yaxis.set_major_locator(MaxNLocator(max_features, integer=True))
+        else:
+            # otherwise show all labels
+            ax.set_yticks(xs)
 
     # set the mouse hover string to the value of abundance
     def x_y_info(x, y):
