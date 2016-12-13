@@ -1,5 +1,10 @@
-# calour functions for sorting samples/observations
-# functions should call reorder_samples() / reorder_obs()
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
 
 from logging import getLogger
 from copy import copy
@@ -9,8 +14,8 @@ import scipy.sparse
 from scipy import cluster, spatial
 from sklearn.preprocessing import scale
 
-import calour as ca
-from calour import Experiment
+from . import Experiment
+from .util import _get_taxonomy_string
 from .filtering import _filter_by_data
 
 
@@ -34,7 +39,7 @@ def sort_taxonomy(exp, inplace=False):
         sorted by taxonomy
     '''
     logger.debug('sorting by taxonomies')
-    taxonomy = ca._get_taxonomy_string(exp, remove_underscore=True)
+    taxonomy = _get_taxonomy_string(exp, remove_underscore=True)
     sort_pos = np.argsort(taxonomy, kind='mergesort')
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
