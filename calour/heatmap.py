@@ -9,6 +9,7 @@
 from logging import getLogger
 import importlib
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -147,8 +148,8 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
                 return ''
         if max_features > 0:
             # set the maximal number of feature lables
-            ax.yaxis.set_major_formatter(FuncFormatter(format_fn))
-            ax.yaxis.set_major_locator(MaxNLocator(max_features, integer=True))
+            ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_fn))
+            ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(max_features, integer=True))
         else:
             # otherwise show all labels
             ax.set_yticks(xs)
