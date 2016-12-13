@@ -113,7 +113,7 @@ def _filter_by_data(data, predicate, axis=0, subset=None, negate=False, **kwargs
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
             'mean_abundance': _mean_abundance,
-            'presence_fraction': _presence_fraction}
+            'prevalence': _prevalence}
     if isinstance(predicate, str):
         predicate = func[predicate]
 
@@ -133,6 +133,7 @@ def _filter_by_data(data, predicate, axis=0, subset=None, negate=False, **kwargs
         select = ~ select
 
     return select
+
 
 def _sum_abundance(x, cutoff=10):
     '''Check if the sum abundance larger than cutoff.
