@@ -178,11 +178,11 @@ def _prevalence(x, cutoff=0, fraction=0.5):
 
     Examples
     --------
-    >>> _presence_fraction(np.array([0, 1]))
+    >>> _prevalence(np.array([0, 1]))
     True
-    >>> _presence_fraction(np.array([0, 1, 2, 3]), 0.5, 2)
+    >>> _prevalence(np.array([0, 1, 2, 3]), 0.5, 2)
     True
-    >>> _presence_fraction(np.array([0, 1, 2]), 0.51, 2)
+    >>> _prevalence(np.array([0, 1, 2]), 0.51, 2)
     False
     '''
     logger.debug('')

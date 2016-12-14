@@ -56,9 +56,15 @@ def _log_min_transform(data, axis=1, min_abundance=None, logit=1, normalize=True
         True (default) to normalize each feature to sum 1 std 1.
         False to not normalize each feature.
 
+    Returns
+    -------
+    ndarray
+        transformed 2-d array
     '''
     if scipy.sparse.issparse(data):
         new = data.toarray()
+    else:
+        new = data.copy()
 
     # filter low-freq rows/columns
     if min_abundance is not None:
