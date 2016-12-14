@@ -12,11 +12,11 @@ from copy import copy
 import numpy as np
 import scipy.sparse
 from scipy import cluster, spatial
-from sklearn.preprocessing import scale
 
 from . import Experiment
 from .util import _get_taxonomy_string
 from .filtering import _filter_by_data
+from .transforming import _log_min_transform
 
 
 logger = getLogger(__name__)
@@ -43,43 +43,6 @@ def sort_taxonomy(exp, inplace=False):
     sort_pos = np.argsort(taxonomy, kind='mergesort')
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
-
-
-def _transform(data, axis=1, min_abundance=None, logit=1, normalize=True):
-    '''transform the data array.
-
-    Parameters
-    ----------
-    min_abundance : None or float (optional)
-        None (default) to not remove any features.
-        float to remove all features with total reads < float (to make clustering faster).
-    lgoit : bool (optional)
-        True (default) to log transform the data before clustering.
-        False to not log transform.
-    normalize : bool (optional)
-        True (default) to normalize each feature to sum 1 std 1.
-        False to not normalize each feature.
-
-    '''
-    if scipy.sparse.issparse(data):
-        new = data.toarray()
-
-    # filter low-freq rows/columns
-    if min_abundance is not None:
-        logger.debug('filtering min abundance %d' % min_abundance)
-        select = _filter_by_data(
-            'sum_abundance', axis=axis, cutoff=min_abundance)
-        new = np.take(new, select, axis=axis)
-
-    if logit is not None:
-        new[new < logit] = logit
-        new = np.log2(new)
-
-    if normalize is True:
-        # center and normalize
-        new = scale(new, axis=axis, copy=False)
-
-    return new
 
 
 @Experiment._record_sig
@@ -111,7 +74,7 @@ def cluster_data(exp, axis=0, transform=None, metric='euclidean', inplace=False,
 
     '''
     if transform is None:
-        transform = _transform
+        transform = _log_min_transform
     data = transform(exp.data, axis=axis, **kwargs)
     if axis == 0:
         data = data.T
