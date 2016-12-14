@@ -84,7 +84,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
 
 
 @Experiment._record_sig
-def filter_by_data(exp, predicate, axis=0, subset=None, negate=False, inplace=False, **kwargs):
+def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
 
     Parameters
@@ -103,12 +103,12 @@ def filter_by_data(exp, predicate, axis=0, subset=None, negate=False, inplace=Fa
     exp : Experiment
 
     '''
-    select = _filter_by_data(exp.data, predicate, axis, subset, negate, **kwargs)
+    select = _filter_by_data(exp.data, predicate, axis, negate, **kwargs)
     logger.info('%s remaining' % np.sum(select))
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def _filter_by_data(data, predicate, axis=0, subset=None, negate=False, **kwargs):
+def _filter_by_data(data, predicate, axis=0, negate=False, **kwargs):
     func = {'sum_abundance': _sum_abundance,
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
