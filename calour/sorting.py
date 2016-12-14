@@ -115,18 +115,22 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def sort_by_data(exp, key='log_mean', axis=0, subset=None, inplace=False, **kwargs):
+def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwargs):
     '''Sort features based on their mean frequency.
 
-    Sort the features based on their log mean frequency (optional in a subgroup of samples).
+    Sort the 2-d array by sample (axis=0) or feature (axis=0),
+    depending on ``axis``. ``key`` will be applied to ``subset`` of
+    each feature (axis=0) or sample (axis=1) and return a comparative value.
 
     Parameters
     ----------
     axis : 0 or 1
         Apply ``key`` function on row (sort by samples) (0) or column (sort by features) (1)
-    subset : None or iterable of indices (optional)
-        None (default) to sort based on mean in all samples in experiment
-        (non-none) to sort based only on data from samples in the sample_subset
+    subset : None or iterable of int (optional)
+        Sorting by only subset of the data.
+    key : callable
+        a function returns a comparative value (like ``key`` in builtin ``sorted`` function).
+        It is applied on each 1-d array.
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
@@ -135,11 +139,12 @@ def sort_by_data(exp, key='log_mean', axis=0, subset=None, inplace=False, **kwar
     -------
     exp : Experiment
         With features sorted by mean frequency
+
     '''
     if subset is None:
         data_subset = exp.data
     else:
-        data_subset = exp.data.take(subset, axis=axis)
+        data_subset = exp.data.take(subset, axis=1-axis)
     func = {'log_mean': _log_mean,
             'prevalence': _prevalence}
     if isinstance(key, str):
@@ -156,7 +161,6 @@ def sort_by_data(exp, key='log_mean', axis=0, subset=None, inplace=False, **kwar
         sort_pos = np.argsort(values)
     else:
         sort_pos = np.argsort(np.apply_along_axis(key, 1 - axis, data_subset, **kwargs))
-    # import ipdb; ipdb.set_trace()
 
     exp = exp.reorder(sort_pos, axis=axis, inplace=inplace)
 
@@ -182,8 +186,11 @@ def _log_mean(x, logit=1):
     if logit is None:
         return np.mean(x)
     else:
-        # make a copy because it's gonna be changed
-        x = x.toarray()
+        try:
+            x = x.toarray()
+        except AttributeError:
+            # make a copy because it's changed inplace
+            x = x.copy()
         x[x < logit] = logit
         # import ipdb; ipdb.set_trace()
         return np.log2(x).mean()

@@ -9,6 +9,8 @@
 from logging import getLogger
 from copy import deepcopy
 
+import scipy
+import numpy as np
 from sklearn import preprocessing
 
 
@@ -79,6 +81,6 @@ def _log_min_transform(data, axis=1, min_abundance=None, logit=1, normalize=True
 
     if normalize is True:
         # center and normalize
-        new = processing.scale(new, axis=axis, copy=False)
+        new = preprocessing.scale(new, axis=axis, copy=False)
 
     return new

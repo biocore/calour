@@ -84,7 +84,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
 
 
 @Experiment._record_sig
-def filter_by_data(exp, predicate, axis=0, subset=None, negate=False, inplace=False, **kwargs):
+def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
 
     Parameters
@@ -103,12 +103,12 @@ def filter_by_data(exp, predicate, axis=0, subset=None, negate=False, inplace=Fa
     exp : Experiment
 
     '''
-    select = _filter_by_data(exp.data, predicate, axis, subset, negate, **kwargs)
+    select = _filter_by_data(exp.data, predicate, axis, negate, **kwargs)
     logger.info('%s remaining' % np.sum(select))
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def _filter_by_data(data, predicate, axis=0, subset=None, negate=False, **kwargs):
+def _filter_by_data(data, predicate, axis=0, negate=False, **kwargs):
     func = {'sum_abundance': _sum_abundance,
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
@@ -172,7 +172,7 @@ def _mean_abundance(x, cutoff=0.01):
 
 
 def _prevalence(x, cutoff=0, fraction=0.5):
-    '''Check the presence fraction.
+    '''Check the prevalence of values above the cutoff.
 
     present (abundance >= cutoff) in at least "fraction" of samples
 
@@ -180,9 +180,9 @@ def _prevalence(x, cutoff=0, fraction=0.5):
     --------
     >>> _prevalence(np.array([0, 1]))
     True
-    >>> _prevalence(np.array([0, 1, 2, 3]), 0.5, 2)
+    >>> _prevalence(np.array([0, 1, 2, 3]), 2, 0.5)
     True
-    >>> _prevalence(np.array([0, 1, 2]), 0.51, 2)
+    >>> _prevalence(np.array([0, 1, 2]), 2, 0.51)
     False
     '''
     logger.debug('')
