@@ -7,15 +7,12 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from copy import copy
 
 import numpy as np
-import scipy.sparse
 from scipy import cluster, spatial
 
 from . import Experiment
 from .util import _get_taxonomy_string
-from .filtering import _filter_by_data
 from .transforming import _log_min_transform
 
 
@@ -110,6 +107,8 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
+    else:
+        raise ValueError('unknown axis %s' % axis)
     idx = np.argsort(x[field], kind='mergesort')
     return exp.reorder(idx, axis=axis, inplace=inplace)
 

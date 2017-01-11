@@ -6,12 +6,11 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from unittest import TestCase, main
+from unittest import TestCase
 from os.path import join, dirname, abspath
 
 import pandas.util.testing as pdt
 import numpy.testing as npt
-import numpy as np
 
 import calour as ca
 

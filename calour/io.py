@@ -14,7 +14,7 @@ import scipy
 import biom
 
 from calour.experiment import Experiment
-from calour.util import _get_taxonomy_string
+from calour.util import _get_taxonomy_string, get_file_md5, get_data_md5
 
 logger = getLogger(__name__)
 
@@ -66,9 +66,10 @@ def _get_md_from_biom(table):
         logger.info('No metadata associated with features in biom table')
     else:
         metadata = [dict(tmd) for tmd in metadata]
-    md_df = pd.DataFrame(metadata, index=ids)
-    # md_df['sequence']=ids
-    md_df.index.name = 'sequence'
+    md_df = pd.DataFrame(metadata)
+    md_df['ids'] = ids
+    md_df.set_index('ids', drop=False, inplace=True)
+    # md_df.index.name = 'sequence'
     return md_df
 
 
@@ -79,7 +80,9 @@ def _read_table(f):
     metadata file
 
     '''
-    table = pd.read_table(f, sep='\t', index_col=0)
+    # table = pd.read_table(f, sep='\t', index_col=0)
+    table = pd.read_table(f, sep='\t')
+    table.set_index(table.columns[0], drop=False, inplace=True)
     # make sure the sample ID is string-type
     table.index = table.index.astype(np.str)
     return table
@@ -132,10 +135,13 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         read the biom table into sparse or dense array
     '''
     logger.info('Reading experiment (biom table %s, map file %s)' % (data_file, sample_metadata_file))
+    exp_metadata = {}
+    exp_metadata['map_md5'] = ''
     sid, oid, data, md = _read_biom(data_file, sparse=sparse)
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
         sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
+        exp_metadata['map_md5'] = get_file_md5(sample_metadata_file)
     else:
         sample_metadata = pd.DataFrame(index=sid)
     if feature_metadata_file is not None:
@@ -145,7 +151,14 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         feature_metadata = pd.concat([fm, md], axis=1)
     else:
         feature_metadata = md
-    return Experiment(data, sample_metadata, feature_metadata, description=description, sparse=sparse)
+
+    # init the experiment metadata details
+    exp_metadata['data_file'] = data_file
+    exp_metadata['sample_metadata_file'] = sample_metadata_file
+    exp_metadata['feature_metadata_file'] = feature_metadata_file
+    exp_metadata['data_md5'] = get_data_md5(data)
+
+    return Experiment(data, sample_metadata, feature_metadata, exp_metadata=exp_metadata, description=description, sparse=sparse)
 
 
 def serialize(exp, f):

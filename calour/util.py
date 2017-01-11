@@ -7,11 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from unittest import TestCase, main
-from os.path import join, dirname, abspath
-
-import numpy as np
-
+import hashlib
+import scipy
 
 logger = getLogger(__name__)
 
@@ -83,3 +80,62 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
     if to_lower:
         taxonomy = [x.lower() for x in taxonomy]
     return taxonomy
+
+
+def get_file_md5(filename):
+    '''get the md5 of the text file: filename
+
+    Parameters
+    ----------
+    filename : str
+        name of the file to calculate md5 on
+
+    Returns
+    -------
+    flmd5: str
+        the md5 of the file filename
+    '''
+    fl = open(filename, 'rU')
+    flmd5 = hashlib.md5()
+    for cline in fl:
+        try:
+            flmd5.update(cline.encode('utf-8'))
+        except:
+            logger.warn('map md5 cannot be calculated - utf problems?')
+            return ''
+    flmd5 = flmd5.hexdigest()
+    return flmd5
+
+
+def get_data_md5(data):
+    '''Calculate the md5 of a dense/sparse matrix
+
+    Calculat matrix md5 based on row by row order
+
+    Parameters
+    ----------
+    data : dense or sparse matrix
+
+    Returns
+    -------
+    datmd5 : str
+        the md5 of the data (row by row)
+    '''
+    logger.debug('caculating data md5')
+    datmd5 = hashlib.md5()
+    if scipy.sparse.issparse(data):
+        issparse = True
+    else:
+        issparse = False
+    for crow in range(data.shape[0]):
+        if issparse:
+            # if sparse need to convert to numpy array
+            cdat = data[crow, :].toarray()[0]
+        else:
+            cdat = data[crow, :]
+        # convert to string of raw data since hashlib.md5 does not take numpy array as input
+        datmd5.update(cdat.tostring())
+
+    datmd5 = datmd5.hexdigest()
+    logger.debug('data md5 is: %s' % datmd5)
+    return datmd5

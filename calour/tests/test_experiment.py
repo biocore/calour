@@ -7,10 +7,8 @@
 # ----------------------------------------------------------------------------
 
 import unittest
-from os.path import join, dirname, abspath
 
 import numpy as np
-import numpy.testing as npt
 
 from calour._testing import Tests
 import calour as ca

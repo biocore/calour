@@ -40,7 +40,7 @@ def _transition_index(l):
 
 
 def plot(exp, sample_field=None, feature_field=None, max_features=1000,
-         logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='cli', axis=None):
+         logit=True, log_cutoff=1, clim=(0, 10), xlabel_rotation=45, cmap=None, title=None, gui='cli', axis=None, rect=None):
     '''Plot an experiment heatmap
 
     Plot an interactive heatmap for the experiment
@@ -77,6 +77,9 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         Other string : name of child class of plotgui (which should reside in gui/lower(classname).py)
     axis : matplotlib axis or None (optional)
         None (default) to create a new figure, axis to plot heatmap into the axis
+    rect : list of int or None (optional)
+        None (default) to set initial zoom window to all experiment.
+        [x_min, x_max, y_min, y_max] to set initial zoom window
     '''
     logger.debug('plot experiment')
     data = exp.data.toarray()
@@ -119,6 +122,11 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
 
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+
+    # set the initial zoom window if supplied
+    if rect is not None:
+        ax.set_xlim((rect[0], rect[1]))
+        ax.set_ylim((rect[2], rect[3]))
 
     # plot vertical lines between sample groups and add x labels for the field
     if sample_field is not None:
@@ -172,3 +180,4 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
     hdat.connect_functions(fig)
 
     plt.show()
+    hdat.run_gui()

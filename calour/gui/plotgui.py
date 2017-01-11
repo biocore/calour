@@ -12,6 +12,17 @@ class PlotGUI:
     '''The base class for heatmap GUI
 
     Various gui classes inherit this class
+
+    Attributes
+    ----------
+    exp : Experiment
+        the experiment associated with this gui
+    selected_features : dict of matplotlib.lines.Line2D
+        used to track the selected features and plot horizontal lines for each selectiom
+        keys - the selected features indeices, values - the line id for each selected feature
+    selected_samples : dict of matplotlib.lines.Line2D
+        used to track the selected samples and plot vertical lines for each selectiom
+        keys - the selected sample indices, values - the line id for each selected samples
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0):
         '''Init the gui windows class
@@ -48,6 +59,11 @@ class PlotGUI:
         else:
             fig = plt.gcf()
         return fig
+
+    def run_gui(self):
+        ''' Run the GUI event loop and return when gui is done. does nothing for base class
+        '''
+        pass
 
     def connect_functions(self, fig):
         '''Connect to the matplotlib callbacks for key and mouse '''
