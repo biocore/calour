@@ -1,17 +1,16 @@
-import matplotlib
-matplotlib.use("Qt5Agg")
+import time
+import sys
+
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
                              QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter,
                              QFrame, QComboBox, QScrollArea, QListWidgetItem)
+from PyQt5.QtWidgets import QApplication
 
 from calour.bactdb import BactDB
 from calour.gui.plotgui import PlotGUI
-
-
-# app_ref=set()
 
 
 class PlotGUI_QT5(PlotGUI):
@@ -24,11 +23,30 @@ class PlotGUI_QT5(PlotGUI):
         self.bactdb = BactDB()
 
     def get_figure(self, newfig=None):
-        self.aw = ApplicationWindow(self.exp)
-#        app_ref.add(self.aw)
+        app_created = False
+        app = QtCore.QCoreApplication.instance()
+        print(sys.argv)
+        if app is None:
+            # app = QApplication(sys.argv)
+            app = QApplication(['calour-%s' % time.ctime()])
+            app_created = True
+        self.app = app
+        self.app_created = app_created
+        if app_created:
+            app.references = set()
+
+        self.aw = ApplicationWindow(self)
+        # if app_created:
+        #     app.references.add(self.aw)
+        app.references.add(self.aw)
         self.aw.setWindowTitle("Calour")
         self.aw.show()
         return self.aw.plotfigure
+
+    def run_gui(self):
+        self.app.exec_()
+        # if self.app_created:
+        #     self.app.exec_()
 
     def update_info(self):
         taxname = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
@@ -40,7 +58,7 @@ class PlotGUI_QT5(PlotGUI):
         self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.last_select_sample]))
 
         self.aw.w_dblist.clear()
-        info = self.bactdb.getannotationstrings(sequence)
+        info = self.bactdb.get_seq_annotation_strings(sequence)
         self.addtocdblist(info)
 
     def addtocdblist(self, info):
@@ -78,7 +96,7 @@ class MyMplCanvas(FigureCanvas):
 
 
 class ApplicationWindow(QMainWindow):
-    def __init__(self, exp):
+    def __init__(self, gui):
         QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
@@ -138,7 +156,7 @@ class ApplicationWindow(QMainWindow):
 
         # fill the values for the gui
         # add the sample field combobox values
-        for cfield in exp.sample_metadata.columns:
+        for cfield in gui.exp.sample_metadata.columns:
             self.w_field.addItem(cfield)
 
         heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -146,6 +164,10 @@ class ApplicationWindow(QMainWindow):
 
         self.plotaxes = heatmap.axes
         self.plotfigure = heatmap.figure
+        self.gui = gui
+
+        # link events to gui
+        self.w_annotate.clicked.connect(self.annotate)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
@@ -156,3 +178,14 @@ class ApplicationWindow(QMainWindow):
     def closeEvent(self, ce):
         self.fileQuit()
 
+    def annotate(self):
+        '''Add database annotation to selected features
+        '''
+        from calour.annotation import annotate_bacteria_gui
+
+        # get the sequences of the selection
+        seqs = []
+        for cseqpos in self.gui.selected_features.keys():
+            seqs.append(self.gui.exp.feature_metadata.index[cseqpos])
+
+        annotate_bacteria_gui(seqs, self.gui.exp)

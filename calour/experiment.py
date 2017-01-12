@@ -8,7 +8,6 @@
 
 from logging import getLogger
 import scipy.sparse
-from os.path import join
 from copy import copy, deepcopy
 from importlib import import_module
 import inspect
@@ -17,7 +16,6 @@ from functools import wraps
 import pandas as pd
 import numpy as np
 import scipy
-import biom
 
 
 logger = getLogger(__name__)
@@ -53,12 +51,15 @@ class Experiment:
         The metadata on the samples
     feature_metadata : ``pandas.DataFrame``
         The metadata on the features
+    exp_metadata : dict
+        metadata about the experiment (data md5, filenames, etc.)
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
-                 description='', sparse=True):
+                 exp_metadata={}, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
         self.feature_metadata = feature_metadata
+        self.exp_metadata = exp_metadata
         self.description = description
 
         # the function calling history list
@@ -238,8 +239,20 @@ def join_experiments(exp1, exp2, orig_field_name='orig_exp', orig_field_values=N
     '''
     join two Experiments into one experiment
     if suffix is not none, add suffix to each sampleid (suffix is a list of 2 values i.e. ('_1','_2'))
-    if same observation id in both studies, use values, otherwise put 0 in values of experiment where the observation in not present
+    if same feature id in both studies, use values, otherwise put 0 in values of experiment where the observation in not present
     '''
+    logger.debug('join experiments')
+    newexp = copy.deepcopy(exp1)
+    newexp.description = 'join %s & %s' % (exp1.description, exp2.description)
+
+    # test if we need to force a suffix (when both experiments contain the same sample)
+    if len(exp1.sample_metadata.index.intersection(exp2.sample_metadata.index)) > 0:
+        if suffixes in None:
+            logger.info('both experiments contain same sample id. adding suffix _1, _2')
+            suffixes = ('_1', '_2')
+
+    # all_feature_md = list(set(exp1.feature_metadata.columns).union(set(exp2.feature_metadata.columns)))
+    return newexp
 
 
 def join_fields(exp, field1, field2, newfield):

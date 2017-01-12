@@ -7,9 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import unittest
-import pandas as pd
-from os.path import join
-import pandas.util.testing as pdt
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal

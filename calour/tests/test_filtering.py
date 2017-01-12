@@ -6,7 +6,7 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from unittest import TestCase, main
+from unittest import main
 
 from skbio.util import get_data_path
 
@@ -38,7 +38,6 @@ class FilteringTests(Tests):
 
         obs = self.exp1.filter_by_metadata('group', 1, inplace=True)
         self.assertIs(obs, self.exp1)
-
 
     def test_filter_by_metadata_feature(self):
         obs = self.exp1.filter_by_metadata('taxonomy', 'bad_bacteria', negate=True, axis=1)
