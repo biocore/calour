@@ -127,9 +127,12 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
         Apply ``key`` function on row (sort by samples) (0) or column (sort by features) (1)
     subset : None or iterable of int (optional)
         Sorting by only subset of the data.
-    key : callable
-        a function returns a comparative value (like ``key`` in builtin ``sorted`` function).
-        It is applied on each 1-d array.
+    key : str or callable
+        If it is a callable, it should be a function accepts 1-D array of numeric and
+        returns a comparative value (like ``key`` in builtin ``sorted`` function).
+        Alternatively it accepts the following str values:
+        "log_mean": sort by log of the mean
+        "prevalence": sort by the prevalence
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp

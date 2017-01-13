@@ -90,7 +90,13 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     Parameters
     ----------
     predicate : str or callable
-        It accepts a list of numeric and return a bool.
+        The callable accepts a list of numeric and return a bool. Alternatively
+        it also accepts the following strings:
+        'sum_abundance': calls ``_sum_abundance``,
+        'freq_ratio': calls ``_freq_ratio``,
+        'unique_cut': calls ``_unique_cut``,
+        'mean_abundance': calls ``_mean_abundance``,
+        'prevalence': calls ``_prevalence``
     axis : 0 or 1
         Apply predicate on row (samples) (0) or column (features) (1)
     negate : bool

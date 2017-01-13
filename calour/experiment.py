@@ -235,13 +235,19 @@ def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming'
                 setattr(cls, fn, f)
 
 
-def join_experiments(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
+def join(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
+    '''Join two Experiment objects into one.
+
+    If suffix is not none, add suffix to each sampleid (suffix is a
+    list of 2 values i.e. ('_1','_2')) if same feature id in both
+    studies, use values, otherwise put 0 in values of experiment where
+    the observation in not present
+
+    Parameters
+    ----------
+    exp1, exp2 : 2 objects to join
     '''
-    join two Experiments into one experiment
-    if suffix is not none, add suffix to each sampleid (suffix is a list of 2 values i.e. ('_1','_2'))
-    if same feature id in both studies, use values, otherwise put 0 in values of experiment where the observation in not present
-    '''
-    logger.debug('join experiments')
+    logger.debug('Join experiments:\n{!r}\n{!r}'.format(exp1, exp2))
     newexp = copy.deepcopy(exp1)
     newexp.description = 'join %s & %s' % (exp1.description, exp2.description)
 

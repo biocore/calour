@@ -82,8 +82,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         [x_min, x_max, y_min, y_max] to set initial zoom window
     '''
     logger.debug('plot experiment')
-    data = exp.data.toarray()
-
+    data = exp.get_data(sparse=False)
     if logit:
         # log transform if needed
         logger.debug('log2 transforming cutoff %f' % log_cutoff)
