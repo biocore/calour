@@ -61,7 +61,7 @@ def _get_md_from_biom(table):
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
-    # print(metadata)
+
     if metadata is None:
         logger.info('No metadata associated with features in biom table')
     else:
@@ -80,7 +80,6 @@ def _read_table(f):
     metadata file
 
     '''
-    # table = pd.read_table(f, sep='\t', index_col=0)
     table = pd.read_table(f, sep='\t')
     table.set_index(table.columns[0], drop=False, inplace=True)
     # make sure the sample ID is string-type
@@ -88,11 +87,11 @@ def _read_table(f):
     return table
 
 
-def read_bacteria(data_file, sample_metadata_file=None, filter_orig_reads=1000, normalize=True, **kwargs):
-    '''Load a 16S experiment biom table
+def read_taxa(data_file, sample_metadata_file=None,
+              filter_orig_reads=1000, normalize=True, **kwargs):
+    '''Load an amplicon experiment.
 
-    Fix taxonomy and normalize if needed.
-    This is a convenience function of read()
+    Fix taxonomy and normalize if needed. This is a convenience function of read()
 
     Parameters
     ----------
@@ -100,6 +99,7 @@ def read_bacteria(data_file, sample_metadata_file=None, filter_orig_reads=1000, 
         int (default) to remove all samples with < filter_orig_reads total reads. None to not filter
     normalize : bool (optional)
         True (default) to normalize each sample to 10000 reads
+
     Returns
     -------
     exp : Experiment
@@ -111,6 +111,8 @@ def read_bacteria(data_file, sample_metadata_file=None, filter_orig_reads=1000, 
     if filter_orig_reads is not None:
         exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
     if normalize:
+        # record the original total read count into sample metadata
+        exp.sample_metadata['_calour_read_count'] = exp.data.sum(axis=1)
         exp.normalize(inplace=True)
     return exp
 
@@ -130,13 +132,15 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         file path to the feature metadata.
     description : str
         description of the experiment
-    type : str (optional)
     sparse : bool
         read the biom table into sparse or dense array
+
+    Returns
+    -------
+    exp : Experiment
     '''
     logger.info('Reading experiment (biom table %s, map file %s)' % (data_file, sample_metadata_file))
-    exp_metadata = {}
-    exp_metadata['map_md5'] = ''
+    exp_metadata = {'map_md5': ''}
     sid, oid, data, md = _read_biom(data_file, sparse=sparse)
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
@@ -158,7 +162,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     exp_metadata['feature_metadata_file'] = feature_metadata_file
     exp_metadata['data_md5'] = get_data_md5(data)
 
-    return Experiment(data, sample_metadata, feature_metadata, exp_metadata=exp_metadata, description=description, sparse=sparse)
+    return Experiment(data, sample_metadata, feature_metadata,
+                      exp_metadata=exp_metadata, description=description, sparse=sparse)
 
 
 def serialize(exp, f):
@@ -173,7 +178,7 @@ def save(exp, prefix, fmt='hdf5'):
     prefix : str
         file path to save to.
     fmt : str
-        'biom','txt' etc.
+        format for the data table. could be 'hdf5', 'txt', or 'json'.
     '''
     exp.save_biom('%s.biom' % prefix, fmt=fmt)
     exp.save_sample_metadata('%s_sample.txt' % prefix)
@@ -214,23 +219,21 @@ def save_biom(exp, f, fmt='hdf5', addtax=True):
 
 
 def save_sample_metadata(exp, f):
-    '''save the sample metadata file '''
+    '''Save sample metadata to file. '''
     exp.sample_metadata.to_csv(f, sep='\t')
 
 
 def save_feature_metadata(exp, f):
+    '''Save feature metadata to file. '''
     exp.feature_metadata.to_csv(f, sep='\t')
 
 
 def save_commands(exp, f):
-    '''
-    save the commands used to generate the exp
-    '''
+    '''Save the commands used to generate the exp '''
 
 
 def save_fasta(exp, f):
-    '''
-    '''
+    ''' '''
 
 
 def _create_biom_table_from_exp(exp, addtax=True):
