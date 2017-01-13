@@ -109,7 +109,7 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
         x = exp.feature_metadata
     else:
         raise ValueError('unknown axis %s' % axis)
-    idx = np.argsort(x[field], kind='mergesort')
+    idx = np.argsort(x[field].values, kind='mergesort')
     return exp.reorder(idx, axis=axis, inplace=inplace)
 
 
