@@ -235,7 +235,7 @@ def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming'
                 setattr(cls, fn, f)
 
 
-def join(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixes=None):
+def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixes=None):
     '''Join two Experiment objects into one.
 
     If suffix is not none, add suffix to each sampleid (suffix is a
@@ -245,17 +245,29 @@ def join(exp1, exp2, orig_field_name='orig_exp', orig_field_values=None, suffixe
 
     Parameters
     ----------
-    exp1, exp2 : 2 objects to join
+    exp, other : 2 objects to join
     '''
-    logger.debug('Join experiments:\n{!r}\n{!r}'.format(exp1, exp2))
-    newexp = copy.deepcopy(exp1)
-    newexp.description = 'join %s & %s' % (exp1.description, exp2.description)
+    logger.debug('Join experiments:\n{!r}\n{!r}'.format(exp, other))
+    newexp = copy.deepcopy(exp)
+    newexp.description = 'join %s & %s' % (exp.description, other.description)
 
-    # test if we need to force a suffix (when both experiments contain the same sample)
-    if len(exp1.sample_metadata.index.intersection(exp2.sample_metadata.index)) > 0:
-        if suffixes in None:
-            logger.info('both experiments contain same sample id. adding suffix _1, _2')
-            suffixes = ('_1', '_2')
+    # test if we need to force a suffix (when both experiments contain the same sample ids)
+    if len(exp.sample_metadata.index.intersection(other.sample_metadata.index)) > 0:
+        if prefixes is None:
+            raise ValueError('You need provide prefix to add to sample ids '
+                             'because the two experiments has some same sample ids.')
+        else:
+            exp_prefix, other_prefix = prefixes
+            logger.info('both experiments contain same sample id')
+            exp.sample_metadata.index = ['{}_{!s}'.format(exp_prefix, i)
+                                         for i in exp.sample_metadata.index]
+            other.sample_metadata.index = ['{}_{!s}'.format(other_prefix, i)
+                                           for i in other.sample_metadata.index]
+    sample_metadata = pd.concat([exp.sample_metadata, other.sample_metadata])
+
+    common_exp = exp.filter_by_metadata()
+    common_features = exp.feature_metadata.index.intersection(other.feature_metadata.index)
+    newexp.feature_metadata.join(other.feature_metadata)
 
     # all_feature_md = list(set(exp1.feature_metadata.columns).union(set(exp2.feature_metadata.columns)))
     return newexp
