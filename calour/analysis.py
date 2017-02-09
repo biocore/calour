@@ -257,7 +257,9 @@ def term_enrichment(seqs1, seqs2, sequence_terms):
     pv = []
     for cterm in all_terms:
         # t, p = stats.ranksums(group1_terms[cterm], group2_terms[cterm])
-        t, p = stats.mannwhitneyu(group1_terms[cterm]+np.random.normal(size=len(group1_terms[cterm]))*0.001, group2_terms[cterm]+np.random.normal(size=len(group2_terms[cterm]))*0.001, alternative='two-sided')
+        t, p = stats.mannwhitneyu(group1_terms[cterm]+np.random.normal(size=len(group1_terms[cterm]))*0.001,
+                                  group2_terms[cterm]+np.random.normal(size=len(group2_terms[cterm]))*0.001,
+                                  alternative='two-sided')
         # store the result
         allp.append(p)
         cpv = {}
