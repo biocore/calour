@@ -67,7 +67,7 @@ def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
     axis : 0 or 1
         the column name is on samples (0) or features (1) metadata
     '''
-    logger.info('')
+    logger.debug('filter_by_metadata')
 
     if not isinstance(values, (list, tuple)):
         values = [values]

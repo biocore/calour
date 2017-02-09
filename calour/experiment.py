@@ -200,7 +200,7 @@ class Experiment:
         ----------
         new_order : Iterable of int
             the order of new indices
-        axis : 0 or 1
+        axis : 0 for samples or 1 for features
         inplace : bool
             reorder in place.
 
@@ -223,7 +223,7 @@ class Experiment:
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming', '.heatmap']):
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming', '.heatmap.heatmap']):
     '''Dynamically add functions to the class as methods.'''
     for module_name in modules:
         module = import_module(module_name, 'calour')
@@ -263,10 +263,10 @@ def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixe
                                          for i in exp.sample_metadata.index]
             other.sample_metadata.index = ['{}_{!s}'.format(other_prefix, i)
                                            for i in other.sample_metadata.index]
-    sample_metadata = pd.concat([exp.sample_metadata, other.sample_metadata])
+    # sample_metadata = pd.concat([exp.sample_metadata, other.sample_metadata])
 
-    common_exp = exp.filter_by_metadata()
-    common_features = exp.feature_metadata.index.intersection(other.feature_metadata.index)
+    # common_exp = exp.filter_by_metadata()
+    # common_features = exp.feature_metadata.index.intersection(other.feature_metadata.index)
     newexp.feature_metadata.join(other.feature_metadata)
 
     # all_feature_md = list(set(exp1.feature_metadata.columns).union(set(exp2.feature_metadata.columns)))

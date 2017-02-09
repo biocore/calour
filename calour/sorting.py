@@ -124,7 +124,7 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
     Parameters
     ----------
     axis : 0 or 1
-        Apply ``key`` function on row (sort by samples) (0) or column (sort by features) (1)
+        Apply ``key`` function on row (sort the samples) (0) or column (sort the features) (1)
     subset : None or iterable of int (optional)
         Sorting by only subset of the data.
     key : str or callable
@@ -146,7 +146,10 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
     if subset is None:
         data_subset = exp.data
     else:
-        data_subset = exp.data.take(subset, axis=1-axis)
+        if axis == 0:
+            data_subset = exp.data[:, subset]
+        else:
+            data_subset = exp.data[subset, :]
     func = {'log_mean': _log_mean,
             'prevalence': _prevalence}
     if isinstance(key, str):

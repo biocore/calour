@@ -8,6 +8,8 @@
 
 from logging import getLogger
 import hashlib
+import configparser
+from pkg_resources import resource_filename
 import scipy
 
 logger = getLogger(__name__)
@@ -139,3 +141,84 @@ def get_data_md5(data):
     datmd5 = datmd5.hexdigest()
     logger.debug('data md5 is: %s' % datmd5)
     return datmd5
+
+
+def get_config_file():
+    '''Get the calour config file location
+    located in calour/config.calour.txt
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    config_file_name : str
+        the full path to the calour config file
+    '''
+    config_file_name = resource_filename(__package__, 'calour.config')
+    return config_file_name
+
+
+def set_config_value(key, value, section='DEFAULT', config_file_name=None):
+    '''Set the value in the calour config file
+
+    Parameters
+    ----------
+    key : str
+        the key to get the value for
+    value : str
+        the value to store
+    section : str (optional)
+        the section to get the value from
+    config_file_name : str (optional)
+        the full path to the config file or None to use XXX
+    '''
+    if config_file_name is None:
+        config_file_name = get_config_file()
+
+    config = configparser.ConfigParser()
+    config.read(config_file_name)
+    if section not in config:
+        config.add_section(section)
+    config.set(section, key, value)
+    with open(config_file_name, 'w') as config_file:
+        config.write(config_file)
+    logger.debug('wrote key %s value %s to config file' % (key, value))
+
+
+def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=None):
+    '''Get the value from the calour config file
+
+    Parameters
+    ----------
+    key : str
+        the key to get the value for
+    fallback : str (optional)
+        the fallback value if the key/section/file does not exist
+    section : str (optional)
+        the section to get the value from
+    config_file_name : str (optional)
+        the full path to the config file or None to use XXX
+
+    Returns
+    -------
+    value : str
+        value of the key or fallback if file/section/key does not exist
+    '''
+    if config_file_name is None:
+        config_file_name = get_config_file()
+
+    config = configparser.ConfigParser()
+    config.read(config_file_name)
+
+    if section not in config:
+        logger.debug('section %s not in config file %s' % (section, config_file_name))
+        return fallback
+
+    if key not in config[section]:
+        logger.debug('key %s not in config file %s section %s' % (key, config_file_name, section))
+        return fallback
+
+    value = config[section][key]
+    logger.debug('found value %s for key %s' % (value, key))
+    return value

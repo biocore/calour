@@ -1,8 +1,11 @@
+from logging import getLogger
 import ipywidgets
 from IPython.display import display, clear_output
 
-from calour.bactdb import BactDB
 from calour.gui.plotgui import PlotGUI
+
+
+logger = getLogger(__name__)
 
 
 class PlotGUI_Jupyter(PlotGUI):
@@ -11,8 +14,8 @@ class PlotGUI_Jupyter(PlotGUI):
     We open the figure as a widget inside the qt5 window
     '''
     def __init__(self, *kargs, **kwargs):
-        PlotGUI.__init__(self, *kargs, **kwargs)
-        self.bactdb = BactDB()
+        super().__init__(*kargs, **kwargs)
+        self.databases = []
 
     def get_figure(self, newfig=None):
         fig = PlotGUI.get_figure(self, newfig=newfig)
@@ -57,7 +60,7 @@ class PlotGUI_Jupyter(PlotGUI):
         display(self.labdb)
         return fig
 
-    def update_info(self):
+    def show_info(self):
         # taxname = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
         taxname = self.exp.feature_metadata[self.select_feature_info.value][self.last_select_feature]
         # sampname = self.exp.sample_metadata.index[self.last_select_sample]
@@ -69,14 +72,22 @@ class PlotGUI_Jupyter(PlotGUI):
         self.labsamp.value = str(sampname)
         self.labreads.value = 'Reads:{:.01f}'.format(self.exp.get_data()[self.last_select_sample, self.last_select_feature])
         self.lab_selected.value = 'Selected: %d' % len(self.selected_features)
-        info = self.bactdb.get_seq_annotation_strings(sequence)
+
+        # get the database annotations
+        info = []
+        for cdatabase in self.databases:
+            cinfo = cdatabase.get_seq_annotation_strings(sequence)
+            if len(cinfo) == 0:
+                cinfo = [[{'annotationtype': 'not found'}, 'No annotation found in database %s' % cdatabase.get_name()]]
+            info.extend(cinfo)
+        # info = self.dbbact.get_seq_annotation_strings(sequence)
         idata = ''
         for cinfo in info:
             cstr = cinfo[1]
+            cannotationid = cinfo[0]['annotationid']
             ccolor = self._get_color(cinfo[0])
-            idata += '<style> a:link {color:%s; background-color:transparent; text-decoration:none} a:visited {color:%s; background-color:transparent;'
-            ' text-decoration:none}</style>' % (ccolor, ccolor)
-            idata += '<p style="color:%s;white-space:nowrap;"><a href="http://amnonim.webfactional.com/scdb_website/exp_info/19" target="_blank">%s</a></p>' % (ccolor, cstr)
+            idata += '<style> a:link {color:%s; background-color:transparent; text-decoration:none} a:visited {color:%s; background-color:transparent; text-decoration:none}</style>' % (ccolor, ccolor)
+            idata += '<p style="color:%s;white-space:nowrap;"><a href="http://amnonim.webfactional.com/scdb_website/annotation_info/%d" target="_blank">%s</a></p>' % (ccolor, cannotationid, cstr)
         self.labdb.value = idata
 
     def _get_color(self, details):
@@ -127,11 +138,14 @@ def zoom_out(b, hdat):
 def _annotate(b, hdat):
     '''Add database annotation to selected features
     '''
-    from calour.annotation import annotate_bacteria_gui
+    if hdat._annotation_db is None:
+        logger.warn('No database with add annotation capability selected (use plot(...,databases=[dbname])')
+        return
 
     # get the sequences of the selection
     seqs = []
     for cseqpos in hdat.selected_features.keys():
         seqs.append(hdat.exp.feature_metadata.index[cseqpos])
 
-    annotate_bacteria_gui(seqs, hdat.exp)
+    # from calour.annotation import annotate_bacteria_gui
+    hdat._annotation_db.add_annotation(seqs, hdat.exp)

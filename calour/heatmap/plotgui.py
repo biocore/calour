@@ -23,6 +23,10 @@ class PlotGUI:
     selected_samples : dict of matplotlib.lines.Line2D
         used to track the selected samples and plot vertical lines for each selectiom
         keys - the selected sample indices, values - the line id for each selected samples
+    scroll_offset : int (optional)
+        The amount of bacteria/samples to scroll when arrow key pressed
+        0 (default) to scroll one full screen every keypress
+        >0 : scroll than constant amount of bacteria per keypress
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0):
         '''Init the gui windows class
@@ -44,6 +48,9 @@ class PlotGUI:
         # list of selected samples
         self.selected_samples = {}
 
+        # list of databases to interface with
+        self.databases = []
+
     def get_figure(self, newfig=None):
         ''' Get the figure to plot the heatmap into
 
@@ -63,7 +70,6 @@ class PlotGUI:
     def run_gui(self):
         ''' Run the GUI event loop and return when gui is done. does nothing for base class
         '''
-        pass
 
     def connect_functions(self, fig):
         '''Connect to the matplotlib callbacks for key and mouse '''
@@ -72,7 +78,7 @@ class PlotGUI:
         self.canvas.mpl_connect('key_press_event', lambda f: _key_press_callback(f, hdat=self))
         self.canvas.mpl_connect('button_press_event', lambda f: _button_press_callback(f, hdat=self))
 
-    def update_info(self):
+    def show_info(self):
         '''Update info when a new feature/sample is selected'''
         raise NotImplemented()
 
@@ -113,8 +119,28 @@ class PlotGUI:
                     del self.selected_features[cpos]
         self.canvas.draw()
 
+    def get_selected_seqs(self):
+        '''Get the list of selected sequences
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        seqs : list of str
+            The selected sequences ('ACGT')
+        '''
+        seqs = []
+        for cseqpos in self.selected_features.keys():
+            seqs.append(self.exp.feature_metadata.index[cseqpos])
+        return seqs
+
 
 def _button_press_callback(event, hdat):
+    ax = event.inaxes
+    if ax is None:
+        return
+
     rx = int(round(event.xdata))
     ry = int(round(event.ydata))
 
@@ -136,18 +162,20 @@ def _button_press_callback(event, hdat):
     hdat.last_select_feature = ry
     hdat.last_select_sample = rx
     # and update the selected info
-    hdat.update_info()
+    hdat.show_info()
 
 
 def _key_press_callback(event, hdat):
     ax = event.inaxes
+    if ax is None:
+        return
     ylim_lower, ylim_upper = ax.get_ylim()
     xlim_lower, xlim_upper = ax.get_xlim()
 
     # set the scroll offset
     if hdat.scroll_offset > 0:
-        x_offset = 1
-        y_offset = 1
+        x_offset = hdat.scroll_offset
+        y_offset = hdat.scroll_offset
     else:
         x_offset = xlim_upper - xlim_lower
         y_offset = ylim_upper - ylim_lower
@@ -180,27 +208,27 @@ def _key_press_callback(event, hdat):
         hdat.last_select_feature += 1
         hdat.clear_selection()
         hdat.update_selection(samplepos=hdat.selected_samples, featurepos=[hdat.last_select_feature])
-        hdat.update_info()
+        hdat.show_info()
     elif event.key == ',':
         hdat.last_select_feature -= 1
         hdat.clear_selection()
         hdat.update_selection(samplepos=hdat.selected_samples, featurepos=[hdat.last_select_feature])
-        hdat.update_info()
+        hdat.show_info()
     elif event.key == '>':
         hdat.last_select_sample += 1
         hdat.clear_selection()
         hdat.update_selection(featurepos=hdat.selected_features, samplepos=[hdat.last_select_sample])
-        hdat.update_info()
+        hdat.show_info()
     elif event.key == '<':
         hdat.last_select_sample -= 1
         hdat.clear_selection()
         hdat.update_selection(featurepos=hdat.selected_features, samplepos=[hdat.last_select_sample])
-        hdat.update_info()
+        hdat.show_info()
 
     else:
         return
 
-#    plt.tight_layout()
+    # plt.tight_layout()
     hdat.canvas.draw()
 
 
