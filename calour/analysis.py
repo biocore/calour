@@ -7,36 +7,57 @@ import numpy as np
 from scipy import stats
 from statsmodels.sandbox.stats.multicomp import multipletests
 
-import calour.pbfdr
+from . import dsfdr
+# import calour.pbfdr
 
 
 logger = getLogger(__name__)
 
 
-# TODO: make nicer (need new code from Serene)
-def getpbfdr(exp, field, val1=None, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdrmethod='pbfdr'):
-    """
+def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdrmethod='dsfdr'):
+    '''
     test the differential expression between 2 groups (val1 and val2 in field field)
-    using permutation based fdr (pbfdr)
-    for bacteria that have a high difference.
-    input:
-    exp : Experiment
-    field - the field for the 2 categories
-    val1 - values for the first group
-    val2 - value for the second group or false to compare to all other or None for all except val1
-    method - the test to compare the 2 groups:
-        mean - absolute difference in mean frequency
-        binary - abs diff in binary presence/absence
-        ranksum - abs diff in rank order (to ignore outliers)
-    transform : how to transform the data
-    numperm - number of random permutations to run
-    maxfval - the maximal f-value (FDR) for a bacteria to keep
-    usepfdr : bool
-        True to use the new permutation fdr, False to use bh-fdr
+    using permutation based fdr (dsfdr)
+    for bacteria that have a significant difference.
 
-    output:
-    newexp - the experiment with only significant (FDR<=maxfval) difference, sorted according to difference
-    """
+    Parameters
+    ----------
+    exp: calour.Experiment
+    field: str
+        The field to test by
+    val1: str or list of str or None (optional)
+        The values for the first group.
+        Can be None if doing a correlation test.
+    val1: str or list of str or None (optional)
+        None (default) to compare to all other samples not in val1
+        ignored if doing a correlation test.
+    method : str or function
+        the method to use for the t-statistic test. options:
+        'meandiff' : mean(A)-mean(B) (binary)
+        'mannwhitney' : mann-whitneu u-test (binary)
+        'kruwallis' : kruskal-wallis test (multiple groups)
+        'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
+        'spearman' : spearman correlation (numeric)
+        'pearson' : pearson correlation (numeric)
+        'nonzerospearman' : spearman correlation only non-zero entries (numeric)
+        'nonzeropearson' : pearson correlation only non-zero entries (numeric)
+        function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
+    transform : str or ''
+        transformation to apply to the data before caluculating the statistic
+        'rankdata' : rank transfrom each OTU reads
+        'log2data' : calculate log2 for each OTU using minimal cutoff of 2
+        'normdata' : normalize the data to constant sum per samples
+        'binarydata' : convert to binary absence/presence
+    alpha : float
+        the desired FDR control level
+    numperm : int
+        number of permutations to perform
+
+    Returns
+    -------
+    newexp : calour.Experiment
+        The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
+    '''
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     if not isinstance(val1, (list, tuple)):
@@ -45,7 +66,7 @@ def getpbfdr(exp, field, val1=None, val2=None, method='meandiff', transform='ran
         if not isinstance(val2, (list, tuple)):
             val2 = [val2]
         cexp = exp.filter_samples(field, val1+val2, negate=False)
-        logger.warn('%d samples left with both values' % cexp.get_num_samples())
+        logger.warn('%d samples with both values' % cexp.get_num_samples())
     else:
         cexp = exp
 
@@ -56,9 +77,9 @@ def getpbfdr(exp, field, val1=None, val2=None, method='meandiff', transform='ran
     else:
         logger.warn(np.sum(cexp.sample_metadata[field].isin(val1).values))
         labels[cexp.sample_metadata[field].isin(val1).values] = 1
-        logger.warn('%d samples for value 1' % np.sum(labels))
+        logger.warn('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     data = cexp.get_data(getcopy=True, sparse=False).transpose()
-    keep, odif = calour.pbfdr.pbfdr(data, labels, method=method, transform=transform, alpha=alpha, numperm=numperm, fdrmethod=fdrmethod)
+    keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform=transform, alpha=alpha, numperm=numperm, fdrmethod=fdrmethod)
 
     keep = np.where(keep)
 
