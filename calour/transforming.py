@@ -38,7 +38,7 @@ def normalize(exp, reads=10000, axis=1, inplace=False):
     '''
     if not inplace:
         exp = deepcopy(exp)
-    exp.data = preprocessing.normalize(exp.data, 'l1', axis=axis) * reads
+    exp.data = preprocessing.normalize(exp.data, 'l1', axis=axis, copy=False) * reads
 
     return exp
 
