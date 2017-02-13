@@ -8,7 +8,6 @@
 
 import unittest
 
-import numpy.testing as npt
 import numpy as np
 
 import calour as ca
