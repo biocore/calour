@@ -20,7 +20,7 @@ class TestAnalysis(Tests):
         super().setUp()
         # load the simple experiment as sparse
         self.simple = ca.read(self.simple_table, self.simple_map)
-        # load the complex experiment as sparse
+        # load the complex experiment as sparse with normalizing and removing low read samples
         self.complex = ca.read_taxa(self.complex_table, self.complex_map)
 
     def test_diff_abundance(self):

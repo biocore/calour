@@ -295,6 +295,4 @@ def _create_biom_table_from_exp(exp, addtax=True):
     if addtax:
         taxdict = exp.feature_metadata.to_dict('index')
         table.add_metadata(taxdict, axis='observation')
-        # metadata = table.metadata(axis='observation')
-        # print(metadata)
     return table
