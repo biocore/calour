@@ -9,6 +9,7 @@
 import unittest
 from tempfile import mkdtemp
 from os.path import join
+import shutil
 
 import calour as ca
 import numpy.testing as npt
@@ -80,7 +81,7 @@ class TestIO(Tests):
         for cseq in skbio.read(f, format='fasta'):
             seqs.append(str(cseq))
         self.assertCountEqual(seqs, exp.feature_metadata.index.values)
-
+        shutil.rmtree(self.outdir)
 
 if __name__ == "__main__":
     unittest.main()
