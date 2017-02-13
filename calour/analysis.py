@@ -66,7 +66,7 @@ def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transfor
         if not isinstance(val2, (list, tuple)):
             val2 = [val2]
         cexp = exp.filter_samples(field, val1+val2, negate=False)
-        logger.warn('%d samples with both values' % cexp.get_num_samples())
+        logger.warn('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
 

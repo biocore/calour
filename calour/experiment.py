@@ -223,19 +223,7 @@ class Experiment:
         return exp
 
 
-def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming', '.heatmap.heatmap']):
-    '''Dynamically add functions to the class as methods.'''
-    for module_name in modules:
-        module = import_module(module_name, 'calour')
-        functions = inspect.getmembers(module, inspect.isfunction)
-        # import ipdb; ipdb.set_trace()
-        for fn, f in functions:
-            # skip private functions
-            if not fn.startswith('_'):
-                setattr(cls, fn, f)
-
-
-def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixes=None):
+def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixes=None):
     '''Join two Experiment objects into one.
 
     If suffix is not none, add suffix to each sampleid (suffix is a
@@ -248,7 +236,7 @@ def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixe
     exp, other : 2 objects to join
     '''
     logger.debug('Join experiments:\n{!r}\n{!r}'.format(exp, other))
-    newexp = copy.deepcopy(exp)
+    newexp = deepcopy(exp)
     newexp.description = 'join %s & %s' % (exp.description, other.description)
 
     # test if we need to force a suffix (when both experiments contain the same sample ids)
@@ -259,18 +247,42 @@ def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixe
         else:
             exp_prefix, other_prefix = prefixes
             logger.info('both experiments contain same sample id')
-            exp.sample_metadata.index = ['{}_{!s}'.format(exp_prefix, i)
-                                         for i in exp.sample_metadata.index]
-            other.sample_metadata.index = ['{}_{!s}'.format(other_prefix, i)
-                                           for i in other.sample_metadata.index]
-    # sample_metadata = pd.concat([exp.sample_metadata, other.sample_metadata])
+            exp_sample_metadata = exp.sample_metadata.copy()
+            other_sample_metadata = other.sample_metadata.copy()
+            exp_sample_metadata.index = ['{}_{!s}'.format(exp_prefix, i)
+                                         for i in exp_sample_metadata.index]
+            other_sample_metadata.index = ['{}_{!s}'.format(other_prefix, i)
+                                           for i in other_sample_metadata.index]
+    else:
+        exp_sample_metadata = exp.sample_metadata
+        other_sample_metadata = other.sample_metadata
+    sample_metadata = pd.concat([exp_sample_metadata, other_sample_metadata], join='outer')
+    newexp.sample_metadata = sample_metadata
 
-    # common_exp = exp.filter_by_metadata()
-    # common_features = exp.feature_metadata.index.intersection(other.feature_metadata.index)
-    newexp.feature_metadata.join(other.feature_metadata)
+    sample_pos_exp = [sample_metadata.index.get_loc(csamp) for csamp in exp_sample_metadata.index.values]
+    sample_pos_other = [sample_metadata.index.get_loc(csamp) for csamp in other_sample_metadata.index.values]
 
-    # all_feature_md = list(set(exp1.feature_metadata.columns).union(set(exp2.feature_metadata.columns)))
+    print(sample_pos_exp)
+    print(sample_pos_other)
+    all_features = exp.sample_metadata.index.union(other.sample_metadata.index)
+    all_data = np.zeros([len(sample_metadata), len(all_features)])
+    feature_metadata = exp.feature_metadata.copy()
+    for cfeature in all_features:
+        pass
+
     return newexp
+
+
+def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming', '.heatmap.heatmap']):
+    '''Dynamically add functions to the class as methods.'''
+    for module_name in modules:
+        module = import_module(module_name, 'calour')
+        functions = inspect.getmembers(module, inspect.isfunction)
+        # import ipdb; ipdb.set_trace()
+        for fn, f in functions:
+            # skip private functions
+            if not fn.startswith('_'):
+                setattr(cls, fn, f)
 
 
 def join_fields(exp, field1, field2, newfield):
