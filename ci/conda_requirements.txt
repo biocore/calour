@@ -10,5 +10,5 @@ scikit-learn
 scikit-bio
 biom-format
 statsmodels
-pyqt5
+pyqt
 ipywidgets
