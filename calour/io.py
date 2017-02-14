@@ -10,7 +10,6 @@ from logging import getLogger
 
 import pandas as pd
 import numpy as np
-import scipy
 import biom
 
 from calour.experiment import Experiment
@@ -26,7 +25,7 @@ def _read_biom(fp, transpose=True, sparse=True):
     ----------
     fp : str
         file path to the biom table
-    transpose : bool
+    transpose : bool (True by default)
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
@@ -36,13 +35,7 @@ def _read_biom(fp, transpose=True, sparse=True):
     sid = table.ids(axis='sample')
     oid = table.ids(axis='observation')
     logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
-    if sparse:
-        logger.debug('storing as sparse matrix')
-        data = scipy.sparse.csr_matrix(table.matrix_data)
-    else:
-        logger.debug('storing as dense matrix')
-        data = table.matrix_data.toarray()
-
+    data = table.matrix_data
     feature_md = _get_md_from_biom(table)
 
     if transpose:

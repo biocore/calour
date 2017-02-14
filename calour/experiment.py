@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-import scipy.sparse
 from copy import copy, deepcopy
 from importlib import import_module
 import inspect
@@ -15,7 +14,7 @@ from functools import wraps
 
 import pandas as pd
 import numpy as np
-import scipy
+import scipy.sparse
 
 
 logger = getLogger(__name__)
@@ -40,7 +39,7 @@ class Experiment:
     description : str
         Text describing the experiment
     sparse : bool
-        Is data array in sparse or dense matrix
+        store the data array in sparse or dense matrix
 
     Attributes
     ----------
@@ -53,8 +52,10 @@ class Experiment:
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
-    shape: tuple of (int, int)
+    shape : tuple of (int, int)
         the dimension of data
+    sparse : bool
+        store the data as sparse or dense array.
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -71,6 +72,18 @@ class Experiment:
 
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
+
+    @property
+    def sparse(self):
+        return self._sparse
+
+    @sparse.setter
+    def sparse(self, sparse):
+        if sparse is True and not scipy.sparse.issparse(self.data):
+            self.data = scipy.sparse.csr_matrix(self.data)
+        elif sparse is False and scipy.sparse.issparse(self.data):
+            self.data = self.data.toarray()
+        self._sparse = sparse
 
     def __repr__(self):
         '''Return a string representation of this object.'''
@@ -138,7 +151,7 @@ class Experiment:
 
         return inner
 
-    def get_data(self, sparse=None, getcopy=False):
+    def get_data(self, sparse=None, copy=False):
         '''Get the data as a 2d array
 
         Get the data 2d array (each column is a feature and row is a sample)
@@ -149,18 +162,18 @@ class Experiment:
             None (default) to pass original data format (sparse or dense).
             True to get as sparse.
             False to get as dense
-        getcopy : bool (optional)
+        copy : bool (optional)
             True (default) to get a copy of the data
             False to get the original data (for inplace)
         '''
         if sparse is None:
-            if getcopy:
+            if copy:
                 return self.data.copy()
             else:
                 return self.data
         elif sparse:
             if scipy.sparse.issparse(self.data):
-                if getcopy:
+                if copy:
                     return self.data.copy()
                 else:
                     return self.data
@@ -170,7 +183,7 @@ class Experiment:
             if scipy.sparse.issparse(self.data):
                 return self.data.toarray()
             else:
-                if getcopy:
+                if copy:
                     return self.data.copy()
                 else:
                     return self.data

@@ -19,10 +19,10 @@ class Tests(TestCase):
     def setUp(self):
         test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
         self.test_data_dir = test_data_dir
-        self.simple_table = join(test_data_dir, 'test1.biom')
-        self.simple_map = join(test_data_dir, 'test1.map.txt')
-        self.complex_table = join(test_data_dir, 'timeseries.biom')
-        self.complex_map = join(test_data_dir, 'timeseries.map.txt')
+        self.test1_biom = join(test_data_dir, 'test1.biom')
+        self.test1_samp = join(test_data_dir, 'test1.sample')
+        self.timeseries_biom = join(test_data_dir, 'timeseries.biom')
+        self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
 
 
 def assertIsInstance(obj, cls, msg=''):
@@ -53,8 +53,8 @@ def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True):
     pdt.assert_frame_equal(exp1.feature_metadata, exp2.feature_metadata)
     pdt.assert_frame_equal(exp1.sample_metadata, exp2.sample_metadata)
     if almost_equal:
-        dat1 = exp1.get_data(sparse=False, getcopy=True)
-        dat2 = exp2.get_data(sparse=False, getcopy=True)
+        dat1 = exp1.get_data(sparse=False, copy=True)
+        dat2 = exp2.get_data(sparse=False, copy=True)
         npt.assert_array_almost_equal(dat1, dat2)
     else:
         npt.assert_array_equal(exp1.data, exp2.data)

@@ -6,16 +6,16 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import unittest
+from unittest import main
+
+import scipy.sparse
 
 import calour as ca
 from calour._testing import Tests
 
 
-class TestIO(Tests):
-
-    def validate_read(self, exp, validate_sample_metadata=True):
-        '''Validate the simple experiment was loaded correctly'''
+class IOTests(Tests):
+    def _validate_read(self, exp, validate_sample_metadata=True):
         # number of bacteria is 12
         self.assertEqual(exp.data.shape[1], 12)
         # number of samples is 20 (should not read the samples only in map or only in biom table)
@@ -40,17 +40,21 @@ class TestIO(Tests):
 
     def test_read(self):
         # load the simple dataset as sparse
-        exp = ca.read(self.simple_table, self.simple_map)
-        self.validate_read(exp)
+        exp = ca.read(self.test1_biom, self.test1_samp)
+        self.assertTrue(scipy.sparse.issparse(exp.data))
+        self._validate_read(exp)
 
+    def test_read_sparse(self):
         # load the simple dataset as dense
-        exp = ca.read(self.simple_table, self.simple_map, sparse=False)
-        self.validate_read(exp)
+        exp = ca.read(self.test1_biom, self.test1_samp, sparse=False)
+        self.assertFalse(scipy.sparse.issparse(exp.data))
+        self._validate_read(exp)
 
+    def test_read_no_sample_metadata(self):
         # test loading without a mapping file
-        exp = ca.read(self.simple_table)
-        self.validate_read(exp, validate_sample_metadata=False)
+        exp = ca.read(self.test1_biom)
+        self._validate_read(exp, validate_sample_metadata=False)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    main()

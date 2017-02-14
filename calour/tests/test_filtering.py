@@ -18,12 +18,12 @@ class FilteringTests(Tests):
     def setUp(self):
         super().setUp()
         self.exp1 = ca.read(*[get_data_path(i) for i in [
-            'filter.1.biom', 'filter.1_sample.txt']])
+            'filter.1.biom', 'filter.1.sample']])
         self.exp2 = ca.read(*[get_data_path(i) for i in [
-            'filter.1.biom', 'filter.1_sample.txt']], sparse=False)
+            'filter.1.biom', 'filter.1.sample']], sparse=False)
 
-    def test_down_sample(self):
-        obs = self.exp1.down_sample('group')
+    def test_downsample(self):
+        obs = self.exp1.downsample('group')
         sid = obs.sample_metadata.index.tolist()
         all_sid = self.exp1.sample_metadata.index.tolist()
         exp = self.exp1.reorder([all_sid.index(i) for i in sid])
