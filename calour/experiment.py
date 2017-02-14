@@ -276,26 +276,16 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
 
     all_features = exp.sample_metadata.index.union(other.sample_metadata.index)
     all_data = np.zeros([len(sample_metadata), len(all_features)])
-    feature_metadata = exp.feature_metadata.copy()
-    for idx,cfeature in enumerate(all_features):
+    data_exp = exp.get_data(sparse=False)
+    data_other = other.get_data(sparse=False)
+    for idx, cfeature in enumerate(all_features):
         if cfeature in exp.feature_metadata.index:
-            all_data[sample_pos_exp, idx] = exp.data[:,idx]
-            pass
-        pass
+            all_data[sample_pos_exp, idx] = data_exp[:, idx]
+
+        if cfeature in other.feature_metadata.index:
+            all_data[sample_pos_other, idx] = data_other[:, idx]
 
     return newexp
-
-
-def add_functions(cls, modules=['.io', '.sorting', '.filtering', '.transforming', '.heatmap.heatmap']):
-    '''Dynamically add functions to the class as methods.'''
-    for module_name in modules:
-        module = import_module(module_name, 'calour')
-        functions = inspect.getmembers(module, inspect.isfunction)
-        # import ipdb; ipdb.set_trace()
-        for fn, f in functions:
-            # skip private functions
-            if not fn.startswith('_'):
-                setattr(cls, fn, f)
 
 
 def join_fields(exp, field1, field2, newfield):
