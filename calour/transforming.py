@@ -9,22 +9,20 @@
 from logging import getLogger
 from copy import deepcopy
 
-import scipy
 import numpy as np
 from sklearn import preprocessing
 
-from .filtering import _filter_by_data
 
 logger = getLogger(__name__)
 
 
-def normalize(exp, reads=10000, axis=1, inplace=False):
+def normalize(exp, total=10000, axis=1, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum reads
 
     Parameters
     ----------
     exp : Experiment
-    reads : float
+    total : float
         the sum (along axis) to normalize to
     axis : int (optional)
         the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
@@ -33,54 +31,54 @@ def normalize(exp, reads=10000, axis=1, inplace=False):
 
     Returns
     -------
-    newexp : Experiment
+    ``Experiment``
         the normalized experiment
     '''
     if not inplace:
         exp = deepcopy(exp)
-    exp.data = preprocessing.normalize(exp.data, 'l1', axis=axis) * reads
+    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=axis) * total
 
     return exp
 
 
-def _log_min_transform(data, axis=1, min_abundance=None, logit=1, normalize=True):
-    '''transform the data array.
+def scale(exp, axis=1, inplace=False):
+    '''Standardize a dataset along an axis
+
+    .. warning:: It will convert the sparse matrix to dense array.
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+    if exp.sparse:
+        exp.sparse = False
+    preprocessing.scale(exp.data, axis=axis, copy=False)
+    return exp
+
+
+def log_n(exp, n=1, inplace=False):
+    '''Log transform the data
 
     Parameters
     ----------
-    min_abundance : None or float (optional)
-        None (default) to not remove any features.
-        float to remove all features with total reads < float (to make clustering faster).
-    lgoit : bool (optional)
-        True (default) to log transform the data before clustering.
-        False to not log transform.
-    normalize : bool (optional)
-        True (default) to normalize each feature to sum 1 std 1.
-        False to not normalize each feature.
-
-    Returns
-    -------
-    ndarray
-        transformed 2-d array
+    n : numeric, optional
+        cap the tiny values and then log transform the data.
+    inplace : bool, optional
     '''
-    if scipy.sparse.issparse(data):
-        new = data.toarray()
-    else:
-        new = data.copy()
+    if not inplace:
+        exp = deepcopy(exp)
 
-    # filter low-freq rows/columns
-    if min_abundance is not None:
-        logger.debug('filtering min abundance %d' % min_abundance)
-        select = _filter_by_data(
-            'sum_abundance', axis=axis, cutoff=min_abundance)
-        new = np.take(new, select, axis=axis)
+    if exp.sparse:
+        exp.sparse = False
 
-    if logit is not None:
-        new[new < logit] = logit
-        new = np.log2(new)
+    exp.data[exp.data < n] = n
+    exp.data = np.log2(exp.data)
 
-    if normalize is True:
-        # center and normalize
-        new = preprocessing.scale(new, axis=axis, copy=False)
+    return exp
 
-    return new
+
+def transform(exp, steps=[], inplace=False):
+    '''Chain transformations together.'''
+    if not inplace:
+        exp = deepcopy(exp)
+    for step in steps:
+        step(exp, inplace=True)
+    return exp
