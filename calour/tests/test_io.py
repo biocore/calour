@@ -40,11 +40,11 @@ class IOTests(Tests):
 
     def test_read(self):
         # load the simple dataset as sparse
-        exp = ca.read(self.test1_biom, self.test1_samp)
+        exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat)
         self.assertTrue(scipy.sparse.issparse(exp.data))
         self._validate_read(exp)
 
-    def test_read_sparse(self):
+    def test_read_not_sparse(self):
         # load the simple dataset as dense
         exp = ca.read(self.test1_biom, self.test1_samp, sparse=False)
         self.assertFalse(scipy.sparse.issparse(exp.data))
