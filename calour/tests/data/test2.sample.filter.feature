@@ -1,0 +1,10 @@
+#SampleID	id	group
+S1	1	1
+S2	2	1
+S3	3	1
+S4	4	1
+S5	5	1
+S6	6	1
+S7	7	1
+S8	8	2
+S9	9	2

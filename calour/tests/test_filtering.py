@@ -17,16 +17,25 @@ import calour as ca
 class FilteringTests(Tests):
     def setUp(self):
         super().setUp()
-        self.exp1 = ca.read(*[get_data_path(i) for i in [
-            'filter.1.biom', 'filter.1.sample']])
-        self.exp2 = ca.read(*[get_data_path(i) for i in [
-            'filter.1.biom', 'filter.1.sample']], sparse=False)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
 
-    def test_downsample(self):
-        obs = self.exp1.downsample('group')
+    def test_downsample_sample(self):
+        obs = self.test2.downsample('group')
+        # should be down to 4 samples; feature number is the same
+        self.assertEqual(obs.shape, (4, 8))
+
         sid = obs.sample_metadata.index.tolist()
-        all_sid = self.exp1.sample_metadata.index.tolist()
-        exp = self.exp1.reorder([all_sid.index(i) for i in sid])
+        all_sid = self.test2.sample_metadata.index.tolist()
+        exp = self.test2.reorder([all_sid.index(i) for i in sid])
+        assert_experiment_equal(obs, exp)
+
+    def test_downsample_feature(self):
+        obs = self.test2.downsample('oxygen', axis=1)
+        sid = obs.feature_metadata.index.tolist()
+        self.assertEqual(obs.shape, (9, 4))
+
+        all_sid = self.test2.feature_metadata.index.tolist()
+        exp = self.test2.reorder([all_sid.index(i) for i in sid], axis=1)
         self.assertEqual(obs, exp)
 
     def test_filter_by_metadata_sample(self):
@@ -60,15 +69,20 @@ class FilteringTests(Tests):
             assert_experiment_equal(obs, exp)
 
     def test_filter_by_data_feature(self):
-        # test on both dense and sparse
-        for e in [self.exp1, self.exp2]:
-            # all features are filtered out
-            obs = e.filter_by_data('sum_abundance', axis=1, cutoff=10000)
-            self.assertEqual(obs.data.shape[1], 0)
-
-            obs = e.filter_by_data('sum_abundance', axis=1, cutoff=1)
-            exp = ca.read(*[get_data_path(i) for i in ['filter.4.biom', 'filter.4_sample.txt']])
-            assert_experiment_equal(obs, exp)
+        # all features are filtered out
+        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=10000)
+        self.assertEqual(obs.shape, (9, 0))
+        # none is filtered out
+        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=1)
+        assert_experiment_equal(obs, self.test2)
+        # one feature is filtered out
+        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=25)
+        self.assertEqual(obs.shape, (9, 7))
+        exp = ca.read(*[get_data_path(i) for i in [
+            'test2.biom.filter.feature',
+            'test2.sample.filter.feature',
+            'test2.feature.filter.feature']])
+        assert_experiment_equal(obs, exp)
 
 
 if __name__ == '__main__':
