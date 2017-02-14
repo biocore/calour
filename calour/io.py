@@ -167,6 +167,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     exp_metadata['feature_metadata_file'] = feature_metadata_file
     exp_metadata['data_md5'] = get_data_md5(data)
 
+    if description == '':
+        description = data_file
+
     return Experiment(data, sample_metadata, feature_metadata,
                       exp_metadata=exp_metadata, description=description, sparse=sparse)
 

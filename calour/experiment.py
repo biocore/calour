@@ -55,6 +55,8 @@ class Experiment:
         metadata about the experiment (data md5, filenames, etc.)
     shape: tuple of (int, int)
         the dimension of data
+    description : str
+        name of the experiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -245,7 +247,7 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
 
     Parameters
     ----------
-    exp, other : 2 objects to join
+    exp, other : Experiments to join
     '''
     logger.debug('Join experiments:\n{!r}\n{!r}'.format(exp, other))
     newexp = deepcopy(exp)
@@ -268,7 +270,12 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
     else:
         exp_sample_metadata = exp.sample_metadata
         other_sample_metadata = other.sample_metadata
-    sample_metadata = pd.concat([exp_sample_metadata, other_sample_metadata], join='outer')
+
+    sample_metadata = pd.concat([exp_sample_metadata, other_sample_metadata], join='outer', )
+    if orig_field_name is not None:
+        sample_metadata[orig_field_name] = np.nan
+        sample_metadata.loc[exp_sample_metadata.index.values, orig_field_name] = exp.description
+        sample_metadata.loc[other_sample_metadata.index.values, orig_field_name] = other.description
     newexp.sample_metadata = sample_metadata
 
     sample_pos_exp = [sample_metadata.index.get_loc(csamp) for csamp in exp_sample_metadata.index.values]
@@ -276,24 +283,28 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
 
     feature_metadata = exp.feature_metadata.merge(other.feature_metadata, how='outer', left_index=True, right_index=True, suffixes=('', '__tmp_other'))
     # merge and remove duplicate columns
-    remove_cols = []
+    keep_cols = []
     for ccol in feature_metadata.columns:
         if ccol.endswith('__tmp_other'):
             expcol = ccol[:-len('__tmp_other')]
             feature_metadata[expcol].fillna(feature_metadata[ccol], inplace=True)
-            remove_cols.append(ccol)
+        else:
+            keep_cols.append(ccol)
+    feature_metadata = feature_metadata[keep_cols]
+    newexp.feature_metadata = feature_metadata
 
     all_features = feature_metadata.index.values
     all_data = np.zeros([len(sample_metadata), len(all_features)])
     data_exp = exp.get_data(sparse=False)
     data_other = other.get_data(sparse=False)
+    logger.warn('data')
+
     for idx, cfeature in enumerate(all_features):
         if cfeature in exp.feature_metadata.index:
-            all_data[sample_pos_exp, idx] = data_exp[:, idx]
-
+            all_data[sample_pos_exp, idx] = data_exp[:, exp.feature_metadata.index.get_loc(cfeature)]
         if cfeature in other.feature_metadata.index:
-            all_data[sample_pos_other, idx] = data_other[:, idx]
-
+            all_data[sample_pos_other, idx] = data_other[:, other.feature_metadata.index.get_loc(cfeature)]
+    newexp.data = all_data
     return newexp
 
 
