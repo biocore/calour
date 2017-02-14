@@ -262,12 +262,13 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
     sample_pos_exp = [sample_metadata.index.get_loc(csamp) for csamp in exp_sample_metadata.index.values]
     sample_pos_other = [sample_metadata.index.get_loc(csamp) for csamp in other_sample_metadata.index.values]
 
-    print(sample_pos_exp)
-    print(sample_pos_other)
     all_features = exp.sample_metadata.index.union(other.sample_metadata.index)
     all_data = np.zeros([len(sample_metadata), len(all_features)])
     feature_metadata = exp.feature_metadata.copy()
-    for cfeature in all_features:
+    for idx,cfeature in enumerate(all_features):
+        if cfeature in exp.feature_metadata.index:
+            all_data[sample_pos_exp, idx] = exp.data[:,idx]
+            pass
         pass
 
     return newexp
