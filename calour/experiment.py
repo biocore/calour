@@ -38,7 +38,7 @@ class Experiment:
     feature_metadata : ``pandas.DataFrame``
         The metadata on the features
     description : str
-        Text describe the experiment
+        Text describing the experiment
     sparse : bool
         Is data array in sparse or dense matrix
 
@@ -53,6 +53,8 @@ class Experiment:
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
+    shape: tuple of (int, int)
+        the dimension of data
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -71,10 +73,7 @@ class Experiment:
         self.sparse = sparse
 
     def __repr__(self):
-        '''Return a string representation of this object.
-
-        should have number of samples, observations, first 3 sequences and first 3 samples?
-        '''
+        '''Return a string representation of this object.'''
         return 'Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
@@ -99,19 +98,14 @@ class Experiment:
         return not (self == other)
 
     def __copy__(self):
-        '''Create a copy of Experiment'''
+        '''Return a copy of Experiment'''
         cls = self.__class__
         result = cls.__new__(cls)
         result.__dict__.update(self.__dict__)
         return result
 
     def __deepcopy__(self, memo):
-        '''Create a deep copy of Experiment
-
-        Parameters
-        ----------
-        memo :
-        '''
+        '''Return a deep copy of Experiment. '''
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
@@ -145,9 +139,9 @@ class Experiment:
         return inner
 
     def get_data(self, sparse=None, getcopy=False):
-        '''Get the data 2d array
+        '''Get the data as a 2d array
 
-        Get the data 2d array (each column is a feature, row is a sample)
+        Get the data 2d array (each column is a feature and row is a sample)
 
         Parameters
         ----------
@@ -181,15 +175,10 @@ class Experiment:
                 else:
                     return self.data
 
-    def get_num_samples(self):
-        '''Get the number of samples in the experiment
-        '''
-        return self.get_data().shape[0]
-
-    def get_num_features(self):
-        '''Get the number of features in the experiment
-        '''
-        return self.get_data().shape[1]
+    @property
+    def shape(self):
+        '''Get the number of samples by features in the experiment. '''
+        return self.get_data().shape
 
     def reorder(self, new_order, axis=0, inplace=False):
         '''Reorder according to indices in the new order.
@@ -201,7 +190,8 @@ class Experiment:
         new_order : Iterable of int
             the order of new indices
         axis : 0 for samples or 1 for features
-        inplace : bool
+            the axis where the reorder occurs
+        inplace : bool, optional
             reorder in place.
 
         Returns
@@ -221,6 +211,28 @@ class Experiment:
             exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
 
         return exp
+
+
+def add_functions(cls,
+                  modules=['.io', '.sorting', '.filtering',
+                           '.transforming', '.heatmap.heatmap']):
+    '''Dynamically add functions to the class as methods.
+
+    Parameters
+    ----------
+    cls : ``class`` object
+        The class that the functions will be added to
+    modules : iterable of str
+        The modules where the functions are defined
+    '''
+    for module_name in modules:
+        module = import_module(module_name, 'calour')
+        functions = inspect.getmembers(module, inspect.isfunction)
+        # import ipdb; ipdb.set_trace()
+        for fn, f in functions:
+            # skip private functions
+            if not fn.startswith('_'):
+                setattr(cls, fn, f)
 
 
 def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixes=None):
