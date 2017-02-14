@@ -8,7 +8,7 @@
 
 from logging import getLogger
 import scipy.sparse
-from copy import copy, deepcopy
+from copy import deepcopy
 from importlib import import_module
 import inspect
 from functools import wraps
