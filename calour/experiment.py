@@ -274,7 +274,16 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
     sample_pos_exp = [sample_metadata.index.get_loc(csamp) for csamp in exp_sample_metadata.index.values]
     sample_pos_other = [sample_metadata.index.get_loc(csamp) for csamp in other_sample_metadata.index.values]
 
-    all_features = exp.sample_metadata.index.union(other.sample_metadata.index)
+    feature_metadata = exp.feature_metadata.merge(other.feature_metadata, how='outer', left_index=True, right_index=True, suffixes=('', '__tmp_other'))
+    # merge and remove duplicate columns
+    remove_cols = []
+    for ccol in feature_metadata.columns:
+        if ccol.endswith('__tmp_other'):
+            expcol = ccol[:-len('__tmp_other')]
+            feature_metadata[expcol].fillna(feature_metadata[ccol], inplace=True)
+            remove_cols.append(ccol)
+
+    all_features = feature_metadata.index.values
     all_data = np.zeros([len(sample_metadata), len(all_features)])
     data_exp = exp.get_data(sparse=False)
     data_other = other.get_data(sparse=False)
