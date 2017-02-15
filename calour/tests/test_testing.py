@@ -48,5 +48,6 @@ class TestTesting(Tests):
         with self.assertRaises(AssertionError):
             assert_experiment_equal(self.test1, newexp)
 
+
 if __name__ == "__main__":
     unittest.main()

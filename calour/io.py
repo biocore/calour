@@ -18,7 +18,7 @@ from calour.util import _get_taxonomy_string, get_file_md5, get_data_md5
 logger = getLogger(__name__)
 
 
-def _read_biom(fp, transpose=True, sparse=True):
+def _read_biom(fp, transpose=True):
     '''Read in a biom table file.
 
     Parameters
@@ -139,7 +139,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     '''
     logger.info('Reading experiment (biom table %s, map file %s)' % (data_file, sample_metadata_file))
     exp_metadata = {'map_md5': ''}
-    sid, oid, data, md = _read_biom(data_file, sparse=sparse)
+    sid, oid, data, md = _read_biom(data_file)
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
         sample_metadata = _read_table(sample_metadata_file).loc[sid, ]

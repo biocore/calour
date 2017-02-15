@@ -105,7 +105,7 @@ def normalize_filter_features(exp, features, reads=10000, exclude=True, inplace=
 
     Returns
     -------
-    newexp : calour.Experiment
+    ``Experiment``
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)

@@ -42,7 +42,7 @@ def sort_taxonomy(exp, inplace=False):
 
 
 @Experiment._record_sig
-def cluster_data(exp, data, axis=0, metric='euclidean', inplace=False, **kwargs):
+def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False, **kwargs):
     '''Cluster the samples/features.
 
     Reorder the features/samples so that ones with similar behavior (pattern
@@ -52,8 +52,9 @@ def cluster_data(exp, data, axis=0, metric='euclidean', inplace=False, **kwargs)
     ----------
     aixs : 0 or 1 (optional)
         0 (default) means clustering features; 1 means clustering samples
-    data : ``Experiment.data``
-        the data matrix either transformed or not to apply clustering method on
+    transform : Callable
+        a callable transform a 2-d matrix. it should not change the dimension
+        of the matrix
     metric : str or callable
         the clustering metric to use. It should be able to be passed to
         ``scipy.spatial.distance.pdist``.
@@ -69,6 +70,11 @@ def cluster_data(exp, data, axis=0, metric='euclidean', inplace=False, **kwargs)
         With samples/features clustered (reordered)
 
     '''
+    if transform is None:
+        data = exp.data
+    else:
+        data = transform(exp.data, **kwargs)
+
     if axis == 0:
         data = data.T
     # cluster

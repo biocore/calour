@@ -212,8 +212,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
     # set the title
     if title is None:
         title = exp.description
-    else:
-        ax.set_title(title)
+    ax.set_title(title)
 
     # link the interactive plot functions
     hdat.connect_functions(fig)

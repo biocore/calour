@@ -1,3 +1,11 @@
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
+
 from logging import getLogger
 
 import numpy as np
@@ -9,9 +17,7 @@ logger = getLogger(__name__)
 
 
 class PlotGUI:
-    '''The base class for heatmap GUI
-
-    Various gui classes inherit this class
+    '''The base class for heatmap GUI.
 
     Attributes
     ----------
@@ -68,8 +74,7 @@ class PlotGUI:
         return fig
 
     def run_gui(self):
-        ''' Run the GUI event loop and return when gui is done. does nothing for base class
-        '''
+        '''Run the GUI event loop and return when gui is done. does nothing for base class'''
 
     def connect_functions(self, fig):
         '''Connect to the matplotlib callbacks for key and mouse '''

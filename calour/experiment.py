@@ -38,9 +38,10 @@ class Experiment:
     feature_metadata : ``pandas.DataFrame``
         The metadata on the features
     description : str
-        Text describing the experiment
+        name of experiment
     sparse : bool
-        store the data array in sparse or dense matrix
+        store the data array in sparse (``scipy.sparse.csr_matrix``) matrix
+        or numpy array
 
     Attributes
     ----------
@@ -56,9 +57,9 @@ class Experiment:
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
-        store the data as sparse or dense array.
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
-        description of the experiment
+        name of the experiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -78,7 +79,7 @@ class Experiment:
 
     @property
     def sparse(self):
-        return self._sparse
+        return scipy.sparse.issparse(self.data)
 
     @sparse.setter
     def sparse(self, sparse):
@@ -86,7 +87,6 @@ class Experiment:
             self.data = scipy.sparse.csr_matrix(self.data)
         elif sparse is False and scipy.sparse.issparse(self.data):
             self.data = self.data.toarray()
-        self._sparse = sparse
 
     def __repr__(self):
         '''Return a string representation of this object.'''
