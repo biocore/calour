@@ -32,9 +32,12 @@ class SortingTests(Tests):
         pdt.assert_series_equal(obs.feature_metadata['taxonomy'], expected_taxonomy, check_names=False)
 
     def test_cluster_data(self):
+        def log_and_scale(exp):
+            exp.log_n(inplace=True)
+            exp.scale(inplace=True, axis=0)
+            return exp
         # no minimal filtering
-        new = self.test1.transform([log_n, scale])
-        obs = self.test1.cluster_data(data=new.data)
+        obs = self.test1.cluster_data(transform=log_and_scale)
         exp = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'), self.test1_samp)
         assert_experiment_equal(obs, exp, almost_equal=True)
 

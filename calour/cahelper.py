@@ -52,7 +52,9 @@ def cluster_features(exp, minreads=10, **kwargs):
     '''
     if minreads > 0:
         newexp = filter_min_reads(exp, minreads)
-    newexp = newexp.cluster_data(axis=0, **kwargs)
+    else:
+        newexp = exp
+    newexp = newexp.cluster_data(transform=log_and_scale, axis=0, **kwargs)
     return newexp
 
 
@@ -259,3 +261,9 @@ def set_log_level(level):
 
     clog = getLogger('calour')
     clog.setLevel(level)
+
+
+def log_and_scale(exp):
+    exp.log_n(inplace=True)
+    exp.scale(inplace=True, axis=0)
+    return exp
