@@ -1,4 +1,10 @@
-# calour functions for doing differential abundance
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
 
 from logging import getLogger
 from collections import defaultdict
@@ -8,13 +14,12 @@ from scipy import stats
 from statsmodels.sandbox.stats.multicomp import multipletests
 
 from . import dsfdr
-# import calour.pbfdr
 
 
 logger = getLogger(__name__)
 
 
-def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdrmethod='dsfdr'):
+def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''
     test the differential expression between 2 groups (val1 and val2 in field field)
     using permutation based fdr (dsfdr)
@@ -66,7 +71,7 @@ def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transfor
         if not isinstance(val2, (list, tuple)):
             val2 = [val2]
         cexp = exp.filter_samples(field, val1+val2, negate=False)
-        logger.warn('%d samples with both values' % cexp.get_num_samples())
+        logger.warn('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
 
