@@ -15,38 +15,38 @@ from calour._testing import Tests, assert_experiment_equal
 class TestTesting(Tests):
     def setUp(self):
         super().setUp()
-        # load the simple experiment as sparse
-        self.simple = ca.read(self.simple_table, self.simple_map)
-        # load the complex experiment as sparse
-        self.complex = ca.read(self.complex_table, self.complex_map)
+        # load the test1 experiment as sparse
+        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        # load the timeseries experiment as sparse
+        self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp)
 
     def test_assert_experiment_equal(self):
         # basic testing
-        assert_experiment_equal(self.simple, self.simple)
+        assert_experiment_equal(self.test1, self.test1)
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.simple, self.complex)
+            assert_experiment_equal(self.test1, self.timeseries)
 
         # is copy working?
-        newexp = self.simple.deepcopy()
-        assert_experiment_equal(self.simple, newexp)
+        newexp = self.test1.deepcopy()
+        assert_experiment_equal(self.test1, newexp)
 
         # just data
-        newexp = self.simple.deepcopy()
+        newexp = self.test1.deepcopy()
         newexp.data[2, 2] = 43
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.simple, newexp)
+            assert_experiment_equal(self.test1, newexp)
 
         # just sample metadata
-        newexp = self.simple.deepcopy()
+        newexp = self.test1.deepcopy()
         newexp.sample_metadata['id', 0] = 42
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.simple, newexp)
+            assert_experiment_equal(self.test1, newexp)
 
         # just feature metadata
-        newexp = self.simple.deepcopy()
+        newexp = self.test1.deepcopy()
         newexp.feature_metadata['taxonomy', 0] = '42'
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.simple, newexp)
+            assert_experiment_equal(self.test1, newexp)
 
 if __name__ == "__main__":
     unittest.main()

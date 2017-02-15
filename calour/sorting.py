@@ -13,7 +13,6 @@ from scipy import cluster, spatial
 
 from . import Experiment
 from .util import _get_taxonomy_string
-from .transforming import scale, log_n
 
 
 logger = getLogger(__name__)
