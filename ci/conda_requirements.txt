@@ -2,10 +2,13 @@ nose
 pep8
 flake8
 sphinx
-click
 numpy
 scipy
+pyqt>=5
 pandas
 matplotlib
 scikit-learn
+scikit-bio
 biom-format
+statsmodels
+ipywidgets
