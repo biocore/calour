@@ -22,6 +22,9 @@ class Tests(TestCase):
         self.test1_biom = join(test_data_dir, 'test1.biom')
         self.test1_samp = join(test_data_dir, 'test1.sample')
         self.test1_feat = join(test_data_dir, 'test1.feature')
+        self.test2_biom = join(test_data_dir, 'test2.biom')
+        self.test2_samp = join(test_data_dir, 'test2.sample')
+        self.test2_feat = join(test_data_dir, 'test2.feature')
         self.timeseries_biom = join(test_data_dir, 'timeseries.biom')
         self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
 

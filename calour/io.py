@@ -54,15 +54,12 @@ def _get_md_from_biom(table):
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
-
     if metadata is None:
         logger.info('No metadata associated with features in biom table')
+        md_df = pd.DataFrame(index=ids)
     else:
-        metadata = [dict(tmd) for tmd in metadata]
-    md_df = pd.DataFrame(metadata)
-    md_df['ids'] = ids
-    md_df.set_index('ids', drop=False, inplace=True)
-    # md_df.index.name = 'sequence'
+        md_df = pd.DataFrame([dict(tmd) for tmd in metadata], index=ids)
+
     return md_df
 
 
@@ -118,6 +115,9 @@ def read_taxa(data_file, sample_metadata_file=None,
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True):
     '''Read the files for the experiment.
+
+    .. note:: The order in the sample and feature metadata tables are changed
+       to align with biom table.
 
     Parameters
     ----------

@@ -200,7 +200,7 @@ class Experiment:
 
         Parameters
         ----------
-        new_order : Iterable of int
+        new_order : Iterable of int or boolean mask
             the order of new indices
         axis : 0 for samples or 1 for features
             the axis where the reorder occurs
@@ -216,6 +216,18 @@ class Experiment:
             exp = deepcopy(self)
         else:
             exp = self
+        # make it a np array; otherwise the slicing won't work if the new_order is
+        # a list of boolean and data is sparse matrix. For example:
+        # from scipy.sparse import csr_matrix
+        # a = csr_matrix((3, 4), dtype=np.int8)
+        # In [125]: a[[False, False, False], :]
+        # Out[125]:
+        # <3x4 sparse matrix of type '<class 'numpy.int8'>'
+
+        # In [126]: a[np.array([False, False, False]), :]
+        # Out[126]:
+        # <0x4 sparse matrix of type '<class 'numpy.int8'>'
+        new_order = np.array(new_order)
         if axis == 0:
             exp.data = exp.data[new_order, :]
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
