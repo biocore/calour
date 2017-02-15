@@ -14,7 +14,6 @@ import pandas.util.testing as pdt
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
-from calour.transforming import log_n, scale
 
 
 class SortingTests(Tests):
