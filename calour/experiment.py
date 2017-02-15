@@ -308,10 +308,30 @@ def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=N
     return newexp
 
 
-def join_fields(exp, field1, field2, newfield):
+def join_fields(exp, field1, field2, newname, separator='-', inplace=False):
     '''
     create a new sample metadata field by concatenating the values in the two fields specified
     '''
+    if inplace:
+        newexp = exp
+    else:
+        newexp = deepcopy(exp)
+
+    # validate the data
+    if field1 not in newexp.sample_metadata.columns:
+        raise ValueError('field %s not in sample metadata' % field1)
+    if field2 not in newexp.sample_metadata.columns:
+        raise ValueError('field %s not in sample metadata' % field2)
+
+    # get the new column name
+    if newname is None:
+        newname = '%s-%s' % (field1, field2)
+
+    # add the new column
+    newcol = exp.sample_metadata[field1].str.cat(exp.sample_metadata[field2].astype(str), sep=separator)
+    newexp.sample_metadata[newname] = newcol
+
+    return newexp
 
 
 def merge_obs_tax(exp, tax_level=3, method='sum'):
