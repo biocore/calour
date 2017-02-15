@@ -6,28 +6,25 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import unittest
+from unittest import main
 from tempfile import mkdtemp
 from os.path import join
 import shutil
 
-import calour as ca
+import scipy.sparse
 import numpy.testing as npt
 import skbio
 
+import calour as ca
 from calour._testing import Tests
 from calour.io import _create_biom_table_from_exp
 
 
-class TestIO(Tests):
+class IOTests(Tests):
     def setUp(self):
         super().setUp()
-        # load the simple experiment as sparse
-        self.simple = ca.read(self.simple_table, self.simple_map)
-        self.outdir = mkdtemp()
 
-    def validate_read(self, exp, validate_sample_metadata=True):
-        '''Validate the simple experiment was loaded correctly'''
+    def _validate_read(self, exp, validate_sample_metadata=True):
         # number of bacteria is 12
         self.assertEqual(exp.data.shape[1], 12)
         # number of samples is 20 (should not read the samples only in map or only in biom table)
@@ -52,19 +49,23 @@ class TestIO(Tests):
 
     def test_read(self):
         # load the simple dataset as sparse
-        exp = ca.read(self.simple_table, self.simple_map)
-        self.validate_read(exp)
+        exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat)
+        self.assertTrue(scipy.sparse.issparse(exp.data))
+        self._validate_read(exp)
 
+    def test_read_not_sparse(self):
         # load the simple dataset as dense
-        exp = ca.read(self.simple_table, self.simple_map, sparse=False)
-        self.validate_read(exp)
+        exp = ca.read(self.test1_biom, self.test1_samp, sparse=False)
+        self.assertFalse(scipy.sparse.issparse(exp.data))
+        self._validate_read(exp)
 
+    def test_read_no_sample_metadata(self):
         # test loading without a mapping file
-        exp = ca.read(self.simple_table)
-        self.validate_read(exp, validate_sample_metadata=False)
+        exp = ca.read(self.test1_biom)
+        self._validate_read(exp, validate_sample_metadata=False)
 
     def test_create_biom_table_from_exp(self):
-        exp = self.simple
+        exp = ca.read(self.test1_biom, self.test1_samp)
         table = _create_biom_table_from_exp(exp)
         self.assertCountEqual(table.ids(axis='observation'), exp.feature_metadata.index.values)
         self.assertCountEqual(table.ids(axis='sample'), exp.sample_metadata.index.values)
@@ -73,15 +74,16 @@ class TestIO(Tests):
         self.assertEqual(metadata['taxonomy'], exp.feature_metadata['taxonomy'].iloc[1])
 
     def test_save_fasta(self):
-        exp = self.simple
-        f = join(self.outdir, 'simple.fasta')
+        exp = ca.read(self.test1_biom, self.test1_samp)
+        d = mkdtemp()
+        f = join(d, 'test1.fasta')
         exp.save_fasta(f)
-
         seqs = []
-        for cseq in skbio.read(f, format='fasta'):
-            seqs.append(str(cseq))
+        for seq in skbio.read(f, format='fasta'):
+            seqs.append(str(seq))
         self.assertCountEqual(seqs, exp.feature_metadata.index.values)
-        shutil.rmtree(self.outdir)
+        shutil.rmtree(d)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    main()

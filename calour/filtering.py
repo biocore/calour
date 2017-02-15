@@ -8,8 +8,8 @@
 
 from heapq import nlargest
 from logging import getLogger
+from collections import Callable
 
-import scipy
 import numpy as np
 
 from .experiment import Experiment
@@ -19,8 +19,8 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def down_sample(exp, field, axis=0, inplace=False):
-    '''Down sample the data set.
+def downsample(exp, field, axis=0, inplace=False):
+    '''Downsample the data set.
 
     This down samples all the samples to have the same number of
     samples for each categorical value of the field in
@@ -56,28 +56,44 @@ def down_sample(exp, field, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def filter_by_metadata(exp, field, values, axis=0, negate=False, inplace=False):
+def filter_by_metadata(exp, field, pick, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
 
     Parameters
     ----------
     field : str
-        the column name or sample or feature metadata
-    values : list, tuple, or numeric/str
-    axis : 0 or 1
-        the column name is on samples (0) or features (1) metadata
+        the column name of the sample or feature metadata tables
+    pick : list, tuple, or Callable
+        pick what to keep based on the value in the specified field
+    axis : 0 or 1, optional
+        the field is on samples (0) or features (1) metadata
+    negate : bool, optional
+        discard instead of keep the pick if set to ``True``
+    inplace : bool, optional
+        do the filtering on the original ``Experiment`` object or a copied one.
+
+    Returns
+    -------
+    ``Experiment``
+        the filtered object
     '''
     logger.debug('filter_by_metadata')
-
-    if not isinstance(values, (list, tuple)):
-        values = [values]
 
     if axis == 0:
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
+    else:
+        raise ValueError('unknown axis %s' % axis)
 
-    select = x[field].isin(values).values
+    if isinstance(pick, Callable):
+        select = pick(x[field])
+    else:
+        if not isinstance(pick, (list, tuple)):
+            pick = [pick]
+
+        select = x[field].isin(pick).values
+
     if negate is True:
         select = ~ select
     return exp.reorder(select, axis=axis, inplace=inplace)
@@ -106,15 +122,9 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
 
     Returns
     -------
-    exp : Experiment
-
+    ``Experiment``
+        the filtered object
     '''
-    select = _filter_by_data(exp.data, predicate, axis, negate, **kwargs)
-    logger.info('%s remaining' % np.sum(select))
-    return exp.reorder(select, axis=axis, inplace=inplace)
-
-
-def _filter_by_data(data, predicate, axis=0, negate=False, **kwargs):
     func = {'sum_abundance': _sum_abundance,
             'freq_ratio': _freq_ratio,
             'unique_cut': _unique_cut,
@@ -123,24 +133,27 @@ def _filter_by_data(data, predicate, axis=0, negate=False, **kwargs):
     if isinstance(predicate, str):
         predicate = func[predicate]
 
-    if scipy.sparse.issparse(data):
-        n = data.shape[axis]
+    if exp.sparse:
+        n = exp.data.shape[axis]
         select = np.ones(n, dtype=bool)
         if axis == 0:
             for row in range(n):
                 # convert the row from sparse to dense, and cast to 1d array
-                select[row] = predicate(data[row, :].todense().A1, **kwargs)
+                select[row] = predicate(exp.data[row, :].todense().A1, **kwargs)
         elif axis == 1:
             for col in range(n):
                 # convert the column from sparse to dense, and cast to 1d array
-                select[col] = predicate(data[:, col].todense().A1, **kwargs)
+                select[col] = predicate(exp.data[:, col].todense().A1, **kwargs)
+        else:
+            raise ValueError('unknown axis %s' % axis)
     else:
-        select = np.apply_along_axis(predicate, 1 - axis, data, **kwargs)
+        select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
 
     if negate is True:
         select = ~ select
 
-    return select
+    logger.info('%s remaining' % np.sum(select))
+    return exp.reorder(select, axis=axis, inplace=inplace)
 
 
 def _sum_abundance(x, cutoff=10):
@@ -230,6 +243,7 @@ def _freq_ratio(x, ratio=2):
     return max_1 / max_2 <= ratio
 
 
+@Experiment._record_sig
 def filter_samples(exp, field, values, negate=False, inplace=False):
     '''Shortcut for filtering samples.'''
     return filter_by_metadata(exp, field=field, values=values,

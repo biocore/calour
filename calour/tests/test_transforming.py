@@ -6,69 +6,74 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import unittest
+from unittest import main
 
-import numpy.testing as npt
 import numpy as np
+from numpy.testing import assert_array_almost_equal
 
 import calour as ca
-from calour.transforming import _log_min_transform, normalize_filter_features
-from calour._testing import Tests
+from calour._testing import Tests, assert_experiment_equal
 
 
 class TestTransforming(Tests):
     def setUp(self):
         super().setUp()
-        # load the simple experiment as sparse
-        self.simple = ca.read(self.simple_table, self.simple_map)
-        # load the complex experiment as sparse
-        self.complex = ca.read(self.complex_table, self.complex_map)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
+
+    def test_transform(self):
+        obs = self.test2.transform()
+        self.assertEqual(obs, self.test2)
+        self.assertIsNot(obs, self.test2)
+
+        obs = self.test2.transform(inplace=True)
+        self.assertIs(obs, self.test2)
+
+    def test_scale(self):
+        obs = self.test2.scale()
+        self.assertIsNot(obs, self.test2)
+
+        obs = self.test2.scale(inplace=True)
+        self.assertIs(obs, self.test2)
+
+    def test_log_n(self):
+        obs = self.test2.log_n()
+        self.test2.data = np.log2(
+            [[10., 20., 1., 20., 5., 100., 844., 100.],
+             [10., 20., 2., 19., 1., 100., 849., 200.],
+             [10., 20., 3., 18., 5., 100., 844., 300.],
+             [10., 20., 4., 17., 1., 100., 849., 400.],
+             [10., 20., 5., 16., 4., 100., 845., 500.],
+             [10., 20., 6., 15., 1., 100., 849., 600.],
+             [10., 20., 7., 14., 3., 100., 846., 700.],
+             [10., 20., 8., 13., 1., 100., 849., 800.],
+             [10., 20., 9., 12., 7., 100., 842., 900.]])
+        assert_experiment_equal(obs, self.test2)
+        self.assertIsNot(obs, self.test2)
+
+        obs = self.test2.log_n(inplace=True)
+        self.assertIs(obs, self.test2)
 
     def test_normalize(self):
-        # test normalizing to 10k reads/sample
-        normed = self.simple.normalize()
-        expected = np.ones([len(normed.sample_metadata)]) * 10000
-        npt.assert_array_almost_equal(np.sum(normed.get_data(sparse=False, getcopy=True), axis=1), expected)
+        total = 1000
+        obs = self.test2.normalize(total)
+        assert_array_almost_equal(obs.data.sum(axis=1).A1,
+                                  [total] * 9)
+        self.assertIsNot(obs, self.test2)
 
-        newexp = self.complex.filter_by_data('sum_abundance', cutoff=1)
-        normed = newexp.normalize()
-        expected = np.ones([len(newexp.sample_metadata)]) * 10000
-        out_sum = np.sum(normed.get_data(sparse=False, getcopy=True), axis=1)
-        npt.assert_array_almost_equal(out_sum, expected)
-
-    def test_log_min_transform(self):
-        data = self.simple.data
-        # test axis=1, with min_abundance, log transform and no normalization
-        ndata = _log_min_transform(data, axis=1, min_abundance=1000, logit=10, normalize=False)
-        # test we didn't filter sample
-        self.assertEqual(ndata.shape[0], data.shape[0])
-        # test we did remove the features
-        self.assertEqual(ndata.shape[1], 3)
-        # test we log transformed the data
-        self.assertEqual(ndata[0, 0], np.log2(100))
-        self.assertEqual(ndata[3, 2], np.log2(400))
-
-        # test axis=1, without min_abundance, no log transform and with normalization
-        ndata = _log_min_transform(data, axis=1, min_abundance=None, logit=None, normalize=True)
-        # test we didn't filter samples
-        self.assertEqual(ndata.shape[0], data.shape[0])
-        # test we didn't remove features
-        self.assertEqual(ndata.shape[1], data.shape[1])
-        # test we log normalized the data to mean 0, std 1
-        npt.assert_array_almost_equal(np.mean(ndata, axis=1), np.zeros([ndata.shape[0]]))
-        npt.assert_array_almost_equal(np.std(ndata, axis=1), np.ones([ndata.shape[0]]))
+        obs = self.test2.normalize(total, inplace=True)
+        self.assertIs(obs, self.test2)
 
     def test_normalize_filter_features(self):
         # test the filtering in standard mode (remove a few features, normalize to 10k)
-        exp = self.simple
+        exp = ca.read(self.test1_biom, self.test1_samp)
         bad_features = [6, 7]
         features = [exp.feature_metadata.index[cbad] for cbad in bad_features]
-        newexp = normalize_filter_features(exp, features, reads=10000, exclude=True, inplace=False)
+        newexp = exp.normalize_filter_features(features, reads=10000, exclude=True, inplace=False)
         # see the mean of the features we want (without 6,7) is 10k
         good_features = list(set(range(exp.data.shape[1])).difference(set(bad_features)))
-        npt.assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)
+        assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)
         self.assertTrue(np.all(newexp.data[:, bad_features] > exp.data[:, bad_features]))
 
 
-if __name__ == "__main__":
-    unittest.main()
+if __name__ == '__main__':
+    main()
