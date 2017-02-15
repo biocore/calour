@@ -66,19 +66,25 @@ def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transfor
         if not isinstance(val2, (list, tuple)):
             val2 = [val2]
         cexp = exp.filter_samples(field, val1+val2, negate=False)
-        logger.warn('%d samples with both values' % cexp.get_num_samples())
+        logger.warn('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
 
+    data = cexp.get_data(getcopy=True, sparse=False).transpose()
     # prepare the labels. If correlation method, get the values, otherwise the group
     labels = np.zeros(len(cexp.sample_metadata))
     if method in ['spearman', 'pearson', 'nonzerospearman', 'nonzeropearson']:
         labels = cexp.sample_metadata[field].values
+        # remove the nans
+        nanpos = np.where(np.isnan(labels))[0]
+        if len(nanpos) > 0:
+            logger.warn('NaN values encountered in labels for correlation. Ignoring these samples')
+            labels = np.delete(labels, nanpos)
+            data = np.delete(data, nanpos, axis=1)
     else:
         logger.warn(np.sum(cexp.sample_metadata[field].isin(val1).values))
         labels[cexp.sample_metadata[field].isin(val1).values] = 1
         logger.warn('%d samples with value 1 (%s)' % (np.sum(labels), val1))
-    data = cexp.get_data(getcopy=True, sparse=False).transpose()
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform=transform, alpha=alpha, numperm=numperm, fdrmethod=fdrmethod)
 
     keep = np.where(keep)

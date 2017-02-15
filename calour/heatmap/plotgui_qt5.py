@@ -6,8 +6,8 @@ from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
                              QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter,
-                             QFrame, QComboBox, QScrollArea, QListWidgetItem, QDialogButtonBox)
-from PyQt5.QtWidgets import QApplication
+                             QFrame, QComboBox, QScrollArea, QListWidgetItem, QDialogButtonBox,
+                             QApplication)
 
 from .plotgui import PlotGUI
 from calour import analysis

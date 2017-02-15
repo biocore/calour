@@ -66,9 +66,13 @@ def sort_samples(exp, field, **kwargs):
 def plot_s(exp, field=None, **kwargs):
     '''Plot bacteria (with taxonomy) after sorting by field
     use after load_taxa()
+    note: if sample_field is in **kwargs, use it as labels after sorting using field
     '''
     newexp = sort_samples(exp, field)
-    newexp.plot(field, feature_field='taxonomy', max_features=100, **kwargs)
+    if 'sample_field' in kwargs:
+        newexp.plot(feature_field='taxonomy', max_features=100, **kwargs)
+    else:
+        newexp.plot(field, feature_field='taxonomy', max_features=100, **kwargs)
 
 
 def filter_min_reads(exp, minreads, **kwargs):

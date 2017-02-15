@@ -7,12 +7,24 @@
 # ----------------------------------------------------------------------------
 
 import unittest
+from tempfile import mkdtemp
+from os.path import join
+import shutil
 
 import calour as ca
+import numpy.testing as npt
+import skbio
+
 from calour._testing import Tests
+from calour.io import _create_biom_table_from_exp
 
 
 class TestIO(Tests):
+    def setUp(self):
+        super().setUp()
+        # load the simple experiment as sparse
+        self.simple = ca.read(self.simple_table, self.simple_map)
+        self.outdir = mkdtemp()
 
     def validate_read(self, exp, validate_sample_metadata=True):
         '''Validate the simple experiment was loaded correctly'''
@@ -51,6 +63,25 @@ class TestIO(Tests):
         exp = ca.read(self.simple_table)
         self.validate_read(exp, validate_sample_metadata=False)
 
+    def test_create_biom_table_from_exp(self):
+        exp = self.simple
+        table = _create_biom_table_from_exp(exp)
+        self.assertCountEqual(table.ids(axis='observation'), exp.feature_metadata.index.values)
+        self.assertCountEqual(table.ids(axis='sample'), exp.sample_metadata.index.values)
+        npt.assert_array_almost_equal(table.matrix_data.toarray(), exp.get_data(sparse=False).transpose())
+        metadata = table.metadata(id=exp.feature_metadata.index[1], axis='observation')
+        self.assertEqual(metadata['taxonomy'], exp.feature_metadata['taxonomy'].iloc[1])
+
+    def test_save_fasta(self):
+        exp = self.simple
+        f = join(self.outdir, 'simple.fasta')
+        exp.save_fasta(f)
+
+        seqs = []
+        for cseq in skbio.read(f, format='fasta'):
+            seqs.append(str(cseq))
+        self.assertCountEqual(seqs, exp.feature_metadata.index.values)
+        shutil.rmtree(self.outdir)
 
 if __name__ == "__main__":
     unittest.main()
