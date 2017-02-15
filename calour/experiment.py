@@ -162,12 +162,15 @@ class Experiment:
         Parameters
         ----------
         sparse : None or bool (optional)
-            None (default) to pass original data format (sparse or dense).
-            True to get as sparse.
-            False to get as dense
+            None (default) to pass original data (sparse or dense).
+            True to get as sparse. False to get as dense
         copy : bool (optional)
-            True (default) to get a copy of the data
-            False to get the original data (for inplace)
+            True to get a copy of the data; otherwise, it can be
+            the original data or a copy (default).
+
+        Returns
+        -------
+        ``Experiment.data``
         '''
         if sparse is None:
             if copy:
@@ -175,7 +178,7 @@ class Experiment:
             else:
                 return self.data
         elif sparse:
-            if scipy.sparse.issparse(self.data):
+            if self.sparse:
                 if copy:
                     return self.data.copy()
                 else:
@@ -183,7 +186,7 @@ class Experiment:
             else:
                 return scipy.sparse.csr_matrix(self.data)
         else:
-            if scipy.sparse.issparse(self.data):
+            if self.sparse:
                 return self.data.toarray()
             else:
                 if copy:
