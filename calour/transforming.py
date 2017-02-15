@@ -9,22 +9,20 @@
 from logging import getLogger
 from copy import deepcopy
 
-import scipy
 import numpy as np
 from sklearn import preprocessing
 
-from .filtering import _filter_by_data
 
 logger = getLogger(__name__)
 
 
-def normalize(exp, reads=10000, axis=1, inplace=False):
+def normalize(exp, total=10000, axis=1, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum reads
 
     Parameters
     ----------
     exp : Experiment
-    reads : float
+    total : float
         the sum (along axis) to normalize to
     axis : int (optional)
         the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
@@ -33,13 +31,55 @@ def normalize(exp, reads=10000, axis=1, inplace=False):
 
     Returns
     -------
-    newexp : Experiment
+    ``Experiment``
         the normalized experiment
     '''
     if not inplace:
         exp = deepcopy(exp)
-    exp.data = preprocessing.normalize(exp.data, 'l1', axis=axis, copy=False) * reads
+    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=axis) * total
+    return exp
 
+
+def scale(exp, axis=1, inplace=False):
+    '''Standardize a dataset along an axis
+
+    .. warning:: It will convert the sparse matrix to dense array.
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+    if exp.sparse:
+        exp.sparse = False
+    preprocessing.scale(exp.data, axis=axis, copy=False)
+    return exp
+
+
+def log_n(exp, n=1, inplace=False):
+    '''Log transform the data
+
+    Parameters
+    ----------
+    n : numeric, optional
+        cap the tiny values and then log transform the data.
+    inplace : bool, optional
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+
+    if exp.sparse:
+        exp.sparse = False
+
+    exp.data[exp.data < n] = n
+    exp.data = np.log2(exp.data)
+
+    return exp
+
+
+def transform(exp, steps=[], inplace=False):
+    '''Chain transformations together.'''
+    if not inplace:
+        exp = deepcopy(exp)
+    for step in steps:
+        step(exp, inplace=True)
     return exp
 
 
@@ -65,7 +105,7 @@ def normalize_filter_features(exp, features, reads=10000, exclude=True, inplace=
 
     Returns
     -------
-    newexp : calour.Experiment
+    ``Experiment``
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
@@ -79,55 +119,3 @@ def normalize_filter_features(exp, features, reads=10000, exclude=True, inplace=
         newexp = deepcopy(exp)
     newexp.data = reads * data / use_reads[:, None]
     return newexp
-
-
-def _log_min_transform(data, axis=1, min_abundance=None, logit=1, normalize=True):
-    '''Transform and normalize the data.
-    Operation is done on features or samples (depending on axis)
-    Filtering/normalization steps are:
-    minimal total reads - remove all features (axis=1) or samples (axis=0) with <min_abundance total
-    log transform - using a minimal value (all entries < logit are transformed to logit before the log)
-    normalize - normalize each feature (axis=1) or sample (axis=0) to mean=0 std=1
-
-    Parameters
-    ----------
-    data : 2d nparray or scipy.sparse
-        The data to transform. If sparse, it is converted to dense
-    axis : int (optional)
-        axis=1 normalizes the features, axis=0 normalizes the samples
-    min_abundance : None or float (optional)
-        None (default) to not remove any features.
-        float to remove all features with total reads < float
-    logit : float or None (optional)
-        float (default) to log transform the data before clustering, using logit as the minimal threshold
-        (data<logit is changed to logit)
-        None to not log transform.
-    normalize : bool (optional)
-        True (default) to normalize each feature to sum 1 std 1.
-        False to not normalize each feature.
-
-    Returns
-    -------
-    ndarray
-        transformed 2-d array
-    '''
-    if scipy.sparse.issparse(data):
-        new = data.toarray()
-    else:
-        new = data.copy()
-
-    # filter low-freq rows/columns
-    if min_abundance is not None:
-        logger.debug('filtering min abundance %d' % min_abundance)
-        select = _filter_by_data(
-            data, 'sum_abundance', axis=axis, cutoff=min_abundance)
-        new = np.take(new, np.where(select)[0], axis=axis)
-
-    if logit is not None:
-        new[new < logit] = logit
-        new = np.log2(new)
-
-    if normalize is True:
-        # center and normalize
-        new = preprocessing.scale(new, axis=axis, copy=False)
-    return new

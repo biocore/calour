@@ -10,7 +10,6 @@ from logging import getLogger
 
 import pandas as pd
 import numpy as np
-import scipy
 import biom
 
 from calour.experiment import Experiment
@@ -19,14 +18,14 @@ from calour.util import _get_taxonomy_string, get_file_md5, get_data_md5
 logger = getLogger(__name__)
 
 
-def _read_biom(fp, transpose=True, sparse=True):
+def _read_biom(fp, transpose=True):
     '''Read in a biom table file.
 
     Parameters
     ----------
     fp : str
         file path to the biom table
-    transpose : bool
+    transpose : bool (True by default)
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
@@ -36,13 +35,7 @@ def _read_biom(fp, transpose=True, sparse=True):
     sid = table.ids(axis='sample')
     oid = table.ids(axis='observation')
     logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
-    if sparse:
-        logger.debug('storing as sparse matrix')
-        data = scipy.sparse.csr_matrix(table.matrix_data)
-    else:
-        logger.debug('storing as dense matrix')
-        data = table.matrix_data.toarray()
-
+    data = table.matrix_data
     feature_md = _get_md_from_biom(table)
 
     if transpose:
@@ -61,15 +54,12 @@ def _get_md_from_biom(table):
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
-
     if metadata is None:
         logger.info('No metadata associated with features in biom table')
+        md_df = pd.DataFrame(index=ids)
     else:
-        metadata = [dict(tmd) for tmd in metadata]
-    md_df = pd.DataFrame(metadata)
-    md_df['ids'] = ids
-    md_df.set_index('ids', drop=False, inplace=True)
-    # md_df.index.name = 'sequence'
+        md_df = pd.DataFrame([dict(tmd) for tmd in metadata], index=ids)
+
     return md_df
 
 
@@ -126,6 +116,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True):
     '''Read the files for the experiment.
 
+    .. note:: The order in the sample and feature metadata tables are changed
+       to align with biom table.
+
     Parameters
     ----------
     data_file : str
@@ -146,7 +139,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     '''
     logger.info('Reading experiment (biom table %s, map file %s)' % (data_file, sample_metadata_file))
     exp_metadata = {'map_md5': ''}
-    sid, oid, data, md = _read_biom(data_file, sparse=sparse)
+    sid, oid, data, md = _read_biom(data_file)
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
         sample_metadata = _read_table(sample_metadata_file).loc[sid, ]

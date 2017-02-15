@@ -13,7 +13,6 @@ from scipy import cluster, spatial
 
 from . import Experiment
 from .util import _get_taxonomy_string
-from .transforming import _log_min_transform
 
 
 logger = getLogger(__name__)
@@ -43,7 +42,7 @@ def sort_taxonomy(exp, inplace=False):
 
 
 @Experiment._record_sig
-def cluster_data(exp, axis=0, transform=None, metric='euclidean', inplace=False, **kwargs):
+def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False, **kwargs):
     '''Cluster the samples/features.
 
     Reorder the features/samples so that ones with similar behavior (pattern
@@ -53,8 +52,9 @@ def cluster_data(exp, axis=0, transform=None, metric='euclidean', inplace=False,
     ----------
     aixs : 0 or 1 (optional)
         0 (default) means clustering features; 1 means clustering samples
-    transform : callable or ``None``
-        transform the data matrix before applying clustering method
+    transform : Callable
+        a callable transform a 2-d matrix. it should not change the dimension
+        of the matrix
     metric : str or callable
         the clustering metric to use. It should be able to be passed to
         ``scipy.spatial.distance.pdist``.
@@ -67,12 +67,14 @@ def cluster_data(exp, axis=0, transform=None, metric='euclidean', inplace=False,
     Returns
     -------
     exp : Experiment
-        With features filtered (if min_abundance is not None) and clsutered (reordered)
+        With samples/features clustered (reordered)
 
     '''
     if transform is None:
-        transform = _log_min_transform
-    data = transform(exp.data, axis=axis, **kwargs)
+        data = exp.data
+    else:
+        data = transform(exp.data, **kwargs)
+
     if axis == 0:
         data = data.T
     # cluster
@@ -100,7 +102,7 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
 
     Returns
     -------
-    exp : Experiment
+    ``Experiment``
     '''
     logger.info('sorting samples by field %s' % field)
     if axis == 0:
@@ -117,16 +119,16 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
 def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwargs):
     '''Sort features based on their mean frequency.
 
-    Sort the 2-d array by sample (axis=0) or feature (axis=0),
-    depending on ``axis``. ``key`` will be applied to ``subset`` of
-    each feature (axis=0) or sample (axis=1) and return a comparative value.
+    Sort the 2-d array by sample (axis=0) or feature (axis=0). ``key``
+    will be applied to ``subset`` of each feature (axis=0) or sample
+    (axis=1) and return a comparative value.
 
     Parameters
     ----------
     axis : 0 or 1
         Apply ``key`` function on row (sort the samples) (0) or column (sort the features) (1)
-    subset : None or iterable of int (optional)
-        Sorting by only subset of the data.
+    subset : ``None`` or iterable of int (optional)
+        Sorting using only subset of the data.
     key : str or callable
         If it is a callable, it should be a function accepts 1-D array of numeric and
         returns a comparative value (like ``key`` in builtin ``sorted`` function).
@@ -136,10 +138,12 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
+    kwargs : dict
+        key word parameters passed to ``key``
 
     Returns
     -------
-    exp : Experiment
+    ``Experiment``
         With features sorted by mean frequency
 
     '''

@@ -7,15 +7,15 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-import scipy.sparse
 from copy import deepcopy
+
 from importlib import import_module
 import inspect
 from functools import wraps
 
 import pandas as pd
 import numpy as np
-import scipy
+import scipy.sparse
 
 
 logger = getLogger(__name__)
@@ -38,9 +38,10 @@ class Experiment:
     feature_metadata : ``pandas.DataFrame``
         The metadata on the features
     description : str
-        Text describing the experiment
+        name of experiment
     sparse : bool
-        Is data array in sparse or dense matrix
+        store the data array in sparse (``scipy.sparse.csr_matrix``) matrix
+        or numpy array
 
     Attributes
     ----------
@@ -53,8 +54,13 @@ class Experiment:
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
-    shape: tuple of (int, int)
+    shape : tuple of (int, int)
         the dimension of data
+<<<<<<< HEAD
+=======
+    sparse : bool
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+>>>>>>> 1aa19c08aa61d9f8ba8365c1bf09835bc940b3f4
     description : str
         name of the experiment
     '''
@@ -73,6 +79,17 @@ class Experiment:
 
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
+
+    @property
+    def sparse(self):
+        return scipy.sparse.issparse(self.data)
+
+    @sparse.setter
+    def sparse(self, sparse):
+        if sparse is True and not scipy.sparse.issparse(self.data):
+            self.data = scipy.sparse.csr_matrix(self.data)
+        elif sparse is False and scipy.sparse.issparse(self.data):
+            self.data = self.data.toarray()
 
     def __repr__(self):
         '''Return a string representation of this object.'''
@@ -140,7 +157,7 @@ class Experiment:
 
         return inner
 
-    def get_data(self, sparse=None, getcopy=False):
+    def get_data(self, sparse=None, copy=False):
         '''Get the data as a 2d array
 
         Get the data 2d array (each column is a feature and row is a sample)
@@ -151,18 +168,18 @@ class Experiment:
             None (default) to pass original data format (sparse or dense).
             True to get as sparse.
             False to get as dense
-        getcopy : bool (optional)
+        copy : bool (optional)
             True (default) to get a copy of the data
             False to get the original data (for inplace)
         '''
         if sparse is None:
-            if getcopy:
+            if copy:
                 return self.data.copy()
             else:
                 return self.data
         elif sparse:
             if scipy.sparse.issparse(self.data):
-                if getcopy:
+                if copy:
                     return self.data.copy()
                 else:
                     return self.data
@@ -172,7 +189,7 @@ class Experiment:
             if scipy.sparse.issparse(self.data):
                 return self.data.toarray()
             else:
-                if getcopy:
+                if copy:
                     return self.data.copy()
                 else:
                     return self.data
@@ -189,7 +206,7 @@ class Experiment:
 
         Parameters
         ----------
-        new_order : Iterable of int
+        new_order : Iterable of int or boolean mask
             the order of new indices
         axis : 0 for samples or 1 for features
             the axis where the reorder occurs
@@ -205,6 +222,18 @@ class Experiment:
             exp = deepcopy(self)
         else:
             exp = self
+        # make it a np array; otherwise the slicing won't work if the new_order is
+        # a list of boolean and data is sparse matrix. For example:
+        # from scipy.sparse import csr_matrix
+        # a = csr_matrix((3, 4), dtype=np.int8)
+        # In [125]: a[[False, False, False], :]
+        # Out[125]:
+        # <3x4 sparse matrix of type '<class 'numpy.int8'>'
+
+        # In [126]: a[np.array([False, False, False]), :]
+        # Out[126]:
+        # <0x4 sparse matrix of type '<class 'numpy.int8'>'
+        new_order = np.array(new_order)
         if axis == 0:
             exp.data = exp.data[new_order, :]
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
