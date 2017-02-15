@@ -114,7 +114,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
         'mean_abundance': calls ``_mean_abundance``,
         'prevalence': calls ``_prevalence``
     axis : 0 or 1
-        Apply predicate on row (samples) (0) or column (features) (1)
+        Apply predicate on each row (samples) (0) or each column (features) (1)
     negate : bool
         negate the predicate for selection
     kwargs : dict
@@ -170,7 +170,6 @@ def _sum_abundance(x, cutoff=10):
     False
 
     '''
-    logger.debug('')
     return x.sum() >= cutoff
 
 
@@ -188,7 +187,6 @@ def _mean_abundance(x, cutoff=0.01):
     True
 
     '''
-    logger.debug('')
     return x.mean() >= cutoff
 
 
@@ -206,7 +204,6 @@ def _prevalence(x, cutoff=1/10000, fraction=0.5):
     >>> _prevalence(np.array([0, 1, 2]), 2, 0.51)
     False
     '''
-    logger.debug('')
     frac = np.sum(x >= cutoff) / len(x)
     return frac >= fraction
 
@@ -223,7 +220,6 @@ def _unique_cut(x, unique=0.05):
     >>> _unique_cut([0, 1], 1.01)
     False
     '''
-    logger.debug('')
     count = len(set(x))
     return count / len(x) >= unique
 
@@ -242,7 +238,6 @@ def _freq_ratio(x, ratio=2):
     >>> _freq_ratio([0, 0, 1, 2], 1.99)
     False
     '''
-    logger.debug('')
     unique, counts = np.unique(np.array(x), return_counts=True)
     max_1, max_2 = nlargest(2, counts)
     return max_1 / max_2 <= ratio

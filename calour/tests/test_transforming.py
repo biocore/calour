@@ -7,12 +7,9 @@
 # ----------------------------------------------------------------------------
 
 from unittest import main
-from os.path import join
 
 import numpy as np
-from numpy.testing import assert_almost_equal
-import pandas as pd
-import pandas.util.testing as pdt
+from numpy.testing import assert_array_almost_equal
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
@@ -59,12 +56,23 @@ class TestTransforming(Tests):
     def test_normalize(self):
         total = 1000
         obs = self.test2.normalize(total)
-        assert_almost_equal(obs.data.sum(axis=1).A1,
-                            [total] * 9)
+        assert_array_almost_equal(obs.data.sum(axis=1).A1,
+                                  [total] * 9)
         self.assertIsNot(obs, self.test2)
 
         obs = self.test2.normalize(total, inplace=True)
         self.assertIs(obs, self.test2)
+
+    def test_normalize_filter_features(self):
+        # test the filtering in standard mode (remove a few features, normalize to 10k)
+        exp = ca.read(self.test1_biom, self.test1_samp)
+        bad_features = [6, 7]
+        features = [exp.feature_metadata.index[cbad] for cbad in bad_features]
+        newexp = exp.normalize_filter_features(features, reads=10000, exclude=True, inplace=False)
+        # see the mean of the features we want (without 6,7) is 10k
+        good_features = list(set(range(exp.data.shape[1])).difference(set(bad_features)))
+        assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)
+        self.assertTrue(np.all(newexp.data[:, bad_features] > exp.data[:, bad_features]))
 
 
 if __name__ == '__main__':

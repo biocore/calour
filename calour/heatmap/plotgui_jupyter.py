@@ -2,7 +2,7 @@ from logging import getLogger
 import ipywidgets
 from IPython.display import display, clear_output
 
-from calour.gui.plotgui import PlotGUI
+from .plotgui import PlotGUI
 
 
 logger = getLogger(__name__)

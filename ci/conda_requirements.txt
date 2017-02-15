@@ -4,9 +4,11 @@ flake8
 sphinx
 numpy
 scipy
+pyqt>=5
 pandas
 matplotlib
 scikit-learn
 scikit-bio
 biom-format
 statsmodels
+ipywidgets

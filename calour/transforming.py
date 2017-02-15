@@ -37,7 +37,6 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     if not inplace:
         exp = deepcopy(exp)
     exp.data = preprocessing.normalize(exp.data, norm='l1', axis=axis) * total
-
     return exp
 
 
@@ -82,3 +81,41 @@ def transform(exp, steps=[], inplace=False):
     for step in steps:
         step(exp, inplace=True)
     return exp
+
+
+def normalize_filter_features(exp, features, reads=10000, exclude=True, inplace=False):
+    '''Normalize the sum of each sample without a list of features
+
+    Normalizes all features (including in the exclude list) after calulcating the scaling
+    without the excluded features.
+    Note: sum is not identical in all samples after normalization (since also keeps the
+    excluded features)
+
+    Parameters
+    ----------
+    features : list of str
+        The features to exclude (or include if exclude=False)
+    reads : int (optional)
+        The number of reads for the non-excluded features per sample
+    exclude : bool (optional)
+        True (default) to calculate normalization factor without features in features list.
+        False to calculate normalization factor only with features in features list.
+    inplace : bool (optional)
+        False (default) to create a new experiment, True to normalize in place
+
+    Returns
+    -------
+    newexp : calour.Experiment
+        The normalized experiment
+    '''
+    feature_pos = exp.feature_metadata.index.isin(features)
+    if exclude:
+        feature_pos = np.invert(feature_pos)
+    data = exp.get_data(sparse=False)
+    use_reads = np.sum(data[:, feature_pos], axis=1)
+    if inplace:
+        newexp = exp
+    else:
+        newexp = deepcopy(exp)
+    newexp.data = reads * data / use_reads[:, None]
+    return newexp

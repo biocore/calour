@@ -7,7 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from copy import copy, deepcopy
+from copy import deepcopy
+
 from importlib import import_module
 import inspect
 from functools import wraps
@@ -56,6 +57,8 @@ class Experiment:
         the dimension of data
     sparse : bool
         store the data as sparse or dense array.
+    description : str
+        description of the experiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -260,7 +263,7 @@ def add_functions(cls,
                 setattr(cls, fn, f)
 
 
-def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixes=None):
+def join_experiments(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixes=None):
     '''Join two Experiment objects into one.
 
     If suffix is not none, add suffix to each sampleid (suffix is a
@@ -270,10 +273,10 @@ def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixe
 
     Parameters
     ----------
-    exp, other : 2 objects to join
+    exp, other : Experiments to join
     '''
     logger.debug('Join experiments:\n{!r}\n{!r}'.format(exp, other))
-    newexp = copy.deepcopy(exp)
+    newexp = deepcopy(exp)
     newexp.description = 'join %s & %s' % (exp.description, other.description)
 
     # test if we need to force a suffix (when both experiments contain the same sample ids)
@@ -284,17 +287,50 @@ def join(exp, other, orig_field_name='orig_exp', orig_field_values=None, prefixe
         else:
             exp_prefix, other_prefix = prefixes
             logger.info('both experiments contain same sample id')
-            exp.sample_metadata.index = ['{}_{!s}'.format(exp_prefix, i)
-                                         for i in exp.sample_metadata.index]
-            other.sample_metadata.index = ['{}_{!s}'.format(other_prefix, i)
-                                           for i in other.sample_metadata.index]
-    # sample_metadata = pd.concat([exp.sample_metadata, other.sample_metadata])
+            exp_sample_metadata = exp.sample_metadata.copy()
+            other_sample_metadata = other.sample_metadata.copy()
+            exp_sample_metadata.index = ['{}_{!s}'.format(exp_prefix, i)
+                                         for i in exp_sample_metadata.index]
+            other_sample_metadata.index = ['{}_{!s}'.format(other_prefix, i)
+                                           for i in other_sample_metadata.index]
+    else:
+        exp_sample_metadata = exp.sample_metadata
+        other_sample_metadata = other.sample_metadata
 
-    # common_exp = exp.filter_by_metadata()
-    # common_features = exp.feature_metadata.index.intersection(other.feature_metadata.index)
-    newexp.feature_metadata.join(other.feature_metadata)
+    sample_metadata = pd.concat([exp_sample_metadata, other_sample_metadata], join='outer', )
+    if orig_field_name is not None:
+        sample_metadata[orig_field_name] = np.nan
+        sample_metadata.loc[exp_sample_metadata.index.values, orig_field_name] = exp.description
+        sample_metadata.loc[other_sample_metadata.index.values, orig_field_name] = other.description
+    newexp.sample_metadata = sample_metadata
 
-    # all_feature_md = list(set(exp1.feature_metadata.columns).union(set(exp2.feature_metadata.columns)))
+    sample_pos_exp = [sample_metadata.index.get_loc(csamp) for csamp in exp_sample_metadata.index.values]
+    sample_pos_other = [sample_metadata.index.get_loc(csamp) for csamp in other_sample_metadata.index.values]
+
+    feature_metadata = exp.feature_metadata.merge(other.feature_metadata, how='outer', left_index=True, right_index=True, suffixes=('', '__tmp_other'))
+    # merge and remove duplicate columns
+    keep_cols = []
+    for ccol in feature_metadata.columns:
+        if ccol.endswith('__tmp_other'):
+            expcol = ccol[:-len('__tmp_other')]
+            feature_metadata[expcol].fillna(feature_metadata[ccol], inplace=True)
+        else:
+            keep_cols.append(ccol)
+    feature_metadata = feature_metadata[keep_cols]
+    newexp.feature_metadata = feature_metadata
+
+    all_features = feature_metadata.index.values
+    all_data = np.zeros([len(sample_metadata), len(all_features)])
+    data_exp = exp.get_data(sparse=False)
+    data_other = other.get_data(sparse=False)
+    logger.warn('data')
+
+    for idx, cfeature in enumerate(all_features):
+        if cfeature in exp.feature_metadata.index:
+            all_data[sample_pos_exp, idx] = data_exp[:, exp.feature_metadata.index.get_loc(cfeature)]
+        if cfeature in other.feature_metadata.index:
+            all_data[sample_pos_other, idx] = data_other[:, other.feature_metadata.index.get_loc(cfeature)]
+    newexp.data = all_data
     return newexp
 
 
