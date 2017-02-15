@@ -6,7 +6,7 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import unittest
+from unittest import main
 from os.path import join
 
 import pandas as pd
@@ -14,53 +14,68 @@ import pandas.util.testing as pdt
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
+from calour.transforming import log_n, scale
 
 
-class TestSorting(Tests):
+class SortingTests(Tests):
     def setUp(self):
         super().setUp()
         # load the simple experiment as sparse
-        self.simple = ca.read(self.simple_table, self.simple_map)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp)
         # load the complex experiment as sparse
-        self.complex = ca.read(self.complex_table, self.complex_map)
+        self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp)
 
     def test_sort_taxonomy(self):
-        obs = self.simple.sort_taxonomy()
+        obs = self.test1.sort_taxonomy()
         expected_taxonomy = pd.Series.from_csv(join(self.test_data_dir, 'test1.sorted.taxonomy.csv'))
         pdt.assert_series_equal(obs.feature_metadata['taxonomy'], expected_taxonomy, check_names=False)
 
     def test_cluster_data(self):
         # no minimal filtering
-        # simple experiment
-        obs = self.simple.cluster_data()
-        exp = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'), join(self.test_data_dir, 'test1.map.txt'))
-        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
-        # # complex experiment (timeseries)
-        # obs = self.complex.cluster_data()
-        # # lets check two sequences that show similar behavior are close to each other after the clustering
-        # s1='TACGTAGGGTGCGAGCGTTAATCGGAATTACTGGGCGTAAAGAGTGCGCAGGCGGTTTTGCAAGACCGATGTGAAATCCCCGGGCTTAACCTGGGAACTGCATTGGTGACTGCAAGGCTAGAGTGTGTCAGAGGGAGGTGGAACTCCGCA'
-        # s2='TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGAGTGCGCAGGCGGTTTTGCAAGACCGATGTGAAATCCCCGGGCTTAACCTGGGAACTGCATTGGTGACTGCAAGGCTAGAGTGTGTCAGAGGGAGGTGGAATTCCGCA'
-        # self.assertEqual(np.abs(obs.index.get_loc(s1), obs.index.get_loc(s2)), 1)
+        new = self.test1.transform([log_n, scale])
+        obs = self.test1.cluster_data(data=new.data)
+        exp = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'), self.test1_samp)
+        assert_experiment_equal(obs, exp, almost_equal=True)
 
-        # exp = ca.read(join(self.test_data_dir, 'timeseries.clustered.features.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
-        # assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
+    def test_sort_by_metadata_sample(self):
+        # test sorting various fields (keeping the order)
+        obs = self.timeseries.sort_by_metadata(
+            field='MINUTES', inplace=True).sort_by_metadata(
+                field='HOUR', inplace=True).sort_by_metadata(
+                    field='DAY', inplace=True)
+        self.assertIs(obs, self.timeseries)
+        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'),
+                      join(self.test_data_dir, 'timeseries.sample'))
+        assert_experiment_equal(obs, exp, almost_equal=True)
+        self.assertListEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'].tolist(), list(range(1, 96)))
 
-    def test_sort_by_metadata(self):
-        # test sorting inplace and various fields (keeping the order)
-        obs = self.complex.sort_by_metadata(field='MINUTES')
-        obs = obs.sort_by_metadata(field='HOUR')
-        obs.sort_by_metadata(field='DAY', inplace=True)
-        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
-        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
-        # also test first and last samples are ok
-        self.assertEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'][0], 1)
-        self.assertEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'][-1], 96)
+    def test_sort_by_metadata_feature(self):
+        obs = self.test2.sort_by_metadata(
+            field='level2', axis=1).sort_by_metadata(
+                field='level1', axis=1)
+        self.assertIsNot(obs, self.test2)
+        assert_experiment_equal(
+            obs, self.test2.reorder(obs.feature_metadata['ori.order'], axis=1))
+        self.assertListEqual(obs.feature_metadata['new.order'].tolist(), list(range(8)))
 
-    def test_sort_by_data(self):
-        obs = self.complex.sort_by_data(axis=1)
-        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'), join(self.test_data_dir, 'timeseries.map.txt'))
-        assert_experiment_equal(obs, exp, check_history=False, almost_equal=True)
+    def test_sort_by_data_sample(self):
+        # sort sample based on the first and last features
+        obs = self.test2.sort_by_data(subset=[0, 7])
+        # the order is the same with original
+        assert_experiment_equal(obs, self.test2)
+
+        obs = self.test2.sort_by_data(subset=[0, 3])
+        assert_experiment_equal(
+            obs, self.test2.reorder(obs.sample_metadata['ori.order'], axis=0))
+        self.assertListEqual(obs.sample_metadata['new.order'].tolist(), list(range(9)))
+
+    def test_sort_by_data_feature(self):
+        obs = self.timeseries.sort_by_data(axis=1)
+        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'),
+                      join(self.test_data_dir, 'timeseries.sample'))
+        assert_experiment_equal(obs, exp, almost_equal=True)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    main()
