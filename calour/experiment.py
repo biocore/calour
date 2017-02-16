@@ -131,6 +131,11 @@ class Experiment:
 
     @staticmethod
     def _convert_axis_name(func):
+        '''Convert str value of axis to 0/1.
+
+        This allows the decorated function with ``axis`` parameter
+        to accept "sample" and "feature" as value for ``axis`` parameter.
+        '''
         conversion = {'sample': 0,
                       's': 0,
                       'samples': 0,
@@ -146,13 +151,26 @@ class Experiment:
                     kwargs['axis'] = conversion[v.lower()]
                 elif v not in {0, 1}:
                     raise ValueError('unknown axis `%r`' % v)
+            else:
+                idx = func.__code__.co_varnames.index('axis')
+                args = list(args)
+                v = args[idx]
+                if isinstance(v, str):
+                    args[idx] = conversion[v.lower()]
+                elif v not in {0, 1}:
+                    raise ValueError('unknown axis `%r`' % v)
+
             return func(*args, **kwargs)
 
         return inner
 
     @staticmethod
     def _record_sig(func):
-        '''Record the function calls to history. '''
+        '''Record the function calls to history.
+
+        Note this require the function decorated to return an
+        ``Experiment`` object.
+        '''
         fn = func.__qualname__
 
         @wraps(func)

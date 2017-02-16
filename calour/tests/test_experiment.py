@@ -19,6 +19,35 @@ class ExperimentTests(Tests):
         super().setUp()
         self.test1 = ca.read(self.test1_biom, self.test1_samp)
 
+    def test_record_sig(self):
+        def foo(exp, axis=1, inplace=True):
+            return exp
+
+        ca.Experiment.foo = ca.Experiment._record_sig(foo)
+        self.test1.foo()
+        self.test1.foo()
+        self.assertListEqual(
+            self.test1._call_history,
+            ['ExperimentTests.test_record_sig.<locals>.foo()'] * 2)
+
+    def test_convert_axis_name(self):
+        def foo(exp, axis=1, inplace=True):
+            return axis, inplace
+
+        ca.Experiment.foo = ca.Experiment._convert_axis_name(foo)
+
+        for i in (0, 's', 'sample', 'samples'):
+            obs = self.test1.foo(axis=i)
+            self.assertEqual(obs, (0, True))
+            obs = self.test1.foo(i, inplace=False)
+            self.assertEqual(obs, (0, False))
+
+        for i in (1, 'f', 'feature', 'features'):
+            obs = self.test1.foo(axis=i)
+            self.assertEqual(obs, (1, True))
+            obs = self.test1.foo(i, inplace=False)
+            self.assertEqual(obs, (1, False))
+
     def test_reorder_samples(self):
         # keep only samples 5 and 4
         new = self.test1.reorder([5, 4], axis=0)
