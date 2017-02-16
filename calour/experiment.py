@@ -146,6 +146,15 @@ class Experiment:
                     kwargs['axis'] = conversion[v.lower()]
                 elif v not in {0, 1}:
                     raise ValueError('unknown axis `%r`' % v)
+            else:
+                idx = func.__code__.co_varnames.index('axis')
+                args = list(args)
+                v = args[idx]
+                if isinstance(v, str):
+                    args[idx] = conversion[v.lower()]
+                elif v not in {0, 1}:
+                    raise ValueError('unknown axis `%r`' % v)
+
             return func(*args, **kwargs)
 
         return inner
