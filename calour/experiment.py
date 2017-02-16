@@ -130,6 +130,27 @@ class Experiment:
         return result
 
     @staticmethod
+    def _convert_axis_name(func):
+        conversion = {'sample': 0,
+                      's': 0,
+                      'samples': 0,
+                      'feature': 1,
+                      'f': 1,
+                      'features': 1}
+
+        @wraps(func)
+        def inner(*args, **kwargs):
+            if 'axis' in kwargs:
+                v = kwargs['axis']
+                if isinstance(v, str):
+                    kwargs['axis'] = conversion[v.lower()]
+                elif v not in {0, 1}:
+                    raise ValueError('unknown axis `%r`' % v)
+            return func(*args, **kwargs)
+
+        return inner
+
+    @staticmethod
     def _record_sig(func):
         '''Record the function calls to history. '''
         fn = func.__qualname__
@@ -162,12 +183,15 @@ class Experiment:
         Parameters
         ----------
         sparse : None or bool (optional)
-            None (default) to pass original data format (sparse or dense).
-            True to get as sparse.
-            False to get as dense
+            None (default) to pass original data (sparse or dense).
+            True to get as sparse. False to get as dense
         copy : bool (optional)
-            True (default) to get a copy of the data
-            False to get the original data (for inplace)
+            True to get a copy of the data; otherwise, it can be
+            the original data or a copy (default).
+
+        Returns
+        -------
+        ``Experiment.data``
         '''
         if sparse is None:
             if copy:
@@ -175,7 +199,7 @@ class Experiment:
             else:
                 return self.data
         elif sparse:
-            if scipy.sparse.issparse(self.data):
+            if self.sparse:
                 if copy:
                     return self.data.copy()
                 else:
@@ -183,7 +207,7 @@ class Experiment:
             else:
                 return scipy.sparse.csr_matrix(self.data)
         else:
-            if scipy.sparse.issparse(self.data):
+            if self.sparse:
                 return self.data.toarray()
             else:
                 if copy:
