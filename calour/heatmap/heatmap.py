@@ -116,7 +116,6 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
     # get the class
     GUIClass = getattr(gui_module, gui)
     hdat = GUIClass(exp)
-    hdat._annotation_db = None
 
     # link with the databases requested
     for cdatabase in databases:

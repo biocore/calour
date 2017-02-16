@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from copy import deepcopy
 
 import numpy as np
 from scipy import cluster, spatial
@@ -53,8 +54,9 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
     aixs : 0 or 1 (optional)
         0 (default) means clustering features; 1 means clustering samples
     transform : Callable
-        a callable transform a 2-d matrix. it should not change the dimension
-        of the matrix
+        a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.
+        The transform function can modify ``Experiment.data`` (it is a copy).
+        It should not change the dimension of ``data`` in ``Experiment``.
     metric : str or callable
         the clustering metric to use. It should be able to be passed to
         ``scipy.spatial.distance.pdist``.
@@ -70,10 +72,13 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
         With samples/features clustered (reordered)
 
     '''
+    logger.debug('clustering data on axis %s' % axis)
     if transform is None:
         data = exp.data
     else:
-        data = transform(exp.data, **kwargs)
+        logger.debug('tansforming data using %s' % transform.__name__)
+        newexp = deepcopy(exp)
+        data = transform(newexp, **kwargs).data
 
     if axis == 0:
         data = data.T

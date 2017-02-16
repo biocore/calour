@@ -16,6 +16,7 @@ import numpy.testing as npt
 import skbio
 
 import calour as ca
+
 from calour._testing import Tests
 from calour.io import _create_biom_table_from_exp
 
