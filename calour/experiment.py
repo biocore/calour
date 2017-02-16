@@ -130,6 +130,27 @@ class Experiment:
         return result
 
     @staticmethod
+    def _convert_axis_name(func):
+        conversion = {'sample': 0,
+                      's': 0,
+                      'samples': 0,
+                      'feature': 1,
+                      'f': 1,
+                      'features': 1}
+
+        @wraps(func)
+        def inner(*args, **kwargs):
+            if 'axis' in kwargs:
+                v = kwargs['axis']
+                if isinstance(v, str):
+                    kwargs['axis'] = conversion[v]
+                elif v not in {0, 1}:
+                    raise ValueError('unknown axis `%r`' % v)
+            return func(*args, **kwargs)
+
+        return inner
+
+    @staticmethod
     def _record_sig(func):
         '''Record the function calls to history. '''
         fn = func.__qualname__

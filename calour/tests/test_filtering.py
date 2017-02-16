@@ -38,6 +38,15 @@ class FilteringTests(Tests):
         exp = self.test2.reorder([all_sid.index(i) for i in sid], axis=1)
         self.assertEqual(obs, exp)
 
+    def test_convert_axis_name(self):
+        for i in (0, 's', 'sample', 'samples'):
+            obs = self.test2.filter_by_metadata('group', [1, 2], axis=i)
+            assert_experiment_equal(obs, self.test2)
+
+        for i in (1, 'f', 'feature', 'features'):
+            obs = self.test2.filter_by_metadata('oxygen', 'facultative', axis=i, negate=True)
+            assert_experiment_equal(obs, self.test2)
+
     def test_filter_by_metadata_sample_edge_cases(self):
         # no group 3 - none filtered
         obs = self.test2.filter_by_metadata('group', 3)
