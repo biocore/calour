@@ -131,6 +131,11 @@ class Experiment:
 
     @staticmethod
     def _convert_axis_name(func):
+        '''Convert str value of axis to 0/1.
+
+        This allows the decorated function with ``axis`` parameter
+        to accept "sample" and "feature" as value for ``axis`` parameter.
+        '''
         conversion = {'sample': 0,
                       's': 0,
                       'samples': 0,
@@ -161,7 +166,11 @@ class Experiment:
 
     @staticmethod
     def _record_sig(func):
-        '''Record the function calls to history. '''
+        '''Record the function calls to history.
+
+        Note this require the function decorated to return an
+        ``Experiment`` object.
+        '''
         fn = func.__qualname__
 
         @wraps(func)

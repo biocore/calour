@@ -19,6 +19,17 @@ class ExperimentTests(Tests):
         super().setUp()
         self.test1 = ca.read(self.test1_biom, self.test1_samp)
 
+    def test_record_sig(self):
+        def foo(exp, axis=1, inplace=True):
+            return exp
+
+        ca.Experiment.foo = ca.Experiment._record_sig(foo)
+        self.test1.foo()
+        self.test1.foo()
+        self.assertListEqual(
+            self.test1._call_history,
+            ['ExperimentTests.test_record_sig.<locals>.foo()'] * 2)
+
     def test_convert_axis_name(self):
         def foo(exp, axis=1, inplace=True):
             return axis, inplace
