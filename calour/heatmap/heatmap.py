@@ -73,9 +73,10 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         None (default) to use mpl default color map. str to use colormap named str.
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
-    gui : str (optional)
-        Name of the gui module to use for displaying the heatmap. options:
-        'cli' : just cli information about selected sample/feature.
+    gui : str or None (optional)
+        If None, just plot a simple matplotlib figure with the heatmap and no interactive elements.
+        is str, name of the gui module to use for displaying the heatmap. options:
+        'cli' (default) : just cli information about selected sample/feature.
         'qt5' : gui using QT5 (with full dbBact interface)
         'jupyter' : gui for Jupyter notebooks (using widgets)
         Other string : name of child class of plotgui (which should reside in heatmap/lower(classname).py)
@@ -103,54 +104,57 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         cmap = plt.rcParams['image.cmap']
 
     # load the appropriate gui module to handle gui events
-    if gui == 'qt5':
-        gui = 'PlotGUI_QT5'
-    elif gui == 'cli':
-        gui = 'PlotGUI_CLI'
-    elif gui == 'jupyter':
-        gui = 'PlotGUI_Jupyter'
+    if gui is None:
+        hdat = None
     else:
-        raise ValueError('Unknown GUI specified: %r' % gui)
-    gui_module_name = 'calour.heatmap.' + gui.lower()
-    gui_module = importlib.import_module(gui_module_name)
-    # get the class
-    GUIClass = getattr(gui_module, gui)
-    hdat = GUIClass(exp)
-
-    # link with the databases requested
-    for cdatabase in databases:
-        if cdatabase == 'dbbact':
-            db_name = 'DBBact'
-            db_module_name = 'dbbact_calour.dbbact'
-        elif cdatabase == 'spongeworld':
-            db_name = 'DBSponge'
-            db_module_name = 'dbbact_calour.dbsponge'
+        if gui == 'qt5':
+            gui = 'PlotGUI_QT5'
+        elif gui == 'cli':
+            gui = 'PlotGUI_CLI'
+        elif gui == 'jupyter':
+            gui = 'PlotGUI_Jupyter'
         else:
-            raise ValueError('Unknown Database specified: %r' % cdatabase)
-
-        # import the database module
-        db_module = importlib.import_module(db_module_name)
+            raise ValueError('Unknown GUI specified: %r' % gui)
+        gui_module_name = 'calour.heatmap.' + gui.lower()
+        gui_module = importlib.import_module(gui_module_name)
         # get the class
-        DBClass = getattr(db_module, db_name)
-        cdb = DBClass()
-        hdat.databases.append(cdb)
-        # select the database for use with the annotate button
-        if cdb.can_annotate():
-            if hdat._annotation_db is None:
-                hdat._annotation_db = cdb
+        GUIClass = getattr(gui_module, gui)
+        hdat = GUIClass(exp)
+
+        # link gui with the databases requested
+        for cdatabase in databases:
+            if cdatabase == 'dbbact':
+                db_name = 'DBBact'
+                db_module_name = 'dbbact_calour.dbbact'
+            elif cdatabase == 'spongeworld':
+                db_name = 'DBSponge'
+                db_module_name = 'dbbact_calour.dbsponge'
             else:
-                logger.warn('More than one database with annotation capability. Using first database (%s) for annotation' % hdat._annotation_db.get_name())
+                raise ValueError('Unknown Database specified: %r' % cdatabase)
+
+            # import the database module
+            db_module = importlib.import_module(db_module_name)
+            # get the class
+            DBClass = getattr(db_module, db_name)
+            cdb = DBClass()
+            hdat.databases.append(cdb)
+            # select the database for use with the annotate button
+            if cdb.can_annotate():
+                if hdat._annotation_db is None:
+                    hdat._annotation_db = cdb
+                else:
+                    logger.warn('More than one database with annotation capability. Using first database (%s) for annotation' % hdat._annotation_db.get_name())
 
     # init the figure
     if axis is None:
-        fig = hdat.get_figure()
+        if hdat is None:
+            fig = plt.figure()
+        else:
+            fig = hdat.get_figure()
         ax = fig.gca()
     else:
         fig = axis.get_figure()
         ax = axis
-
-    hdat.axis = ax
-    hdat.fig = fig
 
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
@@ -213,10 +217,18 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         title = exp.description
     ax.set_title(title)
 
-    # link the interactive plot functions
-    hdat.connect_functions(fig)
-
-    # make the axis titles show
     fig.tight_layout()
-    plt.show()
-    hdat.run_gui()
+
+    if hdat is None:
+        plt.show()
+    else:
+        # link the axis and figure to the gui
+        hdat.axis = ax
+        hdat.fig = fig
+
+        # link the interactive plot functions
+        hdat.connect_functions(fig)
+
+        # make the axis titles show
+        plt.show()
+        hdat.run_gui()

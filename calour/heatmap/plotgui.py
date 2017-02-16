@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from abc import ABC, abstractmethod
 
 import numpy as np
 import matplotlib as mpl
@@ -16,12 +17,12 @@ import matplotlib.pyplot as plt
 logger = getLogger(__name__)
 
 
-class PlotGUI:
-    '''The base class for heatmap GUI.
+class PlotGUI(ABC):
+    '''abstract base class for heatmap GUI.
 
     Attributes
     ----------
-    exp : Experiment
+    exp : ``Experiment``
         the experiment associated with this gui
     selected_features : dict of matplotlib.lines.Line2D
         used to track the selected features and plot horizontal lines for each selectiom
@@ -35,7 +36,7 @@ class PlotGUI:
         >0 : scroll than constant amount of bacteria per keypress
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0):
-        '''Init the gui windows class
+        '''Init the gui window class
 
         Store the experiment and the gui
         '''
@@ -77,7 +78,9 @@ class PlotGUI:
         return fig
 
     def run_gui(self):
-        '''Run the GUI event loop and return when gui is done. does nothing for base class'''
+        '''Run the GUI event loop and return when gui is done.
+        Can also do nothing if no event loop is needed
+        '''
 
     def connect_functions(self, fig):
         '''Connect to the matplotlib callbacks for key and mouse '''
@@ -86,9 +89,9 @@ class PlotGUI:
         self.canvas.mpl_connect('key_press_event', lambda f: _key_press_callback(f, hdat=self))
         self.canvas.mpl_connect('button_press_event', lambda f: _button_press_callback(f, hdat=self))
 
+    @abstractmethod
     def show_info(self):
         '''Update info when a new feature/sample is selected'''
-        raise NotImplemented()
 
     def clear_selection(self):
         ''' Delete all shown selection lines '''
