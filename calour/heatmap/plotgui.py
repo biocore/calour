@@ -57,6 +57,9 @@ class PlotGUI:
         # list of databases to interface with
         self.databases = []
 
+        # the default database used when annotating features
+        self._annotation_db = None
+
     def get_figure(self, newfig=None):
         ''' Get the figure to plot the heatmap into
 

@@ -19,11 +19,13 @@ class TestAnalysis(Tests):
     def setUp(self):
         super().setUp()
         # load the simple experiment as sparse
-        self.simple = ca.read(self.simple_table, self.simple_map)
+        self.simple = ca.read(self.test1_biom, self.test1_samp)
         # load the complex experiment as sparse with normalizing and removing low read samples
-        self.complex = ca.read_taxa(self.complex_table, self.complex_map)
+        self.complex = ca.read_taxa(self.timeseries_biom, self.timeseries_samp)
 
     def test_diff_abundance(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
         # test using defulat values
         dd = diff_abundance(self.simple, 'group', val1='1', val2='2')
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
