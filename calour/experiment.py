@@ -8,10 +8,9 @@
 
 from logging import getLogger
 from copy import deepcopy
-
 from importlib import import_module
-import inspect
 from functools import wraps
+import inspect
 
 import pandas as pd
 import numpy as np
@@ -135,6 +134,9 @@ class Experiment:
 
         This allows the decorated function with ``axis`` parameter
         to accept "sample" and "feature" as value for ``axis`` parameter.
+
+        This should be always the closest decorator to the function if
+        you have multiple decorators for this function.
         '''
         conversion = {'sample': 0,
                       's': 0,
@@ -145,23 +147,16 @@ class Experiment:
 
         @wraps(func)
         def inner(*args, **kwargs):
-            if 'axis' in kwargs:
-                v = kwargs['axis']
-                if isinstance(v, str):
-                    kwargs['axis'] = conversion[v.lower()]
-                elif v not in {0, 1}:
-                    raise ValueError('unknown axis `%r`' % v)
-            else:
-                idx = func.__code__.co_varnames.index('axis')
-                args = list(args)
-                v = args[idx]
-                if isinstance(v, str):
-                    args[idx] = conversion[v.lower()]
-                elif v not in {0, 1}:
-                    raise ValueError('unknown axis `%r`' % v)
-
-            return func(*args, **kwargs)
-
+            sig = inspect.signature(func)
+            ba = sig.bind(*args, **kwargs).arguments
+            v = ba.get('axis', None)
+            if v is None:
+                return func(*args, **kwargs)
+            if isinstance(v, str):
+                ba['axis'] = conversion[v.lower()]
+            elif v not in {0, 1}:
+                raise ValueError('unknown axis `%r`' % v)
+            return func(**ba)
         return inner
 
     @staticmethod

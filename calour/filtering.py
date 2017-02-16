@@ -55,8 +55,8 @@ def downsample(exp, field, axis=0, inplace=False):
     return exp.reorder(np.concatenate(indices), axis=axis, inplace=inplace)
 
 
-@Experiment._convert_axis_name
 @Experiment._record_sig
+@Experiment._convert_axis_name
 def filter_by_metadata(exp, field, pick, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
 

@@ -30,6 +30,12 @@ class ExperimentTests(Tests):
             self.test1._call_history,
             ['ExperimentTests.test_record_sig.<locals>.foo()'] * 2)
 
+    def test_convert_axis_name_other_func(self):
+        def foo(exp, inplace=True):
+            return inplace
+        ca.Experiment.foo = ca.Experiment._convert_axis_name(foo)
+        self.assertEqual(self.test1.foo(), True)
+
     def test_convert_axis_name(self):
         def foo(exp, axis=1, inplace=True):
             return axis, inplace
@@ -47,6 +53,9 @@ class ExperimentTests(Tests):
             self.assertEqual(obs, (1, True))
             obs = self.test1.foo(i, inplace=False)
             self.assertEqual(obs, (1, False))
+
+        obs = self.test1.foo()
+        self.assertEqual(obs, (1, True))
 
     def test_reorder_samples(self):
         # keep only samples 5 and 4
