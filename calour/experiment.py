@@ -143,7 +143,7 @@ class Experiment:
             if 'axis' in kwargs:
                 v = kwargs['axis']
                 if isinstance(v, str):
-                    kwargs['axis'] = conversion[v]
+                    kwargs['axis'] = conversion[v.lower()]
                 elif v not in {0, 1}:
                     raise ValueError('unknown axis `%r`' % v)
             return func(*args, **kwargs)
