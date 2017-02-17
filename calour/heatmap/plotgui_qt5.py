@@ -30,29 +30,26 @@ class PlotGUI_QT5(PlotGUI):
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
-        self._app_created = False
+        # create qt app
+        app = QtCore.QCoreApplication.instance()
+        if app is None:
+            app = QApplication(sys.argv)
+            logger.debug('Qt app created')
+        self.app = app
+        if not hasattr(app, 'references'):
+            # store references to all the windows
+            app.references = set()
+        # create app window
+        self.app_window = ApplicationWindow(self)
+        app.references.add(self.app_window)
+        self.app_window.setWindowTitle("Calour")
 
     @property
     def figure(self):
-        if self._app_created:
-            return self.app_window.plotfigure
-        else:
-            app = QtCore.QCoreApplication.instance()
-            logger.warning('Qt app is %s' % app)
-            if app is None:
-                app = QApplication(sys.argv)
-                logger.debug('Qt app created')
-            self.app = app
-            self._app_created = True
-            if not hasattr(app, 'references'):
-                # store references to all the windows
-                app.references = set()
-            self.app_window = ApplicationWindow(self)
-            app.references.add(self.app_window)
-            self.app_window.setWindowTitle("Calour")
-            self.app_window.show()
-            return self.app_window.plotfigure
+        self.app_window.show()
+        return self.app_window.plotfigure
 
+    # TODO exit cleaning?
     def run_gui(self):
         logger.debug('opening plot window')
         try:
@@ -124,6 +121,7 @@ class PlotGUI_QT5(PlotGUI):
 
 class MplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+    # TODO why? what is width and height?
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
@@ -298,12 +296,13 @@ class SListWindow(QtWidgets.QDialog):
         '''Create a list window with items in the list and the listname as specified
 
         Parameters
+        ----------
         listdata: list of str (optional)
             the data to show in the list
         listname: str (optional)
             name to display above the list
         '''
-        super(SListWindow, self).__init__()
+        super().__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         if listname is not None:
             self.setWindowTitle(listname)

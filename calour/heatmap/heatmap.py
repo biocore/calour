@@ -144,9 +144,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
                     logger.warn('More than one database with annotation capability. Using first database (%s) for annotation' % hdat._annotation_db.get_name())
 
         fig = hdat.figure
-
         hdat.connect_functions()
-        hdat.run_gui()
     else:
         fig = plt.figure()
 
@@ -213,5 +211,6 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
     ax.set_title(title)
 
     fig.tight_layout()
-
+    if hdat:
+        hdat.run_gui()
     plt.show()
