@@ -34,12 +34,14 @@ class PlotGUI(ABC):
         The amount of bacteria/samples to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
         >0 : scroll than constant amount of bacteria per keypress
+
+    Parameters
+    ----------
+    exp :
+    zoom_scale :
+    scroll_offset :
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0):
-        '''Init the gui window class
-
-        Store the experiment and the gui
-        '''
         # the Experiment being plotted
         self.exp = exp
 
@@ -77,6 +79,7 @@ class PlotGUI(ABC):
             fig = plt.gcf()
         return fig
 
+    @abstractmethod
     def run_gui(self):
         '''Run the GUI event loop and return when gui is done.
         Can also do nothing if no event loop is needed
@@ -85,7 +88,7 @@ class PlotGUI(ABC):
     def connect_functions(self, fig):
         '''Connect to the matplotlib callbacks for key and mouse '''
         self.canvas = fig.canvas
-        self.canvas.mpl_connect('scroll_event', lambda f: _scroll_callback(f, hdat=self))
+        self.canvas.mpl_connect('mouse_scroll_event', lambda f: _scroll_callback(f, hdat=self))
         self.canvas.mpl_connect('key_press_event', lambda f: _key_press_callback(f, hdat=self))
         self.canvas.mpl_connect('button_press_event', lambda f: _button_press_callback(f, hdat=self))
 

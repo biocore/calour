@@ -9,9 +9,13 @@ logger = getLogger(__name__)
 
 
 class PlotGUI_Jupyter(PlotGUI):
-    '''QT5 version of plot winfow GUI
+    '''Jupyter GUI of plotting.
 
-    We open the figure as a widget inside the qt5 window
+    Attributes
+    ----------
+
+    Parameters
+    ----------
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
