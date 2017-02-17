@@ -19,6 +19,9 @@ logger = getLogger(__name__)
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
+    Keys:
+
+
     Attributes
     ----------
     exp : ``Experiment``
@@ -37,6 +40,8 @@ class PlotGUI(ABC):
         The amount of bacteria/samples to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
         >0 : scroll than constant amount of bacteria per keypress
+    figure : ``matplotlib.figure.Figure``
+        The figure where the heatmap will be plotted into. It creates one by default.
 
     Parameters
     ----------
@@ -44,7 +49,7 @@ class PlotGUI(ABC):
     zoom_scale :
     scroll_offset :
     '''
-    def __init__(self, exp, zoom_scale=2, scroll_offset=0):
+    def __init__(self, exp, zoom_scale=2, scroll_offset=0, figure=None):
         # the Experiment being plotted
         self.exp = exp
 
@@ -68,22 +73,24 @@ class PlotGUI(ABC):
         # the default database used when annotating features
         self._annotation_db = None
 
-    @property
-    def figure(self):
-        ''' Get the figure to plot the heatmap into'''
-        return plt.gcf()
+        # create the figure to plot the heatmap into
+        if figure is None:
+            self.figure = plt.figure()
+        else:
+            self.figure = figure
 
     @property
     def axis(self):
+        # this attr has to be property so it is updated on mouse/key events
         return self.figure.gca()
 
     @abstractmethod
     def show_info(self):
         '''show info for the selected feature/sample'''
 
-    @abstractmethod
-    def run_gui(self):
-        '''Run the GUI event loop and return when gui is done.'''
+    def __call__(self):
+        '''Run the GUI.'''
+        self.connect_functions()
 
     def connect_functions(self):
         '''Connect to the matplotlib callbacks for key and mouse '''
@@ -96,6 +103,9 @@ class PlotGUI(ABC):
         '''Zoom upon mouse scroll event'''
         logger.debug(repr(event))
         ax = event.inaxes
+        # ax is None when scrolled outside the heatmap
+        if ax is None:
+            return
         cur_xlim = ax.get_xlim()
         cur_ylim = ax.get_ylim()
         xdata = event.xdata  # get event x location
@@ -132,6 +142,7 @@ class PlotGUI(ABC):
         '''
         logger.debug(repr(event))
         ax = event.inaxes
+        # ax is None when clicked outside the heatmap
         if ax is None:
             return
 

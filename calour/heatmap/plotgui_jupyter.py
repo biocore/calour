@@ -21,8 +21,9 @@ class PlotGUI_Jupyter(PlotGUI):
         super().__init__(*kargs, **kwargs)
         self.databases = []
 
-    def get_figure(self, newfig=None):
-        fig = PlotGUI.get_figure(self, newfig=newfig)
+    @property
+    def figure(self, newfig=None):
+        fig = super().figure
         # self.labtax = Label('Feature:-')
         self.labtax = ipywidgets.Label('-')
         # self.labsamp = Label('Sample:')

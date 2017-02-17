@@ -85,10 +85,11 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         'dbbact' : the dbBact manual annotation database
         'spongeworld' : the sponge microbiome automatic annotation database
         'redbiom' : the automatic qiita database
-    axis : matplotlib axis or None (optional)
-        None (default) to create a new figure, axis to plot heatmap into the axis
-    rect : list of int or None (optional)
-        None (default) to set initial zoom window to all experiment.
+    axis : matplotlib ``AxesSubplot`` or None (optional)
+        The axis where the heatmap is plotted. None (default) to create a new figure and
+        axis to plot heatmap into the axis
+    rect : tuple of (int, int, int, int) or None (optional)
+        None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
     '''
     logger.debug('plot experiment')
@@ -99,12 +100,13 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         data[data < log_cutoff] = log_cutoff
         data = np.log2(data)
 
-    # init the default colormap
-    if cmap is None:
-        cmap = plt.rcParams['image.cmap']
-
     # load the appropriate gui module to handle gui events
-    if gui is not None:
+    if gui is None:
+        if axis is None:
+            fig, ax = plt.subplots()
+        else:
+            fig, ax = axis.get_figure(), axis
+    else:
         if gui == 'qt5':
             gui = 'PlotGUI_QT5'
         elif gui == 'cli':
@@ -115,9 +117,10 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
             raise ValueError('Unknown GUI specified: %r' % gui)
         gui_module_name = 'calour.heatmap.' + gui.lower()
         gui_module = importlib.import_module(gui_module_name)
-        # get the class
         GUIClass = getattr(gui_module, gui)
-        hdat = GUIClass(exp)
+        gui_obj = GUIClass(exp)
+        fig = gui_obj.figure
+        ax = fig.gca()
 
         # link gui with the databases requested
         for cdatabase in databases:
@@ -135,23 +138,24 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
             # get the class
             DBClass = getattr(db_module, db_name)
             cdb = DBClass()
-            hdat.databases.append(cdb)
+            gui_obj.databases.append(cdb)
             # select the database for use with the annotate button
             if cdb.can_annotate():
-                if hdat._annotation_db is None:
-                    hdat._annotation_db = cdb
+                if gui_obj._annotation_db is None:
+                    gui_obj._annotation_db = cdb
                 else:
-                    logger.warn('More than one database with annotation capability. Using first database (%s) for annotation' % hdat._annotation_db.get_name())
+                    logger.warning('More than one database with annotation capability.'
+                                'Using first database (%s) for annotation' % gui_obj._annotation_db.get_name())
 
-        fig = hdat.figure
-        hdat.connect_functions()
-    else:
-        fig = plt.figure()
-
-    ax = fig.gca()
+    # init the default colormap
+    if cmap is None:
+        cmap = plt.rcParams['image.cmap']
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
-
+    # set the title
+    if title is None:
+        title = exp.description
+    ax.set_title(title)
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -205,12 +209,9 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         return '{0:.01f}'.format(z)
     ax.format_coord = x_y_info
 
-    # set the title
-    if title is None:
-        title = exp.description
-    ax.set_title(title)
-
     fig.tight_layout()
-    if hdat:
-        hdat.run_gui()
-    plt.show()
+
+    if gui is not None:
+        gui_obj()
+
+    return fig

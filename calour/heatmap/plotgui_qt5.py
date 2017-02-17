@@ -25,8 +25,9 @@ class PlotGUI_QT5(PlotGUI):
     Attributes
     ----------
     figure
-    app
-    app_window
+    app : QT5 App created
+    app_window : Windows belonging to the QT5 App
+    databases :
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
@@ -43,16 +44,13 @@ class PlotGUI_QT5(PlotGUI):
         self.app_window = ApplicationWindow(self)
         app.references.add(self.app_window)
         self.app_window.setWindowTitle("Calour")
+        self.figure = self.app_window.plotfigure
 
-    @property
-    def figure(self):
-        self.app_window.show()
-        return self.app_window.plotfigure
-
-    # TODO exit cleaning?
-    def run_gui(self):
+    def __call__(self):
         logger.debug('opening plot window')
+        super().__call__()
         try:
+            self.app_window.show()
             self.app.exec_()
         finally:
             # clean up when the qt app is closed
@@ -121,7 +119,6 @@ class PlotGUI_QT5(PlotGUI):
 
 class MplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
-    # TODO why? what is width and height?
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)

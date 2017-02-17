@@ -7,10 +7,15 @@
 # ----------------------------------------------------------------------------
 
 from .plotgui import PlotGUI
+from matplotlib import pyplot as plt
 
 
 class PlotGUI_CLI(PlotGUI):
-    '''CLI version of plot window GUI using print() to show info '''
+    '''Show the plot and relevant info in terminal
+
+    It uses ``matplotlib`` only to display the plot and prints info on the
+    terminal screen.
+    '''
     def show_info(self):
         if 'taxonomy' in self.exp.feature_metadata:
             cname = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
@@ -21,5 +26,7 @@ class PlotGUI_CLI(PlotGUI):
         print(cname)
         return cname
 
-    def run_gui(self):
-        '''do nothing'''
+    def __call__(self):
+        '''Run the GUI.'''
+        super().__call__()
+        plt.show()
