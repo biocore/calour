@@ -68,8 +68,6 @@ class PlotGUI(ABC):
         # the default database used when annotating features
         self._annotation_db = None
 
-        self.connect_functions()
-
     @property
     def figure(self):
         ''' Get the figure to plot the heatmap into'''

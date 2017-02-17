@@ -104,9 +104,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         cmap = plt.rcParams['image.cmap']
 
     # load the appropriate gui module to handle gui events
-    if gui is None:
-        hdat = None
-    else:
+    if gui is not None:
         if gui == 'qt5':
             gui = 'PlotGUI_QT5'
         elif gui == 'cli':
@@ -145,17 +143,14 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
                 else:
                     logger.warn('More than one database with annotation capability. Using first database (%s) for annotation' % hdat._annotation_db.get_name())
 
-    # init the figure
-    if axis is None:
-        if hdat is None:
-            fig = plt.figure()
-        else:
-            fig = hdat.figure
-        ax = fig.gca()
-    else:
-        fig = axis.get_figure()
-        ax = axis
+        fig = hdat.figure
 
+        hdat.connect_functions()
+        hdat.run_gui()
+    else:
+        fig = plt.figure()
+
+    ax = fig.gca()
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
 
@@ -219,12 +214,4 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
 
     fig.tight_layout()
 
-    if hdat is None:
-        plt.show()
-    else:
-        # link the interactive plot functions
-        hdat.connect_functions()
-
-        # make the axis titles show
-        plt.show()
-        hdat.run_gui()
+    plt.show()

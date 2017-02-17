@@ -5,12 +5,13 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
-                             QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter,
-                             QFrame, QComboBox, QScrollArea, QListWidgetItem, QDialogButtonBox,
-                             QApplication)
+                             QSizePolicy, QWidget, QPushButton,
+                             QLabel, QListWidget, QSplitter, QFrame,
+                             QComboBox, QScrollArea, QListWidgetItem,
+                             QDialogButtonBox, QApplication)
 
 from .plotgui import PlotGUI
-from calour import analysis
+from .. import analysis
 
 
 logger = getLogger(__name__)
@@ -20,57 +21,63 @@ class PlotGUI_QT5(PlotGUI):
     '''QT5 version of plot winfow GUI
 
     We open the figure as a widget inside the qt5 window
+
+    Attributes
+    ----------
+    figure
+    app
+    app_window
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
-        self.app_created = False
+        self._app_created = False
+
     @property
     def figure(self):
-        if self.app_created == True:
-            return self.aw.plotfigure
+        if self._app_created:
+            return self.app_window.plotfigure
         else:
-            app_created = False
             app = QtCore.QCoreApplication.instance()
             logger.warning('Qt app is %s' % app)
             if app is None:
-                # app = QApplication(sys.argv)
                 app = QApplication(sys.argv)
-                app_created = True
                 logger.debug('Qt app created')
             self.app = app
-            self.app_created = app_created
+            self._app_created = True
             if not hasattr(app, 'references'):
+                # store references to all the windows
                 app.references = set()
-
-            self.aw = ApplicationWindow(self)
-            app.references.add(self.aw)
-            self.aw.setWindowTitle("Calour")
-            self.aw.show()
-            return self.aw.plotfigure
+            self.app_window = ApplicationWindow(self)
+            app.references.add(self.app_window)
+            self.app_window.setWindowTitle("Calour")
+            self.app_window.show()
+            return self.app_window.plotfigure
 
     def run_gui(self):
         logger.debug('opening plot window')
-        self.app.exec_()
-        # nice cleanup
-        if self.aw in self.app.references:
-            logger.debug('removing window from app window list')
-            self.app.references.remove(self.aw)
-        else:
-            logger.debug('window not in app window list. Not removed')
+        try:
+            self.app.exec_()
+        finally:
+            # clean up when the qt app is closed
+            if self.app_window in self.app.references:
+                logger.debug('removing window from app window list')
+                self.app.references.remove(self.app_window)
+            else:
+                logger.debug('window not in app window list. Not removed')
 
     def show_info(self):
         if 'taxonomy' in self.exp.feature_metadata:
-            taxname = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
+            taxname = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
         else:
             taxname = 'NA'
-        sequence = self.exp.feature_metadata.index[self.last_select_feature]
-        self.aw.w_taxonomy.setText('%r' % taxname)
-        self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.last_select_sample, self.last_select_feature]))
-        # self.aw.w_dblist.addItem(taxname)
-        csample_field = str(self.aw.w_field.currentText())
-        self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.last_select_sample]))
+        sequence = self.exp.feature_metadata.index[self.current_select[1]]
+        self.app_window.w_taxonomy.setText('%r' % taxname)
+        self.app_window.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.current_select[0], self.current_select[1]]))
+        # self.app_window.w_dblist.addItem(taxname)
+        csample_field = str(self.app_window.w_field.currentText())
+        self.app_window.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.current_select[0]]))
 
-        self.aw.w_dblist.clear()
+        self.app_window.w_dblist.clear()
         info = []
         for cdatabase in self.databases:
             try:
@@ -112,7 +119,7 @@ class PlotGUI_QT5(PlotGUI):
             else:
                 ccolor = QtGui.QColor(0, 0, 0)
             newitem.setForeground(ccolor)
-            self.aw.w_dblist.addItem(newitem)
+            self.app_window.w_dblist.addItem(newitem)
 
 
 class MplCanvas(FigureCanvas):
@@ -224,7 +231,7 @@ class ApplicationWindow(QMainWindow):
     def copy_sequence(self):
         '''Copy the sequence to the clipboard
         '''
-        cseq = self.gui.exp.feature_metadata.index[self.gui.last_select_feature]
+        cseq = self.gui.exp.feature_metadata.index[self.gui.current_select[1]]
         clipboard = QApplication.clipboard()
         clipboard.setText(cseq)
 
