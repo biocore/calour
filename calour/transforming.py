@@ -45,12 +45,42 @@ def scale(exp, axis=1, inplace=False):
     '''Standardize a dataset along an axis
 
     .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
+
+    Parameters
+    ----------
+    axis : 0 or 1
+        1 means scaling occur sample-wise; 0 feature-wise.
+
+    Returns
+    -------
+    ``Experiment``
     '''
     if not inplace:
         exp = deepcopy(exp)
     if exp.sparse:
         exp.sparse = False
     preprocessing.scale(exp.data, axis=axis, copy=False)
+    return exp
+
+
+def binarize(exp, threshold=1, inplace=False):
+    '''Binarize the data with a threshold.
+
+    It calls scikit-learn to do the real work.
+
+    Parameters
+    ----------
+    threshold : Numeric
+        the cutoff value. Any values below or equal to this will be replaced by 0,
+        above it by 1.
+
+    Returns
+    -------
+    ``Experiment``
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+    preprocessing.scale(exp.data, threshold=threshold, copy=False)
     return exp
 
 
@@ -62,6 +92,10 @@ def log_n(exp, n=1, inplace=False):
     n : numeric, optional
         cap the tiny values and then log transform the data.
     inplace : bool, optional
+
+    Returns
+    -------
+    ``Experiment``
     '''
     if not inplace:
         exp = deepcopy(exp)
@@ -139,7 +173,6 @@ def normalize_by_subset_features(exp, features, total=10000, exclude=True, inpla
     -------
     ``Experiment``
         The normalized experiment
-
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
     if exclude:

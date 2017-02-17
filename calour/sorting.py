@@ -76,7 +76,7 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
     if transform is None:
         data = exp.data
     else:
-        logger.debug('tansforming data using %s' % transform.__name__)
+        logger.debug('tansforming data using %r' % transform)
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).data
 
