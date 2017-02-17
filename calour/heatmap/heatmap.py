@@ -150,7 +150,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         if hdat is None:
             fig = plt.figure()
         else:
-            fig = hdat.get_figure()
+            fig = hdat.figure
         ax = fig.gca()
     else:
         fig = axis.get_figure()
@@ -222,12 +222,8 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
     if hdat is None:
         plt.show()
     else:
-        # link the axis and figure to the gui
-        hdat.axis = ax
-        hdat.fig = fig
-
         # link the interactive plot functions
-        hdat.connect_functions(fig)
+        hdat.connect_functions()
 
         # make the axis titles show
         plt.show()

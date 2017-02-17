@@ -23,26 +23,30 @@ class PlotGUI_QT5(PlotGUI):
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
+        self.app_created = False
+    @property
+    def figure(self):
+        if self.app_created == True:
+            return self.aw.plotfigure
+        else:
+            app_created = False
+            app = QtCore.QCoreApplication.instance()
+            logger.warning('Qt app is %s' % app)
+            if app is None:
+                # app = QApplication(sys.argv)
+                app = QApplication(sys.argv)
+                app_created = True
+                logger.debug('Qt app created')
+            self.app = app
+            self.app_created = app_created
+            if not hasattr(app, 'references'):
+                app.references = set()
 
-    def get_figure(self, newfig=None):
-        app_created = False
-        app = QtCore.QCoreApplication.instance()
-        logger.debug('Qt app is %s' % app)
-        if app is None:
-            # app = QApplication(sys.argv)
-            app = QApplication(sys.argv)
-            app_created = True
-            logger.debug('Qt app created')
-        self.app = app
-        self.app_created = app_created
-        if not hasattr(app, 'references'):
-            app.references = set()
-
-        self.aw = ApplicationWindow(self)
-        app.references.add(self.aw)
-        self.aw.setWindowTitle("Calour")
-        self.aw.show()
-        return self.aw.plotfigure
+            self.aw = ApplicationWindow(self)
+            app.references.add(self.aw)
+            self.aw.setWindowTitle("Calour")
+            self.aw.show()
+            return self.aw.plotfigure
 
     def run_gui(self):
         logger.debug('opening plot window')
@@ -60,7 +64,7 @@ class PlotGUI_QT5(PlotGUI):
         else:
             taxname = 'NA'
         sequence = self.exp.feature_metadata.index[self.last_select_feature]
-        self.aw.w_taxonomy.setText(taxname)
+        self.aw.w_taxonomy.setText('%r' % taxname)
         self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.last_select_sample, self.last_select_feature]))
         # self.aw.w_dblist.addItem(taxname)
         csample_field = str(self.aw.w_field.currentText())

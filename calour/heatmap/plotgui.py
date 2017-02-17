@@ -10,7 +10,6 @@ from logging import getLogger
 from abc import ABC, abstractmethod
 
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
@@ -30,7 +29,11 @@ class PlotGUI(ABC):
     selected_samples : dict of matplotlib.lines.Line2D
         used to track the selected samples and plot vertical lines for each selectiom
         keys - the selected sample indices, values - the line id for each selected samples
-    scroll_offset : int (optional)
+    current_select : tuple of (int, int)
+        current selected point
+    zoom_scale : numeric
+        the scaling factor for zooming
+    scroll_offset : numeric (optional)
         The amount of bacteria/samples to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
         >0 : scroll than constant amount of bacteria per keypress
@@ -57,56 +60,185 @@ class PlotGUI(ABC):
         # list of selected samples
         self.selected_samples = {}
 
+        # current selected point
+        self.current_select = None
         # list of databases to interface with
         self.databases = []
 
         # the default database used when annotating features
         self._annotation_db = None
 
-    def get_figure(self, newfig=None):
-        ''' Get the figure to plot the heatmap into
+        self.connect_functions()
 
-        newfig: None or mpl.figure or False (optional)
-            if None (default) create a new mpl figure.
-            if mpl.figure use this figure to plot into.
-            if False, use current figure to plot into.
-        '''
-        if newfig is None:
-            fig = plt.figure()
-        elif isinstance(newfig, mpl.figure.Figure):
-            fig = newfig
-        else:
-            fig = plt.gcf()
-        return fig
+    @property
+    def figure(self):
+        ''' Get the figure to plot the heatmap into'''
+        return plt.gcf()
 
-    @abstractmethod
-    def run_gui(self):
-        '''Run the GUI event loop and return when gui is done.
-        Can also do nothing if no event loop is needed
-        '''
-
-    def connect_functions(self, fig):
-        '''Connect to the matplotlib callbacks for key and mouse '''
-        self.canvas = fig.canvas
-        self.canvas.mpl_connect('mouse_scroll_event', lambda f: _scroll_callback(f, hdat=self))
-        self.canvas.mpl_connect('key_press_event', lambda f: _key_press_callback(f, hdat=self))
-        self.canvas.mpl_connect('button_press_event', lambda f: _button_press_callback(f, hdat=self))
+    @property
+    def axis(self):
+        return self.figure.gca()
 
     @abstractmethod
     def show_info(self):
-        '''Update info when a new feature/sample is selected'''
+        '''show info for the selected feature/sample'''
+
+    @abstractmethod
+    def run_gui(self):
+        '''Run the GUI event loop and return when gui is done.'''
+
+    def connect_functions(self):
+        '''Connect to the matplotlib callbacks for key and mouse '''
+        canvas = self.figure.canvas
+        canvas.mpl_connect('scroll_event', self.scroll_zoom_callback)
+        canvas.mpl_connect('button_press_event', self.button_press_callback)
+        canvas.mpl_connect('key_press_event', self.key_press_callback)
+
+    def scroll_zoom_callback(self, event):
+        '''Zoom upon mouse scroll event'''
+        logger.debug(repr(event))
+        ax = event.inaxes
+        cur_xlim = ax.get_xlim()
+        cur_ylim = ax.get_ylim()
+        xdata = event.xdata  # get event x location
+        ydata = event.ydata  # get event y location
+        x_left = xdata - cur_xlim[0]
+        x_right = cur_xlim[1] - xdata
+        y_top = ydata - cur_ylim[0]
+        y_bottom = cur_ylim[1] - ydata
+        if event.button == 'up':
+            scale_factor = 1. / self.zoom_scale
+        elif event.button == 'down':
+            scale_factor = self.zoom_scale
+        else:
+            # deal with something that should never happen
+            logger.warning('unknow scroll movement')
+            return
+        # set new limits
+        ax.set_xlim([xdata - x_left * scale_factor,
+                     xdata + x_right * scale_factor])
+        ax.set_ylim([ydata - y_top * scale_factor,
+                     ydata + y_bottom * scale_factor])
+
+        self.figure.canvas.draw()  # force re-draw
+
+    def button_press_callback(self, event):
+        '''Select upon mouse button press.
+
+        button only: empty the previous selection and select the current point
+
+        button + shift: select all the features in the rectangle between
+        current selection and last selecton.
+
+        button + super: add current selected features to the selected list
+        '''
+        logger.debug(repr(event))
+        ax = event.inaxes
+        if ax is None:
+            return
+
+        rx = int(round(event.xdata))
+        ry = int(round(event.ydata))
+
+        if event.key is None:
+            # add selection to list
+            self.clear_selection()
+            self.update_selection(samplepos=[rx], featurepos=[ry])
+        elif event.key == 'shift':
+            try:
+                last_selected_feature = self.current_select[1]
+            except IndexError:
+                logger.critical('You have not selected any previously.')
+                return
+            if last_selected_feature > ry:
+                features = np.arange(last_selected_feature, ry - 1, -1)
+            else:
+                features = np.arange(last_selected_feature, ry + 1, 1)
+            self.clear_selection()
+            self.update_selection(featurepos=features)
+        elif event.key == 'super':
+            self.update_selection(featurepos=[ry])
+
+        self.current_select = (rx, ry)
+        # and show the selected info
+        self.show_info()
+
+    def key_press_callback(self, event):
+        '''Move/zoom upon key pressing.'''
+        logger.debug('%r: %s key pressed' % (event, event.key))
+        ax = event.inaxes
+        if ax is None:
+            return
+
+        ylim_lower, ylim_upper = ax.get_ylim()
+        xlim_lower, xlim_upper = ax.get_xlim()
+
+        # set the scroll offset
+        if self.scroll_offset > 0:
+            x_offset = self.scroll_offset
+            y_offset = self.scroll_offset
+        else:
+            x_offset = xlim_upper - xlim_lower
+            y_offset = ylim_upper - ylim_lower
+
+        if event.key == 'shift+up' or event.key == '=':
+            ax.set_ylim(
+                ylim_lower,
+                ylim_lower + (ylim_upper - ylim_lower) / self.zoom_scale)
+        elif event.key == 'shift+down' or event.key == '-':
+            ax.set_ylim(
+                ylim_lower,
+                ylim_lower + (ylim_upper - ylim_lower) * self.zoom_scale)
+        elif event.key == 'shift+right' or event.key == '+':
+            ax.set_xlim(
+                xlim_lower,
+                xlim_lower + (xlim_upper - xlim_lower) / self.zoom_scale)
+        elif event.key == 'shift+left' or event.key == '_':
+            ax.set_xlim(
+                xlim_lower,
+                xlim_lower + (xlim_upper - xlim_lower) * self.zoom_scale)
+        elif event.key == 'down':
+            ax.set_ylim(ylim_lower - y_offset, ylim_upper - y_offset)
+        elif event.key == 'up':
+            ax.set_ylim(ylim_lower + y_offset, ylim_upper + y_offset)
+        elif event.key == 'left':
+            ax.set_xlim(xlim_lower - x_offset, xlim_upper - x_offset)
+        elif event.key == 'right':
+            ax.set_xlim(xlim_lower + x_offset, xlim_upper + x_offset)
+        elif event.key in {'.', ',', '<', '>'}:
+            shift = {'.': (0, 1),
+                     ',': (0, -1),
+                     '<': (-1, 0),
+                     '>': (1, 0)}
+            try:
+                self.current_select = (self.current_select[0] + shift[event.key][0],
+                                       self.current_select[1] + shift[event.key][1])
+            except IndexError:
+                logger.warning('You have not selected any previously.')
+                return
+            self.clear_selection()
+            self.update_selection(
+                samplepos=[self.current_select[0]], featurepos=[self.current_select[1]])
+            self.show_info()
+        else:
+            logger.warning('Unrecoginzed key: %s' % event.key)
+            return
+
+        self.figure.canvas.draw()
 
     def clear_selection(self):
-        ''' Delete all shown selection lines '''
+        '''Delete all shown selection lines '''
         for cline in self.selected_samples.values():
             self.axis.lines.remove(cline)
+            logger.debug('remove sample selection %r' % cline)
         self.selected_samples = {}
         for cline in self.selected_features.values():
             self.axis.lines.remove(cline)
+            logger.debug('remove sample selection %r' % cline)
         self.selected_features = {}
 
     def update_selection(self, samplepos=[], featurepos=[], toggle=True):
-        '''Update the selection lines displayed
+        '''Update the selection
 
         Parameters
         ----------
@@ -115,23 +247,28 @@ class PlotGUI(ABC):
         featurepos : list of int (optional)
             positions of features to be added
         toggle: bool (optional)
-            True (default) to remove lines in the lists that are already selected, False to ignore
+            True (default) to remove lines in the lists that are already selected.
+            False to ignore
         '''
         for cpos in samplepos:
             if cpos not in self.selected_samples:
-                self.selected_samples[cpos] = self.axis.axvline(x=cpos, color='white', linestyle='dotted')
+                self.selected_samples[cpos] = self.axis.axvline(
+                    x=cpos, color='white', linestyle='dotted')
+                logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
                     self.axis.lines.remove(self.selected_samples[cpos])
                     del self.selected_samples[cpos]
         for cpos in featurepos:
             if cpos not in self.selected_features:
-                self.selected_features[cpos] = self.axis.axhline(y=cpos, color='white', linestyle='dotted')
+                self.selected_features[cpos] = self.axis.axhline(
+                    y=cpos, color='white', linestyle='dotted')
+                logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
                     self.axis.lines.remove(self.selected_features[cpos])
                     del self.selected_features[cpos]
-        self.canvas.draw()
+        self.figure.canvas.draw()
 
     def get_selected_seqs(self):
         '''Get the list of selected sequences
@@ -144,130 +281,4 @@ class PlotGUI(ABC):
         seqs : list of str
             The selected sequences ('ACGT')
         '''
-        seqs = []
-        for cseqpos in self.selected_features.keys():
-            seqs.append(self.exp.feature_metadata.index[cseqpos])
-        return seqs
-
-
-def _button_press_callback(event, hdat):
-    ax = event.inaxes
-    if ax is None:
-        return
-
-    rx = int(round(event.xdata))
-    ry = int(round(event.ydata))
-
-    if event.key is None:
-        # add selection to list
-        hdat.clear_selection()
-        hdat.update_selection(samplepos=[rx], featurepos=[ry])
-    elif event.key == 'shift':
-        if hdat.last_select_feature > ry:
-            newbact = np.arange(hdat.last_select_feature, ry - 1, -1)
-        else:
-            newbact = np.arange(hdat.last_select_feature, ry + 1, 1)
-        hdat.clear_selection()
-        hdat.update_selection(featurepos=newbact)
-    elif event.key == 'super':
-        hdat.update_selection(featurepos=[ry])
-
-    # store the latest selected feature/sample
-    hdat.last_select_feature = ry
-    hdat.last_select_sample = rx
-    # and update the selected info
-    hdat.show_info()
-
-
-def _key_press_callback(event, hdat):
-    ax = event.inaxes
-    if ax is None:
-        return
-    ylim_lower, ylim_upper = ax.get_ylim()
-    xlim_lower, xlim_upper = ax.get_xlim()
-
-    # set the scroll offset
-    if hdat.scroll_offset > 0:
-        x_offset = hdat.scroll_offset
-        y_offset = hdat.scroll_offset
-    else:
-        x_offset = xlim_upper - xlim_lower
-        y_offset = ylim_upper - ylim_lower
-
-    if event.key == 'shift+up' or event.key == '=':
-        ax.set_ylim(
-            ylim_lower,
-            ylim_lower + (ylim_upper - ylim_lower) / hdat.zoom_scale)
-    elif event.key == 'shift+down' or event.key == '-':
-        ax.set_ylim(
-            ylim_lower,
-            ylim_lower + (ylim_upper - ylim_lower) * hdat.zoom_scale)
-    elif event.key == 'shift+right' or event.key == '+':
-        ax.set_xlim(
-            xlim_lower,
-            xlim_lower + (xlim_upper - xlim_lower) / hdat.zoom_scale)
-    elif event.key == 'shift+left' or event.key == '_':
-        ax.set_xlim(
-            xlim_lower,
-            xlim_lower + (xlim_upper - xlim_lower) * hdat.zoom_scale)
-    elif event.key == 'down':
-        ax.set_ylim(ylim_lower - y_offset, ylim_upper - y_offset)
-    elif event.key == 'up':
-        ax.set_ylim(ylim_lower + y_offset, ylim_upper + y_offset)
-    elif event.key == 'left':
-        ax.set_xlim(xlim_lower - x_offset, xlim_upper - x_offset)
-    elif event.key == 'right':
-        ax.set_xlim(xlim_lower + x_offset, xlim_upper + x_offset)
-    elif event.key == '.':
-        hdat.last_select_feature += 1
-        hdat.clear_selection()
-        hdat.update_selection(samplepos=hdat.selected_samples, featurepos=[hdat.last_select_feature])
-        hdat.show_info()
-    elif event.key == ',':
-        hdat.last_select_feature -= 1
-        hdat.clear_selection()
-        hdat.update_selection(samplepos=hdat.selected_samples, featurepos=[hdat.last_select_feature])
-        hdat.show_info()
-    elif event.key == '>':
-        hdat.last_select_sample += 1
-        hdat.clear_selection()
-        hdat.update_selection(featurepos=hdat.selected_features, samplepos=[hdat.last_select_sample])
-        hdat.show_info()
-    elif event.key == '<':
-        hdat.last_select_sample -= 1
-        hdat.clear_selection()
-        hdat.update_selection(featurepos=hdat.selected_features, samplepos=[hdat.last_select_sample])
-        hdat.show_info()
-
-    else:
-        return
-
-    # plt.tight_layout()
-    hdat.canvas.draw()
-
-
-def _scroll_callback(event, hdat):
-    ax = event.inaxes
-    cur_xlim = ax.get_xlim()
-    cur_ylim = ax.get_ylim()
-    xdata = event.xdata  # get event x location
-    ydata = event.ydata  # get event y location
-    x_left = xdata - cur_xlim[0]
-    x_right = cur_xlim[1] - xdata
-    y_top = ydata - cur_ylim[0]
-    y_bottom = cur_ylim[1] - ydata
-    if event.button == 'up':
-        scale_factor = 1. / hdat.zoom_scale
-    elif event.button == 'down':
-        scale_factor = hdat.zoom_scale
-    else:
-        # deal with something that should never happen
-        scale_factor = 1
-        print(event.button)
-    # set new limits
-    ax.set_xlim([xdata - x_left * scale_factor,
-                 xdata + x_right * scale_factor])
-    ax.set_ylim([ydata - y_top * scale_factor,
-                 ydata + y_bottom * scale_factor])
-
-    hdat.canvas.draw()  # force re-draw
+        return self.exp.feature_metadata.index[self.selected_features.keys()]
