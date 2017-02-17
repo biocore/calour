@@ -13,6 +13,7 @@ import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
+from .transforming import log_n
 from .util import _get_taxonomy_string
 
 
@@ -38,6 +39,48 @@ def sort_taxonomy(exp, inplace=False):
     logger.debug('sorting by taxonomies')
     taxonomy = _get_taxonomy_string(exp, remove_underscore=True)
     sort_pos = np.argsort(taxonomy, kind='mergesort')
+    exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
+    return exp
+
+
+@Experiment._record_sig
+def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
+    '''Sort the features based on the center of mass
+
+    Assumes exp samples are sorted by some continuous field,
+    and for each feature finds the center of mass (i.e. value * position along field).
+    Features are then sorted according to this center of mass
+
+    Parameters
+    ----------
+    transform : callable (optional)
+        a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.
+        The transform function can modify ``Experiment.data`` (it is a copy).
+        It should not change the dimension of ``data`` in ``Experiment``.
+    inplace : bool (optional)
+        False (default) to create a copy
+        True to Replace data in exp
+    kwargs : dict
+        additional keyword parameters passed to ``transform``.
+
+    Returns
+    -------
+    exp : Experiment
+        features sorted by center of mass
+    '''
+    logger.debug('sorting features by center of mass')
+    if transform is None:
+        data = exp.data
+    else:
+        logger.debug('tansforming data using %s' % transform.__name__)
+        newexp = deepcopy(exp)
+        data = transform(newexp, **kwargs).data
+    data = data.T
+    coordinates = np.arange(data.shape[1]) - ((data.shape[1] - 1)/2)
+    center_mass = data.dot(coordinates)
+    center_mass = np.divide(center_mass, data.sum(axis=1))
+
+    sort_pos = np.argsort(center_mass, kind='mergesort')
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
 

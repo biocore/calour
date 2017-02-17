@@ -97,14 +97,16 @@ def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transfor
     if len(keep[0]) == 0:
         logger.warn('no significant features found')
         return None
-
     newexp = exp.reorder(keep[0], axis=1)
     odif = odif[keep[0]]
+    pvals = pvals[keep[0]]
     si = np.argsort(odif, kind='mergesort')
     odif = odif[si]
+    pvals = pvals[si]
     logger.warn('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif > 0), val2, np.sum(odif < 0), len(odif)))
     newexp = newexp.reorder(si, axis=1)
-    newexp.feature_metadata['odif'] = odif
+    newexp.feature_metadata['_calour_diff_abundance_effect'] = odif
+    newexp.feature_metadata['_calour_diff_abundance_pval'] = pvals
     return newexp
 
 

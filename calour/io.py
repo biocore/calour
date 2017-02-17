@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+import os.path
 
 import pandas as pd
 import numpy as np
@@ -14,6 +15,7 @@ import biom
 
 from calour.experiment import Experiment
 from calour.util import _get_taxonomy_string, get_file_md5, get_data_md5
+
 
 logger = getLogger(__name__)
 
@@ -29,6 +31,17 @@ def _read_biom(fp, transpose=True):
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
+
+    Returns
+    -------
+    sid : list of str
+        the sample ids
+    oid : list of str
+        the feature ids
+    data : numpy array (2d) of float
+        the table
+    feature_md : pandas DataFram
+        the feature metadata (if availble in table)
     '''
     logger.debug('loading biom table %s' % fp)
     table = biom.load_table(fp)
@@ -37,6 +50,47 @@ def _read_biom(fp, transpose=True):
     logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
     data = table.matrix_data
     feature_md = _get_md_from_biom(table)
+
+    if transpose:
+        logger.debug('transposing table')
+        data = data.transpose()
+
+    return sid, oid, data, feature_md
+
+
+def _read_openms_csv(fp, transpose=True):
+    '''Read an OpenMS bucket table csv file
+
+    Parameters
+    ----------
+    fp : str
+        file path to the biom table
+    transpose : bool (True by default)
+        Transpose the table or not. The biom table has samples in
+        column while sklearn and other packages require samples in
+        row. So you should transpose the data table.
+
+    Returns
+    -------
+    sid : list of str
+        the sample ids
+    oid : list of str
+        the feature ids
+    data : numpy array (2d) of float
+        the table
+    feature_md : pandas DataFram
+        the feature metadata (if availble in table)
+    '''
+    logger.debug('loading OpenMS bucket table %s' % fp)
+    # use the python engine as the default (c) engine throws an error
+    # a known bug in pandas (see #11166)
+    table = pd.read_csv(fp, header=0, engine='python')
+    sample_id_col = table.columns[0]
+    sid = table.columns[1:]
+    oid = table[sample_id_col].values
+    logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
+    data = table.values[:, 1:]
+    feature_md = pd.DataFrame(index=oid)
 
     if transpose:
         logger.debug('transposing table')
@@ -78,6 +132,59 @@ def _read_table(f):
     return table
 
 
+def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=None,
+                 normalize=False, rescale=10000, description=None, sparse=False, **kwargs):
+    '''Load an OpenMS metabolomics experiment
+
+    Parameters
+    ----------
+    data_file : str
+        name of the OpenMS bucket table CSV file
+    sample_metadata_file : str or None (optional)
+        None (default) to not load metadata per sample
+        str to specify name of sample mapping file (tsv)
+    feature_metadata_file : str or None (optional)
+        Name of table containing additional metadata about each feature
+        None (default) to not load
+    normalize : bool (optional)
+        True to normalize each sample to constant sum,
+        False (default) to not normalize
+    rescale : int or None (optional)
+        int to rescale reads so mean total reads per sample (over
+        all samples) to value rescale,
+        None to not rescale
+    description : str or None (optional)
+        Name of the experiment (for display purposes).
+        None (default) to assign file name
+    sparse : bool (optional)
+        False (default) to store data as dense matrix (faster but more memory)
+        True to store as sparse (CSR)
+
+    Returns
+    -------
+    exp : ``Experiment``
+    '''
+    logger.info('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
+    exp = read(data_file, sample_metadata_file, feature_metadata_file,
+               data_file_type='openms', sparse=False, **kwargs)
+    # record the original total read count into sample metadata
+    if normalize:
+        exp.normalize(inplace=True, total=rescale)
+    elif rescale:
+        exp.normalize(inplace=True, total=rescale)
+
+    exp.sample_metadata['id'] = exp.sample_metadata.index.values
+
+    # generate nice M/Z (MZ) and retention time (RT) columns for each feature
+    exp.feature_metadata['id'] = exp.feature_metadata.index.values
+    mzdata = exp.feature_metadata['id'].str.split('_', expand=True)
+    mzdata.columns = ['MZ', 'RT']
+    mzdata = mzdata.astype(float)
+    exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
+
+    return exp
+
+
 def read_taxa(data_file, sample_metadata_file=None,
               filter_orig_reads=1000, normalize=True, **kwargs):
     '''Load an amplicon experiment.
@@ -107,13 +214,12 @@ def read_taxa(data_file, sample_metadata_file=None,
         exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
     if normalize:
         # record the original total read count into sample metadata
-        exp.sample_metadata['_calour_read_count'] = exp.data.sum(axis=1)
         exp.normalize(inplace=True)
     return exp
 
 
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True):
+         description='', sparse=True, data_file_type='biom'):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -132,20 +238,32 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         description of the experiment
     sparse : bool
         read the biom table into sparse or dense array
+    file_type : str (optional)
+        the data_file format. options:
+        'biom' : a biom table (biom-format.org) (default)
+        'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
 
     Returns
     -------
     exp : Experiment
     '''
-    logger.info('Reading experiment (biom table %s, map file %s)' % (data_file, sample_metadata_file))
+    logger.info('Reading experiment (data_file %s, map file %s)' % (data_file, sample_metadata_file))
     exp_metadata = {'map_md5': ''}
-    sid, oid, data, md = _read_biom(data_file)
+    # load the data table
+    if data_file_type == 'biom':
+        sid, oid, data, md = _read_biom(data_file)
+    elif data_file_type == 'openms':
+        sid, oid, data, md = _read_openms_csv(data_file)
+    else:
+        raise ValueError('unkown data_file_type %s' % data_file_type)
+    # load the sample metadata file
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
         sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
         exp_metadata['map_md5'] = get_file_md5(sample_metadata_file)
     else:
         sample_metadata = pd.DataFrame(index=sid)
+    # load the feature metadata file
     if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
         fm = _read_table(feature_metadata_file).loc[oid, ]
@@ -161,7 +279,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     exp_metadata['data_md5'] = get_data_md5(data)
 
     if description == '':
-        description = data_file
+        description = os.path.basename(data_file)
 
     return Experiment(data, sample_metadata, feature_metadata,
                       exp_metadata=exp_metadata, description=description, sparse=sparse)
