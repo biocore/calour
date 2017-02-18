@@ -16,16 +16,6 @@ class PlotGUI_CLI(PlotGUI):
     It uses ``matplotlib`` only to display the plot and prints info on the
     terminal screen.
     '''
-    def show_info(self):
-        if 'taxonomy' in self.exp.feature_metadata:
-            cname = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
-        # sample_name = self.exp.sample_metadata['#SampleID'][self.select_sample]
-        # sample_name = self.exp.get_sample_md().iloc[self.select_sample]
-        else:
-            cname = self.exp.feature_metadata.index[self.current_select[1]]
-        print(cname)
-        return cname
-
     def __call__(self):
         '''Run the GUI.'''
         super().__call__()

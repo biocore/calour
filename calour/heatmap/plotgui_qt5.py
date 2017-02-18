@@ -61,30 +61,13 @@ class PlotGUI_QT5(PlotGUI):
                 logger.debug('window not in app window list. Not removed')
 
     def show_info(self):
-        if 'taxonomy' in self.exp.feature_metadata:
-            taxname = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
-        else:
-            taxname = 'NA'
-        sequence = self.exp.feature_metadata.index[self.current_select[1]]
-        self.app_window.w_taxonomy.setText('%r' % taxname)
-        self.app_window.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.current_select[0], self.current_select[1]]))
-        # self.app_window.w_dblist.addItem(taxname)
-        csample_field = str(self.app_window.w_field.currentText())
-        self.app_window.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.current_select[0]]))
+        sid, fid, abd, tax, info = self.get_info()
+        self.app_window.w_taxonomy.setText('%r' % fid)
+        self.app_window.w_reads.setText('{:.01f}'.format(abd))
+        sample_field = str(self.app_window.w_field.currentText())
+        self.app_window.w_field_val.setText(
+            repr(self.exp.sample_metadata[sample_field][self.current_select[0]]))
 
-        self.app_window.w_dblist.clear()
-        info = []
-        for cdatabase in self.databases:
-            try:
-                cinfo = cdatabase.get_seq_annotation_strings(sequence)
-                if len(cinfo) == 0:
-                    cinfo = [[{'annotationtype': 'not found'}, 'No annotation found in database %s' % cdatabase.get_name()]]
-                else:
-                    for cannotation in cinfo:
-                        cannotation[0]['_db_interface'] = cdatabase
-            except:
-                cinfo = 'error connecting to db %s' % cdatabase.get_name()
-            info.extend(cinfo)
         self._display_annotation_in_qlistwidget(info)
 
     def _display_annotation_in_qlistwidget(self, info):
@@ -99,6 +82,9 @@ class PlotGUI_QT5(PlotGUI):
             string : str
                 The string to add to the list
         '''
+        # clear the current annotation box
+        self.app_window.w_dblist.clear()
+
         for cinfo in info:
             details = cinfo[0]
             newitem = QListWidgetItem(cinfo[1])
@@ -161,7 +147,7 @@ class ApplicationWindow(QMainWindow):
         userside.addLayout(lbox_tax)
         # reads
         lbox_reads = QHBoxLayout()
-        readslabel = QLabel(text='reads:')
+        readslabel = QLabel(text='abundance:')
         self.w_reads = QLabel(text='?')
         lbox_reads.addWidget(readslabel)
         lbox_reads.addWidget(self.w_reads)

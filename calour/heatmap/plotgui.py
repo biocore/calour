@@ -7,7 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,6 +42,7 @@ class PlotGUI(ABC):
         >0 : scroll than constant amount of bacteria per keypress
     figure : ``matplotlib.figure.Figure``
         The figure where the heatmap will be plotted into. It creates one by default.
+    axis : matplotlib axes obtained from ``figure``.
 
     Parameters
     ----------
@@ -84,9 +85,40 @@ class PlotGUI(ABC):
         # this attr has to be property so it is updated on mouse/key events
         return self.figure.gca()
 
-    @abstractmethod
+    def get_info(self):
+        '''Get info for the selected feature/sample
+
+        Returns
+        -------
+        tuple of (str, str, numeric, str or ``None``)
+            sample id, feature id, abundance, taxonomy
+        '''
+        if 'taxonomy' in self.exp.feature_metadata:
+            tax = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
+        else:
+            tax = None
+
+        fid = self.exp.feature_metadata.index[self.current_select[1]]
+        sid = self.exp.sample_metadata.index[self.current_select[0]]
+        abd = self.exp.data[self.current_select[0], self.current_select[1]]
+
+        info = []
+        for cdatabase in self.databases:
+            try:
+                cinfo = cdatabase.get_seq_annotation_strings(fid)
+                if len(cinfo) == 0:
+                    cinfo = [[{'annotationtype': 'not found'}, 'No annotation found in database %s' % cdatabase.get_name()]]
+                else:
+                    for cannotation in cinfo:
+                        cannotation[0]['_db_interface'] = cdatabase
+            except:
+                cinfo = 'error connecting to db %s' % cdatabase.get_name()
+            info.extend(cinfo)
+
+        return sid, fid, abd, tax, info
+
     def show_info(self):
-        '''show info for the selected feature/sample'''
+        print(self.get_info())
 
     def __call__(self):
         '''Run the GUI.'''
