@@ -85,7 +85,7 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         'dbbact' : the dbBact manual annotation database
         'spongeworld' : the sponge microbiome automatic annotation database
         'redbiom' : the automatic qiita database
-    axis : matplotlib ``AxesSubplot`` or None (optional)
+    axis : matplotlib ``AxesSubplot`` object or None (optional)
         The axis where the heatmap is plotted. None (default) to create a new figure and
         axis to plot heatmap into the axis
     rect : tuple of (int, int, int, int) or None (optional)
@@ -144,8 +144,10 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
                 if gui_obj._annotation_db is None:
                     gui_obj._annotation_db = cdb
                 else:
-                    logger.warning('More than one database with annotation capability.'
-                                'Using first database (%s) for annotation' % gui_obj._annotation_db.get_name())
+                    logger.warning(
+                        'More than one database with annotation capability.'
+                        'Using first database (%s) for annotation'
+                        '.' % gui_obj._annotation_db.get_name())
 
     # init the default colormap
     if cmap is None:

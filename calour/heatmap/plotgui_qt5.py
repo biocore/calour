@@ -1,5 +1,6 @@
 import sys
 from logging import getLogger
+from textwrap import fill
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -61,33 +62,36 @@ class PlotGUI_QT5(PlotGUI):
                 logger.debug('window not in app window list. Not removed')
 
     def show_info(self):
-        sid, fid, abd, tax, info = self.get_info()
+        sid, fid, abd, tax, annt = self.get_info()
+        n = 20
         self.app_window.w_taxonomy.setText('%r' % fid)
-        self.app_window.w_reads.setText('{:.01f}'.format(abd))
+        self.app_window.w_abund.setText('{:.01f}'.format(abd))
+        self.app_window.w_fid.setText(fill(fid, n))
+        self.app_window.w_sid.setText(fill(sid, n))
         sample_field = str(self.app_window.w_field.currentText())
         self.app_window.w_field_val.setText(
-            repr(self.exp.sample_metadata[sample_field][self.current_select[0]]))
+            self.exp.sample_metadata[sample_field][self.current_select[0]])
 
-        self._display_annotation_in_qlistwidget(info)
+        self._display_annotation_in_qlistwidget(annt)
 
-    def _display_annotation_in_qlistwidget(self, info):
+    def _display_annotation_in_qlistwidget(self, annt):
         '''Add a line to the annotation list
-        Does not erase previous lines
+
+        It does not erase previous lines.
 
         Parameters
         ----------
-        info : list of (dict, string)
+        annt : list of (dict, str)
             dict : contains the key 'annotationtype' and determines the annotation color
             also contains all other annotation data needed for right click menu/double click
-            string : str
-                The string to add to the list
+            str : The string to add to the list
         '''
-        # clear the current annotation box
+        # clear the previous annotation box
         self.app_window.w_dblist.clear()
 
-        for cinfo in info:
-            details = cinfo[0]
-            newitem = QListWidgetItem(cinfo[1])
+        for cannt in annt:
+            details = cannt[0]
+            newitem = QListWidgetItem(cannt[1])
             newitem.setData(QtCore.Qt.UserRole, details)
             if details['annotationtype'] == 'diffexp':
                 ccolor = QtGui.QColor(0, 0, 200)
@@ -104,7 +108,16 @@ class PlotGUI_QT5(PlotGUI):
 
 
 class MplCanvas(FigureCanvas):
-    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.).
+
+    Parameters
+    ----------
+    parent :
+    width, height : Numeric
+        size of the canvas
+    dpi : int
+
+    """
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
@@ -145,12 +158,27 @@ class ApplicationWindow(QMainWindow):
         lbox_tax.addWidget(taxlabel)
         lbox_tax.addWidget(taxscroll)
         userside.addLayout(lbox_tax)
-        # reads
+        # sample id
+        lbox_sid = QHBoxLayout()
+        sidlabel = QLabel(text='sample ID:')
+        self.w_sid = QLabel(text='?')
+        lbox_sid.addWidget(sidlabel)
+        lbox_sid.addWidget(self.w_sid)
+        userside.addLayout(lbox_sid)
+        # feature id
+        lbox_fid = QHBoxLayout()
+        fidlabel = QLabel(text='feature ID:')
+        # fidlabel.setWordWrap(1)
+        self.w_fid = QLabel(text='?')
+        lbox_fid.addWidget(fidlabel)
+        lbox_fid.addWidget(self.w_fid)
+        userside.addLayout(lbox_fid)
+        # abundance value
         lbox_reads = QHBoxLayout()
         readslabel = QLabel(text='abundance:')
-        self.w_reads = QLabel(text='?')
+        self.w_abund = QLabel(text='?')
         lbox_reads.addWidget(readslabel)
-        lbox_reads.addWidget(self.w_reads)
+        lbox_reads.addWidget(self.w_abund)
         userside.addLayout(lbox_reads)
         # buttons
         lbox_buttons = QHBoxLayout()

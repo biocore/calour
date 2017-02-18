@@ -43,6 +43,8 @@ class PlotGUI(ABC):
     figure : ``matplotlib.figure.Figure``
         The figure where the heatmap will be plotted into. It creates one by default.
     axis : matplotlib axes obtained from ``figure``.
+    databases : list
+        the database to interact with
 
     Parameters
     ----------
@@ -50,27 +52,22 @@ class PlotGUI(ABC):
     zoom_scale :
     scroll_offset :
     '''
-    def __init__(self, exp, zoom_scale=2, scroll_offset=0, figure=None):
+    def __init__(self, exp, zoom_scale=2, scroll_offset=0, figure=None, databases=None):
         # the Experiment being plotted
         self.exp = exp
-
         # how much zooming in on key press
         self.zoom_scale = zoom_scale
-
         # how much to scroll on key press
         self.scroll_offset = scroll_offset
-
         # list of selected features
         self.selected_features = {}
-
         # list of selected samples
         self.selected_samples = {}
-
         # current selected point
         self.current_select = None
         # list of databases to interface with
-        self.databases = []
-
+        if databases is None:
+            self.databases = []
         # the default database used when annotating features
         self._annotation_db = None
 
@@ -102,20 +99,21 @@ class PlotGUI(ABC):
         sid = self.exp.sample_metadata.index[self.current_select[0]]
         abd = self.exp.data[self.current_select[0], self.current_select[1]]
 
-        info = []
+        annt = []
         for cdatabase in self.databases:
             try:
-                cinfo = cdatabase.get_seq_annotation_strings(fid)
-                if len(cinfo) == 0:
-                    cinfo = [[{'annotationtype': 'not found'}, 'No annotation found in database %s' % cdatabase.get_name()]]
+                cannt = cdatabase.get_seq_annotation_strings(fid)
+                if len(cannt) == 0:
+                    cannt = [[{'annotationtype': 'not found'},
+                              'No annotation found in database %s' % cdatabase.get_name()]]
                 else:
-                    for cannotation in cinfo:
+                    for cannotation in cannt:
                         cannotation[0]['_db_interface'] = cdatabase
             except:
-                cinfo = 'error connecting to db %s' % cdatabase.get_name()
-            info.extend(cinfo)
+                cannt = 'error connecting to db %s' % cdatabase.get_name()
+            annt.extend(cannt)
 
-        return sid, fid, abd, tax, info
+        return sid, fid, abd, tax, annt
 
     def show_info(self):
         print(self.get_info())
@@ -278,14 +276,14 @@ class PlotGUI(ABC):
             logger.debug('remove sample selection %r' % cline)
         self.selected_features = {}
 
-    def update_selection(self, samplepos=[], featurepos=[], toggle=True):
+    def update_selection(self, samplepos=(), featurepos=(), toggle=True):
         '''Update the selection
 
         Parameters
         ----------
-        samplepos : list of int (optional)
+        samplepos : iterable of int (optional)
             positions of samples to be added
-        featurepos : list of int (optional)
+        featurepos : iterable of int (optional)
             positions of features to be added
         toggle: bool (optional)
             True (default) to remove lines in the lists that are already selected.
