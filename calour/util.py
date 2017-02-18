@@ -10,6 +10,7 @@ from logging import getLogger
 import hashlib
 import configparser
 from pkg_resources import resource_filename
+
 import scipy
 
 logger = getLogger(__name__)

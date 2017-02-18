@@ -19,14 +19,18 @@ class Tests(TestCase):
     def setUp(self):
         test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
         self.test_data_dir = test_data_dir
+        # a simple artificial biom table
         self.test1_biom = join(test_data_dir, 'test1.biom')
         self.test1_samp = join(test_data_dir, 'test1.sample')
         self.test1_feat = join(test_data_dir, 'test1.feature')
         self.test2_biom = join(test_data_dir, 'test2.biom')
         self.test2_samp = join(test_data_dir, 'test2.sample')
         self.test2_feat = join(test_data_dir, 'test2.feature')
+        # a dense timeseries (real data)
         self.timeseries_biom = join(test_data_dir, 'timeseries.biom')
         self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
+        # a simple openms bucket table csv file
+        self.openms_csv = join(test_data_dir, 'openms_bucket_table.csv')
 
 
 def assertIsInstance(obj, cls, msg=''):
@@ -39,7 +43,7 @@ def assertIsInstance(obj, cls, msg=''):
         raise AssertionError(err_msg.format(msg, cls, type(obj)))
 
 
-def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True):
+def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, ignore_md_fields=['_calour_read_count']):
     '''Test if two experiments are equal
 
     Parameters
@@ -50,12 +54,25 @@ def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True):
         False (default) to skip testing the command history, True to compare also the command history
     almost_equal : bool (optional)
         True (default) to test for almost identical, False to test the data matrix for exact identity
+    ignore_md_fields : list of str or None
+        list of metadata fields to ignore in the comparison. Default is ignoring the original read count (when sample loaded)
     '''
     assertIsInstance(exp1, ca.Experiment, 'exp1 not a calour Experiment class')
     assertIsInstance(exp2, ca.Experiment, 'exp2 not a calour Experiment class')
 
-    pdt.assert_frame_equal(exp1.feature_metadata, exp2.feature_metadata)
-    pdt.assert_frame_equal(exp1.sample_metadata, exp2.sample_metadata)
+    # test the metadata
+    sample_columns = exp1.sample_metadata.columns
+    feature_columns = exp1.feature_metadata.columns
+    if ignore_md_fields is not None:
+        for cignore in ignore_md_fields:
+            if cignore in sample_columns:
+                sample_columns = sample_columns.delete(sample_columns.get_loc(cignore))
+            if cignore in feature_columns:
+                feature_columns = feature_columns.delete(feature_columns.get_loc(cignore))
+    pdt.assert_frame_equal(exp1.feature_metadata[feature_columns], exp2.feature_metadata[feature_columns])
+    pdt.assert_frame_equal(exp1.sample_metadata[sample_columns], exp2.sample_metadata[sample_columns])
+
+    # test the data
     if almost_equal:
         dat1 = exp1.get_data(sparse=False, copy=True)
         dat2 = exp2.get_data(sparse=False, copy=True)

@@ -134,6 +134,8 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     if isinstance(predicate, str):
         predicate = func[predicate]
 
+    logger.debug('filter_by_data using function %r' % predicate)
+
     if exp.sparse:
         n = exp.data.shape[axis]
         select = np.ones(n, dtype=bool)

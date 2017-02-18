@@ -109,6 +109,26 @@ def log_n(exp, n=1, inplace=False):
     return exp
 
 
+def binary(exp, threshold=0, inplace=False):
+    '''Binary transform the data
+
+    Parameters
+    ----------
+    threshold : numeric, optional
+        positions are called present only if >threhold
+        (default=0)
+    inplace : bool, optional
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+
+    if exp.sparse:
+        exp.sparse = False
+
+    exp.data = exp.data > threshold
+    return exp
+
+
 def transform(exp, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.
 

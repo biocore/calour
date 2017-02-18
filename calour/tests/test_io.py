@@ -17,7 +17,8 @@ import skbio
 
 import calour as ca
 
-from calour._testing import Tests
+from calour._testing import Tests, assert_experiment_equal
+
 from calour.io import _create_biom_table_from_exp
 
 
@@ -54,6 +55,16 @@ class IOTests(Tests):
         self.assertTrue(scipy.sparse.issparse(exp.data))
         self._validate_read(exp)
 
+    def test_read_openms_bucket_table(self):
+        # load the openms bucket table with no metadata
+        exp = ca.read(self.openms_csv, data_file_type='openms', sparse=False)
+        self.assertEqual(len(exp.sample_metadata), 9)
+        self.assertEqual(len(exp.feature_metadata), 10)
+        self.assertEqual(exp.shape, (9, 10))
+        self.assertEqual(exp.data[0, :].sum(), 8554202)
+        self.assertEqual(exp.data[:, 1].sum(), 13795540)
+        self.assertEqual(exp.sparse, False)
+
     def test_read_not_sparse(self):
         # load the simple dataset as dense
         exp = ca.read(self.test1_biom, self.test1_samp, sparse=False)
@@ -64,6 +75,15 @@ class IOTests(Tests):
         # test loading without a mapping file
         exp = ca.read(self.test1_biom)
         self._validate_read(exp, validate_sample_metadata=False)
+
+    def test_read_taxa(self):
+        # test loading a taxonomy biom table and filtering/normalizing
+        exp = ca.read_taxa(self.test1_biom)
+        exp2 = ca.read(self.test1_biom)
+        exp2.filter_by_data('sum_abundance', cutoff=1000, inplace=True)
+        exp2.normalize(inplace=True)
+        assert_experiment_equal(exp, exp2)
+        self.assertIn('taxonomy', exp.feature_metadata)
 
     def test_create_biom_table_from_exp(self):
         exp = ca.read(self.test1_biom, self.test1_samp)
