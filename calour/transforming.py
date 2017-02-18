@@ -80,7 +80,7 @@ def binarize(exp, threshold=1, inplace=False):
     '''
     if not inplace:
         exp = deepcopy(exp)
-    preprocessing.scale(exp.data, threshold=threshold, copy=False)
+    preprocessing.binarize(exp.data, threshold=threshold, copy=False)
     return exp
 
 
@@ -106,26 +106,6 @@ def log_n(exp, n=1, inplace=False):
     exp.data[exp.data < n] = n
     exp.data = np.log2(exp.data)
 
-    return exp
-
-
-def binary(exp, threshold=0, inplace=False):
-    '''Binary transform the data
-
-    Parameters
-    ----------
-    threshold : numeric, optional
-        positions are called present only if >threhold
-        (default=0)
-    inplace : bool, optional
-    '''
-    if not inplace:
-        exp = deepcopy(exp)
-
-    if exp.sparse:
-        exp.sparse = False
-
-    exp.data = exp.data > threshold
     return exp
 
 
