@@ -213,7 +213,8 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
 
     fig.tight_layout()
 
-    if gui is not None:
+    if gui is None:
+        return fig
+    else:
         gui_obj()
-
-    return fig
+        return gui_obj

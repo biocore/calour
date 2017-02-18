@@ -22,29 +22,28 @@ class PlotGUI_Jupyter(PlotGUI):
 
     def __call__(self):
         super().__call__()
+        layout = ipywidgets.Layout(width='100%')
         self._ipyw_sid = ipywidgets.Text(
-            value='-', placeholder='Sample ID', description='Sample ID')
+            value='-', placeholder='Sample ID', description='Sample ID', layout=layout)
         self._ipyw_fid = ipywidgets.Text(
-            value='-', placeholder='Feature ID', description='Feature ID')
+            value='-', placeholder='Feature ID', description='Feature ID', layout=layout)
         self._ipyw_abund = ipywidgets.FloatText(
-            value=0, placeholder='Abundance', description='Abundance')
+            value=0, placeholder='Abundance', description='Abundance', layout=layout)
         self._ipyw_selected = ipywidgets.Label('0 features are selected')
         # display selected samples/features
         display(ipywidgets.VBox(
             [self._ipyw_selected, self._ipyw_sid, self._ipyw_fid, self._ipyw_abund]))
 
         self._ipyw_scol = ipywidgets.Dropdown(
-            options=self.exp.sample_metadata.columns.tolist(),
-            width='10%', max_width='10%')
+            options=self.exp.sample_metadata.columns.tolist(), width='10%')
         self._ipyw_scol.observe(self._on_change(axis=0))
         self._ipyw_fcol = ipywidgets.Dropdown(
-            options=self.exp.feature_metadata.columns.tolist(),
-            width='10%')
+            options=self.exp.feature_metadata.columns.tolist(), width='10%')
         self._ipyw_fcol.observe(self._on_change(axis=1))
         self._ipyw_smeta = ipywidgets.Text(
-            '-', placeholder='sample meta', description='')
+            '-', placeholder='sample meta', description='', width='100%')
         self._ipyw_fmeta = ipywidgets.Text(
-            '-', placeholder='feature meta', description='')
+            '-', placeholder='feature meta', description='', width='100%')
 
         display(ipywidgets.HBox([self._ipyw_scol, self._ipyw_smeta]))
         display(ipywidgets.HBox([self._ipyw_fcol, self._ipyw_fmeta]))
@@ -65,15 +64,16 @@ class PlotGUI_Jupyter(PlotGUI):
         annotate_selection.on_click(self._annotate)
         display(ipywidgets.HBox([print_axes_lim, save_selection, annotate_selection]))
 
-        self._ipywdb = ipywidgets.HTML('?')
-        self._ipywdb.layout.overflow = 'auto'
-        self._ipywdb.layout.overflow_x = 'auto'
-        self._ipywdb.layout.max_height = '50px'
-        self._ipywdb.layout.white_space = 'nowrap'
-        self._ipywdb.layout.border = '5px solid gray;'
-        self._ipywdb.background_color = 'red'
+        # display annotation for the selection
+        self._ipyw_annt = ipywidgets.HTML('no annotation found')
+        # self._ipyw_annt.layout.overflow = 'auto'
+        # self._ipyw_annt.layout.overflow_x = 'auto'
+        # self._ipyw_annt.layout.max_height = '50px'
+        # self._ipyw_annt.layout.white_space = 'nowrap'
+        # self._ipyw_annt.layout.border = '5px solid gray;'
+        # self._ipyw_annt.background_color = 'red'
         # self.ipywdb.layout.width = '200px'
-        display(self._ipywdb)
+        display(self._ipyw_annt)
 
     def _on_change(self, axis=0):
         '''Upon change in the dropdown sample or feature widgets, update their
@@ -119,8 +119,7 @@ class PlotGUI_Jupyter(PlotGUI):
         print([xlim_lower, xlim_upper, ylim_lower, ylim_upper])
 
     def _annotate(self, button):
-        '''Add database annotation to selected features
-        '''
+        '''Add annotation of the selected features to the database. '''
         if self._annotation_db is None:
             logger.warn('No database with add annotation capability selected (use plot(...,databases=[dbname])')
             return
@@ -148,14 +147,23 @@ class PlotGUI_Jupyter(PlotGUI):
                   'contamination': 'red',
                   'common': 'green',
                   'highfreq': 'green'}
-        for cannt in annt:
-            cstr = cannt[1]
-            cannotationid = cannt[0]['annotationid']
-            ccolor = colors.get(cannt[0], 'black')
-            l = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
-                 'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
-                 '<p style="color:%s;white-space:nowrap;">'
-                 '<a href="http://amnonim.webfactional.com/scdb_website/annotation_info/%d"'
-                 '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, cannotationid, cstr)
-            idata.append(l)
-        self._ipywdb.value = ''.join(idata)
+
+        try:
+            for cannt in annt:
+                cstr = cannt[1]
+                details = cannt[0]
+                print(cannt)
+                annt_type = details.get('annotationtype', 'None')
+                annt_id = details['annotationid']
+                ccolor = colors.get(annt_type, 'black')
+                l = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
+                     'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
+                     '<p style="color:%s;white-space:nowrap;">'
+                     '<a href="http://dbbact.org/annotation_info/%d"'
+                     '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, annt_id, cstr)
+                idata.append(l)
+        except Exception as e:
+            # use try/except to catch and show the error; otherwise the error goes unnoticed
+            self._ipyw_annt.value = repr(e)
+        else:
+            self._ipyw_annt.value = ''.join(idata)

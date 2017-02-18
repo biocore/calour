@@ -87,8 +87,8 @@ class PlotGUI(ABC):
 
         Returns
         -------
-        tuple of (str, str, numeric, str or ``None``)
-            sample id, feature id, abundance, taxonomy
+        tuple of (str, str, numeric, str or ``None``, dict)
+            sample id, feature id, abundance, taxonomy, annotation
         '''
         if 'taxonomy' in self.exp.feature_metadata:
             tax = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
