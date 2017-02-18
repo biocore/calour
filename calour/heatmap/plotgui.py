@@ -125,7 +125,8 @@ class PlotGUI(ABC):
     def connect_functions(self):
         '''Connect to the matplotlib callbacks for key and mouse '''
         canvas = self.figure.canvas
-        canvas.mpl_connect('scroll_event', self.scroll_zoom_callback)
+        # comment out scroll event for now
+        # canvas.mpl_connect('scroll_event', self.scroll_zoom_callback)
         canvas.mpl_connect('button_press_event', self.button_press_callback)
         canvas.mpl_connect('key_press_event', self.key_press_callback)
 

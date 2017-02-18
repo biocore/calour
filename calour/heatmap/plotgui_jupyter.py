@@ -22,48 +22,75 @@ class PlotGUI_Jupyter(PlotGUI):
 
     def __call__(self):
         super().__call__()
-        # self.labtax = Label('Feature:-')
-        self._labtax = ipywidgets.Label('-')
-        # self.labsamp = Label('Sample:')
-        self._labsamp = ipywidgets.Label('-')
-        self._copy_sample_info = ipywidgets.Button(description='CP', width='2%')
-        self._select_sample_info = ipywidgets.Dropdown(
+        self._ipyw_sid = ipywidgets.Text(
+            value='-', placeholder='Sample ID', description='Sample ID')
+        self._ipyw_fid = ipywidgets.Text(
+            value='-', placeholder='Feature ID', description='Feature ID')
+        self._ipyw_abund = ipywidgets.FloatText(
+            value=0, placeholder='Abundance', description='Abundance')
+        self._ipyw_selected = ipywidgets.Label('0 features are selected')
+        # display selected samples/features
+        display(ipywidgets.VBox(
+            [self._ipyw_selected, self._ipyw_sid, self._ipyw_fid, self._ipyw_abund]))
+
+        self._ipyw_scol = ipywidgets.Dropdown(
             options=self.exp.sample_metadata.columns.tolist(),
-            width='10%', max_width='10%', overflow_x='auto')
-        self._copy_feature_info = ipywidgets.Button(description='CP', width='2%')
-        self._select_feature_info = ipywidgets.Dropdown(
-            options=self.exp.feature_metadata.columns.tolist(), width='10%')
+            width='10%', max_width='10%')
+        self._ipyw_scol.observe(self._on_change(axis=0))
+        self._ipyw_fcol = ipywidgets.Dropdown(
+            options=self.exp.feature_metadata.columns.tolist(),
+            width='10%')
+        self._ipyw_fcol.observe(self._on_change(axis=1))
+        self._ipyw_smeta = ipywidgets.Text(
+            '-', placeholder='sample meta', description='')
+        self._ipyw_fmeta = ipywidgets.Text(
+            '-', placeholder='feature meta', description='')
 
-        self._lababund = ipywidgets.Label('abundance: -')
-        self._copy_view = ipywidgets.Button(description='Copy View')
-        self._copy_view.on_click(self._copy_view)
+        display(ipywidgets.HBox([self._ipyw_scol, self._ipyw_smeta]))
+        display(ipywidgets.HBox([self._ipyw_fcol, self._ipyw_fmeta]))
 
-        self._lab_selected = ipywidgets.Label('Selected: 0')
-        self._save_selection = ipywidgets.Button(description='Save')
-        self._annotate_selection = ipywidgets.Button(description='Annotate')
-        self._annotate_selection.on_click(lambda f: _annotate(f, self))
+        # # display zoom buttons
+        # zoom_in_y = ipywidgets.Button(description='+', width='3%')
+        # zoom_in_y.on_click(self._zoom_in_y)
+        # zoom_out_y = ipywidgets.Button(description='-', width='3%')
+        # zoom_out_y.on_click(self._zoom_out_y)
+        # display(ipywidgets.HBox([zoom_in_y, zoom_out_y]))
 
-        self._labdb = ipywidgets.HTML('?')
-        self._labdb.layout.overflow = 'auto'
-        self._labdb.layout.overflow_x = 'auto'
-        self._labdb.layout.max_height = '50px'
-        self._labdb.layout.white_space = 'nowrap'
-        self._labdb.layout.border = '5px solid gray;'
-        self._labdb.background_color = 'red'
-        # self.labdb.layout.width = '200px'
-        self._zoomin = ipywidgets.Button(description='+', width='3%')
-        self._zoomin.on_click(self._zoom_in)
-        self._zoomout = ipywidgets.Button(description='-', width='3%')
-        self._zoomout.on_click(self._zoom_out)
-        # display(HBox([self._zoomin,self._zoomout]))
+        print_axes_lim = ipywidgets.Button(description='print axes ranges')
+        print_axes_lim.on_click(self._print_axes_lim)
+        # TODO
+        save_selection = ipywidgets.Button(description='Save')
+        save_selection.on_click(self._annotate)
+        annotate_selection = ipywidgets.Button(description='Annotate')
+        annotate_selection.on_click(self._annotate)
+        display(ipywidgets.HBox([print_axes_lim, save_selection, annotate_selection]))
 
-        display(ipywidgets.HBox([self._copy_feature_info, self._select_feature_info, self._labtax]))
-        display(ipywidgets.HBox([self._copy_sample_info, self._select_sample_info, self._labsamp]))
-        display(ipywidgets.HBox([self._lababund, self._copy_view]))
-        display(ipywidgets.HBox([self._lab_selected, self._save_selection, self._annotate_selection]))
-        display(self._labdb)
-    @staticmethod
-    def _zoom_in(b):
+        self._ipywdb = ipywidgets.HTML('?')
+        self._ipywdb.layout.overflow = 'auto'
+        self._ipywdb.layout.overflow_x = 'auto'
+        self._ipywdb.layout.max_height = '50px'
+        self._ipywdb.layout.white_space = 'nowrap'
+        self._ipywdb.layout.border = '5px solid gray;'
+        self._ipywdb.background_color = 'red'
+        # self.ipywdb.layout.width = '200px'
+        display(self._ipywdb)
+
+    def _on_change(self, axis=0):
+        '''Upon change in the dropdown sample or feature widgets, update their
+        metadata values.'''
+        def inner(change):
+            if change['type'] == 'change' and change['name'] == 'value':
+                col = change['new']
+                if axis == 0:
+                    # need to convert all other types to str because it is a text widget.
+                    self._ipyw_smeta.value = str(
+                        self.exp.sample_metadata[col].iloc[self.current_select[axis]])
+                elif axis == 1:
+                    self._ipyw_fmeta.value = str(
+                        self.exp.feature_metadata[col].iloc[self.current_select[axis]])
+        return inner
+
+    def _zoom_in_y(self, button):
         ax = self.figure.gca()
         ylim_lower, ylim_upper = ax.get_ylim()
         xlim_lower, xlim_upper = ax.get_xlim()
@@ -74,7 +101,7 @@ class PlotGUI_Jupyter(PlotGUI):
         clear_output(wait=True)
         display(self.figure)
 
-    def _zoom_out(self, b):
+    def _zoom_out_y(self, button):
         ax = self.figure.gca()
         ylim_lower, ylim_upper = ax.get_ylim()
         xlim_lower, xlim_upper = ax.get_xlim()
@@ -85,13 +112,36 @@ class PlotGUI_Jupyter(PlotGUI):
         clear_output(wait=True)
         display(self.figure)
 
+    def _print_axes_lim(self, button):
+        ax = self.figure.gca()
+        ylim_lower, ylim_upper = ax.get_ylim()
+        xlim_lower, xlim_upper = ax.get_xlim()
+        print([xlim_lower, xlim_upper, ylim_lower, ylim_upper])
+
+    def _annotate(self, button):
+        '''Add database annotation to selected features
+        '''
+        if self._annotation_db is None:
+            logger.warn('No database with add annotation capability selected (use plot(...,databases=[dbname])')
+            return
+
+        # get the sequences of the selection
+        seqs = []
+        for cseqpos in self.selected_features.keys():
+            seqs.append(self.exp.feature_metadata.index[cseqpos])
+
+        # from calour.annotation import annotate_bacteria_gui
+        self._annotation_db.add_annotation(seqs, self.exp)
+
     def show_info(self):
         sid, fid, abd, tax, annt = self.get_info()
-        self._labtax.value = repr(tax)
-        self._labsamp.value = sid
-        self._labfeat.value = fid
-        self._lababund.value = 'abundance: {:.01f}'.format(abd)
-        self._lab_selected.value = '# selected: %d' % len(self.selected_features)
+        self._ipyw_sid.value = sid
+        self._ipyw_fid.value = fid
+        self._ipyw_abund.value = abd
+        self._ipyw_selected.value = '%d features are selected' % len(self.selected_features)
+        # need to convert all other types to str because it is a text widget.
+        self._ipyw_smeta.value = str(self.exp.sample_metadata.loc[sid, self._ipyw_scol.value])
+        self._ipyw_fmeta.value = str(self.exp.feature_metadata.loc[fid, self._ipyw_fcol.value])
 
         idata = []
         colors = {'diffexp': 'blue',
@@ -108,27 +158,4 @@ class PlotGUI_Jupyter(PlotGUI):
                  '<a href="http://amnonim.webfactional.com/scdb_website/annotation_info/%d"'
                  '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, cannotationid, cstr)
             idata.append(l)
-        self._labdb.value = ''.join(idata)
-
-
-def _copy_view(self, b):
-    ax = self.figure.gca()
-    ylim_lower, ylim_upper = ax.get_ylim()
-    xlim_lower, xlim_upper = ax.get_xlim()
-    print([xlim_lower, xlim_upper, ylim_lower, ylim_upper])
-
-
-def _annotate(self, b):
-    '''Add database annotation to selected features
-    '''
-    if self._annotation_db is None:
-        logger.warn('No database with add annotation capability selected (use plot(...,databases=[dbname])')
-        return
-
-    # get the sequences of the selection
-    seqs = []
-    for cseqpos in self.selected_features.keys():
-        seqs.append(self.exp.feature_metadata.index[cseqpos])
-
-    # from calour.annotation import annotate_bacteria_gui
-    self._annotation_db.add_annotation(seqs, self.exp)
+        self._ipywdb.value = ''.join(idata)
