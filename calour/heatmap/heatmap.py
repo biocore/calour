@@ -24,19 +24,19 @@ def _transition_index(l):
     -------
     >>> l = ['a', 'a', 'b']
     >>> list(_transition_index(l))
-    [(0, 'a'), (2, 'b')]
+    [(2, 'a'), (3, 'b')]
 
     Parameters
     ----------
-    l : list, 1-D array, pd.Series
-        l should have method of len and [
+    l : Iterable of arbitrary objects
     '''
-    cur = l[0]
-    yield 0, cur
-    for i in range(1, len(l)):
-        if l[i] != cur:
-            yield i, l[i]
-            cur = l[i]
+    it = enumerate(l)
+    i, item = next(it)
+    for i, current in it:
+        if item != current:
+            yield i, item
+            item = current
+    yield i + 1, item
 
 
 def plot(exp, sample_field=None, feature_field=None, max_features=1000,
@@ -163,39 +163,46 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
         ax.set_xlim((rect[0], rect[1]))
         ax.set_ylim((rect[2], rect[3]))
 
-    # plot vertical lines between sample groups and add x labels for the field
+    # plot vertical lines between sample groups and add x tick labels
     if sample_field is not None:
-        x_pos, x_val = zip(*[(pos, val) for pos, val in _transition_index(
-            exp.sample_metadata[sample_field])])
+        if sample_field not in exp.sample_metadata:
+            raise ValueError('Sample field %r not in sample metadata' % sample_field)
+        ax.set_xlabel(sample_field)
+        x_pos, x_val = zip(*[(pos, val) for pos, val in
+                             _transition_index(exp.sample_metadata[sample_field])])
         # samples start - 0.5 before and go to 0.5 after
-        for pos in x_pos[1:]:
+        for pos in x_pos[:-1]:
             ax.axvline(x=pos - 0.5, color='white')
-        x_pos = list(x_pos)
-        x_pos.append(exp.data.shape[0])
-        x_pos = np.array(x_pos)
+        x_pos = np.array([0] + list(x_pos))
+        # set tick/label at the middle of each sample group
         ax.set_xticks(x_pos[:-1] + (x_pos[1:] - x_pos[:-1]) / 2)
-        # shorten xlabels that are too long:
+        # shorten x tick labels that are too long:
         if xlabel_maxlen is not None:
-            x_val = [str(clabel[:2]) + '..' + str(clabel[5-xlabel_maxlen:]) if len(str(clabel)) > xlabel_maxlen else str(clabel) for clabel in x_val]
+            x_lab = [str(val) for val in x_val]
+            mid = xlabel_maxlen / 2
+            x_val = [lab[:mid] + '..' + lab[-mid:] if len(lab) > xlabel_maxlen else lab for lab in x_lab]
         ax.set_xticklabels(x_val, rotation=xlabel_rotation, ha='right')
 
-    # plot y ticks and labels
+    # dynamically plot y tick labels
     if feature_field is not None:
         if feature_field not in exp.feature_metadata:
-            raise ValueError('Feature field %s not in feature metadata' % feature_field)
-        labels = [x for x in exp.feature_metadata[feature_field]]
+            raise ValueError('Feature field %r not in feature metadata' % feature_field)
+        ax.set_ylabel(feature_field)
+
+        labels = exp.feature_metadata[feature_field].tolist()
+        # for each tick label, show 15 characters at most
         ylabel_maxlen = 15
         labels = [clabel[-ylabel_maxlen:] if len(clabel) > ylabel_maxlen else clabel for clabel in labels]
+
         xs = np.arange(len(labels))
 
-        # display only when zoomed enough
         def format_fn(tick_val, tick_pos):
-            if int(tick_val) in xs:
+            if 0 <= tick_val <= xs[-1]:
                 return labels[int(tick_val)]
             else:
                 return ''
         if max_features > 0:
-            # set the maximal number of feature lables
+            # set the maximal number of feature labels
             ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_fn))
             ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(max_features, integer=True))
             ax.tick_params(axis='y', labelsize=8)
@@ -204,12 +211,16 @@ def plot(exp, sample_field=None, feature_field=None, max_features=1000,
             ax.set_yticks(xs, fontsize=8)
 
     # set the mouse hover string to the value of abundance
-    def x_y_info(x, y):
-        z = image.get_array()[int(y), int(x)]
-        if logit:
-            z = np.power(2, z)
-        return '{0:.01f}'.format(z)
-    ax.format_coord = x_y_info
+    def format_coord(x, y):
+        row = int(x + 0.5)
+        col = int(y + 0.5)
+        numrows, numcols = exp.shape
+        if 0 <= col < numcols and 0 <= row < numrows:
+            z = exp.data[row, col]
+            return 'x=%1.2f, y=%1.2f, z=%1.2f' % (x, y, z)
+        else:
+            return 'x=%1.2f, y=%1.2f' % (x, y)
+    ax.format_coord = format_coord
 
     fig.tight_layout()
 
