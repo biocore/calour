@@ -62,15 +62,16 @@ class PlotGUI_QT5(PlotGUI):
                 logger.debug('window not in app window list. Not removed')
 
     def show_info(self):
-        sid, fid, abd, tax, annt = self.get_info()
-        n = 20
-        self.app_window.w_taxonomy.setText('%r' % fid)
+        sid, fid, abd, annt = self.get_info()
         self.app_window.w_abund.setText('{:.01f}'.format(abd))
-        self.app_window.w_fid.setText(fill(fid, n))
-        self.app_window.w_sid.setText(fill(sid, n))
-        sample_field = str(self.app_window.w_field.currentText())
-        self.app_window.w_field_val.setText(
+        self.app_window.w_fid.setText(fid)
+        self.app_window.w_sid.setText(sid)
+        sample_field = str(self.app_window.w_sfield.currentText())
+        self.app_window.w_sfield_val.setText(
             self.exp.sample_metadata[sample_field][self.current_select[0]])
+        feature_field = str(self.app_window.w_ffield.currentText())
+        self.app_window.w_ffield_val.setText(
+            self.exp.feature_metadata[feature_field][self.current_select[1]])
 
         self._display_annotation_in_qlistwidget(annt)
 
@@ -139,25 +140,33 @@ class ApplicationWindow(QMainWindow):
         # set the GUI widgets
         # the left side (right side is the heatmap)
         userside = QVBoxLayout()
-        # field to display
-        lbox_field = QHBoxLayout()
-        self.w_field = QComboBox()
-        self.w_field_val = QLabel()
-        self.w_field_val.setText('NA')
-        lbox_field.addWidget(self.w_field)
-        lbox_field.addWidget(self.w_field_val)
-        userside.addLayout(lbox_field)
+        # sample field to display
+        lbox_sfield = QHBoxLayout()
+        self.w_sfield = QComboBox()
+        self.w_sfield_val = QLabel()
+        self.w_sfield_val.setText('NA')
+        lbox_sfield.addWidget(self.w_sfield)
+        lbox_sfield.addWidget(self.w_sfield_val)
+        userside.addLayout(lbox_sfield)
+        # sample field to display
+        lbox_ffield = QHBoxLayout()
+        self.w_ffield = QComboBox()
+        self.w_ffield_val = QLabel()
+        self.w_ffield_val.setText('NA')
+        lbox_ffield.addWidget(self.w_ffield)
+        lbox_ffield.addWidget(self.w_ffield_val)
+        userside.addLayout(lbox_ffield)
         # taxonomy
-        lbox_tax = QHBoxLayout()
-        taxlabel = QLabel(text='tax:')
-        taxscroll = QScrollArea()
-        taxscroll.setFixedHeight(18)
-        self.w_taxonomy = QLabel(text='NA')
-        taxscroll.setWidget(self.w_taxonomy)
-        self.w_taxonomy.setMinimumWidth(800)
-        lbox_tax.addWidget(taxlabel)
-        lbox_tax.addWidget(taxscroll)
-        userside.addLayout(lbox_tax)
+        # lbox_tax = QHBoxLayout()
+        # taxlabel = QLabel(text='tax:')
+        # taxscroll = QScrollArea()
+        # taxscroll.setFixedHeight(18)
+        # self.w_taxonomy = QLabel(text='NA')
+        # taxscroll.setWidget(self.w_taxonomy)
+        # self.w_taxonomy.setMinimumWidth(800)
+        # lbox_tax.addWidget(taxlabel)
+        # lbox_tax.addWidget(taxscroll)
+        # userside.addLayout(lbox_tax)
         # sample id
         lbox_sid = QHBoxLayout()
         sidlabel = QLabel(text='sample ID:')
@@ -213,7 +222,9 @@ class ApplicationWindow(QMainWindow):
         # fill the values for the gui
         # add the sample field combobox values
         for cfield in gui.exp.sample_metadata.columns:
-            self.w_field.addItem(cfield)
+            self.w_sfield.addItem(str(cfield))
+        for cfield in gui.exp.feature_metadata.columns:
+            self.w_ffield.addItem(str(cfield))
 
         heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
         heatmap.setFocus()

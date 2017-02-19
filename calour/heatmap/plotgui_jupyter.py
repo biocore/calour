@@ -133,7 +133,7 @@ class PlotGUI_Jupyter(PlotGUI):
         self._annotation_db.add_annotation(seqs, self.exp)
 
     def show_info(self):
-        sid, fid, abd, tax, annt = self.get_info()
+        sid, fid, abd, annt = self.get_info()
         self._ipyw_sid.value = sid
         self._ipyw_fid.value = fid
         self._ipyw_abund.value = abd

@@ -87,17 +87,13 @@ class PlotGUI(ABC):
 
         Returns
         -------
-        tuple of (str, str, numeric, str or ``None``, dict)
+        tuple of (str, str, numeric, dict)
             sample id, feature id, abundance, taxonomy, annotation
         '''
-        if 'taxonomy' in self.exp.feature_metadata:
-            tax = self.exp.feature_metadata['taxonomy'][self.current_select[1]]
-        else:
-            tax = None
-
-        fid = self.exp.feature_metadata.index[self.current_select[1]]
-        sid = self.exp.sample_metadata.index[self.current_select[0]]
-        abd = self.exp.data[self.current_select[0], self.current_select[1]]
+        row, col = self.current_select
+        fid = self.exp.feature_metadata.index[col]
+        sid = self.exp.sample_metadata.index[row]
+        abd = self.exp.data[row, col]
 
         annt = []
         for cdatabase in self.databases:
@@ -113,7 +109,7 @@ class PlotGUI(ABC):
                 cannt = 'error connecting to db %s' % cdatabase.get_name()
             annt.extend(cannt)
 
-        return sid, fid, abd, tax, annt
+        return sid, fid, abd, annt
 
     def show_info(self):
         print(self.get_info())
