@@ -52,7 +52,7 @@ class PlotGUI(ABC):
     zoom_scale :
     scroll_offset :
     '''
-    def __init__(self, exp, zoom_scale=2, scroll_offset=0, figure=None, databases=None):
+    def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None):
         # the Experiment being plotted
         self.exp = exp
         # how much zooming in on key press
@@ -72,10 +72,7 @@ class PlotGUI(ABC):
         self._annotation_db = None
 
         # create the figure to plot the heatmap into
-        if figure is None:
-            self.figure = plt.figure()
-        else:
-            self.figure = figure
+        self.figure = plt.figure()
 
     @property
     def axis(self):

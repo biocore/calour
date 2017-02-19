@@ -1,6 +1,5 @@
 import sys
 from logging import getLogger
-from textwrap import fill
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -25,7 +24,7 @@ class PlotGUI_QT5(PlotGUI):
 
     Attributes
     ----------
-    figure
+    figure : ``matplotlib.figure.Figure``
     app : QT5 App created
     app_window : Windows belonging to the QT5 App
     databases :
@@ -48,7 +47,7 @@ class PlotGUI_QT5(PlotGUI):
         self.figure = self.app_window.plotfigure
 
     def __call__(self):
-        logger.debug('opening plot window')
+        logger.debug('opening Qt5 window')
         super().__call__()
         try:
             self.app_window.show()
@@ -68,10 +67,10 @@ class PlotGUI_QT5(PlotGUI):
         self.app_window.w_sid.setText(sid)
         sample_field = str(self.app_window.w_sfield.currentText())
         self.app_window.w_sfield_val.setText(
-            self.exp.sample_metadata[sample_field][self.current_select[0]])
+            str(self.exp.sample_metadata[sample_field][self.current_select[0]]))
         feature_field = str(self.app_window.w_ffield.currentText())
         self.app_window.w_ffield_val.setText(
-            self.exp.feature_metadata[feature_field][self.current_select[1]])
+            str(self.exp.feature_metadata[feature_field][self.current_select[1]]))
 
         self._display_annotation_in_qlistwidget(annt)
 
@@ -137,58 +136,67 @@ class ApplicationWindow(QMainWindow):
 
         self.main_widget = QWidget(self)
 
+        scroll_box_width = 800
         # set the GUI widgets
-        # the left side (right side is the heatmap)
+        # the user side on the right
         userside = QVBoxLayout()
         # sample field to display
-        lbox_sfield = QHBoxLayout()
+        lbox = QHBoxLayout()
         self.w_sfield = QComboBox()
-        self.w_sfield_val = QLabel()
-        self.w_sfield_val.setText('NA')
-        lbox_sfield.addWidget(self.w_sfield)
-        lbox_sfield.addWidget(self.w_sfield_val)
-        userside.addLayout(lbox_sfield)
-        # sample field to display
-        lbox_ffield = QHBoxLayout()
+        self.w_sfield_val = QLabel(text='NA')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
+        self.w_sfield_val.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_sfield_val)
+        lbox.addWidget(self.w_sfield)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
+        # add the sample field combobox values
+        for i in gui.exp.sample_metadata.columns:
+            self.w_sfield.addItem(str(i))
+        # feature field to display
+        lbox = QHBoxLayout()
         self.w_ffield = QComboBox()
-        self.w_ffield_val = QLabel()
-        self.w_ffield_val.setText('NA')
-        lbox_ffield.addWidget(self.w_ffield)
-        lbox_ffield.addWidget(self.w_ffield_val)
-        userside.addLayout(lbox_ffield)
-        # taxonomy
-        # lbox_tax = QHBoxLayout()
-        # taxlabel = QLabel(text='tax:')
-        # taxscroll = QScrollArea()
-        # taxscroll.setFixedHeight(18)
-        # self.w_taxonomy = QLabel(text='NA')
-        # taxscroll.setWidget(self.w_taxonomy)
-        # self.w_taxonomy.setMinimumWidth(800)
-        # lbox_tax.addWidget(taxlabel)
-        # lbox_tax.addWidget(taxscroll)
-        # userside.addLayout(lbox_tax)
+        self.w_ffield_val = QLabel(text='NA')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
+        self.w_ffield_val.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_ffield_val)
+        lbox.addWidget(self.w_ffield)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
+        for i in gui.exp.feature_metadata.columns:
+            self.w_ffield.addItem(str(i))
+
         # sample id
-        lbox_sid = QHBoxLayout()
-        sidlabel = QLabel(text='sample ID:')
+        lbox = QHBoxLayout()
+        label = QLabel(text='Sample ID:')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
         self.w_sid = QLabel(text='?')
-        lbox_sid.addWidget(sidlabel)
-        lbox_sid.addWidget(self.w_sid)
-        userside.addLayout(lbox_sid)
+        self.w_sid.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_sid)
+        lbox.addWidget(label)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
         # feature id
-        lbox_fid = QHBoxLayout()
-        fidlabel = QLabel(text='feature ID:')
-        # fidlabel.setWordWrap(1)
+        lbox = QHBoxLayout()
+        label = QLabel(text='Feature ID:')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
         self.w_fid = QLabel(text='?')
-        lbox_fid.addWidget(fidlabel)
-        lbox_fid.addWidget(self.w_fid)
-        userside.addLayout(lbox_fid)
+        self.w_fid.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_fid)
+        lbox.addWidget(label)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
         # abundance value
-        lbox_reads = QHBoxLayout()
-        readslabel = QLabel(text='abundance:')
+        lbox = QHBoxLayout()
+        label = QLabel(text='Abundance:')
         self.w_abund = QLabel(text='?')
-        lbox_reads.addWidget(readslabel)
-        lbox_reads.addWidget(self.w_abund)
-        userside.addLayout(lbox_reads)
+        lbox.addWidget(label)
+        lbox.addWidget(self.w_abund)
+        userside.addLayout(lbox)
         # buttons
         lbox_buttons = QHBoxLayout()
         self.w_sequence = QPushButton(text='Copy Seq')
@@ -202,7 +210,7 @@ class ApplicationWindow(QMainWindow):
         self.w_dblist = QListWidget()
         self.w_dblist.itemDoubleClicked.connect(self.double_click_annotation)
         userside.addWidget(self.w_dblist)
-
+        # buttons at bottom
         lbox_buttons_bottom = QHBoxLayout()
         self.w_save_fasta = QPushButton(text='Save Seqs')
         lbox_buttons_bottom.addWidget(self.w_save_fasta)
@@ -210,8 +218,12 @@ class ApplicationWindow(QMainWindow):
         lbox_buttons_bottom.addWidget(self.w_enrichment)
         userside.addLayout(lbox_buttons_bottom)
 
-        layout = QHBoxLayout(self.main_widget)
+        # the heatmap on the left side
         heatmap = MplCanvas(self.main_widget, width=5, height=4, dpi=100)
+        heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
+        heatmap.setFocus()
+
+        layout = QHBoxLayout(self.main_widget)
         frame = QFrame()
         splitter = QSplitter(QtCore.Qt.Horizontal, self.main_widget)
         splitter.addWidget(heatmap)
@@ -219,17 +231,6 @@ class ApplicationWindow(QMainWindow):
         splitter.addWidget(frame)
         layout.addWidget(splitter)
 
-        # fill the values for the gui
-        # add the sample field combobox values
-        for cfield in gui.exp.sample_metadata.columns:
-            self.w_sfield.addItem(str(cfield))
-        for cfield in gui.exp.feature_metadata.columns:
-            self.w_ffield.addItem(str(cfield))
-
-        heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
-        heatmap.setFocus()
-
-        self.plotaxes = heatmap.axes
         self.plotfigure = heatmap.figure
         self.gui = gui
 
