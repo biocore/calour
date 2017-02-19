@@ -21,9 +21,7 @@ class PlotTests(Tests):
 
     def test_create_plot_gui(self):
         row, col = 1, 2
-        # not test qt5 because getting error on linux:
-        # QXcbConnection: Could not connect to display
-        for gui in ('cli', 'jupyter'):
+        for gui in ('cli', 'qt5', 'jupyter'):
             obs = self.test1.create_plot_gui(gui=gui, databases=[])
             obs.current_select = row, col
             sid, fid, abd, annt = obs.get_info()
