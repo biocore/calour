@@ -1,11 +1,15 @@
 # Check on http://lint.travis-ci.org/ after modifying it!
-sudo: false
+sudo: required
 language: c
 os:
   - linux
   - osx
 env:
   - PYVERSION="3.5"
+addons:
+  apt:
+    packages:
+      - xvfb
 before_install:
   - echo "$TRAVIS_OS_NAME"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
@@ -26,6 +30,9 @@ install:
   - source activate test_env
   - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
+before_script:
+  - export DISPLAY=:99.0
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
   - WITH_COVERAGE=TRUE make all
 notifications:
