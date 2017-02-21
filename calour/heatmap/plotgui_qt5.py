@@ -5,12 +5,13 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
-                             QSizePolicy, QWidget, QPushButton, QLabel, QListWidget, QSplitter,
-                             QFrame, QComboBox, QScrollArea, QListWidgetItem, QDialogButtonBox,
-                             QApplication)
+                             QSizePolicy, QWidget, QPushButton,
+                             QLabel, QListWidget, QSplitter, QFrame,
+                             QComboBox, QScrollArea, QListWidgetItem,
+                             QDialogButtonBox, QApplication)
 
 from .plotgui import PlotGUI
-from calour import analysis
+from .. import analysis
 
 
 logger = getLogger(__name__)
@@ -20,82 +21,77 @@ class PlotGUI_QT5(PlotGUI):
     '''QT5 version of plot winfow GUI
 
     We open the figure as a widget inside the qt5 window
+
+    Attributes
+    ----------
+    figure : ``matplotlib.figure.Figure``
+    app : QT5 App created
+    app_window : Windows belonging to the QT5 App
+    databases :
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
-
-    def get_figure(self, newfig=None):
-        app_created = False
+        # create qt app
         app = QtCore.QCoreApplication.instance()
-        logger.debug('Qt app is %s' % app)
         if app is None:
-            # app = QApplication(sys.argv)
             app = QApplication(sys.argv)
-            app_created = True
             logger.debug('Qt app created')
         self.app = app
-        self.app_created = app_created
         if not hasattr(app, 'references'):
+            # store references to all the windows
             app.references = set()
+        # create app window
+        self.app_window = ApplicationWindow(self)
+        app.references.add(self.app_window)
+        self.app_window.setWindowTitle("Calour")
+        self.figure = self.app_window.plotfigure
 
-        self.aw = ApplicationWindow(self)
-        app.references.add(self.aw)
-        self.aw.setWindowTitle("Calour")
-        self.aw.show()
-        return self.aw.plotfigure
-
-    def run_gui(self):
-        logger.debug('opening plot window')
-        self.app.exec_()
-        # nice cleanup
-        if self.aw in self.app.references:
-            logger.debug('removing window from app window list')
-            self.app.references.remove(self.aw)
-        else:
-            logger.debug('window not in app window list. Not removed')
+    def __call__(self):
+        logger.debug('opening Qt5 window')
+        super().__call__()
+        try:
+            self.app_window.show()
+            self.app.exec_()
+        finally:
+            # clean up when the qt app is closed
+            if self.app_window in self.app.references:
+                logger.debug('removing window from app window list')
+                self.app.references.remove(self.app_window)
+            else:
+                logger.debug('window not in app window list. Not removed')
 
     def show_info(self):
-        if 'taxonomy' in self.exp.feature_metadata:
-            taxname = self.exp.feature_metadata['taxonomy'][self.last_select_feature]
-        else:
-            taxname = 'NA'
-        sequence = self.exp.feature_metadata.index[self.last_select_feature]
-        self.aw.w_taxonomy.setText(taxname)
-        self.aw.w_reads.setText('reads:{:.01f}'.format(self.exp.get_data()[self.last_select_sample, self.last_select_feature]))
-        # self.aw.w_dblist.addItem(taxname)
-        csample_field = str(self.aw.w_field.currentText())
-        self.aw.w_field_val.setText(str(self.exp.sample_metadata[csample_field][self.last_select_sample]))
+        sid, fid, abd, annt = self.get_info()
+        self.app_window.w_abund.setText('{:.01f}'.format(abd))
+        self.app_window.w_fid.setText(fid)
+        self.app_window.w_sid.setText(sid)
+        sample_field = str(self.app_window.w_sfield.currentText())
+        self.app_window.w_sfield_val.setText(
+            str(self.exp.sample_metadata[sample_field][self.current_select[0]]))
+        feature_field = str(self.app_window.w_ffield.currentText())
+        self.app_window.w_ffield_val.setText(
+            str(self.exp.feature_metadata[feature_field][self.current_select[1]]))
 
-        self.aw.w_dblist.clear()
-        info = []
-        for cdatabase in self.databases:
-            try:
-                cinfo = cdatabase.get_seq_annotation_strings(sequence)
-                if len(cinfo) == 0:
-                    cinfo = [[{'annotationtype': 'not found'}, 'No annotation found in database %s' % cdatabase.get_name()]]
-                else:
-                    for cannotation in cinfo:
-                        cannotation[0]['_db_interface'] = cdatabase
-            except:
-                cinfo = 'error connecting to db %s' % cdatabase.get_name()
-            info.extend(cinfo)
-        self._display_annotation_in_qlistwidget(info)
+        self._display_annotation_in_qlistwidget(annt)
 
-    def _display_annotation_in_qlistwidget(self, info):
+    def _display_annotation_in_qlistwidget(self, annt):
         '''Add a line to the annotation list
-        Does not erase previous lines
+
+        It does not erase previous lines.
 
         Parameters
         ----------
-        info : list of (dict, string)
+        annt : list of (dict, str)
             dict : contains the key 'annotationtype' and determines the annotation color
             also contains all other annotation data needed for right click menu/double click
-            string : str
-                The string to add to the list
+            str : The string to add to the list
         '''
-        for cinfo in info:
-            details = cinfo[0]
-            newitem = QListWidgetItem(cinfo[1])
+        # clear the previous annotation box
+        self.app_window.w_dblist.clear()
+
+        for cannt in annt:
+            details = cannt[0]
+            newitem = QListWidgetItem(cannt[1])
             newitem.setData(QtCore.Qt.UserRole, details)
             if details['annotationtype'] == 'diffexp':
                 ccolor = QtGui.QColor(0, 0, 200)
@@ -108,11 +104,20 @@ class PlotGUI_QT5(PlotGUI):
             else:
                 ccolor = QtGui.QColor(0, 0, 0)
             newitem.setForeground(ccolor)
-            self.aw.w_dblist.addItem(newitem)
+            self.app_window.w_dblist.addItem(newitem)
 
 
 class MplCanvas(FigureCanvas):
-    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.).
+
+    Parameters
+    ----------
+    parent :
+    width, height : Numeric
+        size of the canvas
+    dpi : int
+
+    """
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
@@ -131,35 +136,67 @@ class ApplicationWindow(QMainWindow):
 
         self.main_widget = QWidget(self)
 
+        scroll_box_width = 800
         # set the GUI widgets
-        # the left side (right side is the heatmap)
+        # the user side on the right
         userside = QVBoxLayout()
-        # field to display
-        lbox_field = QHBoxLayout()
-        self.w_field = QComboBox()
-        self.w_field_val = QLabel()
-        self.w_field_val.setText('NA')
-        lbox_field.addWidget(self.w_field)
-        lbox_field.addWidget(self.w_field_val)
-        userside.addLayout(lbox_field)
-        # taxonomy
-        lbox_tax = QHBoxLayout()
-        taxlabel = QLabel(text='tax:')
-        taxscroll = QScrollArea()
-        taxscroll.setFixedHeight(18)
-        self.w_taxonomy = QLabel(text='NA')
-        taxscroll.setWidget(self.w_taxonomy)
-        self.w_taxonomy.setMinimumWidth(800)
-        lbox_tax.addWidget(taxlabel)
-        lbox_tax.addWidget(taxscroll)
-        userside.addLayout(lbox_tax)
-        # reads
-        lbox_reads = QHBoxLayout()
-        readslabel = QLabel(text='reads:')
-        self.w_reads = QLabel(text='?')
-        lbox_reads.addWidget(readslabel)
-        lbox_reads.addWidget(self.w_reads)
-        userside.addLayout(lbox_reads)
+        # sample field to display
+        lbox = QHBoxLayout()
+        self.w_sfield = QComboBox()
+        self.w_sfield_val = QLabel(text='NA')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
+        self.w_sfield_val.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_sfield_val)
+        lbox.addWidget(self.w_sfield)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
+        # add the sample field combobox values
+        for i in gui.exp.sample_metadata.columns:
+            self.w_sfield.addItem(str(i))
+        # feature field to display
+        lbox = QHBoxLayout()
+        self.w_ffield = QComboBox()
+        self.w_ffield_val = QLabel(text='NA')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
+        self.w_ffield_val.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_ffield_val)
+        lbox.addWidget(self.w_ffield)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
+        for i in gui.exp.feature_metadata.columns:
+            self.w_ffield.addItem(str(i))
+
+        # sample id
+        lbox = QHBoxLayout()
+        label = QLabel(text='Sample ID:')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
+        self.w_sid = QLabel(text='?')
+        self.w_sid.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_sid)
+        lbox.addWidget(label)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
+        # feature id
+        lbox = QHBoxLayout()
+        label = QLabel(text='Feature ID:')
+        scroll = QScrollArea()
+        scroll.setFixedHeight(18)
+        self.w_fid = QLabel(text='?')
+        self.w_fid.setMinimumWidth(scroll_box_width)
+        scroll.setWidget(self.w_fid)
+        lbox.addWidget(label)
+        lbox.addWidget(scroll)
+        userside.addLayout(lbox)
+        # abundance value
+        lbox = QHBoxLayout()
+        label = QLabel(text='Abundance:')
+        self.w_abund = QLabel(text='?')
+        lbox.addWidget(label)
+        lbox.addWidget(self.w_abund)
+        userside.addLayout(lbox)
         # buttons
         lbox_buttons = QHBoxLayout()
         self.w_sequence = QPushButton(text='Copy Seq')
@@ -173,7 +210,7 @@ class ApplicationWindow(QMainWindow):
         self.w_dblist = QListWidget()
         self.w_dblist.itemDoubleClicked.connect(self.double_click_annotation)
         userside.addWidget(self.w_dblist)
-
+        # buttons at bottom
         lbox_buttons_bottom = QHBoxLayout()
         self.w_save_fasta = QPushButton(text='Save Seqs')
         lbox_buttons_bottom.addWidget(self.w_save_fasta)
@@ -181,8 +218,12 @@ class ApplicationWindow(QMainWindow):
         lbox_buttons_bottom.addWidget(self.w_enrichment)
         userside.addLayout(lbox_buttons_bottom)
 
-        layout = QHBoxLayout(self.main_widget)
+        # the heatmap on the left side
         heatmap = MplCanvas(self.main_widget, width=5, height=4, dpi=100)
+        heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
+        heatmap.setFocus()
+
+        layout = QHBoxLayout(self.main_widget)
         frame = QFrame()
         splitter = QSplitter(QtCore.Qt.Horizontal, self.main_widget)
         splitter.addWidget(heatmap)
@@ -190,15 +231,6 @@ class ApplicationWindow(QMainWindow):
         splitter.addWidget(frame)
         layout.addWidget(splitter)
 
-        # fill the values for the gui
-        # add the sample field combobox values
-        for cfield in gui.exp.sample_metadata.columns:
-            self.w_field.addItem(cfield)
-
-        heatmap.setFocusPolicy(QtCore.Qt.ClickFocus)
-        heatmap.setFocus()
-
-        self.plotaxes = heatmap.axes
         self.plotfigure = heatmap.figure
         self.gui = gui
 
@@ -220,7 +252,7 @@ class ApplicationWindow(QMainWindow):
     def copy_sequence(self):
         '''Copy the sequence to the clipboard
         '''
-        cseq = self.gui.exp.feature_metadata.index[self.gui.last_select_feature]
+        cseq = self.gui.exp.feature_metadata.index[self.gui.current_select[1]]
         clipboard = QApplication.clipboard()
         clipboard.setText(cseq)
 
@@ -287,12 +319,13 @@ class SListWindow(QtWidgets.QDialog):
         '''Create a list window with items in the list and the listname as specified
 
         Parameters
+        ----------
         listdata: list of str (optional)
             the data to show in the list
         listname: str (optional)
             name to display above the list
         '''
-        super(SListWindow, self).__init__()
+        super().__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         if listname is not None:
             self.setWindowTitle(listname)

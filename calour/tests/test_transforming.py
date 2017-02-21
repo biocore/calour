@@ -56,6 +56,12 @@ class TestTransforming(Tests):
         obs = self.test2.scale(inplace=True)
         self.assertIs(obs, self.test2)
 
+    def test_binarize(self):
+        obs = self.test2.binarize()
+        self.assertIsNot(obs, self.test2)
+        obs = self.test2.binarize(inplace=True)
+        self.assertIs(obs, self.test2)
+
     def test_log_n(self):
         obs = self.test2.log_n()
         self.test2.data = np.log2(
