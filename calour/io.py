@@ -89,7 +89,7 @@ def _read_openms_csv(fp, transpose=True):
     sid = table.columns[1:]
     oid = table[sample_id_col].values
     logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
-    data = table.values[:, 1:]
+    data = table.values[:, 1:].astype(float)
     feature_md = pd.DataFrame(index=oid)
 
     if transpose:
@@ -113,18 +113,29 @@ def _get_md_from_biom(table):
         md_df = pd.DataFrame(index=ids)
     else:
         md_df = pd.DataFrame([dict(tmd) for tmd in metadata], index=ids)
-
+    # duplicate the index to a column so we can select it
+    md_df['id'] = ids
     return md_df
 
 
-def _read_table(f):
+def _read_table(f, encoding=None):
     '''Read tab-delimited table file.
 
     It is used to read sample metadata (mapping) file and feature
     metadata file
 
+    Parameters
+    ----------
+    f : str
+        the file name to read
+    encoding : str or None (optional)
+        None (default) to use pandas default encoder, str to specify encoder name (see pandas.read_table() documentation)
+
+    Returns
+    -------
+    pandas.DataFrame with index set to first column (as str)
     '''
-    table = pd.read_table(f, sep='\t')
+    table = pd.read_table(f, sep='\t', encoding=encoding)
     table.fillna('na', inplace=True)
     table.set_index(table.columns[0], drop=False, inplace=True)
     # make sure the sample ID is string-type
@@ -166,12 +177,11 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     '''
     logger.info('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type='openms', sparse=False, **kwargs)
-    # record the original total read count into sample metadata
+               data_file_type='openms', sparse=sparse, **kwargs)
     if normalize:
         exp.normalize(inplace=True, total=rescale)
     elif rescale:
-        exp.normalize(inplace=True, total=rescale)
+        exp.rescale(inplace=True, total=rescale)
 
     exp.sample_metadata['id'] = exp.sample_metadata.index.values
 
@@ -219,7 +229,7 @@ def read_taxa(data_file, sample_metadata_file=None,
 
 
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True, data_file_type='biom'):
+         description='', sparse=True, data_file_type='biom', encoding=None):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -242,6 +252,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
+    encoding : str or None (optional)
+        encoder for the metadata files.
+        None (default) to use pandas default encoder, str to specify encoder name (see pandas.read_table() documentation)
 
     Returns
     -------
@@ -259,14 +272,16 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # load the sample metadata file
     if sample_metadata_file is not None:
         # reorder the sample id to align with biom
-        sample_metadata = _read_table(sample_metadata_file).loc[sid, ]
-        exp_metadata['map_md5'] = get_file_md5(sample_metadata_file)
+        sample_metadata = _read_table(sample_metadata_file, encoding=encoding).loc[sid, ]
+        exp_metadata['map_md5'] = get_file_md5(sample_metadata_file, encoding=encoding)
     else:
         sample_metadata = pd.DataFrame(index=sid)
+        sample_metadata['id'] = sample_metadata.index
+
     # load the feature metadata file
     if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
-        fm = _read_table(feature_metadata_file).loc[oid, ]
+        fm = _read_table(feature_metadata_file, encoding=encoding).loc[oid, ]
         # combine it with the metadata from biom
         feature_metadata = pd.concat([fm, md], axis=1)
     else:
@@ -329,6 +344,8 @@ def save_biom(exp, f, fmt='hdf5', addtax=True):
         with open(f, 'w') as f:
             tab.to_json("calour", f)
     elif fmt == 'txt':
+        if addtax:
+            logger.warning('.txt format does not support taxonomy information in save. Saving without taxonomy.')
         s = tab.to_tsv()
         with open(f, 'w') as f:
             f.write(s)

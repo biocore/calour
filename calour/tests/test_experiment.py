@@ -7,8 +7,10 @@
 # ----------------------------------------------------------------------------
 
 from unittest import main
+from copy import copy, deepcopy
 
 import numpy as np
+from scipy import sparse
 
 from calour._testing import Tests, assert_experiment_equal
 import calour as ca
@@ -102,6 +104,57 @@ class ExperimentTests(Tests):
 
         assert_experiment_equal(new, exp)
 
+    def test_copy_experiment(self):
+        exp = copy(self.test1)
+        assert_experiment_equal(exp, self.test1)
+        exp = deepcopy(self.test1)
+        assert_experiment_equal(exp, self.test1)
+
+    def test_get_data_default(self):
+        # default - do not modify the data
+        exp = deepcopy(self.test1)
+        data = exp.get_data()
+        self.assertTrue(sparse.issparse(data))
+        self.assertEqual(data.sum(), exp.data.sum())
+        # test it's not a copy but inplace
+        self.assertIs(data, exp.data)
+
+    def test_get_data_copy(self):
+        # lets force it to copy
+        exp = deepcopy(self.test1)
+        data = exp.get_data(copy=True)
+        self.assertTrue(sparse.issparse(data))
+        self.assertEqual(data.sum(), exp.data.sum())
+        # test it's a copy but inplace
+        self.assertIsNot(data, exp.data)
+
+    def test_get_data_non_sparse(self):
+        # force non-sparse, should copy
+        exp = deepcopy(self.test1)
+        data = exp.get_data(sparse=False)
+        self.assertFalse(sparse.issparse(data))
+        self.assertEqual(data.sum(), exp.data.sum())
+        # test it's a copy but inplace
+        self.assertIsNot(data, exp.data)
+
+    def test_get_data_sparse(self):
+        # force sparse, should not copy
+        exp = deepcopy(self.test1)
+        data = exp.get_data(sparse=True)
+        self.assertTrue(sparse.issparse(data))
+        self.assertEqual(data.sum(), exp.data.sum())
+        # test it's not a copy but inplace
+        self.assertIs(data, exp.data)
+
+    def test_get_data_sparse_copy(self):
+        # force sparse on a non-sparse matrix
+        exp = deepcopy(self.test1)
+        exp.sparse = False
+        data = exp.get_data(sparse=True)
+        self.assertTrue(sparse.issparse(data))
+        self.assertEqual(data.sum(), exp.data.sum())
+        # test it's a copy but inplace
+        self.assertIsNot(data, exp.data)
 
 if __name__ == "__main__":
     main()

@@ -78,6 +78,14 @@ class SortingTests(Tests):
                       join(self.test_data_dir, 'timeseries.sample'))
         assert_experiment_equal(obs, exp, almost_equal=True)
 
+    def test_sort_center_mass(self):
+        exp = self.test1.sort_center_mass()
+        # we didn't change the samples
+        pdt.assert_frame_equal(exp.sample_metadata, self.test1.sample_metadata)
+        # we did change the features but only reordered
+        self.assertEqual(set(exp.feature_metadata.index), set(self.test1.feature_metadata.index))
+        # look if one feature is in the correct place
+        self.assertEqual(exp.feature_metadata.index[1], self.test1.feature_metadata.index[4])
 
 if __name__ == "__main__":
     main()

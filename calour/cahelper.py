@@ -87,7 +87,7 @@ def filter_min_reads(exp, minreads, **kwargs):
 def filter_orig_reads(exp, minreads, **kwargs):
     ''' filter keeping only samples with >= minreads
     '''
-    origread_field = '_calour_read_count'
+    origread_field = '_calour_original_abundance'
     if origread_field not in exp.sample_metadata.columns:
         raise ValueError('%s field not initialzed. Did you load the data with calour.read_taxa() ?' % origread_field)
 
@@ -98,6 +98,17 @@ def filter_orig_reads(exp, minreads, **kwargs):
 
 def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
     ''' filter sequences present in at least fraction fraction of the samples.
+
+    Parameters
+    ----------
+    fraction : float (optional)
+        Keep features present at least in fraction of samples
+    cutoff : float (optional)
+        The minimal fraction of reads for the otu to be called present in a sample
+
+    Returns
+    -------
+    ``Experiment`` with only features present in at least fraction of samples
     '''
     newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
     return newexp
@@ -106,54 +117,41 @@ def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
 def filter_mean(exp, cutoff=0.01, **kwargs):
     ''' filter sequences with a mean at least cutoff
     '''
-    if '_calour_read_count' not in exp.sample_metadata.columns:
-        print('no original read count - cannot filter the mean')
     factor = np.mean(exp.data.sum(axis=1))
     newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
     return newexp
 
 
-def join_fields(exp, field1, field2, newname=None, inplace=False, separator='-'):
-    '''Join two sample metadata fields into a single new field
+def filter_feature_ids(exp, ids, negate=False, inplace=False):
+    '''Filter features based on a list of feature ids (index values)
 
     Parameters
     ----------
-    field1 : str
-        Name of the first sample metadata field to join
-    field2 : str
-        Name of the second sample metadata field to join
-    newname : str or None (optional)
-        name of the new (joined) sample metadata field
-        None (default) to name it as field1-field2
+    ids : iterable of str
+        the feature ids to filter
+    negate : bool (optional)
+        False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.
     inplace : bool (optional)
-        False (default) to create a new Experiment, True to add in current experiment
-    separator : str (optional)
-        The separator between the values of the two fields when joining
+        False (default) to create a copy of the experiment, True to filter inplace
 
     Returns
     -------
     newexp : Experiment
-        with an added sample metadata field
+        filtered so contains only sequence present in exp and in the fasta file
     '''
-    if inplace:
-        newexp = exp
-    else:
-        newexp = copy.copy(exp)
+    logger.debug('filter_feature_ids for %d features input' % len(ids))
+    okpos = []
+    tot_ids = 0
+    for cid in ids:
+        tot_ids += 1
+        if cid in exp.feature_metadata.index:
+            pos = exp.feature_metadata.index.get_loc(cid)
+            okpos.append(pos)
+    logger.debug('loaded %d sequences. found %d sequences in experiment' % (tot_ids, len(okpos)))
+    if negate:
+        okpos = np.setdiff1d(np.arange(len(exp.feature_metadata.index)), okpos, assume_unique=True)
 
-    # validate the data
-    if field1 not in newexp.sample_metadata.columns:
-        raise ValueError('field %s not in sample metadata' % field1)
-    if field2 not in newexp.sample_metadata.columns:
-        raise ValueError('field %s not in sample metadata' % field2)
-
-    # get the new column name
-    if newname is None:
-        newname = '%s-%s' % (field1, field2)
-
-    # add the new column
-    newcol = exp.sample_metadata[field1].str.cat(exp.sample_metadata[field2].astype(str), sep=separator)
-    newexp.sample_metadata[newname] = newcol
-
+    newexp = exp.reorder(okpos, axis=1, inplace=inplace)
     return newexp
 
 

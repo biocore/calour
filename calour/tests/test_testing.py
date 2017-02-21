@@ -38,13 +38,13 @@ class TestTesting(Tests):
 
         # just sample metadata
         newexp = self.test1.deepcopy()
-        newexp.sample_metadata.loc['id', 0] = 42
+        newexp.sample_metadata.loc[newexp.sample_metadata.index[0], 'id'] = 42
         with self.assertRaises(AssertionError):
             assert_experiment_equal(self.test1, newexp)
 
         # just feature metadata
         newexp = self.test1.deepcopy()
-        newexp.feature_metadata.loc['taxonomy', 0] = '42'
+        newexp.feature_metadata.loc[newexp.feature_metadata.index[0], 'taxonomy'] = '42'
         with self.assertRaises(AssertionError):
             assert_experiment_equal(self.test1, newexp)
 

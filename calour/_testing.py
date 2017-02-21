@@ -43,7 +43,7 @@ def assertIsInstance(obj, cls, msg=''):
         raise AssertionError(err_msg.format(msg, cls, type(obj)))
 
 
-def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, ignore_md_fields=['_calour_read_count']):
+def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, ignore_md_fields=('_calour_original_abundance',)):
     '''Test if two experiments are equal
 
     Parameters
@@ -54,21 +54,26 @@ def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, 
         False (default) to skip testing the command history, True to compare also the command history
     almost_equal : bool (optional)
         True (default) to test for almost identical, False to test the data matrix for exact identity
-    ignore_md_fields : list of str or None
+    ignore_md_fields : tuple of str or None
         list of metadata fields to ignore in the comparison. Default is ignoring the original read count (when sample loaded)
     '''
     assertIsInstance(exp1, ca.Experiment, 'exp1 not a calour Experiment class')
     assertIsInstance(exp2, ca.Experiment, 'exp2 not a calour Experiment class')
 
     # test the metadata
-    sample_columns = exp1.sample_metadata.columns
-    feature_columns = exp1.feature_metadata.columns
+    sample_columns = exp1.sample_metadata.columns.union(exp1.sample_metadata.columns)
+    feature_columns = exp1.feature_metadata.columns.union(exp2.feature_metadata.columns)
     if ignore_md_fields is not None:
         for cignore in ignore_md_fields:
             if cignore in sample_columns:
                 sample_columns = sample_columns.delete(sample_columns.get_loc(cignore))
             if cignore in feature_columns:
                 feature_columns = feature_columns.delete(feature_columns.get_loc(cignore))
+    assert(len(sample_columns.difference(exp1.sample_metadata.columns)) == 0)
+    assert(len(sample_columns.difference(exp2.sample_metadata.columns)) == 0)
+    assert(len(feature_columns.difference(exp1.feature_metadata.columns)) == 0)
+    assert(len(feature_columns.difference(exp2.feature_metadata.columns)) == 0)
+
     pdt.assert_frame_equal(exp1.feature_metadata[feature_columns], exp2.feature_metadata[feature_columns])
     pdt.assert_frame_equal(exp1.sample_metadata[sample_columns], exp2.sample_metadata[sample_columns])
 

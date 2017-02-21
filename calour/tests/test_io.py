@@ -12,7 +12,8 @@ from os.path import join
 import shutil
 
 import scipy.sparse
-import numpy.testing as npt
+from numpy.testing import assert_array_almost_equal
+import numpy as np
 import skbio
 
 import calour as ca
@@ -65,6 +66,25 @@ class IOTests(Tests):
         self.assertEqual(exp.data[:, 1].sum(), 13795540)
         self.assertEqual(exp.sparse, False)
 
+    def test_read_open_ms(self):
+        exp = ca.read_open_ms(self.openms_csv)
+        # test we get the MZ and RT correct
+        self.assertIn('MZ', exp.feature_metadata)
+        self.assertIn('RT', exp.feature_metadata)
+        self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
+        self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
+        # test data is rescaled
+        self.assertAlmostEqual(exp.data.sum(axis=1).mean(), 10000)
+        # test rescaling
+        exp = ca.read_open_ms(self.openms_csv, rescale=1000)
+        self.assertAlmostEqual(exp.data.sum(axis=1).mean(), 1000)
+        # test normalizing
+        exp = ca.read_open_ms(self.openms_csv, normalize=True)
+        assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
+        # test load sparse
+        exp = ca.read_open_ms(self.openms_csv, sparse=True)
+        self.assertEqual(exp.sparse, True)
+
     def test_read_not_sparse(self):
         # load the simple dataset as dense
         exp = ca.read(self.test1_biom, self.test1_samp, sparse=False)
@@ -90,7 +110,7 @@ class IOTests(Tests):
         table = _create_biom_table_from_exp(exp)
         self.assertCountEqual(table.ids(axis='observation'), exp.feature_metadata.index.values)
         self.assertCountEqual(table.ids(axis='sample'), exp.sample_metadata.index.values)
-        npt.assert_array_almost_equal(table.matrix_data.toarray(), exp.get_data(sparse=False).transpose())
+        assert_array_almost_equal(table.matrix_data.toarray(), exp.get_data(sparse=False).transpose())
         metadata = table.metadata(id=exp.feature_metadata.index[1], axis='observation')
         self.assertEqual(metadata['taxonomy'], exp.feature_metadata['taxonomy'].iloc[1])
 
@@ -105,6 +125,36 @@ class IOTests(Tests):
         self.assertCountEqual(seqs, exp.feature_metadata.index.values)
         shutil.rmtree(d)
 
+    def test_save_biom(self):
+        # NOTE: Currently not testing the save biom hdf with taxonomy
+        # as there is a bug there!
+        exp = ca.read(self.test1_biom, self.test1_samp)
+        d = mkdtemp()
+        f = join(d, 'test1.save.biom')
+        # test the json biom format
+        exp.save_biom(f, fmt='json')
+        newexp = ca.read(f, self.test1_samp)
+        assert_experiment_equal(newexp, exp)
+        # test the txt biom format
+        exp.save_biom(f, fmt='txt')
+        newexp = ca.read(f, self.test1_samp)
+        assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
+        # test the hdf5 biom format with no taxonomy
+        exp.save_biom(f, addtax=False)
+        newexp = ca.read(f, self.test1_samp)
+        self.assertTrue('taxonomy' not in newexp.feature_metadata)
+        assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
+        shutil.rmtree(d)
+
+    def test_save(self):
+        exp = ca.read(self.test2_biom, self.test2_samp)
+        d = mkdtemp()
+        f = join(d, 'test1.save')
+        # test the json biom format
+        exp.save(f, fmt='json')
+        newexp = ca.read(f+'.biom', f+'_sample.txt')
+        assert_experiment_equal(newexp, exp, ignore_md_fields=['#SampleID.1'])
+        shutil.rmtree(d)
 
 if __name__ == "__main__":
     main()

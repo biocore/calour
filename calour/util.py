@@ -16,23 +16,6 @@ import scipy
 logger = getLogger(__name__)
 
 
-def get_fields(exp):
-    '''
-    return the sample fields of an experiment
-    '''
-    return list(exp.sample_metadata.columns)
-
-
-def get_field_vals(exp, field, unique=True):
-    '''
-    return the values in sample field (unique or all)
-    '''
-    vals = exp.sample_metadata[field]
-    if unique:
-        vals = list(set(vals))
-    return vals
-
-
 def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=False):
     '''Get a nice taxonomy string
     Convert the taxonomy list stored (from biom.read_table) to a single string per feature
@@ -62,7 +45,7 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
 
     # if it is not a list - just return it
     if not isinstance(exp.feature_metadata['taxonomy'][0], list):
-        return exp.feature_metadata['taxonomy']
+        return list(exp.feature_metadata['taxonomy'].values)
 
     if not remove_underscore:
         taxonomy = [separator.join(x) for x in exp.feature_metadata['taxonomy']]
@@ -85,20 +68,25 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
     return taxonomy
 
 
-def get_file_md5(filename):
+def get_file_md5(filename, encoding='utf-8'):
     '''get the md5 of the text file.
 
     Parameters
     ----------
     filename : str
         name of the file to calculate md5 on
+    encoding : str or None (optional)
+        encoding of the text file (see python str.encode() ). None to use 'utf-8'
 
     Returns
     -------
     flmd5: str
         the md5 of the file filename
     '''
-    with open(filename, 'r') as fl:
+    logger.debug('getting file md5 for file %s' % filename)
+    if encoding is None:
+        encoding = 'utf-8'
+    with open(filename, 'r', encoding=encoding) as fl:
         flmd5 = hashlib.md5()
         for cline in fl:
             try:
@@ -107,6 +95,7 @@ def get_file_md5(filename):
                 logger.warn('map md5 cannot be calculated - utf problems?')
                 return ''
         flmd5 = flmd5.hexdigest()
+        logger.debug('md5 is %s' % flmd5)
         return flmd5
 
 
@@ -172,7 +161,7 @@ def set_config_value(key, value, section='DEFAULT', config_file_name=None):
     section : str (optional)
         the section to get the value from
     config_file_name : str (optional)
-        the full path to the config file or None to use XXX
+        the full path to the config file or None to use default config file
     '''
     if config_file_name is None:
         config_file_name = get_config_file()
@@ -199,7 +188,7 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
     section : str (optional)
         the section to get the value from
     config_file_name : str (optional)
-        the full path to the config file or None to use XXX
+        the full path to the config file or None to use default config file
 
     Returns
     -------

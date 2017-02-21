@@ -47,8 +47,9 @@ def sort_taxonomy(exp, inplace=False):
 def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
 
-    Assumes exp samples are sorted by some continuous field,
-    and for each feature finds the center of mass (i.e. value * position along field).
+    Assumes exp samples are sorted by some continuous field, and sort the features based on their
+    center of mass along this field order:
+    For each feature calculate the center of mass (i.e. for each feature go over all samples i and calculate sum(data(i) * i / sum(data(i)) ).
     Features are then sorted according to this center of mass
 
     Parameters
@@ -72,7 +73,7 @@ def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
     if transform is None:
         data = exp.data
     else:
-        logger.debug('tansforming data using %s' % transform.__name__)
+        logger.debug('tansforming data using %r' % transform)
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).data
     data = data.T

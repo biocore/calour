@@ -256,7 +256,25 @@ def filter_samples(exp, field, values, negate=False, inplace=False):
 def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
     '''filter keeping only observations with taxonomy string matching taxonomy
 
-    if substring=True, look for partial match instead of identity
+    if substring=True, look for partial match instead of identity.
+    Matching is case insensitive
+
+    Parameters
+    ----------
+    values : str or list of str
+        the taxonomy string/strings to filter (can be partial if substring is True)
+    negate : bool (optional)
+        False (default) to keep matching taxonomies, True to remove matching taxonomies
+    inplace : bool (optional)
+        do the filtering on the original ``Experiment`` object or a copied one.
+    substring : bool (optional)
+        True (default) to do partial (substring) matching for the taxonomy string,
+        False to do exact matching
+
+    Returns
+    -------
+    ``Experiment``
+        With only features with matching taxonomy
     '''
     if 'taxonomy' not in exp.feature_metadata.columns:
         logger.warn('No taxonomy field in experiment')
@@ -265,7 +283,7 @@ def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
     if not isinstance(values, (list, tuple)):
         values = [values]
 
-    taxstr = [';'.join(x).lower() for x in exp.feature_metadata['taxonomy']]
+    taxstr = exp.feature_metadata['taxonomy'].str.lower()
 
     select = np.zeros(len(taxstr), dtype=bool)
     for cval in values:

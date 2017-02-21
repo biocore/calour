@@ -90,6 +90,16 @@ class TestTransforming(Tests):
         obs = self.test2.normalize(total, inplace=True)
         self.assertIs(obs, self.test2)
 
+    def test_rescale(self):
+        total = 1000
+        obs = self.test2.rescale(total)
+        self.assertAlmostEqual(np.mean(obs.data.sum(axis=1)), 1000)
+        self.assertIsNot(obs, self.test2)
+        self.assertNotAlmostEqual(obs.data.sum(axis=1).A1[0], 1000)
+
+        obs = self.test2.normalize(total, inplace=True)
+        self.assertIs(obs, self.test2)
+
     def test_normalize_by_subset_features(self):
         # test the filtering in standard mode (remove a few features, normalize to 10k)
         exp = ca.read(self.test1_biom, self.test1_samp)

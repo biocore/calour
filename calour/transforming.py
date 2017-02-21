@@ -41,6 +41,33 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     return exp
 
 
+def rescale(exp, total=10000, axis=1, inplace=False):
+    '''Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.
+
+    This function rescales by multiplying ALL entries in exp.data by same number.
+
+    Parameters
+    ----------
+    exp : Experiment
+    total : float
+        the mean sum (along axis) to normalize to
+    axis : int (optional)
+        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
+    inplace : bool (optional)
+        False (default) to create a copy, True to replace values in exp
+
+    Returns
+    -------
+    ``Experiment``
+        the normalized experiment
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+    current_mean = np.mean(exp.data.sum(axis=axis))
+    exp.data = exp.data * total / current_mean
+    return exp
+
+
 def scale(exp, axis=1, inplace=False):
     '''Standardize a dataset along an axis
 

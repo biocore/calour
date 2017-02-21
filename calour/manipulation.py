@@ -11,10 +11,13 @@ from logging import getLogger
 import pandas as pd
 import numpy as np
 
+from . import Experiment
+
 
 logger = getLogger(__name__)
 
 
+@Experiment._convert_axis_name
 def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplace=True):
     '''Join two sample metadata fields into a single new field
 
@@ -47,10 +50,8 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
 
     if axis == 0:
         metadata = newexp.sample_metadata
-    elif axis == 1:
-        metadata = newexp.feature_metadata
     else:
-        raise ValueError('incorrect axis %s. please use 0/1' % axis)
+        metadata = newexp.feature_metadata
 
     # validate the data
     if field1 not in metadata.columns:
@@ -66,7 +67,7 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
         raise ValueError('new field name %s alreay in metadata. Please use different newname value' % newname)
 
     # add the new column
-    newcol = metadata[field1].astype(str).str.cat(metadata[field2].astype(str), sep=separator)
+    newcol = [str(i) + separator + str(j) for i, j in zip(metadata[field1], metadata[field2])]
     if axis == 0:
         newexp.sample_metadata[newname] = newcol
     else:
