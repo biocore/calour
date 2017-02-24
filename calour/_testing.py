@@ -31,6 +31,8 @@ class Tests(TestCase):
         self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
         # a simple openms bucket table csv file
         self.openms_csv = join(test_data_dir, 'openms_bucket_table.csv')
+        # a fasta file for testing the AmpliconExperiment
+        self.seqs1_fasta = join(test_data_dir, 'seqs1.fasta')
 
 
 def assertIsInstance(obj, cls, msg=''):

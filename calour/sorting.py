@@ -13,34 +13,11 @@ import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
+from . import transforming
 from .transforming import log_n
-from .util import _get_taxonomy_string
 
 
 logger = getLogger(__name__)
-
-
-@Experiment._record_sig
-def sort_taxonomy(exp, inplace=False):
-    '''Sort the features based on the taxonomy
-
-    Sort features based on the taxonomy (alphabetical)
-
-    Parameters
-    ----------
-    inplace : bool (optional)
-        False (default) to create a copy
-        True to Replace data in exp
-    Returns
-    -------
-    exp : Experiment
-        sorted by taxonomy
-    '''
-    logger.debug('sorting by taxonomies')
-    taxonomy = _get_taxonomy_string(exp, remove_underscore=True)
-    sort_pos = np.argsort(taxonomy, kind='mergesort')
-    exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
-    return exp
 
 
 @Experiment._record_sig
@@ -184,6 +161,7 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
         Alternatively it accepts the following str values:
         "log_mean": sort by log of the mean
         "prevalence": sort by the prevalence
+        "mean": sort by the mean
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
@@ -204,7 +182,8 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
         else:
             data_subset = exp.data[subset, :]
     func = {'log_mean': _log_mean,
-            'prevalence': _prevalence}
+            'prevalence': _prevalence,
+            'mean': np.mean}
     if isinstance(key, str):
         key = func[key]
     if exp.sparse:
@@ -279,3 +258,61 @@ def sort_niche(exp, field):
     '''
     sort by niches - jamie
     '''
+
+
+def sort_samples(exp, field, **kwargs):
+    '''Sort samples by field
+    A convenience function for sort_by_metadata
+
+    Parameters
+    ----------
+    field : str
+        The field to sort the samples by
+
+    Returns
+    -------
+    ``Experiment`` with samples sorted according to values in field
+    '''
+    newexp = exp.sort_by_metadata(field=field, **kwargs)
+    return newexp
+
+
+def sort_abundance(exp, field=None, value=None, inplace=False, **kwargs):
+    '''Sort features based on their abundance in a subset of the samples.
+    This is a convenience wrapper for sort_by_data()
+
+    Parameters
+    ----------
+    field : str or None (default)
+        None (default) to sort on all samples, str to sort only on samples matching the field/value combination
+    value : str or list of str or None (default)
+        if field is not None, value is the value/list of values so sorting is only on samples matching this list
+    inplace : bool (optional)
+        False (default) to create a copy of the experiment, True to filter inplace
+
+    Returns
+    -------
+    ``Experiment``
+        with features sorted by abundance
+    '''
+    if field is None:
+        subset = None
+    else:
+        if not isinstance(value, (list, tuple)):
+            value = [value]
+        subset = np.where(exp.sample_metadata[field].isin(value).values)[0]
+
+    newexp = exp.sort_by_data(axis=1, subset=subset, inplace=inplace, **kwargs)
+    return newexp
+
+
+def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
+    '''Cluster features following filtering of minimal abundance on features and
+       log transform and scaling on the data (mean 0 std 1)
+    '''
+    if min_abundance > 0:
+        newexp = exp.filter_min_abundance(min_abundance, inplace=inplace)
+    else:
+        newexp = exp
+    newexp = newexp.cluster_data(transform=transforming.transform, axis=0, steps=[transforming.log_n, transforming.scale], scale__axis=0, inplace=inplace, **kwargs)
+    return newexp

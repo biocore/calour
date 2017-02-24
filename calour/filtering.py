@@ -253,47 +253,53 @@ def filter_samples(exp, field, values, negate=False, inplace=False):
                               negate=negate, inplace=inplace)
 
 
-def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
-    '''filter keeping only observations with taxonomy string matching taxonomy
-
-    if substring=True, look for partial match instead of identity.
-    Matching is case insensitive
+def filter_min_abundance(exp, min_abundance, **kwargs):
+    '''Filter keeping only features with >= min_abundance total over all samples
+    This is a convenience function wrapping filter_by_data()
 
     Parameters
     ----------
-    values : str or list of str
-        the taxonomy string/strings to filter (can be partial if substring is True)
-    negate : bool (optional)
-        False (default) to keep matching taxonomies, True to remove matching taxonomies
-    inplace : bool (optional)
-        do the filtering on the original ``Experiment`` object or a copied one.
-    substring : bool (optional)
-        True (default) to do partial (substring) matching for the taxonomy string,
-        False to do exact matching
+    min_abundance : numeric
+        The minimal total abundance for each feature over all samples
+    '''
+    newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=min_abundance, **kwargs)
+    return newexp
+
+
+def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
+    '''Filter features keeping only ones present in at least fraction fraction of the samples.
+    This is a convenience function wrapping filter_by_data()
+
+    Parameters
+    ----------
+    fraction : float (optional)
+        Keep features present at least in fraction of samples
+    cutoff : float (optional)
+        The minimal fraction of reads for the otu to be called present in a sample
+
+    Returns
+    -------
+    ``Experiment`` with only features present in at least fraction of samples
+    '''
+    newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
+    return newexp
+
+
+def filter_mean(exp, cutoff=0.01, **kwargs):
+    '''Filter features with a mean at least cutoff of the mean total abundance/sample
+
+    In order to keep features with mean abundance of 1%, use ``filter_mean(cutoff=0.01)``
+
+    Parameters
+    ----------
+    cutoff : float (optional)
+        The minimal mean abundance fraction (out of the mean of total abundance per sample) for a feature in order
+        to keep it. Default is 0.01 - keep features with mean abundance >=1% of mean total abundance per sample
 
     Returns
     -------
     ``Experiment``
-        With only features with matching taxonomy
     '''
-    if 'taxonomy' not in exp.feature_metadata.columns:
-        logger.warn('No taxonomy field in experiment')
-        return None
-
-    if not isinstance(values, (list, tuple)):
-        values = [values]
-
-    taxstr = exp.feature_metadata['taxonomy'].str.lower()
-
-    select = np.zeros(len(taxstr), dtype=bool)
-    for cval in values:
-        if substring:
-            select += [cval.lower() in ctax for ctax in taxstr]
-        else:
-            select += [cval.lower() == ctax for ctax in taxstr]
-
-    if negate is True:
-        select = ~ select
-
-    logger.warn('%s remaining' % np.sum(select))
-    return exp.reorder(select, axis=1, inplace=inplace)
+    factor = np.mean(exp.data.sum(axis=1))
+    newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
+    return newexp

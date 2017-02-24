@@ -1,9 +1,10 @@
 from logging import getLogger
+from abc import ABC
 
 logger = getLogger(__name__)
 
 
-class Database:
+class Database(ABC):
     def __init__(self, database_name='generic', methods=['get', 'annotate', 'feature_terms']):
         '''Initialize the database interface
 
@@ -30,13 +31,16 @@ class Database:
         '''
         return self._database_name
 
-    def can_annotate(self):
+    @property
+    def annotatable(self):
+        '''True if the database supports adding annotations via the add_annotation() function
+        '''
         return 'annotate' in self._methods
 
-    def can_get(self):
-        return 'get' in self._methods
-
-    def can_feature_terms(self):
+    @property
+    def can_get_feature_terms(self):
+        '''True if the database supports getting a dict of terms per feature via the get_feature_terms() function
+        '''
         return 'feature_terms' in self._methods
 
     def get_seq_annotation_strings(self, sequence):

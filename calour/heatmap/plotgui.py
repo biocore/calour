@@ -79,23 +79,38 @@ class PlotGUI(ABC):
         # this attr has to be property so it is updated on mouse/key events
         return self.figure.gca()
 
-    def get_info(self):
-        '''Get info for the selected feature/sample
+    def get_selection_info(self):
+        '''Get the current selection information
 
         Returns
         -------
-        tuple of (str, str, numeric, dict)
-            sample id, feature id, abundance, taxonomy, annotation
+        tuple of (str, str, numeric)
+            sample id, feature id, abundance
         '''
         row, col = self.current_select
         fid = self.exp.feature_metadata.index[col]
         sid = self.exp.sample_metadata.index[row]
         abd = self.exp.data[row, col]
+        return sid, fid, abd
 
+    def get_database_annotations(self, feature):
+        '''Get database annotations about a feature
+
+        Parameters
+        ----------
+        feature : str
+            The featureID to get info about
+
+        Returns
+        -------
+        annotations : list of tuple of (dict, str)
+            dict : annotation key/value pairs
+            str : a string summarizing the annotations
+        '''
         annt = []
         for cdatabase in self.databases:
             try:
-                cannt = cdatabase.get_seq_annotation_strings(fid)
+                cannt = cdatabase.get_seq_annotation_strings(feature)
                 if len(cannt) == 0:
                     cannt = [[{'annotationtype': 'not found'},
                               'No annotation found in database %s' % cdatabase.get_name()]]
@@ -105,6 +120,18 @@ class PlotGUI(ABC):
             except:
                 cannt = 'error connecting to db %s' % cdatabase.get_name()
             annt.extend(cannt)
+        return annt
+
+    def get_info(self):
+        '''Get info for the selected feature/sample
+
+        Returns
+        -------
+        tuple of (str, str, numeric, dict)
+            sample id, feature id, abundance, taxonomy, annotation
+        '''
+        sid, fid, abd = self.get_selection_info()
+        annt = self.get_database_annotations(fid)
 
         return sid, fid, abd, annt
 

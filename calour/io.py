@@ -13,8 +13,9 @@ import pandas as pd
 import numpy as np
 import biom
 
-from calour.experiment import Experiment
-from calour.util import _get_taxonomy_string, get_file_md5, get_data_md5
+from .experiment import Experiment
+from .amplicon_experiment import AmpliconExperiment
+from .util import _get_taxonomy_string, get_file_md5, get_data_md5
 
 
 logger = getLogger(__name__)
@@ -196,7 +197,7 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
 
 
 def read_taxa(data_file, sample_metadata_file=None,
-              filter_orig_reads=1000, normalize=True, **kwargs):
+              filter_orig_reads=1000, normalize=True, sparse=True, **kwargs):
     '''Load an amplicon experiment.
 
     Fix taxonomy and normalize if needed. This is a convenience function of read().
@@ -211,9 +212,12 @@ def read_taxa(data_file, sample_metadata_file=None,
 
     Returns
     -------
-    exp : Experiment
+    exp : ``AmpliconExperiment``
+        after removing low read sampls and normalizing
     '''
-    exp = read(data_file, sample_metadata_file, **kwargs)
+    data, sample_metadata, feature_metadata, exp_metadata, description = _read(data_file, sample_metadata_file, **kwargs)
+    exp = AmpliconExperiment(data, sample_metadata, feature_metadata,
+                             exp_metadata=exp_metadata, description=description, sparse=sparse)
 
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
@@ -228,8 +232,8 @@ def read_taxa(data_file, sample_metadata_file=None,
     return exp
 
 
-def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True, data_file_type='biom', encoding=None):
+def _read(data_file, sample_metadata_file=None, feature_metadata_file=None,
+          description='', data_file_type='biom', encoding=None):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -258,7 +262,16 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     Returns
     -------
-    exp : Experiment
+    data : np.array or scipy.sprase.csr
+        The experiment count data (each row is a sample, each column is a feature)
+    sample_metadata : pandas.DataFrame
+        Metadata for the samples
+    feature_metadata : pandas.DataFrame
+        Metadata for the features
+    exp_metadata : dict
+        information about the experiment (including 'map_md5', 'data_md5')
+    description : str
+        name of the experiment
     '''
     logger.info('Reading experiment (data_file %s, map file %s)' % (data_file, sample_metadata_file))
     exp_metadata = {'map_md5': ''}
@@ -296,6 +309,45 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if description == '':
         description = os.path.basename(data_file)
 
+    return data, sample_metadata, feature_metadata, exp_metadata, description
+
+
+def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
+         description='', sparse=True, data_file_type='biom', encoding=None):
+    '''Read the files for the experiment.
+
+    .. note:: The order in the sample and feature metadata tables are changed
+       to align with biom table.
+
+    Parameters
+    ----------
+    data_file : str
+        file path to the biom table.
+    sample_metadata_file : None or str (optional)
+        None (default) to just use samplenames (no additional metadata).
+        if not None, file path to the sample metadata (aka mapping file in QIIME).
+    feature_metadata_file : str
+        file path to the feature metadata.
+    description : str
+        description of the experiment
+    sparse : bool
+        read the biom table into sparse or dense array
+    file_type : str (optional)
+        the data_file format. options:
+        'biom' : a biom table (biom-format.org) (default)
+        'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
+    encoding : str or None (optional)
+        encoder for the metadata files.
+        None (default) to use pandas default encoder, str to specify encoder name (see pandas.read_table() documentation)
+
+    Returns
+    -------
+    exp : Experiment
+    '''
+    data, sample_metadata, feature_metadata, exp_metadata, description = _read(data_file, sample_metadata_file,
+                                                                               feature_metadata_file,
+                                                                               description, data_file_type,
+                                                                               encoding)
     return Experiment(data, sample_metadata, feature_metadata,
                       exp_metadata=exp_metadata, description=description, sparse=sparse)
 
