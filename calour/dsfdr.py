@@ -167,43 +167,47 @@ def dsfdr(data,labels, transformtype='rankdata', method='meandiff', alpha=0.1, n
 
 
     # transform the data
-    if transformtype == 'rankdata':
-        data = transform.rankdata(data)
-    elif transformtype == 'log2data':
-        data = transform.log2data(data)
-    elif transformtype == 'binarydata':
-        data = transform.binarydata(data)
-    elif transformtype == 'normdata':
-        data = transform.normdata(data)
+    if transform == 'rankdata':
+           data = rankdata(data)
+     elif transform == 'log2data':
+         data = log2data(data)
+     elif transform == 'binarydata':
+         data = binarydata(data)
+     elif transform == 'normdata':
+         data = normdata(data)
+ 
+     numbact = np.shape(data)[0]
+ 
+     labels = labels.copy()
 
     numbact=np.shape(data)[0]
     labels=labels.copy()
 
     if method == "meandiff":
         # fast matrix multiplication based calculation
-        method = statistics.meandiff
-        tstat=method(data,labels)
-        t=np.abs(tstat)
-        numsamples=np.shape(data)[1]
-        p=np.zeros([numsamples,numperm])
-        k1=1/np.sum(labels == 0)
-        k2=1/np.sum(labels == 1)
+        method = meandiff
+         tstat = method(data, labels)
+         t = np.abs(tstat)
+         numsamples = np.shape(data)[1]
+         p = np.zeros([numsamples, numperm])
+         k1 = 1 / np.sum(labels == 0)
+         k2 = 1 / np.sum(labels == 1)
         for cperm in range(numperm):
             np.random.shuffle(labels)
-            p[labels==0, cperm] = k1
-        p2 = np.ones(p.shape)*k2
-        p2[p>0] = 0
+            p[labels == 0, cperm] = k1
+         p2 = np.ones(p.shape) * k2
+         p2[p > 0] = 0
         mean1 = np.dot(data, p)
         mean2 = np.dot(data, p2)
         u = np.abs(mean1 - mean2)
 
     elif method == 'mannwhitney' or method == 'kruwallis' or method == 'stdmeandiff':
         if method == 'mannwhitney':
-            method = statistics.mannwhitney
+            method = mannwhitney
         if method == 'kruwallis':
-            method = statistics.kruwallis
+            method = kruwallis
         if method == 'stdmeandiff':
-            method = statistics.stdmeandiff
+            method = stdmeandiff
             
         tstat=method(data,labels)
         t=np.abs(tstat)
@@ -216,7 +220,7 @@ def dsfdr(data,labels, transformtype='rankdata', method='meandiff', alpha=0.1, n
     elif method == 'spearman' or method == 'pearson':
         # fast matrix multiplication based correlation
         if method == 'spearman':
-            data = transform.rankdata(data)
+            data = rankdata(data)
             labels = sp.stats.rankdata(labels)
         meanval=np.mean(data,axis=1).reshape([data.shape[0],1])
         data=data-np.repeat(meanval,data.shape[1],axis=1)
