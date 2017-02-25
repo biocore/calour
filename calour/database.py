@@ -89,7 +89,7 @@ class Database:
             empty if ok, otherwise the error encountered
         '''
         logger.debug('Generic function for add_annotations')
-        return 'Not implemented'
+        raise NotImplemented
 
     def get_feature_terms(self, features, exp=None):
         '''Get list of terms per feature
