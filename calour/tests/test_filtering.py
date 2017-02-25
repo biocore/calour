@@ -9,7 +9,6 @@
 from unittest import main
 
 from skbio.util import get_data_path
-import pandas.util.testing as pdt
 
 from calour._testing import Tests, assert_experiment_equal
 import calour as ca
@@ -146,20 +145,53 @@ class FilteringTests(Tests):
             else:
                 self.assertIsNot(obs, self.test2)
 
-    def test_filter_taxonomy(self):
-        # default - substring and keep matching
-        exp = self.test1.filter_taxonomy('proteobacteria')
+    def test_filter_min_abundance(self):
+        exp = self.test1.filter_min_abundance(17008)
         self.assertEqual(exp.shape[1], 2)
-        self.assertEqual(set(exp.feature_metadata.index), set(self.test1.feature_metadata.index[[2, 3]]))
-        # check we didn't change the samples
-        pdt.assert_frame_equal(exp.sample_metadata, self.test1.sample_metadata)
+        okseqs = ['TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
+                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG']
+        self.assertCountEqual(exp.feature_metadata.index, okseqs)
 
-        # test with list of values and negate
-        exp = self.test1.filter_taxonomy(['Firmicutes', 'proteobacteria'], negate=True)
-        self.assertEqual(exp.shape[1], 6)
-        self.assertNotIn(self.test1.feature_metadata.index[4], exp.feature_metadata.index)
-        self.assertIn(self.test1.feature_metadata.index[5], exp.feature_metadata.index)
+    def test_filter_prevalence(self):
+        # default value is 0.5 - keep only features present at least in 0.5 the samples
+        exp = self.test1.filter_prevalence()
+        okseqs = ['TACGTATGTCACAAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTGGATTAAGCGTGTTGTGAAATGTAGACGCTCAACGTCTGAATCGCAGCGCGAACTGGTTCACTTGAGTATGCACAACGTAGGCGGAATTCGTCG',
+                  'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT',
+                  'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG',
+                  'TACGTAGGTGGCAAGCTTTGTCCTTCCTTATTTGGCGTAAAGCGCGCGCAGGCGGCCTATCCAGTCTGTCTTAAAAGTTCGGGGCTCAACCCCGTGATGGGATGGAAACTAGTAGGCTAGAGTATCGGAGAGGAAAGCGGAATTCCTAGT',
+                  'TACGGAGGATGCGAGCGTTATCTGGAATCATTGGGTTTAAAGGGTCCGTAGGCGGGTTGATAAGTCAGAGGTGAAAGCGCTTAGCTCAACTAAGCAACTGCCTTTGAAACTGTCAGTCTTGAATGATTGTGAAGTAGTTGGAATGTGTAG',
+                  'TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
+                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
+                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG']
+        self.assertCountEqual(exp.feature_metadata.index, okseqs)
+        self.assertEqual(exp.shape[1], 8)
+        self.assertEqual(exp.shape[0], self.test1.shape[0])
 
+    def test_filter_mean(self):
+        # default is 0.01 - keep features with mean abundance >= 1%
+        exp = self.test1.filter_mean()
+        okseqs = ['TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
+                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
+                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG']
+        self.assertCountEqual(exp.feature_metadata.index, okseqs)
+        self.assertEqual(exp.shape[1], 3)
+        self.assertEqual(exp.shape[0], self.test1.shape[0])
+
+    def test_filter_ids_default(self):
+        okseqs = ['TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
+                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
+                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG',
+                  'pita']
+        exp = self.test1.filter_ids(okseqs)
+        self.assertEqual(list(exp.feature_metadata.index.values), okseqs[:-1])
+        self.assertIsNot(exp, self.test1)
+
+    def test_filter_ids_samples_inplace_negate(self):
+        badsamples = ['S1', 'S3', 'S5', 'S7', 'S9', 'S11', 'S13', 'S15', 'S17', 'S19', 'pita']
+        oksamples = list(set(self.test1.sample_metadata.index.values).difference(set(badsamples)))
+        exp = self.test1.filter_ids(badsamples, axis=0, negate=True, inplace=True)
+        self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)
+        self.assertIs(exp, self.test1)
 
 if __name__ == '__main__':
     main()

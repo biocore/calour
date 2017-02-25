@@ -1,9 +1,10 @@
 from logging import getLogger
+from abc import ABC
 
 logger = getLogger(__name__)
 
 
-class Database:
+class Database(ABC):
     def __init__(self, database_name='generic', methods=['get', 'annotate', 'feature_terms']):
         '''Initialize the database interface
 
@@ -30,13 +31,16 @@ class Database:
         '''
         return self._database_name
 
-    def can_annotate(self):
+    @property
+    def annotatable(self):
+        '''True if the database supports adding annotations via the add_annotation() function
+        '''
         return 'annotate' in self._methods
 
-    def can_get(self):
-        return 'get' in self._methods
-
-    def can_feature_terms(self):
+    @property
+    def can_get_feature_terms(self):
+        '''True if the database supports getting a dict of terms per feature via the get_feature_terms() function
+        '''
         return 'feature_terms' in self._methods
 
     def get_seq_annotation_strings(self, sequence):
@@ -90,6 +94,42 @@ class Database:
         '''
         logger.debug('Generic function for add_annotations')
         raise NotImplemented
+
+    def delete_annotation(self, annotation_details):
+        '''Delete an annotation from the database (if allowed)
+
+        Parameters
+        ----------
+        annotation_details : dict
+            The details about the annotation to delete (annotationdetails from get_seq_annotation_strings() )
+            Should contain a unique identifier for the annotation (created/used by the database)
+
+        Returns
+        -------
+        str
+            empty if ok, otherwise the error encountered
+        '''
+        logger.debug('Generic function for delete_annotation')
+        return 'Not implemented'
+
+    def remove_feature_from_annotation(self, features, annotation_details):
+        '''remove a feature from the annotation in the database (if allowed)
+
+        Parameters
+        ----------
+        features : list of str
+            The feature ids to remove
+        annotation_details : dict
+            The details about the annotation to delete (annotationdetails from get_seq_annotation_strings() )
+            Should contain a unique identifier for the annotation (created/used by the database)
+
+        Returns
+        -------
+        str
+            empty if ok, otherwise the error encountered
+        '''
+        logger.debug('Generic function for remove_features_from_annotation')
+        return 'Not implemented'
 
     def get_feature_terms(self, features, exp=None):
         '''Get list of terms per feature

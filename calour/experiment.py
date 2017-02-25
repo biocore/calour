@@ -280,6 +280,49 @@ class Experiment:
             exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
         return exp
 
+    def get_pandas(self, sample_field=None, feature_field=None, sparse=None):
+        '''Get a pandas dataframe of the abundances
+        Samples are rows, features are columns. Can specify the metadata fields
+        for the index (default is sample_metadata index) and column labels
+        (default is feature_metadata index)
+
+        Parameters
+        ----------
+        sample_field : str or None (optional)
+            Name of the sample_metadata column to use for index.
+            None (default) is the sample_metadata index
+        feature_field : str or None (optional)
+            Name of the feature_metadata column to use for column names.
+            None (default) is the feature_metadata index
+        sparse: bool or None (optional)
+            None (default) to get sparsity based on the underlying Experiment sparsity
+            True to force to sparse pandas.Dataframe
+            False to force to standard pandas.Dataframe
+
+        Returns
+        -------
+        ``pandas.Dataframe`` or ``pandas.SparseDataframe``
+        '''
+        if sample_field is None:
+            ind = self.sample_metadata.index
+        else:
+            ind = self.sample_metadata[sample_field]
+        if feature_field is None:
+            cols = self.feature_metadata.index
+        else:
+            cols = self.feature_metadata[feature_field]
+
+        if sparse is not None:
+            self.sparse = sparse
+
+        if self.sparse:
+            # create list of sparse rows
+            sr = [pd.SparseSeries(self.data[i, :].toarray().ravel(), fill_value=0) for i in np.arange(self.data.shape[0])]
+            df = pd.SparseDataFrame(sr, index=ind, columns=cols)
+        else:
+            df = pd.DataFrame(self.data, index=ind, columns=cols, copy=True)
+        return df
+
 
 def add_functions(cls,
                   modules=['.io', '.sorting', '.filtering', '.analysis',

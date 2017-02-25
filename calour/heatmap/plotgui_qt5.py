@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
                              QLabel, QListWidget, QSplitter, QFrame,
                              QComboBox, QScrollArea, QListWidgetItem,
                              QDialogButtonBox, QApplication)
+from PyQt5.QtCore import Qt
 
 from .plotgui import PlotGUI
 from .. import analysis
@@ -62,6 +63,10 @@ class PlotGUI_QT5(PlotGUI):
 
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
+        self._update_info_labels(sid, fid, abd)
+        self._display_annotation_in_qlistwidget(annt)
+
+    def _update_info_labels(self, sid, fid, abd):
         self.app_window.w_abund.setText('{:.01f}'.format(abd))
         self.app_window.w_fid.setText(fid)
         self.app_window.w_sid.setText(sid)
@@ -71,8 +76,6 @@ class PlotGUI_QT5(PlotGUI):
         feature_field = str(self.app_window.w_ffield.currentText())
         self.app_window.w_ffield_val.setText(
             str(self.exp.feature_metadata[feature_field][self.current_select[1]]))
-
-        self._display_annotation_in_qlistwidget(annt)
 
     def _display_annotation_in_qlistwidget(self, annt):
         '''Add a line to the annotation list
@@ -144,6 +147,7 @@ class ApplicationWindow(QMainWindow):
         lbox = QHBoxLayout()
         self.w_sfield = QComboBox()
         self.w_sfield_val = QLabel(text='NA')
+        self.w_sfield_val.setTextInteractionFlags(Qt.TextSelectableByMouse)
         scroll = QScrollArea()
         scroll.setFixedHeight(18)
         self.w_sfield_val.setMinimumWidth(scroll_box_width)
@@ -158,6 +162,7 @@ class ApplicationWindow(QMainWindow):
         lbox = QHBoxLayout()
         self.w_ffield = QComboBox()
         self.w_ffield_val = QLabel(text='NA')
+        self.w_ffield_val.setTextInteractionFlags(Qt.TextSelectableByMouse)
         scroll = QScrollArea()
         scroll.setFixedHeight(18)
         self.w_ffield_val.setMinimumWidth(scroll_box_width)
@@ -174,6 +179,7 @@ class ApplicationWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setFixedHeight(18)
         self.w_sid = QLabel(text='?')
+        self.w_sid.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.w_sid.setMinimumWidth(scroll_box_width)
         scroll.setWidget(self.w_sid)
         lbox.addWidget(label)
@@ -185,6 +191,7 @@ class ApplicationWindow(QMainWindow):
         scroll = QScrollArea()
         scroll.setFixedHeight(18)
         self.w_fid = QLabel(text='?')
+        self.w_fid.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.w_fid.setMinimumWidth(scroll_box_width)
         scroll.setWidget(self.w_fid)
         lbox.addWidget(label)
@@ -210,6 +217,9 @@ class ApplicationWindow(QMainWindow):
         self.w_dblist = QListWidget()
         self.w_dblist.itemDoubleClicked.connect(self.double_click_annotation)
         userside.addWidget(self.w_dblist)
+        # the annotation list right mouse menu
+        self.w_dblist.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.w_dblist.customContextMenuRequested.connect(self.annotation_list_right_clicked)
         # buttons at bottom
         lbox_buttons_bottom = QHBoxLayout()
         self.w_save_fasta = QPushButton(text='Save Seqs')
@@ -239,6 +249,8 @@ class ApplicationWindow(QMainWindow):
         self.w_sequence.clicked.connect(self.copy_sequence)
         self.w_save_fasta.clicked.connect(self.save_fasta)
         self.w_enrichment.clicked.connect(self.enrichment)
+        self.w_sfield.currentIndexChanged.connect(self.info_field_changed)
+        self.w_ffield.currentIndexChanged.connect(self.info_field_changed)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
@@ -248,6 +260,58 @@ class ApplicationWindow(QMainWindow):
 
     def closeEvent(self, ce):
         self.fileQuit()
+
+    def annotation_list_right_clicked(self, QPos):
+        self.listMenu = QtWidgets.QMenu()
+        parent_position = self.w_dblist.mapToGlobal(QtCore.QPoint(0, 0))
+        item = self.w_dblist.itemAt(QPos)
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        if db is None:
+            logger.debug('No database for selected item')
+            return
+        menu_details = self.listMenu.addAction("Details")
+        menu_details.triggered.connect(lambda: self.right_menu_details(item))
+        if db.annotatable:
+            menu_delete = self.listMenu.addAction("Delete annotation")
+            menu_delete.triggered.connect(lambda: self.right_menu_delete(item))
+            menu_remove = self.listMenu.addAction("Remove seq. from annotation")
+            menu_remove.triggered.connect(lambda: self.right_menu_remove_feature(item))
+        self.listMenu.move(parent_position + QPos)
+        self.listMenu.show()
+
+    def right_menu_details(self, item):
+        self.double_click_annotation(item)
+
+    def right_menu_delete(self, item):
+        if QtWidgets.QMessageBox.warning(self, "Delete annotation?", "Are you sure you want to delete the annotation:\n%s\n"
+                                         "and all associated features?" % item.text(),
+                                         QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.No:
+            return
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        logger.debug('Deleting annotation %s' % item.text())
+        err = db.delete_annotation(data)
+        if err:
+            logger.error('Annotation not deleted. Error: %s' % err)
+        self.gui.show_info()
+
+    def right_menu_remove_feature(self, item):
+        features = self.gui.get_selected_seqs()
+        if QtWidgets.QMessageBox.warning(self, "Remove feature from annotation?", "Are you sure you want to remove the %d selected features\n"
+                                         "from the annotation:\n%s?" % (len(features), item.text()), QtWidgets.QMessageBox.Yes,
+                                         QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.No:
+            return
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        logger.debug('Removing %d features from annotation %s' % (features, item.text()))
+        err = db.remove_features_from_annotation(features, data)
+        if err:
+            logger.error('Features not removed from annotation. Error: %s' % err)
+
+    def info_field_changed(self):
+        sid, fid, abd = self.gui.get_selection_info()
+        self.gui._update_info_labels(sid, fid, abd)
 
     def copy_sequence(self):
         '''Copy the sequence to the clipboard
@@ -268,7 +332,7 @@ class ApplicationWindow(QMainWindow):
 
         logger.debug('Getting experiment annotations for %d features' % len(allseqs))
         for cdb in self.gui.databases:
-            if not cdb.can_feature_terms():
+            if not cdb.can_get_feature_terms:
                 continue
             logger.debug('Database: %s' % cdb.get_name())
             feature_terms = cdb.get_feature_terms(allseqs, self.gui.exp)
@@ -311,7 +375,11 @@ class ApplicationWindow(QMainWindow):
         # get the sequences of the selection
         seqs = self.gui.get_selected_seqs()
         # annotate
-        self.gui._annotation_db.add_annotation(seqs, self.gui.exp)
+        err = self.gui._annotation_db.add_annotation(seqs, self.gui.exp)
+        if err:
+            logger.error('Error encountered when adding annotaion: %s' % err)
+            return
+        logger.info('Annotation added')
 
 
 class SListWindow(QtWidgets.QDialog):

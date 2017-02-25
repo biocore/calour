@@ -10,6 +10,8 @@ from unittest import main
 from copy import copy, deepcopy
 
 import numpy as np
+import pandas as pd
+import numpy.testing as npt
 from scipy import sparse
 
 from calour._testing import Tests, assert_experiment_equal
@@ -155,6 +157,19 @@ class ExperimentTests(Tests):
         self.assertEqual(data.sum(), exp.data.sum())
         # test it's a copy but inplace
         self.assertIsNot(data, exp.data)
+
+    def test_get_pandas_dense(self):
+        df = self.test1.get_pandas(sparse=False)
+        data = self.test1.get_data(sparse=False)
+        self.assertIsInstance(df, pd.DataFrame)
+        npt.assert_array_almost_equal(df.values, data)
+
+    def test_get_pandas_sparse(self):
+        df = self.test1.get_pandas(sparse=True)
+        data = self.test1.get_data(sparse=False)
+        self.assertIsInstance(df, pd.SparseDataFrame)
+        npt.assert_array_almost_equal(df.to_dense().values, data)
+
 
 if __name__ == "__main__":
     main()

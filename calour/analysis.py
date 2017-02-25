@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -110,34 +109,6 @@ def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transfor
     return newexp
 
 
-def get_annotation_count(seqs, sequence_annotations):
-    '''Get dict of number of each annotation term (from sequence_annotations) in seqs
-
-    Parameters
-    ----------
-    seqs : list of str
-        A list of DNA sequences
-    sequence_annotations : dict of (sequence, list of ontology terms)
-        from dbbact.get_seq_list_fast_annotations()
-
-    Returns
-    -------
-    seq_annotations : dict of (annotationID : count)
-        number of times each annotationID appears for all sequences in seqs combined
-    '''
-    seq_annotations = defaultdict(int)
-    num_seqs_no_annotations = 0
-    for cseq in seqs:
-        if cseq not in sequence_annotations:
-            num_seqs_no_annotations += 1
-            continue
-        for cannotationid in sequence_annotations[cseq]:
-            seq_annotations[cannotationid] += 1
-    if num_seqs_no_annotations > 0:
-        logger.warn('found %d sequences with no annotations out of %d' % (num_seqs_no_annotations, len(seqs)))
-    return seq_annotations
-
-
 def get_term_features(seqs, sequence_annotations):
     '''Get dict of number of appearances in each sequence keyed by term
 
@@ -175,158 +146,6 @@ def get_term_features(seqs, sequence_annotations):
     return seq_annotations
 
 
-def annotation_enrichment(seqs1, seqs2, sequence_annotations):
-    '''Test annotation enrichment for 2 groups of sequences
-
-    Test for enrichment in annotations in sequences from seqs1 compared to sequences from seqs2
-    Note: this test is done independently for each annotation
-
-    Parameters
-    ----------
-    seqs1 : list of str
-        A list of DNA sequences
-    seqs2 : list of str
-        A list of DNA sequences
-    sequence_annotations : dict of (sequence, list of annotationIDs)
-        from dbbact.get_seq_list_fast_annotations()
-
-    Returns
-    -------
-    newplist: list of dict
-        One item per enriched annotation (following BH-FDR control), with the following keys/values:
-            'pval' - pvalue of the enrichment
-            'observed' - number of times annotation was observed in seqs1
-            'expected' - number of times annotation was expected to appear in seqs1 under null model
-            'group1' - fraction of sequences in seqs1 having the annotation
-            'group2' - fraction of sequences in seqs2 having the annotation
-            'description' - the annotation which is enriched
-    '''
-    logger.debug('enrichment. number of sequences in group1 and 2 is: %d, %d' % (len(seqs1), len(seqs2)))
-    group1_annotations = get_annotation_count(seqs1, sequence_annotations)
-    group2_annotations = get_annotation_count(seqs2, sequence_annotations)
-
-    all_annotations = set(group1_annotations.keys()).union(set(group2_annotations.keys()))
-    len1 = len(seqs1)
-    len2 = len(seqs2)
-    tot_len = len1 + len2
-    # the list of p-values for fdr
-    allp = []
-    # list of info per p-value
-    pv = []
-    for cterm in all_annotations:
-        num1 = group1_annotations.get(cterm, 0)
-        num2 = group2_annotations.get(cterm, 0)
-        pval = float(num1 + num2) / tot_len
-        pval1 = 1 - stats.binom.cdf(num1, len1, pval)
-        pval2 = 1 - stats.binom.cdf(num2, len2, pval)
-        p = np.min([pval1, pval2])
-        # store the result
-        allp.append(p)
-        cpv = {}
-        cpv['pval'] = p
-        cpv['observed'] = num1
-        cpv['expected'] = pval * len1
-        cpv['group1'] = float(num1) / len1
-        cpv['group2'] = float(num2) / len2
-        cpv['description'] = cterm
-        pv.append(cpv)
-
-    reject, _, _, _ = multipletests(allp, method='fdr_bh')
-    keep = np.where(reject)[0]
-    plist = []
-    rat = []
-    for cidx in keep:
-        plist.append(pv[cidx])
-        rat.append(np.abs(float(pv[cidx]['observed'] - pv[cidx]['expected'])) / np.mean([pv[cidx]['observed'], pv[cidx]['expected']]))
-    print('found %d' % len(keep))
-    si = np.argsort(rat)
-    si = si[::-1]
-    newplist = []
-    for idx, crat in enumerate(rat):
-        newplist.append(plist[si[idx]])
-
-    return(newplist)
-
-
-def term_enrichment(seqs1, seqs2, sequence_terms):
-    '''Test annotation enrichment for 2 groups of sequences
-
-    Test for enrichment in ontology terms in sequences from seqs1 compared to sequences from seqs2
-    Note: this test is done for all ontology terms in all annotations of the sequences (and the parent ontology terms)
-
-    Parameters
-    ----------
-    seqs1 : list of str
-        A list of DNA sequences
-    seqs2 : list of str
-        A list of DNA sequences
-    sequence_terms : dict of (sequence, list of ontology terms)
-        from dbbact.get_seq_list_fast_annotations()
-
-    Returns
-    -------
-    newplist: list of dict
-        One item per enriched annotation (following BH-FDR control), with the following keys/values:
-            'tstat' : the t-statistic for the ontolgy term
-            'pval' - pvalue of the ontology term enrichment
-            'group1' - number of timers the ontology term appears in seqs1
-            'group2' - number of timers the ontology term appears in seqs2
-            'description' - name of the ontology term which is enriched
-    '''
-    logger.debug('enrichment. number of sequences in group1, 2 is %d, %d' % (len(seqs1), len(seqs2)))
-    if len(sequence_terms) == 0:
-        logger.debug('no terms in list')
-        return []
-
-    group1_terms = get_term_features(seqs1, sequence_terms)
-    group2_terms = get_term_features(seqs2, sequence_terms)
-
-    len1 = len(seqs1)
-    len2 = len(seqs2)
-
-    all_terms = set(group1_terms.keys()).union(set(group2_terms.keys()))
-    # the list of p-values for fdr
-    allp = []
-    # list of info per p-value
-    pv = []
-    for cterm in all_terms:
-        # t, p = stats.ranksums(group1_terms[cterm], group2_terms[cterm])
-        t, p = stats.mannwhitneyu(group1_terms[cterm]+np.random.normal(size=len(group1_terms[cterm]))*0.001,
-                                  group2_terms[cterm]+np.random.normal(size=len(group2_terms[cterm]))*0.001,
-                                  alternative='two-sided')
-        # store the result
-        allp.append(p)
-        cpv = {}
-        cpv['tstat'] = t
-        cpv['pval'] = p
-        cpv['group1'] = np.sum(group1_terms[cterm])
-        cpv['group2'] = np.sum(group2_terms[cterm])
-        cpv['description'] = cterm
-        pv.append(cpv)
-
-    reject, _, _, _ = multipletests(allp, method='fdr_bh')
-    keep = np.where(reject)[0]
-    plist = []
-    rat = []
-    newpvals = []
-    for cidx in keep:
-        plist.append(pv[cidx])
-        crat = np.abs(pv[cidx]['group1'] / len1 - pv[cidx]['group2'] / len2) / np.mean([pv[cidx]['group1'] / len1, pv[cidx]['group2'] / len2])
-        rat.append(crat)
-        pv[cidx]['ratio'] = crat
-        newpvals.append(pv[cidx]['pval'])
-    rat = np.array(rat)
-    # si = np.argsort(rat)
-    si = np.argsort(newpvals)[::-1]
-    rat = rat[si]
-    si = si[::-1]
-    newplist = []
-    for idx, crat in enumerate(rat):
-        newplist.append(plist[si[idx]])
-
-    return(newplist)
-
-
 def relative_enrichment(exp, features, feature_terms):
     '''Get the list of enriched terms in features compared to all features in exp, given uneven distribtion of number of terms per feature
 
@@ -342,6 +161,17 @@ def relative_enrichment(exp, features, feature_terms):
             the feature (out of exp) to which the terms relate
         feature_terms (value) : list of str or int
             the terms associated with this feature
+
+    Returns
+    -------
+    list of dict
+        info about significantly enriched terms. one item per term, keys are:
+        'pval' : the p-value for the enrichment (float)
+        'observed' : the number of observations of this term in group1 (int)
+        'expected' : the expected (based on all features) number of observations of this term in group1 (float)
+        'group1' : fraction of total terms in group 1 which are the specific term (float)
+        'group2' : fraction of total terms in group 2 which are the specific term (float)
+        'description' : the term (str)
     '''
     all_features = set(exp.feature_metadata.index.values)
     bg_features = list(all_features.difference(features))

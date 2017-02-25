@@ -102,7 +102,7 @@ def create_plot_gui(exp, gui='cli', databases=('dbbact',)):
         cdb = DBClass()
         gui_obj.databases.append(cdb)
         # select the database for use with the annotate button
-        if cdb.can_annotate():
+        if cdb.annotatable:
             if gui_obj._annotation_db is None:
                 gui_obj._annotation_db = cdb
             else:
@@ -256,8 +256,28 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def plot(exp, gui, databases=('dbbact',), **kwargs):
+def plot(exp, gui='cli', databases=('dbbact',), **kwargs):
     gui_obj = create_plot_gui(exp, gui, databases)
     exp.heatmap(axis=gui_obj.axis, **kwargs)
     # set up the gui ready for interaction
     gui_obj()
+
+
+def plot_sort(exp, field=None, **kwargs):
+    '''Plot bacteria after sorting by field
+    This is a convenience wrapper for plot()
+    Note: if sample_field is in **kwargs, use it as labels after sorting using field
+
+    Parameters
+    ----------
+    field : str or None (optional)
+        The field to sort samples by before plotting
+    '''
+    if field is not None:
+        newexp = exp.sort_samples(field)
+    else:
+        newexp = exp
+    if 'sample_field' in kwargs:
+        newexp.plot(**kwargs)
+    else:
+        newexp.plot(sample_field=field, **kwargs)

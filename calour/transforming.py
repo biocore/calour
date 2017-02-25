@@ -82,6 +82,7 @@ def scale(exp, axis=1, inplace=False):
     -------
     ``Experiment``
     '''
+    logger.debug('scaling the data, axis=%d' % axis)
     if not inplace:
         exp = deepcopy(exp)
     if exp.sparse:
@@ -105,6 +106,7 @@ def binarize(exp, threshold=1, inplace=False):
     -------
     ``Experiment``
     '''
+    logger.debug('binarizing the data. threshold=%f' % threshold)
     if not inplace:
         exp = deepcopy(exp)
     preprocessing.binarize(exp.data, threshold=threshold, copy=False)
@@ -124,6 +126,7 @@ def log_n(exp, n=1, inplace=False):
     -------
     ``Experiment``
     '''
+    logger.debug('log_n transforming the data, min. threshold=%f' % n)
     if not inplace:
         exp = deepcopy(exp)
 
