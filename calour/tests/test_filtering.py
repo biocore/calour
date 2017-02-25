@@ -177,6 +177,21 @@ class FilteringTests(Tests):
         self.assertEqual(exp.shape[1], 3)
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
+    def test_filter_ids_default(self):
+        okseqs = ['TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
+                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
+                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG',
+                  'pita']
+        exp = self.test1.filter_ids(okseqs)
+        self.assertEqual(list(exp.feature_metadata.index.values), okseqs[:-1])
+        self.assertIsNot(exp, self.test1)
+
+    def test_filter_ids_samples_inplace_negate(self):
+        badsamples = ['S1', 'S3', 'S5', 'S7', 'S9', 'S11', 'S13', 'S15', 'S17', 'S19', 'pita']
+        oksamples = list(set(self.test1.sample_metadata.index.values).difference(set(badsamples)))
+        exp = self.test1.filter_ids(badsamples, axis=0, negate=True, inplace=True)
+        self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)
+        self.assertIs(exp, self.test1)
 
 if __name__ == '__main__':
     main()

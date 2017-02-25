@@ -341,4 +341,4 @@ class PlotGUI(ABC):
         seqs : list of str
             The selected sequences ('ACGT')
         '''
-        return self.exp.feature_metadata.index[self.selected_features.keys()]
+        return list(self.exp.feature_metadata.index[list(self.selected_features.keys())])

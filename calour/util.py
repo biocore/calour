@@ -212,3 +212,18 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
     value = config[section][key]
     logger.debug('found value %s for key %s' % (value, key))
     return value
+
+
+def set_log_level(level):
+    '''Set the debug level for calour
+
+    Parameters
+    ----------
+    level : int
+        10 for debug, 20 for info, 30 for warn, etc.
+    '''
+
+    clog = getLogger('calour')
+    if level < 10:
+        level = 10
+    clog.setLevel(level)

@@ -217,6 +217,9 @@ class ApplicationWindow(QMainWindow):
         self.w_dblist = QListWidget()
         self.w_dblist.itemDoubleClicked.connect(self.double_click_annotation)
         userside.addWidget(self.w_dblist)
+        # the annotation list right mouse menu
+        self.w_dblist.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.w_dblist.customContextMenuRequested.connect(self.annotation_list_right_clicked)
         # buttons at bottom
         lbox_buttons_bottom = QHBoxLayout()
         self.w_save_fasta = QPushButton(text='Save Seqs')
@@ -257,6 +260,54 @@ class ApplicationWindow(QMainWindow):
 
     def closeEvent(self, ce):
         self.fileQuit()
+
+    def annotation_list_right_clicked(self, QPos):
+        self.listMenu = QtWidgets.QMenu()
+        parent_position = self.w_dblist.mapToGlobal(QtCore.QPoint(0, 0))
+        item = self.w_dblist.itemAt(QPos)
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        if db is None:
+            logger.debug('No database for selected item')
+            return
+        menu_details = self.listMenu.addAction("Details")
+        menu_details.triggered.connect(lambda: self.right_menu_details(item))
+        if db.annotatable:
+            menu_delete = self.listMenu.addAction("Delete annotation")
+            menu_delete.triggered.connect(lambda: self.right_menu_delete(item))
+            menu_remove = self.listMenu.addAction("Remove seq. from annotation")
+            menu_remove.triggered.connect(lambda: self.right_menu_remove_feature(item))
+        self.listMenu.move(parent_position + QPos)
+        self.listMenu.show()
+
+    def right_menu_details(self, item):
+        self.double_click_annotation(item)
+
+    def right_menu_delete(self, item):
+        if QtWidgets.QMessageBox.warning(self, "Delete annotation?", "Are you sure you want to delete the annotation:\n%s\n"
+                                         "and all associated features?" % item.text(),
+                                         QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.No:
+            return
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        logger.debug('Deleting annotation %s' % item.text())
+        err = db.delete_annotation(data)
+        if err:
+            logger.error('Annotation not deleted. Error: %s' % err)
+        self.gui.show_info()
+
+    def right_menu_remove_feature(self, item):
+        features = self.gui.get_selected_seqs()
+        if QtWidgets.QMessageBox.warning(self, "Remove feature from annotation?", "Are you sure you want to remove the %d selected features\n"
+                                         "from the annotation:\n%s?" % (len(features), item.text()), QtWidgets.QMessageBox.Yes,
+                                         QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.No:
+            return
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        logger.debug('Removing %d features from annotation %s' % (features, item.text()))
+        err = db.remove_features_from_annotation(features, data)
+        if err:
+            logger.error('Features not removed from annotation. Error: %s' % err)
 
     def info_field_changed(self):
         sid, fid, abd = self.gui.get_selection_info()
@@ -324,7 +375,11 @@ class ApplicationWindow(QMainWindow):
         # get the sequences of the selection
         seqs = self.gui.get_selected_seqs()
         # annotate
-        self.gui._annotation_db.add_annotation(seqs, self.gui.exp)
+        err = self.gui._annotation_db.add_annotation(seqs, self.gui.exp)
+        if err:
+            logger.error('Error encountered when adding annotaion: %s' % err)
+            return
+        logger.info('Annotation added')
 
 
 class SListWindow(QtWidgets.QDialog):

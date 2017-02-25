@@ -95,6 +95,42 @@ class Database(ABC):
         logger.debug('Generic function for add_annotations')
         return 'Not implemented'
 
+    def delete_annotation(self, annotation_details):
+        '''Delete an annotation from the database (if allowed)
+
+        Parameters
+        ----------
+        annotation_details : dict
+            The details about the annotation to delete (annotationdetails from get_seq_annotation_strings() )
+            Should contain a unique identifier for the annotation (created/used by the database)
+
+        Returns
+        -------
+        str
+            empty if ok, otherwise the error encountered
+        '''
+        logger.debug('Generic function for delete_annotation')
+        return 'Not implemented'
+
+    def remove_feature_from_annotation(self, features, annotation_details):
+        '''remove a feature from the annotation in the database (if allowed)
+
+        Parameters
+        ----------
+        features : list of str
+            The feature ids to remove
+        annotation_details : dict
+            The details about the annotation to delete (annotationdetails from get_seq_annotation_strings() )
+            Should contain a unique identifier for the annotation (created/used by the database)
+
+        Returns
+        -------
+        str
+            empty if ok, otherwise the error encountered
+        '''
+        logger.debug('Generic function for remove_features_from_annotation')
+        return 'Not implemented'
+
     def get_feature_terms(self, features, exp=None):
         '''Get list of terms per feature
 

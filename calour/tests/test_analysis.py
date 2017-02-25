@@ -111,7 +111,6 @@ class TestAnalysis(Tests):
         res = relative_enrichment(self.test1, f[:5], feature_terms)
         # we get 2 enriched features
         self.assertEqual(len(res), 2)
-        print(res)
         # and the correct enrichment terms
         expected = [{'group2': 0.0, 'group1': 0.31428571428571428, 'description': 'e', 'observed': 11.0,
                      'pval': 0.0077273098637136162, 'expected': 5.7462686567164178},

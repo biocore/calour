@@ -303,3 +303,42 @@ def filter_mean(exp, cutoff=0.01, **kwargs):
     factor = np.mean(exp.data.sum(axis=1))
     newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
     return newexp
+
+
+def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
+    '''Filter samples or features based on a list index values
+
+    Parameters
+    ----------
+    ids : iterable of str
+        the feature/sample ids to filter (index values)
+    axis : int (optional)
+        1 (default) to filter features, 0 to filter samples
+    negate : bool (optional)
+        False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.
+    inplace : bool (optional)
+        False (default) to create a copy of the experiment, True to filter inplace
+
+    Returns
+    -------
+    ``Experiment``
+        filtered so contains only features/samples present in exp and in ids
+    '''
+    logger.debug('filter_ids')
+    okpos = []
+    tot_ids = 0
+    if axis == 0:
+        index = exp.sample_metadata.index
+    else:
+        index = exp.feature_metadata.index
+    for cid in ids:
+        tot_ids += 1
+        if cid in index:
+            pos = index.get_loc(cid)
+            okpos.append(pos)
+    logger.debug('list contained %d sequences. Found %d sequences in experiment' % (tot_ids, len(okpos)))
+    if negate:
+        okpos = np.setdiff1d(np.arange(len(index)), okpos, assume_unique=True)
+
+    newexp = exp.reorder(okpos, axis=axis, inplace=inplace)
+    return newexp
