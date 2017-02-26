@@ -281,7 +281,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
 
     # calculate permutation p-vals
     pvals = np.zeros([numbact])  # p-value for original test statistic t
-    pvals_u = np.zeros([numbact, numperm])  # pseudo p-values for permutated test statistic u 
+    pvals_u = np.zeros([numbact, numperm])  # pseudo p-values for permutated test statistic u
     for crow in range(numbact):
         allstat = np.hstack([t[crow], u[crow, :]])
         allstat = 1 - (sp.stats.rankdata(allstat, method='min') / len(allstat))
