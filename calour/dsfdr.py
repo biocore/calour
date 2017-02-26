@@ -163,7 +163,7 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
                     index.append(i)  
             else:
                 index.append(i)
-        data = data[index,:]    
+        data = data[index, :]    
 
 
     # transform the data
@@ -213,12 +213,12 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
         if method == 'stdmeandiff':
             method = stdmeandiff
             
-        tstat = method(data,labels)
+        tstat = method(data, labels)
         t = np.abs(tstat)
-        u = np.zeros([numbact,numperm])
+        u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
             rlabels = np.random.permutation(labels)
-            rt = method(data,rlabels)
+            rt = method(data, rlabels)
             u[:,cperm] = rt
 
     elif method == 'spearman' or method == 'pearson':
@@ -227,15 +227,15 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
             data = rankdata(data)
             labels = sp.stats.rankdata(labels)
         meanval = np.mean(data,axis=1).reshape([data.shape[0],1])
-        data = data-np.repeat(meanval,data.shape[1],axis=1)
+        data = data-np.repeat(meanval, data.shape[1],axis=1)
         labels = labels-np.mean(labels)
         tstat = np.dot(data, labels)
         t = np.abs(tstat)
         permlabels = np.zeros([len(labels), numperm])
         for cperm in range(numperm):
             rlabels = np.random.permutation(labels)
-            permlabels[:,cperm] = rlabels
-        u = np.abs(np.dot(data,permlabels))
+            permlabels[:, cperm] = rlabels
+        u = np.abs(np.dot(data, permlabels))
 
     elif method == 'nonzerospearman' or method == 'nonzeropearson':
         t = np.zeros([numbact])
@@ -261,12 +261,12 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
 
     elif isinstance(method, types.FunctionType):
         # call the user-defined function of statistical test
-        t = method(data,labels)
+        t = method(data, labels)
         tstat = t.copy()
-        u = np.zeros([numbact,numperm])
+        u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
             rlabels = np.random.permutation(labels)
-            rt = method(data,rlabels)
+            rt = method(data, rlabels)
             u[:, cperm] = rt
     else:
         print('unsupported method %s' % method)
@@ -274,15 +274,15 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
 
     # fix floating point errors (important for permutation values!)
     for crow in range(numbact):
-        closepos = np.isclose(t[crow],u[crow,:])
+        closepos = np.isclose(t[crow], u[crow,:])
         u[crow,closepos] = t[crow]
 
     # calculate permutation p-vals
     pvals = np.zeros([numbact]) # p-value for original test statistic t
-    pvals_u = np.zeros([numbact,numperm])  # pseudo p-values for permutated test statistic u 
+    pvals_u = np.zeros([numbact, numperm])  # pseudo p-values for permutated test statistic u 
     for crow in range(numbact):
-        allstat = np.hstack([t[crow],u[crow,:]])
-        allstat = 1-(sp.stats.rankdata(allstat,method='min') / len(allstat))
+        allstat = np.hstack([t[crow], u[crow,:]])
+        allstat = 1-(sp.stats.rankdata(allstat, method='min') / len(allstat))
         pvals[crow] = allstat[0]    
         pvals_u[crow,:] = allstat[1:]
 
@@ -309,7 +309,7 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
 
         if not foundit:
             # no good threshold was found
-            reject = np.repeat([False],numbact)
+            reject = np.repeat([False], numbact)
             return reject, tstat, pvals
 
         # fill the reject null hypothesis
