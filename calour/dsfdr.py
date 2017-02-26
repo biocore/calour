@@ -40,23 +40,23 @@ def binarydata(data):
 
 def normdata(data):
     logger.debug('normalizing the data')
-    data = data / np.sum(data, axis = 0)
+    data = data / np.sum(data, axis=0)
     return data
 
 
 # different methods to calculate test statistic
 def meandiff(data, labels):
-    mean0 = np.mean(data[:, labels == 0], axis = 1)
-    mean1 = np.mean(data[:, labels == 1], axis = 1)
+    mean0 = np.mean(data[:, labels == 0], axis=1)
+    mean1 = np.mean(data[:, labels == 1], axis=1)
     tstat = mean1 - mean0
     return tstat
 
 
 def stdmeandiff(data, labels):
-    mean0 = np.mean(data[:, labels == 0], axis = 1)
-    mean1 = np.mean(data[:, labels == 1], axis = 1)
-    sd0 = np.std(data[:, labels == 0], axis = 1, ddof = 1)
-    sd1 = np.std(data[:, labels == 1], axis = 1, ddof = 1)
+    mean0 = np.mean(data[:, labels == 0], axis=1)
+    mean1 = np.mean(data[:, labels == 1], axis=1)
+    sd0 = np.std(data[:, labels == 0], axis=1, ddof=1)
+    sd1 = np.std(data[:, labels == 1], axis=1, ddof=1)
     tstat = (mean1 - mean0) / (sd1 + sd0)
     return tstat
 
@@ -95,7 +95,7 @@ def spearman(data, labels):
 
 
 # new fdr method 
-def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha = 0.1, numperm = 1000, fdrmethod = 'dsfdr'):
+def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, numperm=1000, fdrmethod='dsfdr'):
     '''
     calculate the Discrete FDR for the data
 
@@ -152,13 +152,14 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
 
     if fdrmethod == "filterBH":
         index = []
-        n0 = np.sum(labels==0)
-        n1 = np.sum(labels==1)
+        n0 = np.sum(labels == 0)
+        n1 = np.sum(labels == 1)
 
         for i in range(np.shape(data)[0]):
-            nonzeros = np.count_nonzero(data[i,:])
-            if nonzeros < min(n0,n1):
-                pval_min = (comb(n0, nonzeros, exact=True) + comb(n1, nonzeros, exact=True)) / comb(n0 + n1, nonzeros)
+            nonzeros = np.count_nonzero(data[i, :])
+            if nonzeros < min(n0, n1):
+                pval_min = (comb(n0, nonzeros, exact=True) + 
+                    comb(n1, nonzeros, exact=True)) / comb(n0 + n1, nonzeros)
                 if pval_min <= alpha:
                     index.append(i)  
             else:
@@ -205,7 +206,8 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
         mean2 = np.dot(data, p2)
         u = np.abs(mean1 - mean2)
 
-    elif method == 'mannwhitney' or method == 'kruwallis' or method == 'stdmeandiff':
+    elif method == 'mannwhitney' or method == 'kruwallis' 
+        or method == 'stdmeandiff':
         if method == 'mannwhitney':
             method = mannwhitney
         if method == 'kruwallis':
@@ -219,16 +221,16 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
         for cperm in range(numperm):
             rlabels = np.random.permutation(labels)
             rt = method(data, rlabels)
-            u[:,cperm] = rt
+            u[:, cperm] = rt
 
     elif method == 'spearman' or method == 'pearson':
         # fast matrix multiplication based correlation
         if method == 'spearman':
             data = rankdata(data)
             labels = sp.stats.rankdata(labels)
-        meanval = np.mean(data,axis=1).reshape([data.shape[0],1])
-        data = data-np.repeat(meanval, data.shape[1],axis=1)
-        labels = labels-np.mean(labels)
+        meanval = np.mean(data, axis=1).reshape([data.shape[0], 1])
+        data = data - np.repeat(meanval, data.shape[1], axis=1)
+        labels = labels - np.mean(labels)
         tstat = np.dot(data, labels)
         t = np.abs(tstat)
         permlabels = np.zeros([len(labels), numperm])
@@ -256,7 +258,7 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
             permlabels = np.zeros([len(label_nonzero), numperm])
             for cperm in range(numperm):
                 rlabels = np.random.permutation(label_nonzero)
-                permlabels[:,cperm] = rlabels
+                permlabels[:, cperm] = rlabels
             u[i, :] = np.abs(np.dot(sample_nonzero, permlabels))
 
     elif isinstance(method, types.FunctionType):
@@ -268,23 +270,23 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
             rlabels = np.random.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
-    else:
+    else:        
         print('unsupported method %s' % method)
-        return None,None
+        return None, None
 
     # fix floating point errors (important for permutation values!)
     for crow in range(numbact):
-        closepos = np.isclose(t[crow], u[crow,:])
-        u[crow,closepos] = t[crow]
+        closepos = np.isclose(t[crow], u[crow, :])
+        u[crow, closepos] = t[crow]
 
     # calculate permutation p-vals
-    pvals = np.zeros([numbact]) # p-value for original test statistic t
+    pvals = np.zeros([numbact])  # p-value for original test statistic t
     pvals_u = np.zeros([numbact, numperm])  # pseudo p-values for permutated test statistic u 
     for crow in range(numbact):
-        allstat = np.hstack([t[crow], u[crow,:]])
-        allstat = 1-(sp.stats.rankdata(allstat, method='min') / len(allstat))
+        allstat = np.hstack([t[crow], u[crow, :]])
+        allstat = 1 - (sp.stats.rankdata(allstat, method='min') / len(allstat))
         pvals[crow] = allstat[0]    
-        pvals_u[crow,:] = allstat[1:]
+        pvals_u[crow, :] = allstat[1:]
 
     # calculate FDR
     if fdrmethod == 'dsfdr':
@@ -313,18 +315,20 @@ def dsfdr(data, labels, transformtype = 'rankdata', method = 'meandiff', alpha =
             return reject, tstat, pvals
 
         # fill the reject null hypothesis
-        reject = np.zeros(numbact, dtype = int)
+        reject = np.zeros(numbact, dtype=int)
         reject = (pvals <= realcp)      
-        
+
     elif fdrmethod == 'bhfdr' or fdrmethod == 'filterBH':
         t_star = np.array([t, ] * numperm).transpose()
-        pvals = (np.sum(u >= t_star,axis=1) + 1) / (numperm + 1)
-        reject = statsmodels.sandbox.stats.multicomp.multipletests(pvals, alpha = alpha, method = 'fdr_bh')[0]
+        pvals = (np.sum(u >= t_star, axis=1) + 1) / (numperm + 1)
+        reject = statsmodels.sandbox.stats.multicomp.multipletests(pvals, 
+            alpha=alpha, method='fdr_bh')[0]
 
-    elif fdrmethod =='byfdr':
+    elif fdrmethod == 'byfdr':
         t_star = np.array([t, ] * numperm).transpose()
-        pvals = (np.sum(u >= t_star,axis=1) + 1) / (numperm + 1)
-        reject = statsmodels.sandbox.stats.multicomp.multipletests(pvals, alpha = alpha, method = 'fdr_by')[0]
+        pvals = (np.sum(u >= t_star, axis=1) + 1) / (numperm + 1)
+        reject=statsmodels.sandbox.stats.multicomp.multipletests(pvals, 
+            alpha=alpha, method='fdr_by')[0]
 
     else:
         raise ValueError('fdr method %s not supported' % fdrmethod)
