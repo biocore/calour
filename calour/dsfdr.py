@@ -270,7 +270,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
             rlabels = np.random.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
-    else:        
+    else:
         print('unsupported method %s' % method)
         return None, None
 
@@ -285,7 +285,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
     for crow in range(numbact):
         allstat = np.hstack([t[crow], u[crow, :]])
         allstat = 1 - (sp.stats.rankdata(allstat, method='min') / len(allstat))
-        pvals[crow] = allstat[0]    
+        pvals[crow] = allstat[0]
         pvals_u[crow, :] = allstat[1:]
 
     # calculate FDR
@@ -307,7 +307,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
             if fdr <= alpha:
                 realcp = cp
                 foundit = True
-                break   
+                break
 
         if not foundit:
             # no good threshold was found
@@ -316,7 +316,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
 
         # fill the reject null hypothesis
         reject = np.zeros(numbact, dtype=int)
-        reject = (pvals <= realcp)      
+        reject = (pvals <= realcp)
 
     elif fdrmethod == 'bhfdr' or fdrmethod == 'filterBH':
         t_star = np.array([t, ] * numperm).transpose()
