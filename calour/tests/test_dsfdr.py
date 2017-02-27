@@ -11,7 +11,7 @@ from calour import dsfdr
 # npt.almost equal (round to 1 if bigger than 0.5)
 
 
-class FDRmethodsTests(TestCase):
+class fdr_methodsTests(TestCase):
 
     def setUp(self):
         np.random.seed(31)
@@ -26,38 +26,38 @@ class FDRmethodsTests(TestCase):
 
     def test_dsfdr(self):
         # test on dummy self.data
-        res_ds = dsfdr.dsfdr(self.data, self.labels, method='meandiff', transform='none',
-                             alpha=0.1, numperm=1000, fdrmethod='dsfdr')
+        res_ds = dsfdr.dsfdr(self.data, self.labels, method='meandiff', transform_type='none',
+                             alpha=0.1, numperm=1000, fdr_method='dsfdr')
         self.assertEqual(np.shape(res_ds)[0], self.data.shape[0])
         np.testing.assert_array_equal(res_ds[0], [True, False, False])
 
-        res_bh = dsfdr.dsfdr(self.data, self.labels, method='meandiff', transform='none',
-                             alpha=0.1, numperm=1000, fdrmethod='bhfdr')
+        res_bh = dsfdr.dsfdr(self.data, self.labels, method='meandiff', transform_type='none',
+                             alpha=0.1, numperm=1000, fdr_method='bhfdr')
         self.assertEqual(np.shape(res_bh)[0], self.data.shape[0])
         np.testing.assert_array_equal(res_bh[0], [True, False, False])
 
-        res_by = dsfdr.dsfdr(self.data, self.labels, method='meandiff', transform='none',
-                             alpha=0.1, numperm=1000, fdrmethod='byfdr')
+        res_by = dsfdr.dsfdr(self.data, self.labels, method='meandiff', transform_type='none',
+                             alpha=0.1, numperm=1000, fdr_method='byfdr')
         self.assertEqual(np.shape(res_by)[0], self.data.shape[0])
         np.testing.assert_array_equal(res_by[0], [True, False, False])
 
         # test on simulated self.data_sim
         np.random.seed(31)
-        res_ds2 = dsfdr.dsfdr(self.data_sim, self.labels_sim, method='meandiff', transform='none',
-                              alpha=0.1, numperm=1000, fdrmethod='dsfdr')[0]
+        res_ds2 = dsfdr.dsfdr(self.data_sim, self.labels_sim, method='meandiff', transform_type='none',
+                              alpha=0.1, numperm=1000, fdr_method='dsfdr')[0]
         fdr_ds2 = (np.sum(np.where(res_ds2)[0] >= 100)) / np.sum(res_ds2)
         np.testing.assert_equal(fdr_ds2 <= 0.1, True)
 
         np.random.seed(31)
-        res_bh2 = dsfdr.dsfdr(self.data_sim, self.labels_sim, method='meandiff', transform='none',
-                              alpha=0.1, numperm=1000, fdrmethod='bhfdr')[0]
+        res_bh2 = dsfdr.dsfdr(self.data_sim, self.labels_sim, method='meandiff', transform_type='none',
+                              alpha=0.1, numperm=1000, fdr_method='bhfdr')[0]
         self.assertEqual(np.shape(res_bh2)[0], self.data_sim.shape[0])
         fdr_bh2 = (np.sum(np.where(res_bh2)[0] >= 100)) / np.sum(res_bh2)
         np.testing.assert_equal(fdr_bh2 <= 0.1, True)
 
         np.random.seed(31)
-        res_by2 = dsfdr.dsfdr(self.data_sim, self.labels_sim, method='meandiff', transform='none',
-                              alpha=0.1, numperm=1000, fdrmethod='byfdr')[0]
+        res_by2 = dsfdr.dsfdr(self.data_sim, self.labels_sim, method='meandiff', transform_type='none',
+                              alpha=0.1, numperm=1000, fdr_method='byfdr')[0]
         self.assertEqual(np.shape(res_by2)[0], self.data_sim.shape[0])
         fdr_by2 = (np.sum(np.where(res_by2)[0] >= 100)) / np.sum(res_by2)
         np.testing.assert_equal(fdr_by2 <= 0.1, True)

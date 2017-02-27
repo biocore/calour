@@ -10,7 +10,6 @@ from logging import getLogger
 import importlib
 
 import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 
 from ..transforming import log_n
@@ -157,6 +156,8 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     ``matplotlib.figure.Figure``
 
     '''
+    import matplotlib.pyplot as plt
+
     logger.debug('plot heatmap')
     numrows, numcols = exp.shape
     # step 1. transform data
