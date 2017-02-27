@@ -22,7 +22,7 @@ class PlotGUI_Jupyter(PlotGUI):
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
         if matplotlib.get_backend() != 'nbAgg':
-            raise RuntimeError('You need to set up jupyter notebook with `%matplotlib notebook`')
+            logger.warning('You need to set up jupyter notebook with `%matplotlib notebook`')
 
     def __call__(self):
         super().__call__()
