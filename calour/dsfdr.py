@@ -150,7 +150,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
 
     data = data.copy()
 
-    if fdrmethod == "filterBH":
+    if fdrmethod == 'filterBH':
         index = []
         n0 = np.sum(labels == 0)
         n1 = np.sum(labels == 1)
@@ -188,7 +188,7 @@ def dsfdr(data, labels, transformtype='rankdata', method='meandiff', alpha=0.1, 
     numbact = np.shape(data)[0]
     labels = labels.copy()
 
-    if method == "meandiff":
+    if method == 'meandiff':
         # fast matrix multiplication based calculation
         method = meandiff
         tstat = method(data, labels)
