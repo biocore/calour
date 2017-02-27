@@ -109,7 +109,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         (0/1 if binary, 0-G-1 if G groups, or numeric values for correlation)
 
 
-    transform_type : str or ''
+    transform_type : str or None
         transformation to apply to the data before caluculating
         the test statistic
         'rankdata' : rank transfrom each OTU reads
@@ -282,6 +282,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         return None, None
 
     # fix floating point errors (important for permutation values!)
+    # https://github.com/numpy/numpy/issues/8116
     for crow in range(numbact):
         closepos = np.isclose(t[crow], u[crow, :])
         u[crow, closepos] = t[crow]
