@@ -115,7 +115,7 @@ def create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 
 def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
-            title=None, clim=(0, 10), cmap=None,
+            title=None, clim=None, cmap=None,
             axis=None, rect=None,  transform=log_n, **kwargs):
     '''Plot a heatmap for the experiment.
 
@@ -134,7 +134,8 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         The maximal number of feature names to display in the plot (when zoomed out)
         0 to show all labels
     clim : tuple of (float, float) or None (optional)
-        the min and max values for the heatmap or None to use all range
+        the min and max values for the heatmap or None to use all range. It uses the min
+        and max values in the ``data`` array by default.
     xticklabel_rot : float (optional)
         The rotation angle for the x labels (if sample_field is supplied)
     xticklabel_len : int (optional) or None
@@ -259,13 +260,15 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
 def plot(exp, gui='cli', databases=('dbbact',), **kwargs):
     gui_obj = create_plot_gui(exp, gui, databases)
     exp.heatmap(axis=gui_obj.axis, **kwargs)
-    # set up the gui ready for interaction
     gui_obj()
+    # set up the gui ready for interaction
 
 
 def plot_sort(exp, field=None, **kwargs):
-    '''Plot bacteria after sorting by field
+    '''Plot after sorting by sample field.
+
     This is a convenience wrapper for plot()
+
     Note: if sample_field is in **kwargs, use it as labels after sorting using field
 
     Parameters

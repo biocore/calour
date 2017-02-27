@@ -35,8 +35,8 @@ class PlotGUI_Jupyter(PlotGUI):
             value=0, placeholder='Abundance', description='Abundance', layout=layout)
         self._ipyw_selected = ipywidgets.Label('0 features are selected')
         # display selected samples/features
-        display(ipywidgets.VBox(
-            [self._ipyw_selected, self._ipyw_sid, self._ipyw_fid, self._ipyw_abund]))
+        display(self._ipyw_selected)
+        display(ipywidgets.HBox([self._ipyw_sid, self._ipyw_fid, self._ipyw_abund]))
 
         self._ipyw_scol = ipywidgets.Dropdown(
             options=self.exp.sample_metadata.columns.tolist(), width='10%')
