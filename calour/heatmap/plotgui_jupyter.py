@@ -69,7 +69,8 @@ class PlotGUI_Jupyter(PlotGUI):
         display(ipywidgets.HBox([print_axes_lim, save_selection, annotate_selection]))
 
         # display annotation for the selection
-        self._ipyw_annt = ipywidgets.HTML('no annotation found')
+        self._ipyw_annt = ipywidgets.HTML(
+            'no annotation found', layout=ipywidgets.Layout(height='100px', overflow_y='auto'))
         # self._ipyw_annt.layout.overflow = 'auto'
         # self._ipyw_annt.layout.overflow_x = 'auto'
         # self._ipyw_annt.layout.max_height = '50px'
