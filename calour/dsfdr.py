@@ -11,7 +11,8 @@ import types
 import numpy as np
 import scipy as sp
 import scipy.stats
-import statsmodels.sandbox.stats.multicomp
+from statsmodels.sandbox.stats.multicomp import multipletests
+from scipy.special import comb
 
 logger = getLogger(__name__)
 
@@ -64,8 +65,8 @@ def stdmeandiff(data, labels):
 def mannwhitney(data, labels):
     group0 = data[:, labels == 0]
     group1 = data[:, labels == 1]
-    tstat = np.array([scipy.stats.mannwhitneyu(group0[i, :],
-                                               group1[i, :]).statistic for i in range(np.shape(data)[0])])
+    tstat = np.array([scipy.stats.mannwhitneyu(group0[i, :], group1[i, :])
+                      .statistic for i in range(np.shape(data)[0])])
     return tstat
 
 
@@ -84,18 +85,19 @@ def kruwallis(data, labels):
 
 def pearson(data, labels):
     tstat = np.array([scipy.stats.pearsonr(data[i, :],
-                                           labels)[0] for i in range(np.shape(data)[0])])
+                     labels)[0] for i in range(np.shape(data)[0])])
     return tstat
 
 
 def spearman(data, labels):
     tstat = np.array([scipy.stats.spearmanr(data[i, :],
-                                            labels).correlation for i in range(np.shape(data)[0])])
+                     labels).correlation for i in range(np.shape(data)[0])])
     return tstat
 
 
 # new fdr method
-def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, numperm=1000, fdrmethod='dsfdr'):
+def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
+          alpha=0.1, numperm=1000, fdr_method='dsfdr'):
     '''
     calculate the Discrete FDR for the data
 
@@ -103,56 +105,98 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
     data : N x S numpy array
         each column is a sample (S total), each row an OTU (N total)
     labels : a 1d numpy array (length S)
-        the labels of each sample (same order as data) with the group (0/1 if binary, 0-G-1 if G groups, or numeric values for correlation)
-    method : str or function
-        the method to use for the t-statistic test. options:
-        'meandiff' : mean(A)-mean(B) (binary)
-        'mannwhitney' : mann-whitneu u-test (binary)
-        'kruwallis' : kruskal-wallis test (multiple groups)
-        'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
-        'spearman' : spearman correlation (numeric)
-        'pearson' : pearson correlation (numeric)
-        'nonzerospearman' : spearman correlation only non-zero entries (numeric)
-        'nonzeropearson' : pearson correlation only non-zero entries (numeric)
-        function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
+        the labels of each sample (same order as data) with the group
+        (0/1 if binary, 0-G-1 if G groups, or numeric values for correlation)
 
-    transform : str or ''
-        transformation to apply to the data before caluculating the statistic
+
+    transform_type : str or None
+        transformation to apply to the data before caluculating
+        the test statistic
         'rankdata' : rank transfrom each OTU reads
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
+         None : no transformation to perform
+
+    method : str or function
+        the method to use for calculating test statistics:
+        'meandiff' : mean(A)-mean(B) (binary)
+        'mannwhitney' : mann-whitney u-test (binary)
+        'kruwallis' : kruskal-wallis test (multiple groups)
+        'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
+        'spearman' : spearman correlation (numeric)
+        'pearson' : pearson correlation (numeric)
+        'nonzerospearman' : spearman correlation only non-zero entries
+                            (numeric)
+        'nonzeropearson' : pearson correlation only non-zero entries (numeric)
+        function : use this function to calculate the test statistic
+        (input is data,labels, output is array of float)
 
     alpha : float
         the desired FDR control level
     numperm : int
         number of permutations to perform
 
+    fdr_method : str
+        the FDR procedure to determine significant bacteria
+        'dsfdr' : discrete FDR method
+        'bhfdr' : Benjamini-Hochberg FDR method
+        'byfdr' : Benjamini-Yekutielli FDR method
+        'filterBH' : Benjamini-Hochberg FDR method with filtering
+
     output:
     reject : np array of bool (length N)
         True for OTUs where the null hypothesis is rejected
     tstat : np array of float (length N)
-        the t-statistic value for each OTU (for effect size)
+        the test statistic value for each OTU (for effect size)
     pvals : np array of float (length N)
         the p-value for each OTU
     '''
-    logger.debug('dsfdr using fdr method: %s' % fdrmethod)
+
+    logger.debug('dsfdr using fdr method: %s' % fdr_method)
+
     data = data.copy()
+
+    if fdr_method == 'filterBH':
+        index = []
+        n0 = np.sum(labels == 0)
+        n1 = np.sum(labels == 1)
+
+        for i in range(np.shape(data)[0]):
+            nonzeros = np.count_nonzero(data[i, :])
+            if nonzeros < min(n0, n1):
+                pval_min = (comb(n0, nonzeros, exact=True) +
+                            comb(n1, nonzeros,
+                                 exact=True)) / comb(n0 + n1, nonzeros)
+                if pval_min <= alpha:
+                    index.append(i)
+            else:
+                index.append(i)
+        data = data[index, :]
+
     # transform the data
-    if transform == 'rankdata':
+    if transform_type == 'rankdata':
         data = rankdata(data)
-    elif transform == 'log2data':
+    elif transform_type == 'log2data':
         data = log2data(data)
-    elif transform == 'binarydata':
+    elif transform_type == 'binarydata':
         data = binarydata(data)
-    elif transform == 'normdata':
+    elif transform_type == 'normdata':
         data = normdata(data)
+    elif transform_type is None:
+            pass
+    else:
+        raise ValueError('transform type %s not supported' % transform_type)
 
     numbact = np.shape(data)[0]
 
     labels = labels.copy()
-    if method == "meandiff":
-        # do matrix multiplication based calculation
+
+    numbact = np.shape(data)[0]
+    labels = labels.copy()
+
+    if method == 'meandiff':
+        # fast matrix multiplication based calculation
         method = meandiff
         tstat = method(data, labels)
         t = np.abs(tstat)
@@ -169,28 +213,15 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
         mean2 = np.dot(data, p2)
         u = np.abs(mean1 - mean2)
 
-    elif method == 'mannwhitney':
-        method = mannwhitney
-        tstat = method(data, labels)
-        t = np.abs(tstat)
-        u = np.zeros([numbact, numperm])
-        for cperm in range(numperm):
-            rlabels = np.random.permutation(labels)
-            rt = method(data, rlabels)
-            u[:, cperm] = rt
+    elif method == 'mannwhitney' or method == \
+                   'kruwallis' or method == 'stdmeandiff':
+        if method == 'mannwhitney':
+            method = mannwhitney
+        if method == 'kruwallis':
+            method = kruwallis
+        if method == 'stdmeandiff':
+            method = stdmeandiff
 
-    elif method == 'kruwallis':
-        method = kruwallis
-        tstat = method(data, labels)
-        t = np.abs(tstat)
-        u = np.zeros([numbact, numperm])
-        for cperm in range(numperm):
-            rlabels = np.random.permutation(labels)
-            rt = method(data, rlabels)
-            u[:, cperm] = rt
-
-    elif method == 'stdmeandiff':
-        method = stdmeandiff
         tstat = method(data, labels)
         t = np.abs(tstat)
         u = np.zeros([numbact, numperm])
@@ -200,7 +231,7 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
             u[:, cperm] = rt
 
     elif method == 'spearman' or method == 'pearson':
-        # do fast matrix multiplication based correlation
+        # fast matrix multiplication based correlation
         if method == 'spearman':
             data = rankdata(data)
             labels = sp.stats.rankdata(labels)
@@ -238,7 +269,7 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
             u[i, :] = np.abs(np.dot(sample_nonzero, permlabels))
 
     elif isinstance(method, types.FunctionType):
-        # if it's a function, call it
+        # call the user-defined function of statistical test
         t = method(data, labels)
         tstat = t.copy()
         u = np.zeros([numbact, numperm])
@@ -247,17 +278,19 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
             rt = method(data, rlabels)
             u[:, cperm] = rt
     else:
-        logger.warn('unsupported statistic %s' % method)
+        print('unsupported method %s' % method)
         return None, None
 
     # fix floating point errors (important for permutation values!)
+    # https://github.com/numpy/numpy/issues/8116
     for crow in range(numbact):
         closepos = np.isclose(t[crow], u[crow, :])
         u[crow, closepos] = t[crow]
 
     # calculate permutation p-vals
     pvals = np.zeros([numbact])  # p-value for original test statistic t
-    pvals_u = np.zeros([numbact, numperm])  # pseudo p-values for permutated test statistic u
+    pvals_u = np.zeros([numbact, numperm])
+    # pseudo p-values for permutated test statistic u
     for crow in range(numbact):
         allstat = np.hstack([t[crow], u[crow, :]])
         allstat = 1 - (sp.stats.rankdata(allstat, method='min') / len(allstat))
@@ -265,18 +298,20 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
         pvals_u[crow, :] = allstat[1:]
 
     # calculate FDR
-    if fdrmethod == 'dsfdr':
-        # sort the p-values for original test statistics from big to small
+    if fdr_method == 'dsfdr':
+        # sort p-values for original test statistics from biggest to smallest
         sortp = list(set(pvals))
         sortp = np.sort(sortp)
         sortp = sortp[::-1]
 
+        # find a data-dependent threshold for the p-value
         foundit = False
         allfdr = []
         allt = []
         for cp in sortp:
             realnum = np.sum(pvals <= cp)
-            fdr = (realnum + np.count_nonzero(pvals_u <= cp)) / (realnum * (numperm + 1))
+            fdr = (realnum + np.count_nonzero(
+                pvals_u <= cp)) / (realnum * (numperm + 1))
             allfdr.append(fdr)
             allt.append(cp)
             if fdr <= alpha:
@@ -293,15 +328,17 @@ def dsfdr(data, labels, method='meandiff', transform='rankdata', alpha=0.1, nump
         reject = np.zeros(numbact, dtype=int)
         reject = (pvals <= realcp)
 
-    elif fdrmethod == 'bhfdr':
+    elif fdr_method == 'bhfdr' or fdr_method == 'filterBH':
         t_star = np.array([t, ] * numperm).transpose()
         pvals = (np.sum(u >= t_star, axis=1) + 1) / (numperm + 1)
-        reject = statsmodels.sandbox.stats.multicomp.multipletests(pvals, alpha=alpha, method='fdr_bh')[0]
+        reject = multipletests(pvals, alpha=alpha, method='fdr_bh')[0]
 
-    elif fdrmethod == 'byfdr':
+    elif fdr_method == 'byfdr':
         t_star = np.array([t, ] * numperm).transpose()
         pvals = (np.sum(u >= t_star, axis=1) + 1) / (numperm + 1)
-        reject = statsmodels.sandbox.stats.multicomp.multipletests(pvals, alpha=alpha, method='fdr_by')[0]
+        reject = multipletests(pvals, alpha=alpha, method='fdr_by')[0]
 
-    logger.debug('rejected %d null hypothesis' % np.sum(reject))
+    else:
+        raise ValueError('fdr method %s not supported' % fdr_method)
+
     return reject, tstat, pvals

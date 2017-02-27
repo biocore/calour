@@ -89,7 +89,7 @@ def diff_abundance(exp, field, val1=None, val2=None, method='meandiff', transfor
     else:
         labels[cexp.sample_metadata[field].isin(val1).values] = 1
         logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
-    keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform=transform, alpha=alpha, numperm=numperm, fdrmethod=fdr_method)
+    keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
 
     keep = np.where(keep)
 
