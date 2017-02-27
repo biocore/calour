@@ -1,7 +1,7 @@
 # From serenejiang DescreteFDR
 # https://github.com/serenejiang/DiscreteFDR
 
-# revised code for fdr_methods
+# revised code for fdrmethods
 # take away abs in calculating test statistics
 # calculate pvalues for dsfdr
 # pvalue calculation for bh and by fdr
@@ -116,10 +116,10 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
-        'none' : no transformation to perform
+         None : no transformation to perform
 
     method : str or function
-        the method to use for the statistical test. options:
+        the method to use for calculating test statistics:
         'meandiff' : mean(A)-mean(B) (binary)
         'mannwhitney' : mann-whitney u-test (binary)
         'kruwallis' : kruskal-wallis test (multiple groups)
@@ -183,7 +183,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         data = binarydata(data)
     elif transform_type == 'normdata':
         data = normdata(data)
-    elif transform_type == 'none':
+    elif transform_type is None:
             pass
     else:
         raise ValueError('transform type %s not supported' % transform_type)
