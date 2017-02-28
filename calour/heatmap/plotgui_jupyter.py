@@ -26,7 +26,7 @@ class PlotGUI_Jupyter(PlotGUI):
 
     def __call__(self):
         super().__call__()
-        layout = ipywidgets.Layout(width='100%')
+        layout = ipywidgets.Layout(width='100%', word_wrap='normal', white_space='nowrap')
         self._ipyw_sid = ipywidgets.Text(
             value='-', placeholder='Sample ID', description='Sample ID', layout=layout)
         self._ipyw_fid = ipywidgets.Text(
@@ -39,15 +39,19 @@ class PlotGUI_Jupyter(PlotGUI):
         display(ipywidgets.HBox([self._ipyw_sid, self._ipyw_fid, self._ipyw_abund]))
 
         self._ipyw_scol = ipywidgets.Dropdown(
-            options=self.exp.sample_metadata.columns.tolist(), width='10%')
+            options=self.exp.sample_metadata.columns.tolist(),
+            layout=ipywidgets.Layout(width='20%'))
         self._ipyw_scol.observe(self._on_change(axis=0))
         self._ipyw_fcol = ipywidgets.Dropdown(
-            options=self.exp.feature_metadata.columns.tolist(), width='10%')
+            options=self.exp.feature_metadata.columns.tolist(),
+            layout=ipywidgets.Layout(width='20%'))
         self._ipyw_fcol.observe(self._on_change(axis=1))
         self._ipyw_smeta = ipywidgets.Text(
-            '-', placeholder='sample meta', description='', width='100%')
+            '-', placeholder='sample meta', description='',
+            layout=ipywidgets.Layout(width='80%'))
         self._ipyw_fmeta = ipywidgets.Text(
-            '-', placeholder='feature meta', description='', width='100%')
+            '-', placeholder='feature meta', description='',
+            layout=ipywidgets.Layout(width='80%'))
 
         display(ipywidgets.HBox([self._ipyw_scol, self._ipyw_smeta]))
         display(ipywidgets.HBox([self._ipyw_fcol, self._ipyw_fmeta]))
@@ -70,14 +74,8 @@ class PlotGUI_Jupyter(PlotGUI):
 
         # display annotation for the selection
         self._ipyw_annt = ipywidgets.HTML(
-            'no annotation found', layout=ipywidgets.Layout(height='100px', overflow_y='auto'))
-        # self._ipyw_annt.layout.overflow = 'auto'
-        # self._ipyw_annt.layout.overflow_x = 'auto'
-        # self._ipyw_annt.layout.max_height = '50px'
-        # self._ipyw_annt.layout.white_space = 'nowrap'
-        # self._ipyw_annt.layout.border = '5px solid gray;'
-        # self._ipyw_annt.background_color = 'red'
-        # self.ipywdb.layout.width = '200px'
+            'no annotation found',
+            layout=ipywidgets.Layout(height='100px', overflow_y='auto'))
         display(self._ipyw_annt)
 
     def _on_change(self, axis=0):
