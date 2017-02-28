@@ -39,6 +39,19 @@ class FilteringTests(Tests):
         exp = self.test2.reorder([all_sid.index(i) for i in sid], axis=1)
         self.assertEqual(obs, exp)
 
+    def test_downsample_num_keep_too_big(self):
+        # test error raised when num_keep is too big
+        with self.assertRaises(ValueError):
+            self.test2.downsample('group', num_keep=9)
+
+    def test_downsample_num_keep(self):
+        # test keeping num_keep samples, and inplace
+        obs = self.test1.downsample('group', num_keep=9, inplace=True)
+        # should be down to 2 groups (18 samples); feature number is the same
+        self.assertEqual(obs.shape, (18, 12))
+        self.assertEqual(set(obs.sample_metadata['group']), set(['1', '2']))
+        self.assertIs(obs, self.test1)
+
     def test_filter_by_metadata_sample_edge_cases(self):
         # no group 3 - none filtered
         obs = self.test2.filter_by_metadata('group', 3)

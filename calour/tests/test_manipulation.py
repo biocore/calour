@@ -9,6 +9,8 @@
 from unittest import main
 from copy import deepcopy
 
+import numpy as np
+
 import calour as ca
 
 from calour._testing import Tests, assert_experiment_equal
@@ -47,6 +49,43 @@ class IOTests(Tests):
         self.assertEqual(len(newexp.sample_metadata), len(self.test1.sample_metadata)*2)
         fexp = newexp.filter_samples('orig_exp', 't2')
         assert_experiment_equal(fexp, texp, ignore_md_fields=['orig_exp'])
+
+    def test_merge_identical(self):
+        # test default conditions - on samples, not inplace, mean method
+        newexp = self.test1.merge_identical('group')
+        self.assertEqual(newexp.shape[0], 3)
+        self.assertEqual(list(newexp.data[:, 3]), [0, 10, 5])
+        self.assertIsNot(newexp, self.test1)
+        self.assertEqual(newexp.shape[1], self.test1.shape[1])
+
+    def test_merge_identical_sum(self):
+        # test on samples, inplace, sum method
+        newexp = self.test1.merge_identical('group', method='sum', inplace=True)
+        newexp.sparse = False
+        self.assertEqual(newexp.shape[0], 3)
+        self.assertEqual(list(newexp.data[:, 3]), [0, 90, 5])
+        self.assertIs(newexp, self.test1)
+        self.assertEqual(newexp.shape[1], 12)
+
+    def test_merge_identical_random_unique(self):
+        # test on features, random method, not inplace
+        # since each taxonomy is unique, should have the same as original
+        newexp = self.test1.merge_identical('taxonomy', method='random', axis=1)
+        self.assertEqual(newexp.shape, self.test1.shape)
+        self.assertIsNot(newexp, self.test1)
+
+    def test_merge_identical_random(self):
+        # test on samples, random method, not inplace
+        np.random.seed(2017)
+        newexp = self.test1.merge_identical('group', method='random')
+        self.assertEqual(newexp.shape[0], 3)
+        self.assertEqual(list(newexp.data[:, 7]), [849, 859, 9])
+        self.assertEqual(newexp.shape[1], self.test1.shape[1])
+        self.assertIsNot(newexp, self.test1)
+        np.random.seed(2018)
+        newexp = self.test1.merge_identical('group', method='random')
+        self.assertNotEqual(list(newexp.data[:, 7]), [849, 859, 9])
+
 
 if __name__ == "__main__":
     main()

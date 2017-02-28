@@ -280,7 +280,7 @@ class Experiment:
             exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
         return exp
 
-    def get_pandas(self, sample_field=None, feature_field=None, sparse=None):
+    def to_pandas(self, sample_field=None, feature_field=None, sparse=None):
         '''Get a pandas dataframe of the abundances
         Samples are rows, features are columns. Can specify the metadata fields
         for the index (default is sample_metadata index) and column labels
@@ -327,7 +327,7 @@ class Experiment:
 def add_functions(cls,
                   modules=['.io', '.sorting', '.filtering', '.analysis',
                            '.transforming', '.heatmap.heatmap',
-                           '.manipulation']):
+                           '.manipulation', '.analysis']):
     '''Dynamically add functions to the class as methods.
 
     Parameters

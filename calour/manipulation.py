@@ -88,14 +88,71 @@ def _collapse_obs(exp, groups, method='sum'):
     '''
 
 
-def merge_samples(exp, field, method='mean'):
+def merge_identical(exp, field, method='mean', axis=0, inplace=False):
+    '''Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field
+    Methods for merge (value for each observation) are:
+    'mean' : the mean of all samples/features
+    'random' : a random sample/feature out of the group (same sample/feature for all observations)
+    'sum' : the sum of values in all the samples/features
+
+    Parameters
+    ----------
+    field : str
+        The sample/feature metadata field
+    method : str (optional)
+        'mean' : the mean of all samples/features
+        'random' : a random sample/feature out of the group (same sample/feature for all observations)
+        'sum' : the sum of values in all the samples/features
+    axis : 0/1 (optional)
+        0 (default) to merge samples, 1 to merge features
+    inplace : bool (optional)
+        False (default) to create new Experiment, True to perform inplace
+
+    Returns
+    -------
+    newexp : ``Experiment``
     '''
-    merge all samples that have the same value in field
-    methods for merge (value for each observation) are:
-    'mean' : the mean of all samples
-    'random' : a random sample out of the group (same sample for all observations)
-    'sum' : the sum of values in all the samples
-    '''
+    logger.debug('merge samples using field %s, method %s' % (field, method))
+    if inplace:
+        newexp = exp
+    else:
+        newexp = deepcopy(exp)
+    if axis == 0:
+        metadata = newexp.sample_metadata
+    else:
+        metadata = newexp.feature_metadata
+    if field not in metadata:
+        raise ValueError('field %s not in metadata' % field)
+
+    # convert to dense for efficient slicing
+    newexp.sparse = False
+    data = newexp.get_data()
+    keep_pos = []
+    for cval in metadata[field].unique():
+        # in case the sample had nan is the value
+        if pd.isnull(cval):
+            pos = (metadata[field].isnull()).values
+        else:
+            pos = (metadata[field] == cval).values
+        if axis == 0:
+            cdata = data[pos, :]
+        else:
+            cdata = data[:, pos]
+        if method == 'mean':
+            newdat = cdata.mean(axis=axis)
+        elif method == 'sum':
+            newdat = cdata.sum(axis=axis)
+        elif method == 'random':
+            random_pos = np.random.randint(np.sum(pos))
+            newdat = cdata[random_pos]
+        replace_pos = np.where(pos)[0][0]
+        keep_pos.append(replace_pos)
+        if axis == 0:
+            newexp.data[replace_pos, :] = newdat
+        else:
+            newexp.data[:, replace_pos] = newdat
+    newexp.reorder(keep_pos, inplace=True, axis=axis)
+    return newexp
 
 
 def add_observation(exp, obs_id, data=None):

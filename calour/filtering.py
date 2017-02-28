@@ -19,11 +19,11 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def downsample(exp, field, axis=0, inplace=False):
+def downsample(exp, field, axis=0, num_keep=None, inplace=False):
     '''Downsample the data set.
 
-    This down samples all the samples to have the same number of
-    samples for each categorical value of the field in
+    This down samples all the samples/features to have the same number of
+    samples/features for each categorical value of the field in
     ``sample_metadata`` or ``feature_metadata``.
 
     Parameters
@@ -31,27 +31,47 @@ def downsample(exp, field, axis=0, inplace=False):
     field : str
         The name of the column in samples metadata table. This column
         should has categorical values
+    axis : 0 / 1 (optional)
+        0 (default) to filter samples, 1 to filter features
+    num_keep : int or None (optional)
+        None (default) to downsample to minimal group size.
+        int : downsample to num_keep samples/features per group, drop values
+        with < num_keep
+    inplace : bool (optional)
+        False (default) to do the filtering on a copy.
+        True to do the filtering on the original ``Experiment``
 
     Returns
     -------
-    Experiment
+    ``Experiment``
     '''
+    logger.debug('downsample on field %s' % field)
     if axis == 0:
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
-    values = x[field].values
+    # convert to string type because nan values, if they exist in the column,
+    # will fail `np.unique`
+    values = x[field].astype(str).values
     unique, counts = np.unique(values, return_counts=True)
-    min_index = counts.argmin()
-    min_value = unique[min_index]
-    min_count = counts[min_index]
+    if num_keep is None:
+        num_keep = counts.min()
     indices = []
+    num_skipped = 0
     for i in unique:
         i_indice = np.where(values == i)[0]
-        if i == min_value:
+        if len(i_indice) < num_keep:
+            num_skipped += 1
+            continue
+        elif len(i_indice) == num_keep:
             indices.append(i_indice)
         else:
-            indices.append(np.random.choice(i_indice, min_count))
+            indices.append(np.random.choice(i_indice, num_keep))
+    if num_skipped > 0:
+        logger.info('%d values had < %d items and were skipped' % (num_skipped, num_keep))
+    # if nothing left, raise error
+    if len(indices) == 0:
+        raise ValueError('No groups have more than %d items' % num_keep)
     return exp.reorder(np.concatenate(indices), axis=axis, inplace=inplace)
 
 

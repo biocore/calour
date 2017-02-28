@@ -158,14 +158,14 @@ class ExperimentTests(Tests):
         # test it's a copy but inplace
         self.assertIsNot(data, exp.data)
 
-    def test_get_pandas_dense(self):
-        df = self.test1.get_pandas(sparse=False)
+    def test_to_pandas_dense(self):
+        df = self.test1.to_pandas(sparse=False)
         data = self.test1.get_data(sparse=False)
         self.assertIsInstance(df, pd.DataFrame)
         npt.assert_array_almost_equal(df.values, data)
 
-    def test_get_pandas_sparse(self):
-        df = self.test1.get_pandas(sparse=True)
+    def test_to_pandas_sparse(self):
+        df = self.test1.to_pandas(sparse=True)
         data = self.test1.get_data(sparse=False)
         self.assertIsInstance(df, pd.SparseDataFrame)
         npt.assert_array_almost_equal(df.to_dense().values, data)

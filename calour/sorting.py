@@ -95,11 +95,11 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
     '''
     logger.debug('clustering data on axis %s' % axis)
     if transform is None:
-        data = exp.data
+        data = exp.get_data(sparse=False)
     else:
         logger.debug('tansforming data using %r' % transform)
         newexp = deepcopy(exp)
-        data = transform(newexp, **kwargs).data
+        data = transform(newexp, **kwargs).get_data(sparse=False)
 
     if axis == 0:
         data = data.T

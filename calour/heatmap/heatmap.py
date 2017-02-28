@@ -206,7 +206,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         xticklabels = [str(i) for i in x_val]
         # shorten x tick labels that are too long:
         if xticklabel_len is not None:
-            mid = xticklabel_len / 2
+            mid = int(xticklabel_len / 2)
             xticklabels = ['%s..%s' % (i[:mid], i[-mid:])
                            if len(i) > xticklabel_len else i
                            for i in xticklabels]
