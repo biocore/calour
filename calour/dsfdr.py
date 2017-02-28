@@ -1,10 +1,6 @@
 # From serenejiang DescreteFDR
 # https://github.com/serenejiang/DiscreteFDR
 
-# revised code for fdrmethods
-# take away abs in calculating test statistics
-# calculate pvalues for dsfdr
-# pvalue calculation for bh and by fdr
 
 from logging import getLogger
 import types
@@ -194,6 +190,8 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     numbact = np.shape(data)[0]
     labels = labels.copy()
+
+    logger.debug('start permutation')
 
     if method == 'meandiff':
         # fast matrix multiplication based calculation
