@@ -10,6 +10,7 @@ from logging import getLogger
 import importlib
 
 import matplotlib as mpl
+import matplotlib.patches as mpatches
 import numpy as np
 
 from ..transforming import log_n
@@ -251,39 +252,58 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def bar_xax(axis, values, height=0.2, colors=['red', 'green']):
+def bar_xax(axis, values, height=0.3, colors=['red', 'green']):
     '''plot color bars along x axis'''
     uniques = np.unique(values)
-    import matplotlib.patches as patches
     col = dict(zip(uniques, colors))
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
-        axis.add_patch(patches.Rectangle(
+        rect = mpatches.Rectangle(
             (prev - offset, 0),
             (i - prev),
             height,
             edgecolor="none",     # No border
-            facecolor=col[value]))
+            facecolor=col[value])
+        axis.add_patch(rect)
+        rx, ry = rect.get_xy()
+        cx = rx + rect.get_width()/2.0
+        cy = ry + rect.get_height()/2.0
+        axis.annotate(value, (cx, cy), color='w', weight='bold',
+                      fontsize=7, ha='center', va='center')
         prev = i
+    # axis.legend(
+    #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
+    #     ncol=len(col))
     return axis
 
 
-def bar_yax(axis, values, width=0.2, colors=['red', 'green']):
+def bar_yax(axis, values, width=0.3, colors=['red', 'green']):
     '''plot color bars along y axis'''
     uniques = np.unique(values)
-    import matplotlib.patches as patches
     col = dict(zip(uniques, colors))
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
-        axis.add_patch(patches.Rectangle(
-            (0, prev - offset),
-            width,
-            (i - prev),
+        rect = mpatches.Rectangle(
+            (0, prev - offset),   # position
+            width,                # width
+            (i - prev),           # height
             edgecolor="none",     # No border
-            facecolor=col[value]))
+            facecolor=col[value],
+            label=value)
+        axis.add_patch(rect)
+        rx, ry = rect.get_xy()
+        cx = rx + rect.get_width()/2.0
+        cy = ry + rect.get_height()/2.0
+        # add the text in the color bars
+        axis.annotate(value, (cx, cy), color='w', weight='bold',
+                      fontsize=7, ha='center', va='center', rotation=90)
         prev = i
+    # axis.legend(
+    #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
+    #     bbox_to_anchor=(0, 1.2),
+    #     ncol=len(col))
     return axis
 
 
