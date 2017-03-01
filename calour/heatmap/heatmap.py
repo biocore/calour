@@ -8,6 +8,7 @@
 
 from logging import getLogger
 import importlib
+import itertools
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
@@ -255,13 +256,10 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
 def bar_xax(axis, values, width, position=0, colors=None):
     '''plot color bars along x axis'''
     uniques = np.unique(values)
-    n = len(uniques)
     if colors is None:
-        cmap = mpl.cm.get_cmap('rainbow')
-        colors = cmap(np.linspace(0, 1, n))
-    elif len(colors) < n:
-        raise ValueError('You have less colors (%r) than values (%r)' % (colors, uniques))
-    col = dict(zip(uniques, colors))
+        cmap = mpl.cm.get_cmap('Dark2')
+        colors = cmap.colors
+    col = dict(zip(uniques, itertools.cycle(colors)))
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
@@ -287,14 +285,10 @@ def bar_xax(axis, values, width, position=0, colors=None):
 def bar_yax(axis, values, width, position=0, colors=None):
     '''plot color bars along y axis'''
     uniques = np.unique(values)
-    n = len(uniques)
     if colors is None:
-        cmap = mpl.cm.get_cmap('Accent')
-        step = cmap.N / n
-        colors = [cmap(int(step * i)) for i in range(n)]
-    elif len(colors) < n:
-        raise ValueError('You have less colors (%r) than values (%r)' % (colors, uniques))
-    col = dict(zip(uniques, colors))
+        cmap = mpl.cm.get_cmap('Dark2')
+        colors = cmap.colors
+    col = dict(zip(uniques, itertools.cycle(colors)))
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
