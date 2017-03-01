@@ -194,7 +194,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         ax.set_xlabel(sample_field)
         x_pos, x_val = zip(*xticks)
         x_pos = np.array([0.] + list(x_pos))
-        # samples start - 0.5 before and go to 0.5 after
+        # samples position - 0.5 before and go to 0.5 after
         x_pos -= 0.5
         for pos in x_pos[1:-1]:
             ax.axvline(x=pos, color='white')
@@ -252,17 +252,23 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def bar_xax(axis, values, height=0.3, colors=['red', 'green']):
+def bar_xax(axis, values, width, position=0, colors=None):
     '''plot color bars along x axis'''
     uniques = np.unique(values)
+    n = len(uniques)
+    if colors is None:
+        cmap = mpl.cm.get_cmap('rainbow')
+        colors = cmap(np.linspace(0, 1, n))
+    elif len(colors) < n:
+        raise ValueError('You have less colors (%r) than values (%r)' % (colors, uniques))
     col = dict(zip(uniques, colors))
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
         rect = mpatches.Rectangle(
-            (prev - offset, 0),
+            (prev - offset, position),
             (i - prev),
-            height,
+            width,
             edgecolor="none",     # No border
             facecolor=col[value])
         axis.add_patch(rect)
@@ -278,15 +284,22 @@ def bar_xax(axis, values, height=0.3, colors=['red', 'green']):
     return axis
 
 
-def bar_yax(axis, values, width=0.3, colors=['red', 'green']):
+def bar_yax(axis, values, width, position=0, colors=None):
     '''plot color bars along y axis'''
     uniques = np.unique(values)
+    n = len(uniques)
+    if colors is None:
+        cmap = mpl.cm.get_cmap('Accent')
+        step = cmap.N / n
+        colors = [cmap(int(step * i)) for i in range(n)]
+    elif len(colors) < n:
+        raise ValueError('You have less colors (%r) than values (%r)' % (colors, uniques))
     col = dict(zip(uniques, colors))
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
         rect = mpatches.Rectangle(
-            (0, prev - offset),   # position
+            (position, prev - offset),   # position
             width,                # width
             (i - prev),           # height
             edgecolor="none",     # No border
@@ -307,11 +320,22 @@ def bar_yax(axis, values, width=0.3, colors=['red', 'green']):
     return axis
 
 
-def plot(exp, gui='cli', databases=('dbbact',), **kwargs):
+def plot(exp, sample_color_bars=None, feature_color_bars=None,
+         gui='cli', databases=('dbbact',), **kwargs):
     gui_obj = create_plot_gui(exp, gui, databases)
     exp.heatmap(axis=gui_obj.axis, **kwargs)
-    bar_xax(gui_obj.xax, values=exp.sample_metadata['group'])
-    bar_yax(gui_obj.yax, values=exp.feature_metadata['oxygen'])
+    barwidth = 0.3
+    barspace = 0.05
+    if sample_color_bars is not None:
+        position = 0
+        for s in sample_color_bars:
+            bar_xax(gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position)
+            position += (barspace + barwidth)
+    if feature_color_bars is not None:
+        position = 0
+        for f in feature_color_bars:
+            bar_yax(gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position)
+            position += (barspace + barwidth)
     gui_obj()
     # set up the gui ready for interaction
 
