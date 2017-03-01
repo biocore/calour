@@ -71,9 +71,11 @@ class PlotGUI(ABC):
             self.databases = []
         # the default database used when annotating features
         self._annotation_db = None
-
         # create the figure to plot the heatmap into
-        self.figure = plt.figure()
+        self._set_figure(plt.figure())
+
+    def _set_figure(self, figure):
+        self.figure = figure
         gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
         hm_ax = self.figure.add_subplot(gs[2])
         self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
@@ -81,7 +83,6 @@ class PlotGUI(ABC):
         self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
         self.yax.axis('off')
         self.axis = hm_ax
-        self.figure.subplots_adjust(hspace=0.2, wspace=0.2)
 
     def get_selection_info(self):
         '''Get the current selection information
