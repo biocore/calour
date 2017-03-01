@@ -194,7 +194,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
             xticks = _transition_index(exp.sample_metadata[sample_field])
         except KeyError:
             raise ValueError('Sample field %r not in sample metadata' % sample_field)
-        ax.set_xlabel(sample_field)
+        # ax.set_xlabel(sample_field)
         x_pos, x_val = zip(*xticks)
         x_pos = np.array([0.] + list(x_pos))
         # samples start - 0.5 before and go to 0.5 after
@@ -218,7 +218,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
             ffield = exp.feature_metadata[feature_field]
         except KeyError:
             raise ValueError('Feature field %r not in feature metadata' % feature_field)
-        ax.set_ylabel(feature_field)
+        # ax.set_ylabel(feature_field)
         yticklabels = [str(i) for i in ffield]
         # for each tick label, show 15 characters at most
         if yticklabel_len is not None:
@@ -258,9 +258,49 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
+def bar_xax(axis, values, height=0.2, colors=['red', 'green']):
+    '''plot color bars along x axis'''
+    uniques = np.unique(values)
+    import matplotlib.patches as patches
+    col = dict(zip(uniques, colors))
+    prev = 0
+    offset = 0.5
+    for i, value in _transition_index(values):
+        axis.add_patch(patches.Rectangle(
+            (prev - offset, 0),
+            (i - prev),
+            height,
+            edgecolor="none",     # No border
+            facecolor=col[value]))
+        print(i-prev)
+        prev = i
+    return axis
+
+
+def bar_yax(axis, values, width=0.2, colors=['red', 'green']):
+    '''plot color bars along y axis'''
+    uniques = np.unique(values)
+    import matplotlib.patches as patches
+    col = dict(zip(uniques, colors))
+    prev = 0
+    offset = 0.5
+    for i, value in _transition_index(values):
+        axis.add_patch(patches.Rectangle(
+            (0, prev - offset),
+            width,
+            (i - prev),
+            edgecolor="none",     # No border
+            facecolor=col[value]))
+        print(i-prev)
+        prev = i
+    return axis
+
+
 def plot(exp, gui='cli', databases=('dbbact',), **kwargs):
     gui_obj = create_plot_gui(exp, gui, databases)
     exp.heatmap(axis=gui_obj.axis, **kwargs)
+    bar_xax(gui_obj.xax, values=exp.sample_metadata['group'])
+    bar_yax(gui_obj.yax, values=exp.feature_metadata['oxygen'])
     gui_obj()
     # set up the gui ready for interaction
 

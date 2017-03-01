@@ -11,6 +11,7 @@ from abc import ABC
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 
 logger = getLogger(__name__)
@@ -73,11 +74,21 @@ class PlotGUI(ABC):
 
         # create the figure to plot the heatmap into
         self.figure = plt.figure()
-
-    @property
-    def axis(self):
-        # this attr has to be property so it is updated on mouse/key events
-        return self.figure.gca()
+        gs = GridSpec(2, 2, width_ratios=[1, 12], height_ratios=[12, 1])
+        hm_ax = self.figure.add_subplot(gs[1])
+        self.yax = self.figure.add_subplot(gs[0], sharey=hm_ax)
+        self.yax.xaxis.set_visible(False)
+        self.xax = self.figure.add_subplot(gs[3], sharex=hm_ax)
+        self.xax.yaxis.set_visible(False)
+        for i in ['top', 'bottom', 'left', 'right']:
+            self.xax.spines[i].set_visible(False)
+            self.yax.spines[i].set_visible(False)
+        self.axis = hm_ax
+        # self.axis.axis('off')
+    # @property
+    # def axis(self):
+    #     # this attr has to be property so it is updated on mouse/key events
+    #     return self.figure.gca()
 
     def get_selection_info(self):
         '''Get the current selection information
