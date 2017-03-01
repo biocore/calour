@@ -74,21 +74,14 @@ class PlotGUI(ABC):
 
         # create the figure to plot the heatmap into
         self.figure = plt.figure()
-        gs = GridSpec(2, 2, width_ratios=[1, 12], height_ratios=[12, 1])
-        hm_ax = self.figure.add_subplot(gs[1])
-        self.yax = self.figure.add_subplot(gs[0], sharey=hm_ax)
-        self.yax.xaxis.set_visible(False)
-        self.xax = self.figure.add_subplot(gs[3], sharex=hm_ax)
-        self.xax.yaxis.set_visible(False)
-        for i in ['top', 'bottom', 'left', 'right']:
-            self.xax.spines[i].set_visible(False)
-            self.yax.spines[i].set_visible(False)
+        gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
+        hm_ax = self.figure.add_subplot(gs[2])
+        self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+        self.xax.axis('off')
+        self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
+        self.yax.axis('off')
         self.axis = hm_ax
-        # self.axis.axis('off')
-    # @property
-    # def axis(self):
-    #     # this attr has to be property so it is updated on mouse/key events
-    #     return self.figure.gca()
+        self.figure.subplots_adjust(hspace=0.2, wspace=0.2)
 
     def get_selection_info(self):
         '''Get the current selection information
@@ -152,6 +145,9 @@ class PlotGUI(ABC):
     def __call__(self):
         '''Run the GUI.'''
         self.connect_functions()
+        self.figure.tight_layout()
+        # squeeze color bars close to the heatmap
+        self.figure.subplots_adjust(hspace=0.01, wspace=0.01)
 
     def connect_functions(self):
         '''Connect to the matplotlib callbacks for key and mouse '''
