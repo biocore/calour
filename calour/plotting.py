@@ -22,6 +22,10 @@ def plot_hist(exp, **kwargs):
     kwargs : dict
         key word arguments passing to the matplotlib ``hist`` plotting function.
 
+    Retures
+    -------
+    tuple of 1-D int array, 1-D float array, ``Figure``
+        the count in each bin, the start coord of each bin, and hist figure
     '''
     fig, ax = plt.subplots()
     data = exp.get_data(sparse=False, copy=True)

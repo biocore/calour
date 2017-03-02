@@ -155,7 +155,6 @@ class PlotGUI_Jupyter(PlotGUI):
             for cannt in annt:
                 cstr = cannt[1]
                 details = cannt[0]
-                print(cannt)
                 annt_type = details.get('annotationtype', 'None')
                 annt_id = details['annotationid']
                 ccolor = colors.get(annt_type, 'black')
