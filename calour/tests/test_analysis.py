@@ -48,39 +48,72 @@ class TestAnalysis(Tests):
         for cid in expected_ids:
             print(self.test1.feature_metadata.index[cid])
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+
+    def test_correlation_default(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
         # test using spearman correlation
-        dd = diff_abundance(self.test1, 'id', method='spearman')
-        expected_ids = [0, 1, 2, 3, 4, 7, 10]
-        self.assertEqual(len(dd.feature_metadata), 7)
-        for cid in expected_ids:
-            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
-        # test using non zero spearman correlation
-        dd = diff_abundance(self.test1, 'id', method='nonzerospearman')
-        expected_ids = [0, 1, 2, 3, 4, 7, 10]
-        self.assertEqual(len(dd.feature_metadata), 7)
-        for cid in expected_ids:
-            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
-        # test using pearson correlation
-        dd = diff_abundance(self.test1, 'id', method='pearson')
-        expected_ids = [0, 1, 2, 3, 4, 7, 10]
-        self.assertEqual(len(dd.feature_metadata), 7)
-        for cid in expected_ids:
-            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
-        # test using non zero pearson correlation
-        dd = diff_abundance(self.test1, 'id', method='nonzeropearson')
+        dd = self.test1.correlation('id')
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
 
-        # test on real complex dataset (timeseries)
-        dd = diff_abundance(self.complex, 'MF_SAMPLE_NUMBER', method='pearson')
+    def test_correlation_nonzero_spearman(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
+        # test using non zero spearman correlation
+        dd = self.test1.correlation('id', method='spearman', nonzero=True)
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
-        self.assertGreaterEqual(20, np.abs(len(dd.feature_metadata) - 40))
+        self.assertEqual(len(dd.feature_metadata), 7)
+        for cid in expected_ids:
+            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+
+    def test_correlation_pearson(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
+        # test using pearson correlation
+        dd = self.test1.correlation('id', method='pearson')
+        expected_ids = [0, 1, 2, 3, 4, 7, 10]
+        self.assertEqual(len(dd.feature_metadata), 7)
+        for cid in expected_ids:
+            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+
+    def test_correlation_nonzero_pearson(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
+        # test using non zero pearson correlation
+        dd = self.test1.correlation('id', method='pearson', nonzero=True)
+        expected_ids = [0, 1, 2, 3, 4, 7, 10]
+        self.assertEqual(len(dd.feature_metadata), 7)
+        for cid in expected_ids:
+            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+
+    def test_correlation_complex(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
+        # test on real complex dataset (timeseries)
+        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson')
+        self.assertTrue(np.abs(101 - len(dd.feature_metadata)) < 5)
         goodseq = 'TACGGAGGATGCGAGCGTTATTCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGGCTATTAAGTCAGGGGTGAAAGGTTTCAGCTTAACTGAGAAATTGCCTTTGATACTGGTAGTCTTGAATATCTGTGAAGTTCTTGGAATGTGTAG'
         self.assertIn(goodseq, dd.feature_metadata.index)
         goodseq = 'TACGTAGGTGGCAAGCGTTGTCCGGAATTATTGGGCGTAAAGCGCGCGCAGGCGGATCAGTCAGTCTGTCTTAAAAGTTCGGGGCTTAACCCCGTGATGGGATGGAAACTGCTGATCTAGAGTATCGGAGAGGAAAGTGGAATTCCTAGT'
         self.assertIn(goodseq, dd.feature_metadata.index)
+
+    def test_correlation_complex_spearman(self):
+        # set the seed as we are testing random permutations
+        np.random.seed(2017)
+        # test on real complex dataset (timeseries) with spearman correlation
+        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='spearman')
+        self.assertTrue(np.abs(51 - len(dd.feature_metadata)) < 5)
+
+    def test_diff_abundance_kw(self):
+        np.random.seed(2017)
+        dd = self.test1.diff_abundance_kw(field='group')
+        expected_ids = [0, 1, 2, 3, 4, 7, 10]
+        self.assertEqual(len(dd.feature_metadata), 7)
+        for cid in expected_ids:
+            self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
 
     def test_get_term_features(self):
         features = ['1', '2', '3', '4']

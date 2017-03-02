@@ -281,7 +281,7 @@ class PlotGUI(ABC):
                 samplepos=[self.current_select[0]], featurepos=[self.current_select[1]])
             self.show_info()
         else:
-            logger.warning('Unrecoginzed key: %s' % event.key)
+            logger.debug('Unrecoginzed key: %s' % event.key)
             return
 
         self.figure.canvas.draw()

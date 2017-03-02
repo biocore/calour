@@ -136,8 +136,10 @@ def _read_table(f, encoding=None):
     -------
     pandas.DataFrame with index set to first column (as str)
     '''
-    table = pd.read_table(f, sep='\t', encoding=encoding)
+    table = pd.read_table(f, sep='\t', encoding=encoding, dtype={'#SampleID': str})
     table.fillna('na', inplace=True)
+    # in case the first column is not labelled #SampleID
+    table[table.columns[0]] = table[table.columns[0]].astype(str)
     table.set_index(table.columns[0], drop=False, inplace=True)
     # make sure the sample ID is string-type
     table.index = table.index.astype(np.str)
@@ -223,6 +225,8 @@ def read_taxa(data_file, sample_metadata_file=None,
 
     if 'taxonomy' in exp.feature_metadata.columns:
         exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp)
+    else:
+        exp.feature_metadata['taxonomy'] = 'NA'
 
     if filter_orig_reads is not None:
         exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
