@@ -10,8 +10,11 @@ from unittest import main
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
+from matplotlib import pyplot as plt
+
 import calour as ca
 from calour._testing import Tests
+from calour.heatmap.heatmap import ax_color_bar
 
 
 class PlotTests(Tests):
@@ -57,6 +60,24 @@ class PlotTests(Tests):
         obs_yticklabels = [i.get_text() for i in ax.yaxis.get_ticklabels()]
         self.assertListEqual(obs_yticklabels,
                              self.test1.feature_metadata['ph'].astype(str).tolist())
+
+    def test_ax_color_bar(self):
+        fig, ax = plt.subplots()
+        colors = [(1.0, 0.0, 0.0, 1), (0.0, 0.5, 0.0, 1)]
+        axes = ax_color_bar(ax, ['a', 'a', 'b'], 0.3, 0, colors)
+        self.assertIs(ax, axes)
+        # test face color rectangle in the bar
+        self.assertListEqual(
+            [i.get_facecolor() for i in axes.patches],
+            colors)
+        # test the position rectangle in the bar
+        self.assertListEqual(
+            [i.get_xy() for i in axes.patches],
+            [(-0.5, 0), (1.5, 0)])
+        # test the texts in each rectangle in the bar
+        self.assertListEqual(
+            [i.get_text() for i in axes.texts],
+            ['a', 'b'])
 
 
 if __name__ == '__main__':
