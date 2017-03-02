@@ -13,6 +13,7 @@ import pandas as pd
 import biom
 
 from .experiment import Experiment
+from .amplicon_experiment import AmpliconExperiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 
 
@@ -190,7 +191,8 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
 
 
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True, data_file_type='biom', encoding=None):
+         description='', sparse=True, data_file_type='biom', encoding=None,
+         cls=Experiment):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -271,8 +273,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if description == '':
         description = os.path.basename(data_file)
 
-    return Experiment(data, sample_metadata, feature_metadata,
-                      exp_metadata=exp_metadata, description=description, sparse=sparse)
+    return cls(data, sample_metadata, feature_metadata,
+               exp_metadata=exp_metadata, description=description, sparse=sparse)
 
 
 def read_taxa(data_file, sample_metadata_file=None,
@@ -294,7 +296,8 @@ def read_taxa(data_file, sample_metadata_file=None,
     exp : ``AmpliconExperiment``
         after removing low read sampls and normalizing
     '''
-    exp = read(data_file, sample_metadata_file, **kwargs)
+    exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment, **kwargs)
+
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
     if 'taxonomy' in exp.feature_metadata.columns:
