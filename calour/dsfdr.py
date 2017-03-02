@@ -69,13 +69,13 @@ def mannwhitney(data, labels):
 # kruwallis give a column vector while others give row vector
 def kruwallis(data, labels):
     n = len(np.unique(labels))
-    allt = []
+    allt = np.zeros(np.shape(data)[0])
     for cbact in range(np.shape(data)[0]):
         group = []
         for j in range(n):
             group.append(data[cbact, labels == j])
         tstat = scipy.stats.kruskal(*group).statistic
-        allt.append(tstat)
+        allt[cbact] = tstat
     return allt
 
 

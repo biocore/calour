@@ -97,9 +97,6 @@ class TestTransforming(Tests):
         self.assertIsNot(obs, self.test2)
         self.assertNotAlmostEqual(obs.data.sum(axis=1).A1[0], 1000)
 
-        obs = self.test2.normalize(total, inplace=True)
-        self.assertIs(obs, self.test2)
-
     def test_normalize_by_subset_features(self):
         # test the filtering in standard mode (remove a few features, normalize to 10k)
         exp = ca.read(self.test1_biom, self.test1_samp)
