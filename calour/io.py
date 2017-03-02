@@ -14,8 +14,7 @@ import numpy as np
 import biom
 
 from .experiment import Experiment
-from .amplicon_experiment import AmpliconExperiment
-from .util import _get_taxonomy_string, get_file_md5, get_data_md5
+from .util import get_file_md5, get_data_md5
 
 
 logger = getLogger(__name__)
@@ -130,7 +129,8 @@ def _read_table(f, encoding=None):
     f : str
         the file name to read
     encoding : str or None (optional)
-        None (default) to use pandas default encoder, str to specify encoder name (see pandas.read_table() documentation)
+        None (default) to use pandas default encoder, str to specify
+        encoder name (see pandas.read_table() documentation)
 
     Returns
     -------
@@ -193,42 +193,6 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     mzdata = mzdata.astype(float)
     exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
 
-    return exp
-
-
-def read_taxa(data_file, sample_metadata_file=None,
-              filter_orig_reads=1000, normalize=True, sparse=True, **kwargs):
-    '''Load an amplicon experiment.
-
-    Fix taxonomy and normalize if needed. This is a convenience function of read().
-    Also convert feature index (sequences) to upper case
-
-    Parameters
-    ----------
-    filter_orig_reads : int or None (optional)
-        int (default) to remove all samples with < filter_orig_reads total reads. None to not filter
-    normalize : bool (optional)
-        True (default) to normalize each sample to 10000 reads
-
-    Returns
-    -------
-    exp : ``AmpliconExperiment``
-        after removing low read sampls and normalizing
-    '''
-    data, sample_metadata, feature_metadata, exp_metadata, description = _read(data_file, sample_metadata_file, **kwargs)
-    exp = AmpliconExperiment(data, sample_metadata, feature_metadata,
-                             exp_metadata=exp_metadata, description=description, sparse=sparse)
-
-    exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
-
-    if 'taxonomy' in exp.feature_metadata.columns:
-        exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp)
-
-    if filter_orig_reads is not None:
-        exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
-    if normalize:
-        # record the original total read count into sample metadata
-        exp.normalize(inplace=True)
     return exp
 
 

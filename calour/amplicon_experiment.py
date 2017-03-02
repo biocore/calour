@@ -19,6 +19,42 @@ logger = getLogger(__name__)
 
 
 class AmpliconExperiment(Experiment):
+    @classmethod
+    def read_taxa(data_file, sample_metadata_file=None,
+                  filter_orig_reads=1000, normalize=True, sparse=True, **kwargs):
+        '''Load an amplicon experiment.
+
+        Fix taxonomy and normalize if needed. This is a convenience function of read().
+        Also convert feature index (sequences) to upper case
+
+        Parameters
+        ----------
+        filter_orig_reads : int or None (optional)
+            int (default) to remove all samples with < filter_orig_reads total reads. None to not filter
+        normalize : bool (optional)
+            True (default) to normalize each sample to 10000 reads
+
+        Returns
+        -------
+        exp : ``AmpliconExperiment``
+            after removing low read sampls and normalizing
+        '''
+        data, sample_metadata, feature_metadata, exp_metadata, description = _read(data_file, sample_metadata_file, **kwargs)
+        exp = AmpliconExperiment(data, sample_metadata, feature_metadata,
+                                 exp_metadata=exp_metadata, description=description, sparse=sparse)
+
+        exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
+
+        if 'taxonomy' in exp.feature_metadata.columns:
+            exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp)
+
+        if filter_orig_reads is not None:
+            exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
+        if normalize:
+            # record the original total read count into sample metadata
+            exp.normalize(inplace=True)
+        return exp
+
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'AmpliconExperiment %s with %d samples, %d features' % (
