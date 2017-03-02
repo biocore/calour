@@ -167,9 +167,8 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     '''
     logger.info('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type='openms', sparse=sparse, **kwargs)
-    if normalize:
-        exp.normalize(inplace=True)
+               data_file_type='openms', sparse=sparse,
+               normalize=normalize,  **kwargs)
 
     exp.sample_metadata['id'] = exp.sample_metadata.index.values
 
@@ -270,8 +269,14 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if description == '':
         description = os.path.basename(data_file)
 
-    return cls(data, sample_metadata, feature_metadata,
-               exp_metadata=exp_metadata, description=description, sparse=sparse)
+    exp = cls(data, sample_metadata, feature_metadata,
+              exp_metadata=exp_metadata, description=description, sparse=sparse)
+
+    if normalize:
+        # record the original total read count into sample metadata
+        exp.normalize(inplace=True)
+
+    return exp
 
 
 def read_amplicon(data_file, sample_metadata_file=None,
@@ -298,7 +303,8 @@ def read_amplicon(data_file, sample_metadata_file=None,
         after removing low read sampls and normalizing
 
     '''
-    exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment, **kwargs)
+    exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
+               normalize=normalize, **kwargs)
 
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
@@ -309,9 +315,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     if filter_orig_reads is not None:
         exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
-    if normalize:
-        # record the original total read count into sample metadata
-        exp.normalize(inplace=True)
+
     return exp
 
 

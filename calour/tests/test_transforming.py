@@ -20,7 +20,7 @@ from calour.transforming import log_n, scale
 class TestTransforming(Tests):
     def setUp(self):
         super().setUp()
-        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=False)
 
     def test_transform(self):
         obs = self.test2.transform()
@@ -99,7 +99,7 @@ class TestTransforming(Tests):
 
     def test_normalize_by_subset_features(self):
         # test the filtering in standard mode (remove a few features, normalize to 10k)
-        exp = ca.read(self.test1_biom, self.test1_samp)
+        exp = ca.read(self.test1_biom, self.test1_samp, normalize=False)
         bad_features = [6, 7]
         features = [exp.feature_metadata.index[cbad] for cbad in bad_features]
         newexp = exp.normalize_by_subset_features(features, 10000, exclude=True, inplace=False)

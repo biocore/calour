@@ -22,7 +22,7 @@ import calour as ca
 class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read_taxa(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read_amplicon(self.test1_biom, self.test1_samp, normalize=True)
 
     def test_filter_taxonomy(self):
         # default - substring and keep matching

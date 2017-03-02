@@ -16,9 +16,9 @@ class TestTesting(Tests):
     def setUp(self):
         super().setUp()
         # load the test1 experiment as sparse
-        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=False)
         # load the timeseries experiment as sparse
-        self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp)
+        self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp, normalize=False)
 
     def test_assert_experiment_equal(self):
         # basic testing
