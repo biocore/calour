@@ -236,30 +236,6 @@ def _prevalence(x, cutoff=0):
     return np.sum(i >= cutoff for i in x) / len(x)
 
 
-def sort_obs_center_mass(exp, field=None, numeric=True, uselog=True, inplace=False):
-    '''
-    sort observations based on center of mass after sorting samples by field (or None not to pre sort)
-    '''
-
-
-def reverse_obs(exp, inplace=False):
-    '''
-    reverse the order of the observations
-    '''
-
-
-def sort_samples_by_seqs(exp, seqs, inplace=False):
-    '''
-    sort the samples based on the frequencies of sequences in seqs
-    '''
-
-
-def sort_niche(exp, field):
-    '''
-    sort by niches - jamie
-    '''
-
-
 def sort_samples(exp, field, **kwargs):
     '''Sort samples by field
     A convenience function for sort_by_metadata

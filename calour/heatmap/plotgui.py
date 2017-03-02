@@ -11,6 +11,7 @@ from abc import ABC
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 
 logger = getLogger(__name__)
@@ -70,14 +71,18 @@ class PlotGUI(ABC):
             self.databases = []
         # the default database used when annotating features
         self._annotation_db = None
-
         # create the figure to plot the heatmap into
-        self.figure = plt.figure()
+        self._set_figure(plt.figure())
 
-    @property
-    def axis(self):
-        # this attr has to be property so it is updated on mouse/key events
-        return self.figure.gca()
+    def _set_figure(self, figure):
+        self.figure = figure
+        gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
+        hm_ax = self.figure.add_subplot(gs[2])
+        self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+        self.xax.axis('off')
+        self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
+        self.yax.axis('off')
+        self.axis = hm_ax
 
     def get_selection_info(self):
         '''Get the current selection information
@@ -141,6 +146,9 @@ class PlotGUI(ABC):
     def __call__(self):
         '''Run the GUI.'''
         self.connect_functions()
+        self.figure.tight_layout()
+        # squeeze color bars close to the heatmap
+        self.figure.subplots_adjust(hspace=0.01, wspace=0.01)
 
     def connect_functions(self):
         '''Connect to the matplotlib callbacks for key and mouse '''

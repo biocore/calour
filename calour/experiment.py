@@ -349,7 +349,7 @@ class Experiment:
 
 def add_functions(cls,
                   modules=['.io', '.sorting', '.filtering', '.analysis',
-                           '.transforming', '.heatmap.heatmap',
+                           '.transforming', '.heatmap.heatmap', '.plotting',
                            '.manipulation', '.analysis']):
     '''Dynamically add functions to the class as methods.
 
@@ -363,7 +363,6 @@ def add_functions(cls,
     for module_name in modules:
         module = import_module(module_name, 'calour')
         functions = inspect.getmembers(module, inspect.isfunction)
-        # import ipdb; ipdb.set_trace()
         for fn, f in functions:
             # skip private functions
             if not fn.startswith('_'):

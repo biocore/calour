@@ -44,7 +44,7 @@ class PlotGUI_QT5(PlotGUI):
         self.app_window = ApplicationWindow(self)
         app.references.add(self.app_window)
         self.app_window.setWindowTitle("Calour")
-        self.figure = self.app_window.plotfigure
+        self._set_figure(self.app_window.plotfigure)
 
     def __call__(self):
         logger.debug('opening Qt5 window')
@@ -122,7 +122,8 @@ class MplCanvas(FigureCanvas):
     """
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
+        # comment out because it draws frame on the whole plotting area
+        # self.axes = fig.add_subplot(111)
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 

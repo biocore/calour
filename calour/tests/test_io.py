@@ -140,7 +140,7 @@ class IOTests(Tests):
         newexp = ca.read(f, self.test1_samp)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         # test the hdf5 biom format with no taxonomy
-        exp.save_biom(f, addtax=False)
+        exp.save_biom(f, add_metadata=None)
         newexp = ca.read(f, self.test1_samp)
         self.assertTrue('taxonomy' not in newexp.feature_metadata)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])

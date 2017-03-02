@@ -8,8 +8,10 @@
 
 from logging import getLogger
 import importlib
+import itertools
 
 import matplotlib as mpl
+import matplotlib.patches as mpatches
 import numpy as np
 
 from ..transforming import log_n
@@ -179,10 +181,6 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap
     ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
-    # set the title
-    if title is None:
-        title = exp.description
-    ax.set_title(title)
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -197,7 +195,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         ax.set_xlabel(sample_field)
         x_pos, x_val = zip(*xticks)
         x_pos = np.array([0.] + list(x_pos))
-        # samples start - 0.5 before and go to 0.5 after
+        # samples position - 0.5 before and go to 0.5 after
         x_pos -= 0.5
         for pos in x_pos[1:-1]:
             ax.axvline(x=pos, color='white')
@@ -252,17 +250,114 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         else:
             return 'x=%1.2f, y=%1.2f' % (x, y)
     ax.format_coord = format_coord
-
-    fig.tight_layout()
-
     return fig
 
 
-def plot(exp, gui='cli', databases=('dbbact',), **kwargs):
+def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True):
+    '''plot color bars along x or y axis
+
+    Parameters
+    ----------
+    axis : ``matplotlib`` axis
+        the axis to plot the color bars in.
+    values : list/tuple
+        the values informing the colors on the bar
+    width : float
+        the width of the color bar
+    position : float, optional
+        the position of the color bar (its left bottom corner)
+    colors : list of colors, optional
+        the colors for each unique value in the ``values`` list.
+        if it is ``None``, it will use ``Dark2`` discrete color map
+        in a cycling way.
+    horizontal : bool
+        plot the color bar horizontally or vertically
+
+    Returns
+    -------
+    ``matplotlib`` axis
+    '''
+    uniques = np.unique(values)
+    if colors is None:
+        cmap = mpl.cm.get_cmap('Dark2')
+        colors = cmap.colors
+    col = dict(zip(uniques, itertools.cycle(colors)))
+    prev = 0
+    offset = 0.5
+    for i, value in _transition_index(values):
+        if horizontal is True:
+            pos = prev - offset, position
+            w, h = i - prev, width
+            rotation = 0
+        else:
+            pos = position, prev - offset
+            w, h = width, i - prev
+            rotation = 90
+        rect = mpatches.Rectangle(
+            pos,               # position
+            w,                 # width (size along x axis)
+            h,                 # height (size along y axis)
+            edgecolor="none",  # No border
+            facecolor=col[value],
+            label=value)
+        axis.add_patch(rect)
+        rx, ry = rect.get_xy()
+        cx = rx + rect.get_width()/2.0
+        cy = ry + rect.get_height()/2.0
+        # add the text in the color bars
+        axis.annotate(value, (cx, cy), color='w', weight='bold',
+                      fontsize=7, ha='center', va='center', rotation=rotation)
+        prev = i
+    # axis.legend(
+    #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
+    #     bbox_to_anchor=(0, 1.2),
+    #     ncol=len(col))
+    return axis
+
+
+def plot(exp, sample_color_bars=None, feature_color_bars=None,
+         gui='cli', databases=('dbbact',), **kwargs):
+    '''Plot the main heatmap and its associated axis.
+
+    Parameters
+    ----------
+    exp : ``Experiment``
+        the object to plot
+    sample_color_bars : list, optional
+        list of column names in the sample metadata. It plots a color bar
+        for each column. It doesn't plot color bars by default (``None``)
+    feature_color_bars : list, optional
+        list of column names in the feature metadata. It plots a color bar
+        for each column. It doesn't plot color bars by default (``None``)
+    gui : str, optional
+        GUI to use
+    databases : Iterable of str
+        a list of databases to access or add annotation
+
+    Returns
+    -------
+    ``PlottingGUI``
+    '''
     gui_obj = create_plot_gui(exp, gui, databases)
     exp.heatmap(axis=gui_obj.axis, **kwargs)
-    gui_obj()
+    barwidth = 0.3
+    barspace = 0.05
+    if sample_color_bars is not None:
+        position = 0
+        for s in sample_color_bars:
+            ax_color_bar(
+                gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position)
+            position += (barspace + barwidth)
+    if feature_color_bars is not None:
+        position = 0
+        for f in feature_color_bars:
+            ax_color_bar(
+                gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, horizontal=False)
+            position += (barspace + barwidth)
     # set up the gui ready for interaction
+    gui_obj()
+
+    return gui
 
 
 def plot_sort(exp, field=None, **kwargs):
