@@ -19,11 +19,16 @@ help:
 	@echo 'Use "make pep8" to validate PEP8 compliance.'
 	@echo 'Use "make html" to create html documentation with sphinx'
 	@echo 'Use "make all" to run all the targets listed above.'
+	@echo 'Use "make doc_upload" to create html documentation and upload to github pages.'
 test:
 	$(TEST_COMMAND)
 pep8:
 	flake8 calour setup.py
 html:
 	make -C doc clean html
-
+doc_upload:
+	make -C doc clean
+	cd doc/_build/ && git clone -b gh-pages --single-branch git@github.com:biocore/calour.git html
+	make -C doc html
+	cd doc/_build/html && git commit -a -m 'push' && git push origin gh-pages
 all: test pep8 html
