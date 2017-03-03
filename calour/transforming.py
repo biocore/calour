@@ -55,6 +55,8 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     '''
     if isinstance(total, bool):
         raise ValueError('Normalization total (%s) not numeric' % total)
+    if total <= 0:
+        raise ValueError('Normalization total (%s) must be positive' % total)
     if not inplace:
         exp = deepcopy(exp)
     exp.data = preprocessing.normalize(exp.data, norm='l1', axis=axis) * total

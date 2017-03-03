@@ -104,6 +104,8 @@ class TestTransforming(Tests):
     def test_rescale_non_numeric(self):
         with self.assertRaises(ValueError):
             self.test2.normalize(False)
+        with self.assertRaises(ValueError):
+            self.test2.normalize(0)
 
     def test_normalize_by_subset_features(self):
         # test the filtering in standard mode (remove a few features, normalize to 10k)
