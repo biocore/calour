@@ -31,6 +31,6 @@ html:
 all: test pep8 html
 doc_upload:
 	make -C doc clean
-	cd doc/_build/ && git clone -b gh-pages --single-branch git@github.com:biocore/calour.git html
+	cd doc/_build/ && git clone -b gh-pages --single-branch https://github.com/biocore/calour.git html
 	make -C doc html
 	cd doc/_build/html && git commit -a -m "$(CMSG)" && git push origin gh-pages
