@@ -303,10 +303,10 @@ def read_amplicon(data_file, sample_metadata_file=None,
     -------
     ``AmpliconExperiment``
         after removing low read sampls and normalizing
-
     '''
+    # don't do normalize before the possible filtering
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
-               normalize=normalize, **kwargs)
+               normalize=None, **kwargs)
 
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
@@ -317,6 +317,8 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     if filter_reads is not None:
         exp.filter_by_data('sum_abundance', cutoff=filter_reads, inplace=True)
+    if normalize is not None:
+        exp.normalize(total=normalize, inplace=True)
 
     return exp
 

@@ -22,7 +22,8 @@ class TestAnalysis(Tests):
         # load the simple experiment as sparse
         self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         # load the complex experiment as sparse with normalizing and removing low read samples
-        self.complex = ca.read_amplicon(self.timeseries_biom, self.timeseries_samp, normalize=10000)
+        self.complex = ca.read_amplicon(self.timeseries_biom, self.timeseries_samp,
+                                        filter_reads=1000, normalize=10000)
 
     def test_diff_abundance(self):
         # set the seed as we are testing random permutations

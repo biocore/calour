@@ -93,7 +93,7 @@ class IOTests(Tests):
 
     def test_read_amplicon(self):
         # test loading a taxonomy biom table and filtering/normalizing
-        exp = ca.read_amplicon(self.test1_biom, normalize=10000)
+        exp = ca.read_amplicon(self.test1_biom, filter_reads=1000, normalize=10000)
         exp2 = ca.read(self.test1_biom, normalize=None)
         exp2.filter_by_data('sum_abundance', cutoff=1000, inplace=True)
         exp2.normalize(inplace=True)
