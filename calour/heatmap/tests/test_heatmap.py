@@ -20,7 +20,7 @@ from calour.heatmap.heatmap import ax_color_bar
 class PlotTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=False)
+        self.test1 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
 
     def test_create_plot_gui(self):
         row, col = 1, 2
