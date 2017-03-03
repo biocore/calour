@@ -43,4 +43,4 @@ A sample jupyter notebook is located in:
 [https://github.com/amnona/calour/blob/master/notebooks/demo.ipynb](https://github.com/amnona/calour/blob/master/notebooks/demo.ipynb)
 
 Full Documentation is located in:
-[http://www.google.com/url?q=http%3A%2F%2Fbiocore.github.io%2Fcalour%2F&sa=D&sntz=1&usg=AFQjCNF8Eml5hh0UoP6AN2OZ7tUDruhKbA](http://www.google.com/url?q=http%3A%2F%2Fbiocore.github.io%2Fcalour%2F&sa=D&sntz=1&usg=AFQjCNF8Eml5hh0UoP6AN2OZ7tUDruhKbA)
+[http://biocore.github.io/calour/](http://biocore.github.io/calour/)
