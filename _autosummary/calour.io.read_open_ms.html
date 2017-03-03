@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.io.read_open_ms &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="read &amp; write (calour.io)" href="../io.html" />
+    <link rel="next" title="calour.io.save" href="calour.io.save.html" />
+    <link rel="prev" title="calour.io.read_amplicon" href="calour.io.read_amplicon.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-io-read-open-ms">
+<h1>calour.io.read_open_ms<a class="headerlink" href="#calour-io-read-open-ms" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.io.read_open_ms">
+<code class="descclassname">calour.io.</code><code class="descname">read_open_ms</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=None</em>, <em>sparse=False</em>, <em>*</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/io.html#read_open_ms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read_open_ms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load an OpenMS metabolomics experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; name of the OpenMS bucket table CSV file</li>
+<li><strong>sample_metadata_file</strong> (<em>str or None (optional)</em>) &#8211; None (default) to not load metadata per sample
+str to specify name of sample mapping file (tsv)</li>
+<li><strong>feature_metadata_file</strong> (<em>str or None (optional)</em>) &#8211; Name of table containing additional metadata about each feature
+None (default) to not load</li>
+<li><strong>description</strong> (<em>str or None (optional)</em>) &#8211; Name of the experiment (for display purposes).
+None (default) to assign file name</li>
+<li><strong>sparse</strong> (<em>bool (optional)</em>) &#8211; False (default) to store data as dense matrix (faster but more memory)
+True to store as sparse (CSR)</li>
+<li><strong>normalize</strong> (<em>int or None</em>) &#8211; normalize each sample to the specified reads. <code class="docutils literal"><span class="pre">None</span></code> to not normalize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>exp</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Experiment</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a><ul>
+      <li>Previous: <a href="calour.io.read_amplicon.html" title="previous chapter">calour.io.read_amplicon</a></li>
+      <li>Next: <a href="calour.io.save.html" title="next chapter">calour.io.save</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.io.read_open_ms.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.io.read_open_ms.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.sorting &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.sorting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">sorting (:mod:`calour.sorting`)</span>
+<span class="sd">===============================</span>
+
+<span class="sd">.. currentmodule:: calour.sorting</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   sort_by_data</span>
+<span class="sd">   sort_by_metadata</span>
+<span class="sd">   sort_samples</span>
+<span class="sd">   sort_abundance</span>
+<span class="sd">   cluster_data</span>
+<span class="sd">   cluster_features</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">cluster</span><span class="p">,</span> <span class="n">spatial</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">transforming</span>
+<span class="kn">from</span> <span class="nn">.transforming</span> <span class="k">import</span> <span class="n">log_n</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<span class="k">def</span> <span class="nf">sort_center_mass</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">log_n</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sort the features based on the center of mass</span>
+
+<span class="sd">    Assumes exp samples are sorted by some continuous field, and sort the features based on their</span>
+<span class="sd">    center of mass along this field order:</span>
+<span class="sd">    For each feature calculate the center of mass (i.e. for each feature go over all samples i and calculate sum(data(i) * i / sum(data(i)) ).</span>
+<span class="sd">    Features are then sorted according to this center of mass</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    transform : callable (optional)</span>
+<span class="sd">        a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.</span>
+<span class="sd">        The transform function can modify ``Experiment.data`` (it is a copy).</span>
+<span class="sd">        It should not change the dimension of ``data`` in ``Experiment``.</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy</span>
+<span class="sd">        True to Replace data in exp</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        additional keyword parameters passed to ``transform``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    exp : Experiment</span>
+<span class="sd">        features sorted by center of mass</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;sorting features by center of mass&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;tansforming data using </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">transform</span><span class="p">)</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">newexp</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">center_mass</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+    <span class="n">center_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">center_mass</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">sort_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">center_mass</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">)</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">sort_pos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exp</span>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<div class="viewcode-block" id="cluster_data"><a class="viewcode-back" href="../../_autosummary/calour.sorting.cluster_data.html#calour.sorting.cluster_data">[docs]</a><span class="k">def</span> <span class="nf">cluster_data</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Cluster the samples/features.</span>
+
+<span class="sd">    Reorder the features/samples so that ones with similar behavior (pattern</span>
+<span class="sd">    across samples/features) are close to each other</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    aixs : 0 or 1 (optional)</span>
+<span class="sd">        0 (default) means clustering features; 1 means clustering samples</span>
+<span class="sd">    transform : Callable</span>
+<span class="sd">        a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.</span>
+<span class="sd">        The transform function can modify ``Experiment.data`` (it is a copy).</span>
+<span class="sd">        It should not change the dimension of ``data`` in ``Experiment``.</span>
+<span class="sd">    metric : str or callable</span>
+<span class="sd">        the clustering metric to use. It should be able to be passed to</span>
+<span class="sd">        ``scipy.spatial.distance.pdist``.</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy.</span>
+<span class="sd">        True to Replace data in exp.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        additional keyword parameters passed to ``transform``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    exp : Experiment</span>
+<span class="sd">        With samples/features clustered (reordered)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;clustering data on axis </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;tansforming data using </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">transform</span><span class="p">)</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">newexp</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span>
+    <span class="c1"># cluster</span>
+    <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">spatial</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+    <span class="n">linkage</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">single</span><span class="p">(</span><span class="n">dist_mat</span><span class="p">)</span>
+    <span class="n">sort_order</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">leaves_list</span><span class="p">(</span><span class="n">linkage</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">sort_order</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<div class="viewcode-block" id="sort_by_metadata"><a class="viewcode-back" href="../../_autosummary/calour.sorting.sort_by_metadata.html#calour.sorting.sort_by_metadata">[docs]</a><span class="k">def</span> <span class="nf">sort_by_metadata</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sort samples or features based on metadata values in the field.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field : str</span>
+<span class="sd">        Name of the field to sort by</span>
+<span class="sd">    axis : 0 or 1</span>
+<span class="sd">        sort by samples (0) or by features (1), i.e. the ``field`` is a column</span>
+<span class="sd">        in ``sample_metadata`` (0) or ``feature_metadata`` (1)</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy</span>
+<span class="sd">        True to Replace data in exp</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;sorting samples by field </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">field</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span>
+    <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown axis </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<div class="viewcode-block" id="sort_by_data"><a class="viewcode-back" href="../../_autosummary/calour.sorting.sort_by_data.html#calour.sorting.sort_by_data">[docs]</a><span class="k">def</span> <span class="nf">sort_by_data</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;log_mean&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sort features based on their mean frequency.</span>
+
+<span class="sd">    Sort the 2-d array by sample (axis=0) or feature (axis=0). ``key``</span>
+<span class="sd">    will be applied to ``subset`` of each feature (axis=0) or sample</span>
+<span class="sd">    (axis=1) and return a comparative value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    axis : 0 or 1</span>
+<span class="sd">        Apply ``key`` function on row (sort the samples) (0) or column (sort the features) (1)</span>
+<span class="sd">    subset : ``None`` or iterable of int (optional)</span>
+<span class="sd">        Sorting using only subset of the data.</span>
+<span class="sd">    key : str or callable</span>
+<span class="sd">        If it is a callable, it should be a function accepts 1-D array of numeric and</span>
+<span class="sd">        returns a comparative value (like ``key`` in builtin ``sorted`` function).</span>
+<span class="sd">        Alternatively it accepts the following str values:</span>
+<span class="sd">        &quot;log_mean&quot;: sort by log of the mean</span>
+<span class="sd">        &quot;prevalence&quot;: sort by the prevalence</span>
+<span class="sd">        &quot;mean&quot;: sort by the mean</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy</span>
+<span class="sd">        True to Replace data in exp</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        key word parameters passed to ``key``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        With features sorted by mean frequency</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">subset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_subset</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">data_subset</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">subset</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_subset</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">subset</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;log_mean&#39;</span><span class="p">:</span> <span class="n">_log_mean</span><span class="p">,</span>
+            <span class="s1">&#39;prevalence&#39;</span><span class="p">:</span> <span class="n">_prevalence</span><span class="p">,</span>
+            <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">func</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">exp</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">data_subset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">data_subset</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">data_subset</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">sort_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sort_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">axis</span><span class="p">,</span> <span class="n">data_subset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">sort_pos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<span class="k">def</span> <span class="nf">_log_mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">logit</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Log transform and then return the mean.</span>
+
+<span class="sd">    It caps the small value to the `logit` on the lower end before it does</span>
+<span class="sd">    log2 transform.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; x = np.array([0, 0, 2, 4])</span>
+<span class="sd">    &gt;&gt;&gt; _log_mean(x)</span>
+<span class="sd">    0.75</span>
+<span class="sd">    &gt;&gt;&gt; _log_mean(x, 2)</span>
+<span class="sd">    1.25</span>
+<span class="sd">    &gt;&gt;&gt; _log_mean(x, None)  # don&#39;t log transform</span>
+<span class="sd">    1.5</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">logit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># make a copy because it&#39;s changed inplace</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">logit</span><span class="p">]</span> <span class="o">=</span> <span class="n">logit</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_prevalence</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">cutoff</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="sort_samples"><a class="viewcode-back" href="../../_autosummary/calour.sorting.sort_samples.html#calour.sorting.sort_samples">[docs]</a><span class="k">def</span> <span class="nf">sort_samples</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sort samples by field</span>
+<span class="sd">    A convenience function for sort_by_metadata</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field : str</span>
+<span class="sd">        The field to sort the samples by</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment`` with samples sorted according to values in field</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sort_by_metadata</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<div class="viewcode-block" id="sort_abundance"><a class="viewcode-back" href="../../_autosummary/calour.sorting.sort_abundance.html#calour.sorting.sort_abundance">[docs]</a><span class="k">def</span> <span class="nf">sort_abundance</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sort features based on their abundance in a subset of the samples.</span>
+<span class="sd">    This is a convenience wrapper for sort_by_data()</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field : str or None (default)</span>
+<span class="sd">        None (default) to sort on all samples, str to sort only on samples matching the field/value combination</span>
+<span class="sd">    value : str or list of str or None (default)</span>
+<span class="sd">        if field is not None, value is the value/list of values so sorting is only on samples matching this list</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy of the experiment, True to filter inplace</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        with features sorted by abundance</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sort_by_data</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<div class="viewcode-block" id="cluster_features"><a class="viewcode-back" href="../../_autosummary/calour.sorting.cluster_features.html#calour.sorting.cluster_features">[docs]</a><span class="k">def</span> <span class="nf">cluster_features</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">min_abundance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Cluster features following filtering of minimal abundance on features and</span>
+<span class="sd">       log transform and scaling on the data (mean 0 std 1)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">min_abundance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">filter_min_abundance</span><span class="p">(</span><span class="n">min_abundance</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span>
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">newexp</span><span class="o">.</span><span class="n">cluster_data</span><span class="p">(</span><span class="n">transform</span><span class="o">=</span><span class="n">transforming</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="n">transforming</span><span class="o">.</span><span class="n">log_n</span><span class="p">,</span> <span class="n">transforming</span><span class="o">.</span><span class="n">scale</span><span class="p">],</span> <span class="n">scale__axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

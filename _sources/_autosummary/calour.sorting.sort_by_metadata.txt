@@ -1,0 +1,6 @@
+calour.sorting.sort_by_metadata
+===============================
+
+.. currentmodule:: calour.sorting
+
+.. autofunction:: sort_by_metadata

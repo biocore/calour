@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.amplicon_experiment.AmpliconExperiment &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="amplicon experiment (calour.amplicon_experiment)" href="../amplicon_experiment.html" />
+    <link rel="next" title="read &amp; write (calour.io)" href="../io.html" />
+    <link rel="prev" title="amplicon experiment (calour.amplicon_experiment)" href="../amplicon_experiment.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-amplicon-experiment-ampliconexperiment">
+<h1>calour.amplicon_experiment.AmpliconExperiment<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="calour.amplicon_experiment.AmpliconExperiment">
+<em class="property">class </em><code class="descclassname">calour.amplicon_experiment.</code><code class="descname">AmpliconExperiment</code><span class="sig-paren">(</span><em>data</em>, <em>sample_metadata</em>, <em>feature_metadata=None</em>, <em>exp_metadata={}</em>, <em>description=''</em>, <em>sparse=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/amplicon_experiment.html#AmpliconExperiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="calour.amplicon_experiment.AmpliconExperiment.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data</em>, <em>sample_metadata</em>, <em>feature_metadata=None</em>, <em>exp_metadata={}</em>, <em>description=''</em>, <em>sparse=True</em><span class="sig-paren">)</span><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#calour.amplicon_experiment.AmpliconExperiment.__init__" title="calour.amplicon_experiment.AmpliconExperiment.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(data,&nbsp;sample_metadata[,&nbsp;...])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">add_observation</span></code>(exp,&nbsp;obs_id[,&nbsp;data])</td>
+<td>add an observation to the experiment. fill the data with 0 if values is none, or with the values of data</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">ax_color_bar</span></code>(axis,&nbsp;values,&nbsp;width[,&nbsp;...])</td>
+<td>plot color bars along x or y axis</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">binarize</span></code>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
+<td>Binarize the data with a threshold.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">cluster_data</span></code>(exp[,&nbsp;transform,&nbsp;axis,&nbsp;metric,&nbsp;...])</td>
+<td>Cluster the samples/features.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">cluster_features</span></code>(exp[,&nbsp;min_abundance,&nbsp;inplace])</td>
+<td>Cluster features following filtering of minimal abundance on features and</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">correlation</span></code>(exp,&nbsp;field[,&nbsp;method,&nbsp;nonzero,&nbsp;...])</td>
+<td>Find features with correlation to a numeric metadata field</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">create_plot_gui</span></code>(exp[,&nbsp;gui,&nbsp;databases])</td>
+<td>Create plot GUI object.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">deepcopy</span></code>(x[,&nbsp;memo,&nbsp;_nil])</td>
+<td>Deep copy operation on arbitrary Python objects.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diff_abundance</span></code>(exp,&nbsp;field,&nbsp;val1[,&nbsp;val2,&nbsp;...])</td>
+<td>test the differential expression between 2 groups (val1 and val2 in field field)</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diff_abundance_kw</span></code>(exp,&nbsp;field[,&nbsp;transform,&nbsp;...])</td>
+<td>Test the differential expression between multiple sample groups using the Kruskal Wallis test.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">downsample</span></code>(exp,&nbsp;field[,&nbsp;axis,&nbsp;num_keep,&nbsp;inplace])</td>
+<td>Downsample the data set.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_by_data</span></code>(exp,&nbsp;predicate[,&nbsp;axis,&nbsp;...])</td>
+<td>Filter samples or features by data.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_by_metadata</span></code>(exp,&nbsp;field,&nbsp;pick[,&nbsp;axis,&nbsp;...])</td>
+<td>Filter samples or features by metadata.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_fasta</span></code>(exp,&nbsp;filename[,&nbsp;negate,&nbsp;inplace])</td>
+<td>Filter features from experiment based on fasta file</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_ids</span></code>(exp,&nbsp;ids[,&nbsp;axis,&nbsp;negate,&nbsp;inplace])</td>
+<td>Filter samples or features based on a list index values</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_mean</span></code>(exp[,&nbsp;cutoff])</td>
+<td>Filter features with a mean at least cutoff of the mean total abundance/sample</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_min_abundance</span></code>(exp,&nbsp;min_abundance,&nbsp;...)</td>
+<td>Filter keeping only features with &gt;= min_abundance total over all samples</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_orig_reads</span></code>(exp,&nbsp;minreads,&nbsp;\*\*kwargs)</td>
+<td>Filter keeping only samples with &gt;= minreads in the original reads column Note this function uses the _calour_original_abundance field rather than the current sum of sequences per sample.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_prevalence</span></code>(exp[,&nbsp;fraction,&nbsp;cutoff])</td>
+<td>Filter features keeping only ones present in at least fraction fraction of the samples.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_samples</span></code>(exp,&nbsp;field,&nbsp;values[,&nbsp;negate,&nbsp;...])</td>
+<td>Shortcut for filtering samples.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_taxonomy</span></code>(exp,&nbsp;values[,&nbsp;negate,&nbsp;...])</td>
+<td>filter keeping only observations with taxonomy string matching taxonomy</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">from_pandas</span></code>(df[,&nbsp;exp])</td>
+<td>Convert a Pandas DataFrame into an experiment Can use an existing calour Experimebt (exp) (if supplied) to obtain feature and sample metadata.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">getLogger</span></code>([name])</td>
+<td>Return a logger with the specified name, creating it if necessary.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">get_data</span></code>([sparse,&nbsp;copy])</td>
+<td>Get the data as a 2d array</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">get_data_md5</span></code>(data)</td>
+<td>Calculate the md5 of a dense/sparse matrix</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">get_file_md5</span></code>(filename[,&nbsp;encoding])</td>
+<td>get the md5 of the text file.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">get_term_features</span></code>(seqs,&nbsp;sequence_annotations)</td>
+<td>Get dict of number of appearances in each sequence keyed by term</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">heatmap</span></code>(exp[,&nbsp;sample_field,&nbsp;feature_field,&nbsp;...])</td>
+<td>Plot a heatmap for the experiment.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">join_experiments</span></code>(exp,&nbsp;other[,&nbsp;...])</td>
+<td>Join two Experiment objects into one.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">join_fields</span></code>(exp,&nbsp;field1,&nbsp;field2[,&nbsp;newname,&nbsp;...])</td>
+<td>Join two sample metadata fields into a single new field</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">log_n</span></code>(exp[,&nbsp;n,&nbsp;inplace])</td>
+<td>Log transform the data</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">merge_identical</span></code>(exp,&nbsp;field[,&nbsp;method,&nbsp;axis,&nbsp;...])</td>
+<td>Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">merge_obs_tax</span></code>(exp[,&nbsp;tax_level,&nbsp;method])</td>
+<td>merge all observations with identical taxonomy (at level tax_level) by summing the values per sample</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">multipletests</span></code>(pvals[,&nbsp;alpha,&nbsp;method,&nbsp;...])</td>
+<td>test results and p-value correction for multiple tests</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">nlargest</span></code>(n,&nbsp;iterable[,&nbsp;key])</td>
+<td>Find the n largest elements in a dataset.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<td>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code>(exp,&nbsp;features)</td>
+<td>Normalize each sample by their total sums without a list of features</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code>([databases,&nbsp;feature_field])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code>(exp,&nbsp;\*\*kwargs)</td>
+<td>Plot histogram of all the values in data.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code>(exp[,&nbsp;field])</td>
+<td>Plot bacteria after sorting by field</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">read</span></code>(data_file[,&nbsp;sample_metadata_file,&nbsp;...])</td>
+<td>Read the files for the experiment.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">read_amplicon</span></code>(data_file[,&nbsp;sample_metadata_file])</td>
+<td>Load an amplicon experiment.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">read_open_ms</span></code>(data_file[,&nbsp;...])</td>
+<td>Load an OpenMS metabolomics experiment.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">relative_enrichment</span></code>(exp,&nbsp;features,&nbsp;feature_terms)</td>
+<td>Get the list of enriched terms in features compared to all features in exp, given uneven distribtion of number of terms per feature</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">reorder</span></code>(new_order[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Reorder according to indices in the new order.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">rescale</span></code>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<td>Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">save</span></code>(exp,&nbsp;prefix[,&nbsp;fmt])</td>
+<td>Save the experiment data to disk.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">save_biom</span></code>(exp,&nbsp;f[,&nbsp;fmt,&nbsp;add_metadata])</td>
+<td>Save experiment to biom format</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">save_commands</span></code>(exp,&nbsp;f)</td>
+<td>Save the commands used to generate the exp</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">save_fasta</span></code>(exp,&nbsp;f[,&nbsp;seqs])</td>
+<td>Save a list of sequences to fasta.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">save_feature_metadata</span></code>(exp,&nbsp;f)</td>
+<td>Save feature metadata to file.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">save_sample_metadata</span></code>(exp,&nbsp;f)</td>
+<td>Save sample metadata to file.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code>(exp[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Standardize a dataset along an axis</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">serialize</span></code>(exp,&nbsp;f)</td>
+<td>Serialize the Experiment object to disk.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_abundance</span></code>(exp[,&nbsp;field,&nbsp;value,&nbsp;inplace])</td>
+<td>Sort features based on their abundance in a subset of the samples.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_by_data</span></code>(exp[,&nbsp;axis,&nbsp;subset,&nbsp;key,&nbsp;inplace])</td>
+<td>Sort features based on their mean frequency.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_by_metadata</span></code>(exp,&nbsp;field[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Sort samples or features based on metadata values in the field.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_center_mass</span></code>(exp[,&nbsp;transform,&nbsp;inplace])</td>
+<td>Sort the features based on the center of mass</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code>(exp,&nbsp;field,&nbsp;\*\*kwargs)</td>
+<td>Sort samples by field</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_taxonomy</span></code>(exp[,&nbsp;inplace])</td>
+<td>Sort the features based on the taxonomy</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
+<td>Get a pandas dataframe of the abundances Samples are rows, features are columns.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">transform</span></code>(exp[,&nbsp;steps,&nbsp;inplace])</td>
+<td>Chain transformations together.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">shape</span></code></td>
+<td>Get the number of samples by features in the experiment.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sparse</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a><ul>
+      <li>Previous: <a href="../amplicon_experiment.html" title="previous chapter">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
+      <li>Next: <a href="../io.html" title="next chapter">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.amplicon_experiment.AmpliconExperiment.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.amplicon_experiment.AmpliconExperiment.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

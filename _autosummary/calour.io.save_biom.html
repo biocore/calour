@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.io.save_biom &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="read &amp; write (calour.io)" href="../io.html" />
+    <link rel="next" title="calour.io.save_sample_metadata" href="calour.io.save_sample_metadata.html" />
+    <link rel="prev" title="calour.io.save" href="calour.io.save.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-io-save-biom">
+<h1>calour.io.save_biom<a class="headerlink" href="#calour-io-save-biom" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.io.save_biom">
+<code class="descclassname">calour.io.</code><code class="descname">save_biom</code><span class="sig-paren">(</span><em>exp</em>, <em>f</em>, <em>fmt='hdf5'</em>, <em>add_metadata='taxonomy'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/io.html#save_biom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.save_biom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save experiment to biom format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>f</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the file to save to</li>
+<li><strong>fmt</strong> (<em>str (optional)</em>) &#8211; the output biom table format. options are:
+&#8216;hdf5&#8217; (default) save to hdf5 biom table.
+&#8216;json&#8217; same to json biom table.
+&#8216;txt&#8217; save to text (tsv) biom table.</li>
+<li><strong>add_metadata</strong> (<em>str or None (optional)</em>) &#8211; add metadata column from <code class="docutils literal"><span class="pre">Experiment.feature_metadata</span></code> to biom table.
+Don&#8217;t add if it is <code class="docutils literal"><span class="pre">None</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a><ul>
+      <li>Previous: <a href="calour.io.save.html" title="previous chapter">calour.io.save</a></li>
+      <li>Next: <a href="calour.io.save_sample_metadata.html" title="next chapter">calour.io.save_sample_metadata</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.io.save_biom.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.io.save_biom.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

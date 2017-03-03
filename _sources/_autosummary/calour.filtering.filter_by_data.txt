@@ -1,0 +1,6 @@
+calour.filtering.filter_by_data
+===============================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_by_data

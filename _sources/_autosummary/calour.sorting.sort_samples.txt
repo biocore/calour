@@ -1,0 +1,6 @@
+calour.sorting.sort_samples
+===========================
+
+.. currentmodule:: calour.sorting
+
+.. autofunction:: sort_samples

@@ -1,0 +1,562 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.io &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.io</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">read &amp; write (:mod:`calour.io`)</span>
+<span class="sd">===============================</span>
+
+<span class="sd">.. currentmodule:: calour.io</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   read</span>
+<span class="sd">   read_amplicon</span>
+<span class="sd">   read_open_ms</span>
+<span class="sd">   save</span>
+<span class="sd">   save_biom</span>
+<span class="sd">   save_sample_metadata</span>
+<span class="sd">   save_feature_metadata</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">biom</span>
+
+<span class="kn">from</span> <span class="nn">.experiment</span> <span class="k">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">.amplicon_experiment</span> <span class="k">import</span> <span class="n">AmpliconExperiment</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">get_file_md5</span><span class="p">,</span> <span class="n">get_data_md5</span><span class="p">,</span> <span class="n">_get_taxonomy_string</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_read_biom</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Read in a biom table file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : str</span>
+<span class="sd">        file path to the biom table</span>
+<span class="sd">    transpose : bool (True by default)</span>
+<span class="sd">        Transpose the table or not. The biom table has samples in</span>
+<span class="sd">        column while sklearn and other packages require samples in</span>
+<span class="sd">        row. So you should transpose the data table.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sid : list of str</span>
+<span class="sd">        the sample ids</span>
+<span class="sd">    oid : list of str</span>
+<span class="sd">        the feature ids</span>
+<span class="sd">    data : numpy array (2d) of float</span>
+<span class="sd">        the table</span>
+<span class="sd">    feature_md : pandas DataFram</span>
+<span class="sd">        the feature metadata (if availble in table)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading biom table </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fp</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">biom</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="n">sid</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">ids</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;sample&#39;</span><span class="p">)</span>
+    <span class="n">oid</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">ids</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;loaded </span><span class="si">%d</span><span class="s1"> samples, </span><span class="si">%d</span><span class="s1"> observations&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sid</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">oid</span><span class="p">)))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">matrix_data</span>
+    <span class="n">feature_md</span> <span class="o">=</span> <span class="n">_get_md_from_biom</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">transpose</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;transposing table&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">sid</span><span class="p">,</span> <span class="n">oid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">feature_md</span>
+
+
+<span class="k">def</span> <span class="nf">_get_md_from_biom</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Get the metadata of last column in the biom table.</span>
+
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    ``pandas.DataFrame`` or ``None``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">ids</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">metadata</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No metadata associated with features in biom table&#39;</span><span class="p">)</span>
+        <span class="n">md_df</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">md_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="n">tmd</span><span class="p">)</span> <span class="k">for</span> <span class="n">tmd</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">md_df</span>
+
+
+<span class="k">def</span> <span class="nf">_read_open_ms</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Read an OpenMS bucket table csv file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : str</span>
+<span class="sd">        file path to the biom table</span>
+<span class="sd">    transpose : bool (True by default)</span>
+<span class="sd">        Transpose the table or not. The biom table has samples in</span>
+<span class="sd">        column while sklearn and other packages require samples in</span>
+<span class="sd">        row. So you should transpose the data table.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sid : list of str</span>
+<span class="sd">        the sample ids</span>
+<span class="sd">    oid : list of str</span>
+<span class="sd">        the feature ids</span>
+<span class="sd">    data : numpy array (2d) of float</span>
+<span class="sd">        the table</span>
+<span class="sd">    feature_md : pandas DataFram</span>
+<span class="sd">        the feature metadata (if availble in table)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading OpenMS bucket table </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fp</span><span class="p">)</span>
+    <span class="c1"># use the python engine as the default (c) engine throws an error</span>
+    <span class="c1"># a known bug in pandas (see #11166)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;loaded </span><span class="si">%d</span><span class="s1"> observations, </span><span class="si">%d</span><span class="s1">  samples&#39;</span> <span class="o">%</span> <span class="n">table</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">sid</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">oid</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">transpose</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;transposing table&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sid</span><span class="p">,</span> <span class="n">oid</span><span class="p">,</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_read_table</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Read tab-delimited table file.</span>
+
+<span class="sd">    It is used to read sample metadata (mapping) file and feature</span>
+<span class="sd">    metadata file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fp : str</span>
+<span class="sd">        the file path to read</span>
+<span class="sd">    encoding : str or None (optional)</span>
+<span class="sd">        None (default) to use pandas default encoder, str to specify</span>
+<span class="sd">        encoder name (see pandas.read_table() documentation)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame with index set to first column (as str)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># read the 1st column as str</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">str</span><span class="p">})</span>
+    <span class="c1"># table.fillna(&#39;na&#39;, inplace=True)</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">table</span>
+
+
+<div class="viewcode-block" id="read_open_ms"><a class="viewcode-back" href="../../_autosummary/calour.io.read_open_ms.html#calour.io.read_open_ms">[docs]</a><span class="k">def</span> <span class="nf">read_open_ms</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Load an OpenMS metabolomics experiment.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_file : str</span>
+<span class="sd">        name of the OpenMS bucket table CSV file</span>
+<span class="sd">    sample_metadata_file : str or None (optional)</span>
+<span class="sd">        None (default) to not load metadata per sample</span>
+<span class="sd">        str to specify name of sample mapping file (tsv)</span>
+<span class="sd">    feature_metadata_file : str or None (optional)</span>
+<span class="sd">        Name of table containing additional metadata about each feature</span>
+<span class="sd">        None (default) to not load</span>
+<span class="sd">    description : str or None (optional)</span>
+<span class="sd">        Name of the experiment (for display purposes).</span>
+<span class="sd">        None (default) to assign file name</span>
+<span class="sd">    sparse : bool (optional)</span>
+<span class="sd">        False (default) to store data as dense matrix (faster but more memory)</span>
+<span class="sd">        True to store as sparse (CSR)</span>
+<span class="sd">    normalize : int or None</span>
+<span class="sd">        normalize each sample to the specified reads. ``None`` to not normalize</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    exp : ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Reading OpenMS data (OpenMS bucket table </span><span class="si">%s</span><span class="s1">, map file </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="p">))</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="p">,</span> <span class="n">feature_metadata_file</span><span class="p">,</span>
+               <span class="n">data_file_type</span><span class="o">=</span><span class="s1">&#39;openms&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span>
+               <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># generate nice M/Z (MZ) and retention time (RT) columns for each feature</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">mzdata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mzdata</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MZ&#39;</span><span class="p">,</span> <span class="s1">&#39;RT&#39;</span><span class="p">]</span>
+    <span class="n">mzdata</span> <span class="o">=</span> <span class="n">mzdata</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">,</span> <span class="n">mzdata</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<div class="viewcode-block" id="read"><a class="viewcode-back" href="../../_autosummary/calour.io.read.html#calour.io.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_file_type</span><span class="o">=</span><span class="s1">&#39;biom&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+         <span class="n">cls</span><span class="o">=</span><span class="n">Experiment</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">normalize</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Read the files for the experiment.</span>
+
+<span class="sd">    .. note:: The order in the sample and feature metadata tables are changed</span>
+<span class="sd">       to align with biom table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_file : str</span>
+<span class="sd">        file path to the biom table.</span>
+<span class="sd">    sample_metadata_file : None or str (optional)</span>
+<span class="sd">        None (default) to just use samplenames (no additional metadata).</span>
+<span class="sd">        if not None, file path to the sample metadata (aka mapping file in QIIME).</span>
+<span class="sd">    feature_metadata_file : str</span>
+<span class="sd">        file path to the feature metadata.</span>
+<span class="sd">    description : str</span>
+<span class="sd">        description of the experiment</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        read the biom table into sparse or dense array</span>
+<span class="sd">    file_type : str (optional)</span>
+<span class="sd">        the data_file format. options:</span>
+<span class="sd">        &#39;biom&#39; : a biom table (biom-format.org) (default)</span>
+<span class="sd">        &#39;openms&#39; : an OpenMS bucket table csv (rows are feature, columns are samples)</span>
+<span class="sd">    encoding : str or None (optional)</span>
+<span class="sd">        encoder for the metadata files. None (default) to use</span>
+<span class="sd">        pandas default encoder, str to specify encoder name (see</span>
+<span class="sd">         pandas.read_table() documentation)</span>
+<span class="sd">    cls : ``class``, optional</span>
+<span class="sd">        what class object to read the data into (``Experiment`` by default)</span>
+<span class="sd">    normalize : int or None</span>
+<span class="sd">        normalize each sample to the specified reads. ``None`` to not normalize</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : np.array or scipy.sprase.csr</span>
+<span class="sd">        The experiment count data (each row is a sample, each column is a feature)</span>
+<span class="sd">    sample_metadata : pandas.DataFrame</span>
+<span class="sd">        Metadata for the samples</span>
+<span class="sd">    feature_metadata : pandas.DataFrame</span>
+<span class="sd">        Metadata for the features</span>
+<span class="sd">    exp_metadata : dict</span>
+<span class="sd">        information about the experiment (including &#39;map_md5&#39;, &#39;data_md5&#39;)</span>
+<span class="sd">    description : str</span>
+<span class="sd">        name of the experiment</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Reading experiment (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="p">,</span> <span class="n">feature_metadata_file</span><span class="p">))</span>
+    <span class="n">exp_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;map_md5&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+    <span class="c1"># load the data table</span>
+    <span class="k">if</span> <span class="n">data_file_type</span> <span class="o">==</span> <span class="s1">&#39;biom&#39;</span><span class="p">:</span>
+        <span class="n">sid</span><span class="p">,</span> <span class="n">oid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">md</span> <span class="o">=</span> <span class="n">_read_biom</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">data_file_type</span> <span class="o">==</span> <span class="s1">&#39;openms&#39;</span><span class="p">:</span>
+        <span class="n">sid</span><span class="p">,</span> <span class="n">oid</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_read_open_ms</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unkown data_file_type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">data_file_type</span><span class="p">)</span>
+    <span class="c1"># load the sample metadata file</span>
+    <span class="k">if</span> <span class="n">sample_metadata_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># reorder the sample id to align with biom</span>
+        <span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">_read_table</span><span class="p">(</span><span class="n">sample_metadata_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sid</span><span class="p">,</span> <span class="p">]</span>
+        <span class="n">exp_metadata</span><span class="p">[</span><span class="s1">&#39;map_md5&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_file_md5</span><span class="p">(</span><span class="n">sample_metadata_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+        <span class="c1"># duplicate the index to a column so we can select it</span>
+        <span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sid</span>
+
+    <span class="c1"># load the feature metadata file</span>
+    <span class="k">if</span> <span class="n">feature_metadata_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># reorder the feature id to align with that from biom table</span>
+        <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">_read_table</span><span class="p">(</span><span class="n">feature_metadata_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">oid</span><span class="p">,</span> <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">oid</span><span class="p">)</span>
+        <span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">oid</span>
+    <span class="k">if</span> <span class="n">data_file_type</span> <span class="o">==</span> <span class="s1">&#39;biom&#39;</span> <span class="ow">and</span> <span class="n">md</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># combine it with the metadata</span>
+        <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">feature_metadata</span><span class="p">,</span> <span class="n">md</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># init the experiment metadata details</span>
+    <span class="n">exp_metadata</span><span class="p">[</span><span class="s1">&#39;data_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_file</span>
+    <span class="n">exp_metadata</span><span class="p">[</span><span class="s1">&#39;sample_metadata_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_metadata_file</span>
+    <span class="n">exp_metadata</span><span class="p">[</span><span class="s1">&#39;feature_metadata_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_metadata_file</span>
+    <span class="n">exp_metadata</span><span class="p">[</span><span class="s1">&#39;data_md5&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data_md5</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">description</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="p">,</span>
+              <span class="n">exp_metadata</span><span class="o">=</span><span class="n">exp_metadata</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># record the original total read count into sample metadata</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<div class="viewcode-block" id="read_amplicon"><a class="viewcode-back" href="../../_autosummary/calour.io.read_amplicon.html#calour.io.read_amplicon">[docs]</a><span class="k">def</span> <span class="nf">read_amplicon</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="o">*</span><span class="p">,</span> <span class="n">filter_reads</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Load an amplicon experiment.</span>
+
+<span class="sd">    Fix taxonomy, normalize reads, and filter low abundance</span>
+<span class="sd">    samples. This wraps ``read()``.  Also convert feature metadata</span>
+<span class="sd">    index (sequences) to upper case</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sample_metadata_file : None or str (optional)</span>
+<span class="sd">        None (default) to just use samplenames (no additional metadata).</span>
+<span class="sd">    filter_reads : int or None</span>
+<span class="sd">        int (default) to remove all samples with less than ``filter_reads``.</span>
+<span class="sd">        ``None`` to not filter</span>
+<span class="sd">    normalize : int or None</span>
+<span class="sd">        normalize each sample to the specified reads. ``None`` to not normalize</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``AmpliconExperiment``</span>
+<span class="sd">        after removing low read sampls and normalizing</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># don&#39;t do normalize before the possible filtering</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">AmpliconExperiment</span><span class="p">,</span>
+               <span class="n">normalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="s1">&#39;taxonomy&#39;</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_taxonomy_string</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+
+    <span class="k">if</span> <span class="n">filter_reads</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">filter_by_data</span><span class="p">(</span><span class="s1">&#39;sum_abundance&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">filter_reads</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Serialize the Experiment object to disk.&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../_autosummary/calour.io.save.html#calour.io.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;hdf5&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Save the experiment data to disk.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prefix : str</span>
+<span class="sd">        file path to save to.</span>
+<span class="sd">    fmt : str</span>
+<span class="sd">        format for the data table. could be &#39;hdf5&#39;, &#39;txt&#39;, or &#39;json&#39;.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">save_biom</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.biom&#39;</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">save_sample_metadata</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_sample.txt&#39;</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">)</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">save_feature_metadata</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_feature.txt&#39;</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_biom"><a class="viewcode-back" href="../../_autosummary/calour.io.save_biom.html#calour.io.save_biom">[docs]</a><span class="k">def</span> <span class="nf">save_biom</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;hdf5&#39;</span><span class="p">,</span> <span class="n">add_metadata</span><span class="o">=</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Save experiment to biom format</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str</span>
+<span class="sd">        the file to save to</span>
+<span class="sd">    fmt : str (optional)</span>
+<span class="sd">        the output biom table format. options are:</span>
+<span class="sd">        &#39;hdf5&#39; (default) save to hdf5 biom table.</span>
+<span class="sd">        &#39;json&#39; same to json biom table.</span>
+<span class="sd">        &#39;txt&#39; save to text (tsv) biom table.</span>
+<span class="sd">    add_metadata : str or None (optional)</span>
+<span class="sd">        add metadata column from ``Experiment.feature_metadata`` to biom table.</span>
+<span class="sd">        Don&#39;t add if it is ``None``.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;save biom table to file </span><span class="si">%s</span><span class="s1"> format </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fmt</span><span class="p">))</span>
+    <span class="n">tab</span> <span class="o">=</span> <span class="n">_create_biom_table_from_exp</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">add_metadata</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;hdf5&#39;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">biom</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">biom_open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">tab</span><span class="o">.</span><span class="n">to_hdf5</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;calour&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">tab</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;calour&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;txt&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">add_metadata</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;.txt format does not support taxonomy information in save. Saving without taxonomy.&#39;</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">to_tsv</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknwon file format </span><span class="si">%s</span><span class="s1"> for save&#39;</span> <span class="o">%</span> <span class="n">fmt</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;biom table saved to file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">f</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_sample_metadata"><a class="viewcode-back" href="../../_autosummary/calour.io.save_sample_metadata.html#calour.io.save_sample_metadata">[docs]</a><span class="k">def</span> <span class="nf">save_sample_metadata</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Save sample metadata to file. &#39;&#39;&#39;</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_feature_metadata"><a class="viewcode-back" href="../../_autosummary/calour.io.save_feature_metadata.html#calour.io.save_feature_metadata">[docs]</a><span class="k">def</span> <span class="nf">save_feature_metadata</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Save feature metadata to file. &#39;&#39;&#39;</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">save_commands</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Save the commands used to generate the exp &#39;&#39;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">save_fasta</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">seqs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Save a list of sequences to fasta.</span>
+<span class="sd">    Use taxonomy information if available, otherwise just use sequence as header.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str</span>
+<span class="sd">        the filename to save to</span>
+<span class="sd">    seqs : list of str sequences (&#39;ACGT&#39;) or None (optional)</span>
+<span class="sd">        None (default) to save all sequences in exp, or list of sequences to only save these sequences.</span>
+<span class="sd">        Note: sequences not in exp will not be saved</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;save_fasta to file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">seqs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;no sequences supplied - saving all sequences&#39;</span><span class="p">)</span>
+        <span class="n">seqs</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">num_skipped</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="s1">&#39;taxonomy&#39;</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">add_taxonomy</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;no taxonomy field in experiment. saving without taxonomy&#39;</span><span class="p">)</span>
+        <span class="n">add_taxonomy</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fasta_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">cseq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">seqs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">cseq</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">num_skipped</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">add_taxonomy</span><span class="p">:</span>
+                <span class="n">cheader</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">][</span><span class="n">cseq</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cheader</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">cseq</span><span class="p">)</span>
+            <span class="n">fasta_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cheader</span><span class="p">,</span> <span class="n">cseq</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;wrote fasta file with </span><span class="si">%d</span><span class="s1"> sequences. </span><span class="si">%d</span><span class="s1"> sequences skipped&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqs</span><span class="p">)</span><span class="o">-</span><span class="n">num_skipped</span><span class="p">,</span> <span class="n">num_skipped</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_create_biom_table_from_exp</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">add_metadata</span><span class="o">=</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Create a biom table from an experiment</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exp : Experiment</span>
+<span class="sd">    add_metadata : str or None (optional)</span>
+<span class="sd">        add metadata column from ``Experiment.feature_metadata`` to biom table.</span>
+<span class="sd">        Don&#39;t add if it is ``None``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    biom_table</span>
+<span class="sd">        the biom table representation of the experiment</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">biom</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span> <span class="n">features</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;OTU table&quot;</span><span class="p">)</span>
+    <span class="c1"># and add metabolite name as taxonomy:</span>
+    <span class="k">if</span> <span class="n">add_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># md has to be a dict of dict, so it needs to be converted from</span>
+        <span class="c1"># a DataFrame instead of Series</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">add_metadata</span><span class="p">]]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_metadata</span><span class="p">(</span><span class="n">md</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">table</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,6 @@
+calour.experiment.add_functions
+===============================
+
+.. currentmodule:: calour.experiment
+
+.. autofunction:: add_functions

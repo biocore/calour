@@ -1,0 +1,6 @@
+calour.heatmap.create_plot_gui
+==============================
+
+.. currentmodule:: calour.heatmap
+
+.. autofunction:: create_plot_gui

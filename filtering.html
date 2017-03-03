@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>filtering (calour.filtering) &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="index.html" />
+    <link rel="next" title="calour.filtering.filter_by_data" href="_autosummary/calour.filtering.filter_by_data.html" />
+    <link rel="prev" title="calour.io.save_feature_metadata" href="_autosummary/calour.io.save_feature_metadata.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-calour.filtering"></span><div class="section" id="filtering-calour-filtering">
+<h1>filtering (<a class="reference internal" href="#module-calour.filtering" title="calour.filtering"><code class="xref py py-mod docutils literal"><span class="pre">calour.filtering</span></code></a>)<a class="headerlink" href="#filtering-calour-filtering" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_by_data.html#calour.filtering.filter_by_data" title="calour.filtering.filter_by_data"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_data</span></code></a>(exp,&nbsp;predicate[,&nbsp;axis,&nbsp;...])</td>
+<td>Filter samples or features by data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_by_metadata.html#calour.filtering.filter_by_metadata" title="calour.filtering.filter_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_metadata</span></code></a>(exp,&nbsp;field,&nbsp;pick[,&nbsp;axis,&nbsp;...])</td>
+<td>Filter samples or features by metadata.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_samples.html#calour.filtering.filter_samples" title="calour.filtering.filter_samples"><code class="xref py py-obj docutils literal"><span class="pre">filter_samples</span></code></a>(exp,&nbsp;field,&nbsp;values[,&nbsp;negate,&nbsp;...])</td>
+<td>Shortcut for filtering samples.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_ids.html#calour.filtering.filter_ids" title="calour.filtering.filter_ids"><code class="xref py py-obj docutils literal"><span class="pre">filter_ids</span></code></a>(exp,&nbsp;ids[,&nbsp;axis,&nbsp;negate,&nbsp;inplace])</td>
+<td>Filter samples or features based on a list index values</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_mean.html#calour.filtering.filter_mean" title="calour.filtering.filter_mean"><code class="xref py py-obj docutils literal"><span class="pre">filter_mean</span></code></a>(exp[,&nbsp;cutoff])</td>
+<td>Filter features with a mean at least cutoff of the mean total abundance/sample</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_prevalence.html#calour.filtering.filter_prevalence" title="calour.filtering.filter_prevalence"><code class="xref py py-obj docutils literal"><span class="pre">filter_prevalence</span></code></a>(exp[,&nbsp;fraction,&nbsp;cutoff])</td>
+<td>Filter features keeping only ones present in at least fraction fraction of the samples.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_autosummary/calour.filtering.filter_min_abundance.html#calour.filtering.filter_min_abundance" title="calour.filtering.filter_min_abundance"><code class="xref py py-obj docutils literal"><span class="pre">filter_min_abundance</span></code></a>(exp,&nbsp;min_abundance,&nbsp;...)</td>
+<td>Filter keeping only features with &gt;= min_abundance total over all samples</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="_autosummary/calour.io.save_feature_metadata.html" title="previous chapter">calour.io.save_feature_metadata</a></li>
+      <li>Next: <a href="_autosummary/calour.filtering.filter_by_data.html" title="next chapter">calour.filtering.filter_by_data</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/filtering.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/filtering.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

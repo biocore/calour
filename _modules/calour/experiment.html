@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.experiment &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.experiment</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Experiment (:mod:`calour.experiment`)</span>
+<span class="sd">=====================================</span>
+
+<span class="sd">.. currentmodule:: calour.experiment</span>
+
+<span class="sd">Classes</span>
+<span class="sd">^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   Experiment</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   add_functions</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Experiment"><a class="viewcode-back" href="../../_autosummary/calour.experiment.Experiment.html#calour.amplicon_experiment.Experiment">[docs]</a><span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;This class contains the data for a experiment or a meta experiment.</span>
+
+<span class="sd">    The data set includes a data table (otu table, gene table,</span>
+<span class="sd">    metabolomic table, or all those tables combined), a sample</span>
+<span class="sd">    metadata table, and a feature metadata.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ``numpy.array`` or ``scipy.sparse``</span>
+<span class="sd">        The abundance table for OTUs, metabolites, genes, etc. Samples</span>
+<span class="sd">        are in row and features in column</span>
+<span class="sd">    sample_metadata : ``pandas.DataFrame``</span>
+<span class="sd">        The metadata on the samples</span>
+<span class="sd">    feature_metadata : ``pandas.DataFrame``</span>
+<span class="sd">        The metadata on the features</span>
+<span class="sd">    description : str</span>
+<span class="sd">        name of experiment</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        store the data array in sparse (``scipy.sparse.csr_matrix``) matrix</span>
+<span class="sd">        or numpy array</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ``numpy.array`` or ``scipy.sparse``</span>
+<span class="sd">        The abundance table for OTUs, metabolites, genes, etc. Samples</span>
+<span class="sd">        are in row and features in column</span>
+<span class="sd">    sample_metadata : ``pandas.DataFrame``</span>
+<span class="sd">        The metadata on the samples</span>
+<span class="sd">    feature_metadata : ``pandas.DataFrame``</span>
+<span class="sd">        The metadata on the features</span>
+<span class="sd">    exp_metadata : dict</span>
+<span class="sd">        metadata about the experiment (data md5, filenames, etc.)</span>
+<span class="sd">    shape : tuple of (int, int)</span>
+<span class="sd">        the dimension of data</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.</span>
+<span class="sd">    description : str</span>
+<span class="sd">        name of the experiment</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Experiment.__init__"><a class="viewcode-back" href="../../_autosummary/calour.experiment.Experiment.html#calour.amplicon_experiment.Experiment.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">exp_metadata</span><span class="o">=</span><span class="p">{},</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">sample_metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">feature_metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp_metadata</span> <span class="o">=</span> <span class="n">exp_metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+
+        <span class="c1"># the function calling history list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_call_history</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># whether to log to history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># flag if data array is sparse (True) or dense (False)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span> <span class="o">=</span> <span class="n">sparse</span>
+
+        <span class="c1"># remeber how many reads per sample/feature before any procesing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;_calour_original_abundance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+        <span class="c1"># self.feature_metadata[&#39;_calour_original_abundance&#39;] = self.data.sum(axis=0)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@sparse</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sparse</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sparse</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return a string representation of this object.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Experiment </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%d</span><span class="s1"> samples, </span><span class="si">%d</span><span class="s1"> features&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Check equality.</span>
+
+<span class="sd">        Need to check sparsity and do the conversion if needed first.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">sparse</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">other_data</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">other_data</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other_data</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_convert_axis_name</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Convert str value of axis to 0/1.</span>
+
+<span class="sd">        This allows the decorated function with ``axis`` parameter</span>
+<span class="sd">        to accept &quot;sample&quot; and &quot;feature&quot; as value for ``axis`` parameter.</span>
+
+<span class="sd">        This should be always the closest decorator to the function if</span>
+<span class="sd">        you have multiple decorators for this function.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">conversion</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sample&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s1">&#39;samples&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s1">&#39;feature&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="n">ba</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">arguments</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">ba</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;axis&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">ba</span><span class="p">[</span><span class="s1">&#39;axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conversion</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+            <span class="k">elif</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">}:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown axis `</span><span class="si">%r</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">ba</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inner</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_record_sig</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Record the function calls to history.</span>
+
+<span class="sd">        Note this require the function decorated to return an</span>
+<span class="sd">        ``Experiment`` object.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">__qualname__</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># this extra code here is to prevent recording func call</span>
+            <span class="c1"># if the method is called inside another method.</span>
+            <span class="n">exp</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">log</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">_log</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_exp</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">exp</span><span class="o">.</span><span class="n">_log</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+                    <span class="n">param</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+                    <span class="n">new_exp</span><span class="o">.</span><span class="n">_call_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">(</span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+                    <span class="n">exp</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="c1"># set log status back</span>
+                <span class="n">exp</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="n">log</span>
+            <span class="k">return</span> <span class="n">new_exp</span>
+
+        <span class="k">return</span> <span class="n">inner</span>
+
+    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get the data as a 2d array</span>
+
+<span class="sd">        Get the data 2d array (each column is a feature and row is a sample)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sparse : None or bool (optional)</span>
+<span class="sd">            None (default) to pass original data (sparse or dense).</span>
+<span class="sd">            True to get as sparse. False to get as dense</span>
+<span class="sd">        copy : bool (optional)</span>
+<span class="sd">            True to get a copy of the data; otherwise, it can be</span>
+<span class="sd">            the original data or a copy (default).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ``Experiment.data``</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">sparse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">elif</span> <span class="n">sparse</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get the number of samples by features in the experiment. &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="k">def</span> <span class="nf">reorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Reorder according to indices in the new order.</span>
+
+<span class="sd">        Note that we can also drop samples in new order.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_order : Iterable of int or boolean mask</span>
+<span class="sd">            the order of new indices</span>
+<span class="sd">        axis : 0 for samples or 1 for features</span>
+<span class="sd">            the axis where the reorder occurs</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            reorder in place.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Experiment</span>
+<span class="sd">            experiment with reordered samples</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">inplace</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exp</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># make it a np array; otherwise the slicing won&#39;t work if the new_order is</span>
+        <span class="c1"># a list of boolean and data is sparse matrix. For example:</span>
+        <span class="c1"># from scipy.sparse import csr_matrix</span>
+        <span class="c1"># a = csr_matrix((3, 4), dtype=np.int8)</span>
+        <span class="c1"># In [125]: a[[False, False, False], :]</span>
+        <span class="c1"># Out[125]:</span>
+        <span class="c1"># &lt;3x4 sparse matrix of type &#39;&lt;class &#39;numpy.int8&#39;&gt;&#39;</span>
+
+        <span class="c1"># In [126]: a[np.array([False, False, False]), :]</span>
+        <span class="c1"># Out[126]:</span>
+        <span class="c1"># &lt;0x4 sparse matrix of type &#39;&lt;class &#39;numpy.int8&#39;&gt;&#39;</span>
+        <span class="n">new_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_order</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">new_order</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">new_order</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">new_order</span><span class="p">]</span>
+            <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">new_order</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">exp</span>
+
+    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get a pandas dataframe of the abundances</span>
+<span class="sd">        Samples are rows, features are columns. Can specify the metadata fields</span>
+<span class="sd">        for the index (default is sample_metadata index) and column labels</span>
+<span class="sd">        (default is feature_metadata index)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample_field : str or None (optional)</span>
+<span class="sd">            Name of the sample_metadata column to use for index.</span>
+<span class="sd">            None (default) is the sample_metadata index</span>
+<span class="sd">        feature_field : str or None (optional)</span>
+<span class="sd">            Name of the feature_metadata column to use for column names.</span>
+<span class="sd">            None (default) is the feature_metadata index</span>
+<span class="sd">        sparse: bool or None (optional)</span>
+<span class="sd">            None (default) to get sparsity based on the underlying Experiment sparsity</span>
+<span class="sd">            True to force to sparse pandas.Dataframe</span>
+<span class="sd">            False to force to standard pandas.Dataframe</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ``pandas.Dataframe`` or ``pandas.SparseDataframe``</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">sample_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="n">sample_field</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">feature_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="n">feature_field</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span> <span class="o">=</span> <span class="n">sparse</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+            <span class="c1"># create list of sparse rows</span>
+            <span class="n">sr</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">SparseSeries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">SparseDataFrame</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">ind</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">ind</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_pandas</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Convert a Pandas DataFrame into an experiment</span>
+<span class="sd">        Can use an existing calour Experimebt (exp) (if supplied) to obtain feature and sample metadata.</span>
+<span class="sd">        Note currently only works with non-sparse DataFrame</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : Pandas.DataFrame</span>
+<span class="sd">            The dataframe to use. should contain samples in rows, features in columns.</span>
+<span class="sd">            Index values will be used for the sample_metadata index and column names will be used for feature_metadata index</span>
+<span class="sd">        exp : Experiment (optional)</span>
+<span class="sd">            If not None, use sample and feature metadata from the experiment</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ``Experiment`` with non-sparse data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">exp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            <span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">exp_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;From Pandas DataFrame&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">description</span> <span class="o">+</span> <span class="s1">&#39; From Pandas&#39;</span>
+            <span class="n">exp_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">exp_metadata</span>
+            <span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">]</span>
+            <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">]</span>
+            <span class="n">cls</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">__class__</span>
+
+        <span class="c1"># print(sample_metadata)</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="p">,</span>
+                     <span class="n">exp_metadata</span><span class="o">=</span><span class="n">exp_metadata</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<div class="viewcode-block" id="add_functions"><a class="viewcode-back" href="../../_autosummary/calour.experiment.add_functions.html#calour.amplicon_experiment.add_functions">[docs]</a><span class="k">def</span> <span class="nf">add_functions</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span>
+                  <span class="n">modules</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;.io&#39;</span><span class="p">,</span> <span class="s1">&#39;.sorting&#39;</span><span class="p">,</span> <span class="s1">&#39;.filtering&#39;</span><span class="p">,</span> <span class="s1">&#39;.analysis&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;.transforming&#39;</span><span class="p">,</span> <span class="s1">&#39;.heatmap.heatmap&#39;</span><span class="p">,</span> <span class="s1">&#39;.plotting&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;.manipulation&#39;</span><span class="p">,</span> <span class="s1">&#39;.analysis&#39;</span><span class="p">]):</span>
+    <span class="sd">&#39;&#39;&#39;Dynamically add functions to the class as methods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cls : ``class`` object</span>
+<span class="sd">        The class that the functions will be added to</span>
+<span class="sd">    modules : iterable of str</span>
+<span class="sd">        The modules where the functions are defined</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="s1">&#39;calour&#39;</span><span class="p">)</span>
+        <span class="n">functions</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fn</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
+            <span class="c1"># skip private functions</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.transforming &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.transforming</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">transforming (:mod:`calour.transforming`)</span>
+<span class="sd">========================================</span>
+
+<span class="sd">.. currentmodule:: calour.transforming</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   normalize</span>
+<span class="sd">   scale</span>
+<span class="sd">   binarize</span>
+<span class="sd">   log_n</span>
+<span class="sd">   transform</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">preprocessing</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="normalize"><a class="viewcode-back" href="../../_autosummary/calour.transforming.normalize.html#calour.transforming.normalize">[docs]</a><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exp : Experiment</span>
+<span class="sd">    total : float</span>
+<span class="sd">        the sum (along axis) to normalize to</span>
+<span class="sd">    axis : int (optional)</span>
+<span class="sd">        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy, True to replace values in exp</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        the normalized experiment</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;l1&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span> <span class="o">*</span> <span class="n">total</span>
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<span class="k">def</span> <span class="nf">rescale</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.</span>
+
+<span class="sd">    This function rescales by multiplying ALL entries in exp.data by same number.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exp : Experiment</span>
+<span class="sd">    total : float</span>
+<span class="sd">        the mean sum (along axis) to normalize to</span>
+<span class="sd">    axis : int (optional)</span>
+<span class="sd">        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy, True to replace values in exp</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        the normalized experiment</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="n">current_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">))</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">*</span> <span class="n">total</span> <span class="o">/</span> <span class="n">current_mean</span>
+    <span class="k">return</span> <span class="n">exp</span>
+
+
+<div class="viewcode-block" id="scale"><a class="viewcode-back" href="../../_autosummary/calour.transforming.scale.html#calour.transforming.scale">[docs]</a><span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Standardize a dataset along an axis</span>
+
+<span class="sd">    .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    axis : 0 or 1</span>
+<span class="sd">        1 means scaling occur sample-wise; 0 feature-wise.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;scaling the data, axis=</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exp</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">sparse</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">preprocessing</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<div class="viewcode-block" id="binarize"><a class="viewcode-back" href="../../_autosummary/calour.transforming.binarize.html#calour.transforming.binarize">[docs]</a><span class="k">def</span> <span class="nf">binarize</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Binarize the data with a threshold.</span>
+
+<span class="sd">    It calls scikit-learn to do the real work.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    threshold : Numeric</span>
+<span class="sd">        the cutoff value. Any values below or equal to this will be replaced by 0,</span>
+<span class="sd">        above it by 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;binarizing the data. threshold=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="n">preprocessing</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<div class="viewcode-block" id="log_n"><a class="viewcode-back" href="../../_autosummary/calour.transforming.log_n.html#calour.transforming.log_n">[docs]</a><span class="k">def</span> <span class="nf">log_n</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Log transform the data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : numeric, optional</span>
+<span class="sd">        cap the tiny values and then log transform the data.</span>
+<span class="sd">    inplace : bool, optional</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;log_n transforming the data, min. threshold=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">exp</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">sparse</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<div class="viewcode-block" id="transform"><a class="viewcode-back" href="../../_autosummary/calour.transforming.transform.html#calour.transforming.transform">[docs]</a><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="p">[],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Chain transformations together.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    steps : list of callable</span>
+<span class="sd">        each callable is a transformer that takes ``Experiment`` object as</span>
+<span class="sd">        its 1st argument and has a boolean parameter of ``inplace``. Each</span>
+<span class="sd">        callable should return an ``Experiment`` object.</span>
+<span class="sd">    inplace : bool</span>
+<span class="sd">        transformation occuring in the original data or a copy</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        keyword arguments to pass to each transformers. The key should</span>
+<span class="sd">        be in the form of &quot;&lt;transformer_name&gt;__&lt;param_name&gt;&quot;. For</span>
+<span class="sd">        example, &quot;transform(exp, steps=[log_n], log_n__n=3)&quot; will set</span>
+<span class="sd">        &quot;n&quot; of function &quot;log_n&quot; to 3</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        with its data transformed</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">transformer</span><span class="p">,</span> <span class="n">param_name</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">param_name</span> <span class="o">==</span> <span class="s1">&#39;inplace&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;You should not give </span><span class="si">%s</span><span class="s1"> argument. It should be &#39;</span>
+                             <span class="s1">&#39;set thru `inplace` argument for this function.&#39;</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">transformer</span><span class="p">][</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+        <span class="n">step</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">[</span><span class="n">step</span><span class="o">.</span><span class="n">__name__</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">exp</span></div>
+
+
+<span class="k">def</span> <span class="nf">normalize_by_subset_features</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Normalize each sample by their total sums without a list of features</span>
+
+<span class="sd">    Normalizes all features (including in the exclude list) by the</span>
+<span class="sd">    total sum calculated without the excluded features. This is to</span>
+<span class="sd">    alleviate the compositionality in the data set by only keeping the</span>
+<span class="sd">    features that you think are not changing across samples.</span>
+
+<span class="sd">    .. note:: sum is not identical in all samples after normalization</span>
+<span class="sd">       (since also keeps the excluded features)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    features : list of str</span>
+<span class="sd">        The features to exclude (or include if exclude=False)</span>
+<span class="sd">    total : int (optional)</span>
+<span class="sd">        The total abundance for the non-excluded features per sample</span>
+<span class="sd">    exclude : bool (optional)</span>
+<span class="sd">        True (default) to calculate normalization factor without features in features list.</span>
+<span class="sd">        False to calculate normalization factor only with features in features list.</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a new experiment, True to normalize in place</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        The normalized experiment</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">feature_pos</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exclude</span><span class="p">:</span>
+        <span class="n">feature_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">feature_pos</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">use_reads</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">feature_pos</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">total</span> <span class="o">*</span> <span class="n">data</span> <span class="o">/</span> <span class="n">use_reads</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">newexp</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.analysis.diff_abundance &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="analysis (calour.analysis)" href="../analysis.html" />
+    <link rel="next" title="calour.analysis.diff_abundance_kw" href="calour.analysis.diff_abundance_kw.html" />
+    <link rel="prev" title="calour.analysis.correlation" href="calour.analysis.correlation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-analysis-diff-abundance">
+<h1>calour.analysis.diff_abundance<a class="headerlink" href="#calour-analysis-diff-abundance" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.analysis.diff_abundance">
+<code class="descclassname">calour.analysis.</code><code class="descname">diff_abundance</code><span class="sig-paren">(</span><em>exp</em>, <em>field</em>, <em>val1</em>, <em>val2=None</em>, <em>method='meandiff'</em>, <em>transform='rankdata'</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/analysis.html#diff_abundance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.analysis.diff_abundance" title="Permalink to this definition">¶</a></dt>
+<dd><p>test the differential expression between 2 groups (val1 and val2 in field field)
+using permutation based fdr (dsfdr)
+for bacteria that have a significant difference.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exp</strong> (<em>calour.Experiment</em>) &#8211; </li>
+<li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The field to test by</li>
+<li><strong>val1</strong> (<em>str or list of str or None (optional)</em>) &#8211; The values for the first group.</li>
+<li><strong>val1</strong> &#8211; None (default) to compare to all other samples (not in val1)</li>
+<li><strong>method</strong> (<em>str or function</em>) &#8211; the method to use for the t-statistic test. options:
+&#8216;meandiff&#8217; : mean(A)-mean(B) (binary)
+&#8216;mannwhitney&#8217; : mann-whitneu u-test (binary)
+&#8216;kruwallis&#8217; : kruskal-wallis test (multiple groups)
+&#8216;stdmeandiff&#8217; : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
+function : use this function to calculate the t-statistic (input is data,labels, output is array of float)</li>
+<li><strong>transform</strong> (<em>str or None</em>) &#8211; transformation to apply to the data before caluculating the statistic
+&#8216;rankdata&#8217; : rank transfrom each OTU reads
+&#8216;log2data&#8217; : calculate log2 for each OTU using minimal cutoff of 2
+&#8216;normdata&#8217; : normalize the data to constant sum per samples
+&#8216;binarydata&#8217; : convert to binary absence/presence</li>
+<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; the desired FDR control level</li>
+<li><strong>numperm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; number of permutations to perform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>newexp</strong> &#8211; The experiment with only significant (FDR&lt;=maxfval) difference, sorted according to difference</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">calour.Experiment</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a><ul>
+      <li>Previous: <a href="calour.analysis.correlation.html" title="previous chapter">calour.analysis.correlation</a></li>
+      <li>Next: <a href="calour.analysis.diff_abundance_kw.html" title="next chapter">calour.analysis.diff_abundance_kw</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.analysis.diff_abundance.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.analysis.diff_abundance.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

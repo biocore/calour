@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.io.read &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="read &amp; write (calour.io)" href="../io.html" />
+    <link rel="next" title="calour.io.read_amplicon" href="calour.io.read_amplicon.html" />
+    <link rel="prev" title="read &amp; write (calour.io)" href="../io.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-io-read">
+<h1>calour.io.read<a class="headerlink" href="#calour-io-read" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.io.read">
+<code class="descclassname">calour.io.</code><code class="descname">read</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=''</em>, <em>sparse=True</em>, <em>data_file_type='biom'</em>, <em>encoding=None</em>, <em>cls=&lt;class 'calour.experiment.Experiment'&gt;</em>, <em>*</em>, <em>normalize</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/io.html#read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the files for the experiment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The order in the sample and feature metadata tables are changed
+to align with biom table.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; file path to the biom table.</li>
+<li><strong>sample_metadata_file</strong> (<em>None or str (optional)</em>) &#8211; None (default) to just use samplenames (no additional metadata).
+if not None, file path to the sample metadata (aka mapping file in QIIME).</li>
+<li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; file path to the feature metadata.</li>
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; description of the experiment</li>
+<li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; read the biom table into sparse or dense array</li>
+<li><strong>file_type</strong> (<em>str (optional)</em>) &#8211; the data_file format. options:
+&#8216;biom&#8217; : a biom table (biom-format.org) (default)
+&#8216;openms&#8217; : an OpenMS bucket table csv (rows are feature, columns are samples)</li>
+<li><strong>encoding</strong> (<em>str or None (optional)</em>) &#8211; <p>encoder for the metadata files. None (default) to use
+pandas default encoder, str to specify encoder name (see</p>
+<blockquote>
+<div>pandas.read_table() documentation)</div></blockquote>
+</li>
+<li><strong>cls</strong> (<code class="docutils literal"><span class="pre">class</span></code>, optional) &#8211; what class object to read the data into (<code class="docutils literal"><span class="pre">Experiment</span></code> by default)</li>
+<li><strong>normalize</strong> (<em>int or None</em>) &#8211; normalize each sample to the specified reads. <code class="docutils literal"><span class="pre">None</span></code> to not normalize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data</strong> (<em>np.array or scipy.sprase.csr</em>) &#8211; The experiment count data (each row is a sample, each column is a feature)</li>
+<li><strong>sample_metadata</strong> (<em>pandas.DataFrame</em>) &#8211; Metadata for the samples</li>
+<li><strong>feature_metadata</strong> (<em>pandas.DataFrame</em>) &#8211; Metadata for the features</li>
+<li><strong>exp_metadata</strong> (<em>dict</em>) &#8211; information about the experiment (including &#8216;map_md5&#8217;, &#8216;data_md5&#8217;)</li>
+<li><strong>description</strong> (<em>str</em>) &#8211; name of the experiment</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a><ul>
+      <li>Previous: <a href="../io.html" title="previous chapter">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+      <li>Next: <a href="calour.io.read_amplicon.html" title="next chapter">calour.io.read_amplicon</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.io.read.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.io.read.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

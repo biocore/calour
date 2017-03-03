@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.filtering.filter_ids &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="filtering (calour.filtering)" href="../filtering.html" />
+    <link rel="next" title="calour.filtering.filter_mean" href="calour.filtering.filter_mean.html" />
+    <link rel="prev" title="calour.filtering.filter_samples" href="calour.filtering.filter_samples.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-filtering-filter-ids">
+<h1>calour.filtering.filter_ids<a class="headerlink" href="#calour-filtering-filter-ids" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.filtering.filter_ids">
+<code class="descclassname">calour.filtering.</code><code class="descname">filter_ids</code><span class="sig-paren">(</span><em>exp</em>, <em>ids</em>, <em>axis=1</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/filtering.html#filter_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.filter_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter samples or features based on a list index values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ids</strong> (<em>iterable of str</em>) &#8211; the feature/sample ids to filter (index values)</li>
+<li><strong>axis</strong> (<em>int (optional)</em>) &#8211; 1 (default) to filter features, 0 to filter samples</li>
+<li><strong>negate</strong> (<em>bool (optional)</em>) &#8211; False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.</li>
+<li><strong>inplace</strong> (<em>bool (optional)</em>) &#8211; False (default) to create a copy of the experiment, True to filter inplace</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">filtered so contains only features/samples present in exp and in ids</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Experiment</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a><ul>
+      <li>Previous: <a href="calour.filtering.filter_samples.html" title="previous chapter">calour.filtering.filter_samples</a></li>
+      <li>Next: <a href="calour.filtering.filter_mean.html" title="next chapter">calour.filtering.filter_mean</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.filtering.filter_ids.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.filtering.filter_ids.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

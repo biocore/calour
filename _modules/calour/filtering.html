@@ -1,0 +1,473 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.filtering &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.filtering</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">filtering (:mod:`calour.filtering`)</span>
+<span class="sd">===================================</span>
+
+<span class="sd">.. currentmodule:: calour.filtering</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   filter_by_data</span>
+<span class="sd">   filter_by_metadata</span>
+<span class="sd">   filter_samples</span>
+<span class="sd">   filter_ids</span>
+<span class="sd">   filter_mean</span>
+<span class="sd">   filter_prevalence</span>
+<span class="sd">   filter_min_abundance</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">heapq</span> <span class="k">import</span> <span class="n">nlargest</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Callable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.experiment</span> <span class="k">import</span> <span class="n">Experiment</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<span class="k">def</span> <span class="nf">downsample</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_keep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Downsample the data set.</span>
+
+<span class="sd">    This down samples all the samples/features to have the same number of</span>
+<span class="sd">    samples/features for each categorical value of the field in</span>
+<span class="sd">    ``sample_metadata`` or ``feature_metadata``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field : str</span>
+<span class="sd">        The name of the column in samples metadata table. This column</span>
+<span class="sd">        should has categorical values</span>
+<span class="sd">    axis : 0 / 1 (optional)</span>
+<span class="sd">        0 (default) to filter samples, 1 to filter features</span>
+<span class="sd">    num_keep : int or None (optional)</span>
+<span class="sd">        None (default) to downsample to minimal group size.</span>
+<span class="sd">        int : downsample to num_keep samples/features per group, drop values</span>
+<span class="sd">        with &lt; num_keep</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to do the filtering on a copy.</span>
+<span class="sd">        True to do the filtering on the original ``Experiment``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;downsample on field </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">field</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span>
+    <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span>
+    <span class="c1"># convert to string type because nan values, if they exist in the column,</span>
+    <span class="c1"># will fail `np.unique`</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_keep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">num_keep</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">num_skipped</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">unique</span><span class="p">:</span>
+        <span class="n">i_indice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">values</span> <span class="o">==</span> <span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i_indice</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_keep</span><span class="p">:</span>
+            <span class="n">num_skipped</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">i_indice</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_keep</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_indice</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">i_indice</span><span class="p">,</span> <span class="n">num_keep</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">num_skipped</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> values had &lt; </span><span class="si">%d</span><span class="s1"> items and were skipped&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_skipped</span><span class="p">,</span> <span class="n">num_keep</span><span class="p">))</span>
+    <span class="c1"># if nothing left, raise error</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No groups have more than </span><span class="si">%d</span><span class="s1"> items&#39;</span> <span class="o">%</span> <span class="n">num_keep</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_convert_axis_name</span>
+<div class="viewcode-block" id="filter_by_metadata"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_by_metadata.html#calour.filtering.filter_by_metadata">[docs]</a><span class="k">def</span> <span class="nf">filter_by_metadata</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">pick</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Filter samples or features by metadata.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field : str</span>
+<span class="sd">        the column name of the sample or feature metadata tables</span>
+<span class="sd">    pick : list, tuple, or Callable</span>
+<span class="sd">        pick what to keep based on the value in the specified field</span>
+<span class="sd">    axis : 0 or 1, optional</span>
+<span class="sd">        the field is on samples (0) or features (1) metadata</span>
+<span class="sd">    negate : bool, optional</span>
+<span class="sd">        discard instead of keep the pick if set to ``True``</span>
+<span class="sd">    inplace : bool, optional</span>
+<span class="sd">        do the filtering on the original ``Experiment`` object or a copied one.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        the filtered object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;filter_by_metadata&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span>
+    <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown axis </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">axis</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pick</span><span class="p">,</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="n">pick</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">field</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pick</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">pick</span> <span class="o">=</span> <span class="p">[</span><span class="n">pick</span><span class="p">]</span>
+
+        <span class="n">select</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">pick</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">if</span> <span class="n">negate</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="o">~</span> <span class="n">select</span>
+    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">select</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<div class="viewcode-block" id="filter_by_data"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_by_data.html#calour.filtering.filter_by_data">[docs]</a><span class="k">def</span> <span class="nf">filter_by_data</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">predicate</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Filter samples or features by data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    predicate : str or callable</span>
+<span class="sd">        The callable accepts a list of numeric and return a bool. Alternatively</span>
+<span class="sd">        it also accepts the following strings:</span>
+<span class="sd">        &#39;sum_abundance&#39;: calls ``_sum_abundance``,</span>
+<span class="sd">        &#39;freq_ratio&#39;: calls ``_freq_ratio``,</span>
+<span class="sd">        &#39;unique_cut&#39;: calls ``_unique_cut``,</span>
+<span class="sd">        &#39;mean_abundance&#39;: calls ``_mean_abundance``,</span>
+<span class="sd">        &#39;prevalence&#39;: calls ``_prevalence``</span>
+<span class="sd">    axis : 0 or 1</span>
+<span class="sd">        Apply predicate on each row (samples) (0) or each column (features) (1)</span>
+<span class="sd">    negate : bool</span>
+<span class="sd">        negate the predicate for selection</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        keyword argument passing to predicate function</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        the filtered object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sum_abundance&#39;</span><span class="p">:</span> <span class="n">_sum_abundance</span><span class="p">,</span>
+            <span class="s1">&#39;freq_ratio&#39;</span><span class="p">:</span> <span class="n">_freq_ratio</span><span class="p">,</span>
+            <span class="s1">&#39;unique_cut&#39;</span><span class="p">:</span> <span class="n">_unique_cut</span><span class="p">,</span>
+            <span class="s1">&#39;mean_abundance&#39;</span><span class="p">:</span> <span class="n">_mean_abundance</span><span class="p">,</span>
+            <span class="s1">&#39;prevalence&#39;</span><span class="p">:</span> <span class="n">_prevalence</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">predicate</span> <span class="o">=</span> <span class="n">func</span><span class="p">[</span><span class="n">predicate</span><span class="p">]</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;filter_by_data using function </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">predicate</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">exp</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="c1"># convert the row from sparse to dense, and cast to 1d array</span>
+                <span class="n">select</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">predicate</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="c1"># convert the column from sparse to dense, and cast to 1d array</span>
+                <span class="n">select</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">predicate</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown axis </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">axis</span><span class="p">,</span> <span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">negate</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="o">~</span> <span class="n">select</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> remaining&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">select</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">select</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_sum_abundance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Check if the sum abundance larger than cutoff.</span>
+
+<span class="sd">    It can be used filter features with at least &quot;cutoff&quot; abundance</span>
+<span class="sd">    total over all samples</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; _sum_abundance(np.array([0, 1, 1]), 2)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; _sum_abundance(np.array([0, 1, 1]), 2.01)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">cutoff</span>
+
+
+<span class="k">def</span> <span class="nf">_mean_abundance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Check if the mean abundance larger than cutoff.</span>
+
+<span class="sd">    Can be used to keep features with means at least &quot;cutoff&quot; in all</span>
+<span class="sd">    samples</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; _mean_abundance(np.array([0, 0, 1, 1]), 0.51)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; _mean_abundance(np.array([0, 0, 1, 1]), 0.5)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">cutoff</span>
+
+
+<span class="k">def</span> <span class="nf">_prevalence</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">10000</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Check the prevalence of values above the cutoff.</span>
+
+<span class="sd">    present (abundance &gt;= cutoff) in at least &quot;fraction&quot; of samples</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; _prevalence(np.array([0, 1]))</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; _prevalence(np.array([0, 1, 2, 3]), 2, 0.5)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; _prevalence(np.array([0, 1, 2]), 2, 0.51)</span>
+<span class="sd">    False</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">frac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">cutoff</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">frac</span> <span class="o">&gt;=</span> <span class="n">fraction</span>
+
+
+<span class="k">def</span> <span class="nf">_unique_cut</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;the percentage of distinct values out of the number of total samples.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; _unique_cut([0, 0], 0.49)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; _unique_cut([0, 0], 0.51)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; _unique_cut([0, 1], 1.01)</span>
+<span class="sd">    False</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">unique</span>
+
+
+<span class="k">def</span> <span class="nf">_freq_ratio</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;the ratio of the most common value to the second most common value</span>
+
+<span class="sd">    Return True if the ratio is not greater than &quot;ratio&quot;.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; _freq_ratio([0, 0, 1, 2], 2)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; _freq_ratio([0, 0, 1, 1], 1.01)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; _freq_ratio([0, 0, 1, 2], 1.99)</span>
+<span class="sd">    False</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">max_1</span><span class="p">,</span> <span class="n">max_2</span> <span class="o">=</span> <span class="n">nlargest</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">max_1</span> <span class="o">/</span> <span class="n">max_2</span> <span class="o">&lt;=</span> <span class="n">ratio</span>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+<div class="viewcode-block" id="filter_samples"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_samples.html#calour.filtering.filter_samples">[docs]</a><span class="k">def</span> <span class="nf">filter_samples</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Shortcut for filtering samples.&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">filter_by_metadata</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span> <span class="n">pick</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+                              <span class="n">negate</span><span class="o">=</span><span class="n">negate</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="filter_min_abundance"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_min_abundance.html#calour.filtering.filter_min_abundance">[docs]</a><span class="k">def</span> <span class="nf">filter_min_abundance</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">min_abundance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Filter keeping only features with &gt;= min_abundance total over all samples</span>
+<span class="sd">    This is a convenience function wrapping filter_by_data()</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    min_abundance : numeric</span>
+<span class="sd">        The minimal total abundance for each feature over all samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">filter_by_data</span><span class="p">(</span><span class="s1">&#39;sum_abundance&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">min_abundance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<div class="viewcode-block" id="filter_prevalence"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_prevalence.html#calour.filtering.filter_prevalence">[docs]</a><span class="k">def</span> <span class="nf">filter_prevalence</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">10000</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Filter features keeping only ones present in at least fraction fraction of the samples.</span>
+<span class="sd">    This is a convenience function wrapping filter_by_data()</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fraction : float (optional)</span>
+<span class="sd">        Keep features present at least in fraction of samples</span>
+<span class="sd">    cutoff : float (optional)</span>
+<span class="sd">        The minimal fraction of reads for the otu to be called present in a sample</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment`` with only features present in at least fraction of samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">filter_by_data</span><span class="p">(</span><span class="s1">&#39;prevalence&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="n">fraction</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<div class="viewcode-block" id="filter_mean"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_mean.html#calour.filtering.filter_mean">[docs]</a><span class="k">def</span> <span class="nf">filter_mean</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Filter features with a mean at least cutoff of the mean total abundance/sample</span>
+
+<span class="sd">    In order to keep features with mean abundance of 1%, use ``filter_mean(cutoff=0.01)``</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cutoff : float (optional)</span>
+<span class="sd">        The minimal mean abundance fraction (out of the mean of total abundance per sample) for a feature in order</span>
+<span class="sd">        to keep it. Default is 0.01 - keep features with mean abundance &gt;=1% of mean total abundance per sample</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">filter_by_data</span><span class="p">(</span><span class="s1">&#39;mean_abundance&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<div class="viewcode-block" id="filter_ids"><a class="viewcode-back" href="../../_autosummary/calour.filtering.filter_ids.html#calour.filtering.filter_ids">[docs]</a><span class="k">def</span> <span class="nf">filter_ids</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Filter samples or features based on a list index values</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ids : iterable of str</span>
+<span class="sd">        the feature/sample ids to filter (index values)</span>
+<span class="sd">    axis : int (optional)</span>
+<span class="sd">        1 (default) to filter features, 0 to filter samples</span>
+<span class="sd">    negate : bool (optional)</span>
+<span class="sd">        False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create a copy of the experiment, True to filter inplace</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        filtered so contains only features/samples present in exp and in ids</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;filter_ids&#39;</span><span class="p">)</span>
+    <span class="n">okpos</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tot_ids</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">tot_ids</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+            <span class="n">okpos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;list contained </span><span class="si">%d</span><span class="s1"> sequences. Found </span><span class="si">%d</span><span class="s1"> sequences in experiment&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tot_ids</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">okpos</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">negate</span><span class="p">:</span>
+        <span class="n">okpos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)),</span> <span class="n">okpos</span><span class="p">,</span> <span class="n">assume_unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">okpos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

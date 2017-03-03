@@ -1,0 +1,332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.util &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.util</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">utilities (:mod:`calour.util`)</span>
+<span class="sd">==============================</span>
+
+<span class="sd">.. currentmodule:: calour.util</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   set_log_level</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span>
+
+<span class="kn">import</span> <span class="nn">scipy</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_taxonomy_string</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">remove_underscore</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">to_lower</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Get a nice taxonomy string</span>
+<span class="sd">    Convert the taxonomy list stored (from biom.read_table) to a single string per feature</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exp : Experiment</span>
+<span class="sd">        with the taxonomy entry in the feature_metadata</span>
+<span class="sd">    separator : str (optional)</span>
+<span class="sd">        the output separator to use between the taxonomic levels</span>
+<span class="sd">    remove_underscore : bool (optional)</span>
+<span class="sd">        True (default) to remove the &#39;g__&#39; entries and missing values</span>
+<span class="sd">        False to keep them</span>
+<span class="sd">    to_lower : bool (optional)</span>
+<span class="sd">        False (default) to keep case</span>
+<span class="sd">        True to convert to lowercase</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    taxonomy : list of str</span>
+<span class="sd">        list of taxonomy string per feature</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># test if we have taxonomy in the feature metadata</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;getting taxonomy string&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;taxonomy&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No taxonomy field in experiment&#39;</span><span class="p">)</span>
+
+    <span class="c1"># if it is not a list - just return it</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">remove_underscore</span><span class="p">:</span>
+        <span class="n">taxonomy</span> <span class="o">=</span> <span class="p">[</span><span class="n">separator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">taxonomy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ctax</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">]:</span>
+            <span class="n">taxstr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">clevel</span> <span class="ow">in</span> <span class="n">ctax</span><span class="p">:</span>
+                <span class="n">clevel</span> <span class="o">=</span> <span class="n">clevel</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clevel</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">clevel</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;__&#39;</span><span class="p">:</span>
+                        <span class="n">clevel</span> <span class="o">=</span> <span class="n">clevel</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+                    <span class="n">taxstr</span> <span class="o">+=</span> <span class="n">clevel</span> <span class="o">+</span> <span class="n">separator</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">taxstr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">taxstr</span> <span class="o">=</span> <span class="s1">&#39;na&#39;</span>
+            <span class="n">taxonomy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">taxstr</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">to_lower</span><span class="p">:</span>
+        <span class="n">taxonomy</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">taxonomy</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">taxonomy</span>
+
+
+<span class="k">def</span> <span class="nf">get_file_md5</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;get the md5 of the text file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        name of the file to calculate md5 on</span>
+<span class="sd">    encoding : str or None (optional)</span>
+<span class="sd">        encoding of the text file (see python str.encode() ). None to use &#39;utf-8&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    flmd5: str</span>
+<span class="sd">        the md5 of the file filename</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;getting file md5 for file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+        <span class="n">flmd5</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">cline</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">flmd5</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cline</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;map md5 cannot be calculated - utf problems?&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">flmd5</span> <span class="o">=</span> <span class="n">flmd5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;md5 is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">flmd5</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">flmd5</span>
+
+
+<span class="k">def</span> <span class="nf">get_data_md5</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculate the md5 of a dense/sparse matrix</span>
+
+<span class="sd">    Calculat matrix md5 based on row by row order</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : dense or sparse matrix</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    datmd5 : str</span>
+<span class="sd">        the md5 of the data (row by row)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;caculating data md5&#39;</span><span class="p">)</span>
+    <span class="n">datmd5</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">issparse</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">issparse</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">crow</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">:</span>
+            <span class="c1"># if sparse need to convert to numpy array</span>
+            <span class="n">cdat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">crow</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cdat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">crow</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="c1"># convert to string of raw data since hashlib.md5 does not take numpy array as input</span>
+        <span class="n">datmd5</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cdat</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+
+    <span class="n">datmd5</span> <span class="o">=</span> <span class="n">datmd5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;data md5 is: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">datmd5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">datmd5</span>
+
+
+<span class="k">def</span> <span class="nf">get_config_file</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Get the calour config file location</span>
+<span class="sd">    located in calour/config.calour.txt</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    config_file_name : str</span>
+<span class="sd">        the full path to the calour config file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">config_file_name</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__package__</span><span class="p">,</span> <span class="s1">&#39;calour.config&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config_file_name</span>
+
+
+<span class="k">def</span> <span class="nf">set_config_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;DEFAULT&#39;</span><span class="p">,</span> <span class="n">config_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Set the value in the calour config file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    key : str</span>
+<span class="sd">        the key to get the value for</span>
+<span class="sd">    value : str</span>
+<span class="sd">        the value to store</span>
+<span class="sd">    section : str (optional)</span>
+<span class="sd">        the section to get the value from</span>
+<span class="sd">    config_file_name : str (optional)</span>
+<span class="sd">        the full path to the config file or None to use default config file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">config_file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config_file_name</span> <span class="o">=</span> <span class="n">get_config_file</span><span class="p">()</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_file_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;wrote key </span><span class="si">%s</span><span class="s1"> value </span><span class="si">%s</span><span class="s1"> to config file&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">get_config_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;DEFAULT&#39;</span><span class="p">,</span> <span class="n">config_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Get the value from the calour config file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    key : str</span>
+<span class="sd">        the key to get the value for</span>
+<span class="sd">    fallback : str (optional)</span>
+<span class="sd">        the fallback value if the key/section/file does not exist</span>
+<span class="sd">    section : str (optional)</span>
+<span class="sd">        the section to get the value from</span>
+<span class="sd">    config_file_name : str (optional)</span>
+<span class="sd">        the full path to the config file or None to use default config file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    value : str</span>
+<span class="sd">        value of the key or fallback if file/section/key does not exist</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">config_file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config_file_name</span> <span class="o">=</span> <span class="n">get_config_file</span><span class="p">()</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_file_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;section </span><span class="si">%s</span><span class="s1"> not in config file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">config_file_name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fallback</span>
+
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;key </span><span class="si">%s</span><span class="s1"> not in config file </span><span class="si">%s</span><span class="s1"> section </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">config_file_name</span><span class="p">,</span> <span class="n">section</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fallback</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;found value </span><span class="si">%s</span><span class="s1"> for key </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<div class="viewcode-block" id="set_log_level"><a class="viewcode-back" href="../../_autosummary/calour.util.set_log_level.html#calour.util.set_log_level">[docs]</a><span class="k">def</span> <span class="nf">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Set the debug level for calour</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    level : int</span>
+<span class="sd">        10 for debug, 20 for info, 30 for warn, etc.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">clog</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;calour&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">level</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">clog</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

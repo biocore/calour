@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.heatmap.create_plot_gui &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="heatmap (calour.heatmap)" href="../heatmap.html" />
+    <link rel="next" title="analysis (calour.analysis)" href="../analysis.html" />
+    <link rel="prev" title="calour.heatmap.heatmap" href="calour.heatmap.heatmap.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-heatmap-create-plot-gui">
+<h1>calour.heatmap.create_plot_gui<a class="headerlink" href="#calour-heatmap-create-plot-gui" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.heatmap.create_plot_gui">
+<code class="descclassname">calour.heatmap.</code><code class="descname">create_plot_gui</code><span class="sig-paren">(</span><em>exp</em>, <em>gui='cli'</em>, <em>databases=('dbbact'</em>, <em>)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/heatmap/heatmap.html#create_plot_gui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.create_plot_gui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create plot GUI object.</p>
+<p>It still waits for the heatmap to be plotted and set up.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gui</strong> (<em>str or None (optional)</em>) &#8211; If None, just plot a simple matplotlib figure with the heatmap and no interactive elements.
+is str, name of the gui module to use for displaying the heatmap. options:
+&#8216;cli&#8217; (default) : just cli information about selected sample/feature.
+&#8216;qt5&#8217; : gui using QT5 (with full dbBact interface)
+&#8216;jupyter&#8217; : gui for Jupyter notebooks (using widgets)
+Other string : name of child class of plotgui (which should reside in heatmap/lower(classname).py)</li>
+<li><strong>databases</strong> (<em>list of str (optional)</em>) &#8211; Names of the databases to use to obtain info about sequences. options:
+&#8216;dbbact&#8217; : the dbBact manual annotation database
+&#8216;spongeworld&#8217; : the sponge microbiome automatic annotation database
+&#8216;redbiom&#8217; : the automatic qiita database</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">PlotGUI</span></code> or its child class</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a><ul>
+      <li>Previous: <a href="calour.heatmap.heatmap.html" title="previous chapter">calour.heatmap.heatmap</a></li>
+      <li>Next: <a href="../analysis.html" title="next chapter">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.heatmap.create_plot_gui.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.heatmap.create_plot_gui.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

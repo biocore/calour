@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.manipulation &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.manipulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">analysis (:mod:`calour.manipulation`)</span>
+<span class="sd">=====================================</span>
+
+<span class="sd">.. currentmodule:: calour.manipulation</span>
+
+<span class="sd">Functions</span>
+<span class="sd">^^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   join_fields</span>
+<span class="sd">   join_experiments</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">Experiment</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="nd">@Experiment</span><span class="o">.</span><span class="n">_convert_axis_name</span>
+<div class="viewcode-block" id="join_fields"><a class="viewcode-back" href="../../_autosummary/calour.manipulation.join_fields.html#calour.manipulation.join_fields">[docs]</a><span class="k">def</span> <span class="nf">join_fields</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field1</span><span class="p">,</span> <span class="n">field2</span><span class="p">,</span> <span class="n">newname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Join two sample metadata fields into a single new field</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field1 : str</span>
+<span class="sd">        Name of the first sample metadata field to join</span>
+<span class="sd">    field2 : str</span>
+<span class="sd">        Name of the second sample metadata field to join</span>
+<span class="sd">    newname : str or None (optional)</span>
+<span class="sd">        name of the new (joined) sample metadata field</span>
+<span class="sd">        None (default) to name it as field1-field2</span>
+<span class="sd">    axis : int</span>
+<span class="sd">        0 (default) to modify sample metadata fields, 1 to modify feature metadata fields</span>
+<span class="sd">    separator : str (optional)</span>
+<span class="sd">        The separator between the values of the two fields when joining</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        True (default) to add in current experiment, False to create a new Experiment</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    newexp : Experiment</span>
+<span class="sd">        with an added sample metadata field</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;joining fields </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1"> into </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field1</span><span class="p">,</span> <span class="n">field2</span><span class="p">,</span> <span class="n">newname</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">newexp</span><span class="o">.</span><span class="n">sample_metadata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">newexp</span><span class="o">.</span><span class="n">feature_metadata</span>
+
+    <span class="c1"># validate the data</span>
+    <span class="k">if</span> <span class="n">field1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;field </span><span class="si">%s</span><span class="s1"> not in metadata&#39;</span> <span class="o">%</span> <span class="n">field1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">field2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;field </span><span class="si">%s</span><span class="s1"> not in metadata&#39;</span> <span class="o">%</span> <span class="n">field2</span><span class="p">)</span>
+
+    <span class="c1"># get the new column name</span>
+    <span class="k">if</span> <span class="n">newname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">newname</span> <span class="o">=</span> <span class="n">field1</span> <span class="o">+</span> <span class="n">separator</span> <span class="o">+</span> <span class="n">field2</span>
+
+    <span class="k">if</span> <span class="n">newname</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;new field name </span><span class="si">%s</span><span class="s1"> alreay in metadata. Please use different newname value&#39;</span> <span class="o">%</span> <span class="n">newname</span><span class="p">)</span>
+
+    <span class="c1"># add the new column</span>
+    <span class="n">newcol</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">separator</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">field1</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="n">field2</span><span class="p">])]</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">newexp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="n">newname</span><span class="p">]</span> <span class="o">=</span> <span class="n">newcol</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newexp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="n">newname</span><span class="p">]</span> <span class="o">=</span> <span class="n">newcol</span>
+
+    <span class="k">return</span> <span class="n">newexp</span></div>
+
+
+<span class="k">def</span> <span class="nf">merge_obs_tax</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">tax_level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    merge all observations with identical taxonomy (at level tax_level) by summing the values per sample</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_collapse_obs</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    collapse the observations based on values in groups (list of lists)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">merge_identical</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field</span>
+<span class="sd">    Methods for merge (value for each observation) are:</span>
+<span class="sd">    &#39;mean&#39; : the mean of all samples/features</span>
+<span class="sd">    &#39;random&#39; : a random sample/feature out of the group (same sample/feature for all observations)</span>
+<span class="sd">    &#39;sum&#39; : the sum of values in all the samples/features</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field : str</span>
+<span class="sd">        The sample/feature metadata field</span>
+<span class="sd">    method : str (optional)</span>
+<span class="sd">        &#39;mean&#39; : the mean of all samples/features</span>
+<span class="sd">        &#39;random&#39; : a random sample/feature out of the group (same sample/feature for all observations)</span>
+<span class="sd">        &#39;sum&#39; : the sum of values in all the samples/features</span>
+<span class="sd">    axis : 0/1 (optional)</span>
+<span class="sd">        0 (default) to merge samples, 1 to merge features</span>
+<span class="sd">    inplace : bool (optional)</span>
+<span class="sd">        False (default) to create new Experiment, True to perform inplace</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    newexp : ``Experiment``</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;merge samples using field </span><span class="si">%s</span><span class="s1">, method </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">method</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">newexp</span><span class="o">.</span><span class="n">sample_metadata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">newexp</span><span class="o">.</span><span class="n">feature_metadata</span>
+    <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;field </span><span class="si">%s</span><span class="s1"> not in metadata&#39;</span> <span class="o">%</span> <span class="n">field</span><span class="p">)</span>
+
+    <span class="c1"># convert to dense for efficient slicing</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">sparse</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">newexp</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+    <span class="n">keep_pos</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cval</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="c1"># in case the sample had nan is the value</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">cval</span><span class="p">):</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">==</span> <span class="n">cval</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">pos</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">pos</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="n">newdat</span> <span class="o">=</span> <span class="n">cdata</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
+            <span class="n">newdat</span> <span class="o">=</span> <span class="n">cdata</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="n">random_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pos</span><span class="p">))</span>
+            <span class="n">newdat</span> <span class="o">=</span> <span class="n">cdata</span><span class="p">[</span><span class="n">random_pos</span><span class="p">]</span>
+        <span class="n">replace_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">keep_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">replace_pos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">newexp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">replace_pos</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">newdat</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newexp</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">replace_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">newdat</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">keep_pos</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newexp</span>
+
+
+<span class="k">def</span> <span class="nf">add_observation</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">obs_id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    add an observation to the experiment. fill the data with 0 if values is none, or with the values of data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="join_experiments"><a class="viewcode-back" href="../../_autosummary/calour.manipulation.join_experiments.html#calour.manipulation.join_experiments">[docs]</a><span class="k">def</span> <span class="nf">join_experiments</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">orig_field_name</span><span class="o">=</span><span class="s1">&#39;orig_exp&#39;</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Join two Experiment objects into one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exp, other : ``Experiment``</span>
+<span class="sd">        The experiments to join.</span>
+<span class="sd">        If both experiments contain the same feature metadata column, the value will be taken from</span>
+<span class="sd">        exp and not from other.</span>
+<span class="sd">    orig_field_name : str (optional)</span>
+<span class="sd">        Name of the new ``sample_metdata`` field containing the experiment each sample is coming from</span>
+<span class="sd">    prefixes : tuple of (str,str) (optional)</span>
+<span class="sd">        Prefix to append to the sample_metadata index for identical samples in the 2 experiments.</span>
+<span class="sd">        Required only if the two experiments share an identical sample name</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``Experiment``</span>
+<span class="sd">        A new experiment with samples from both experiments concatenated, features from both</span>
+<span class="sd">        experiments merged.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Join experiments:</span><span class="se">\n</span><span class="si">{!r}</span><span class="se">\n</span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+    <span class="n">newexp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;join </span><span class="si">%s</span><span class="s1"> &amp; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># test if we need to force a suffix (when both experiments contain the same sample ids)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prefixes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;You need provide prefix to add to sample ids &#39;</span>
+                             <span class="s1">&#39;because the two experiments has some same sample ids.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exp_prefix</span><span class="p">,</span> <span class="n">other_prefix</span> <span class="o">=</span> <span class="n">prefixes</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;both experiments contain same sample id&#39;</span><span class="p">)</span>
+            <span class="n">exp_sample_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">other_sample_metadata</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">exp_prefix</span><span class="p">:</span>
+                <span class="n">exp_sample_metadata</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exp_prefix</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">other_prefix</span><span class="p">:</span>
+                <span class="n">other_sample_metadata</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other_prefix</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exp_sample_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span>
+        <span class="n">other_sample_metadata</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">sample_metadata</span>
+
+    <span class="c1"># concatenate the sample_metadata</span>
+    <span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">exp_sample_metadata</span><span class="p">,</span> <span class="n">other_sample_metadata</span><span class="p">],</span> <span class="n">join</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">orig_field_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sample_metadata</span><span class="p">[</span><span class="n">orig_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">sample_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">exp_sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">orig_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">description</span>
+        <span class="n">sample_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">other_sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">orig_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">description</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">sample_metadata</span>
+
+    <span class="c1"># and store the positions of samples from each experiment in the new samples list</span>
+    <span class="n">sample_pos_exp</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">csamp</span><span class="p">)</span> <span class="k">for</span> <span class="n">csamp</span> <span class="ow">in</span> <span class="n">exp_sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="n">sample_pos_other</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">csamp</span><span class="p">)</span> <span class="k">for</span> <span class="n">csamp</span> <span class="ow">in</span> <span class="n">other_sample_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+
+    <span class="c1"># merge the features</span>
+    <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;__tmp_other&#39;</span><span class="p">))</span>
+    <span class="c1"># merge and remove duplicate columns</span>
+    <span class="n">keep_cols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ccol</span> <span class="ow">in</span> <span class="n">feature_metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ccol</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;__tmp_other&#39;</span><span class="p">):</span>
+            <span class="n">expcol</span> <span class="o">=</span> <span class="n">ccol</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;__tmp_other&#39;</span><span class="p">)]</span>
+            <span class="n">feature_metadata</span><span class="p">[</span><span class="n">expcol</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">feature_metadata</span><span class="p">[</span><span class="n">ccol</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keep_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ccol</span><span class="p">)</span>
+    <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">feature_metadata</span><span class="p">[</span><span class="n">keep_cols</span><span class="p">]</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">feature_metadata</span>
+
+    <span class="c1"># join the data of the two experiments, putting 0 if feature is not in an experiment</span>
+    <span class="n">all_features</span> <span class="o">=</span> <span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">all_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_metadata</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_features</span><span class="p">)])</span>
+    <span class="n">data_exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">data_other</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">cfeature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_features</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cfeature</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">all_data</span><span class="p">[</span><span class="n">sample_pos_exp</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_exp</span><span class="p">[:,</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">cfeature</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">cfeature</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">all_data</span><span class="p">[</span><span class="n">sample_pos_other</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_other</span><span class="p">[:,</span> <span class="n">other</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">cfeature</span><span class="p">)]</span>
+    <span class="n">newexp</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">all_data</span>
+    <span class="k">return</span> <span class="n">newexp</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

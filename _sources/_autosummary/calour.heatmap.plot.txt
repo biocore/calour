@@ -1,0 +1,6 @@
+calour.heatmap.plot
+===================
+
+.. currentmodule:: calour.heatmap
+
+.. autofunction:: plot

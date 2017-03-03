@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.amplicon_experiment &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calour.amplicon_experiment</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">amplicon experiment (:mod:`calour.amplicon_experiment`)</span>
+<span class="sd">=======================================================</span>
+
+<span class="sd">.. currentmodule:: calour.amplicon_experiment</span>
+
+<span class="sd">Classes</span>
+<span class="sd">^^^^^^^^</span>
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :toctree: _autosummary</span>
+
+<span class="sd">   AmpliconExperiment</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ----------------------------------------------------------------------------</span>
+<span class="c1"># Copyright (c) 2016--,  Calour development team.</span>
+<span class="c1">#</span>
+<span class="c1"># Distributed under the terms of the Modified BSD License.</span>
+<span class="c1">#</span>
+<span class="c1"># The full license is in the file COPYING.txt, distributed with this software.</span>
+<span class="c1"># ----------------------------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">getLogger</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">skbio</span>
+
+<span class="kn">from</span> <span class="nn">.experiment</span> <span class="k">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">_get_taxonomy_string</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AmpliconExperiment"><a class="viewcode-back" href="../../_autosummary/calour.amplicon_experiment.AmpliconExperiment.html#calour.amplicon_experiment.AmpliconExperiment">[docs]</a><span class="k">class</span> <span class="nc">AmpliconExperiment</span><span class="p">(</span><span class="n">Experiment</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return a string representation of this object.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;AmpliconExperiment </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%d</span><span class="s1"> samples, </span><span class="si">%d</span><span class="s1"> features&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">databases</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;dbbact&#39;</span><span class="p">,),</span> <span class="n">feature_field</span><span class="o">=</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># plot the experiment using taxonmy field and dbbact database</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">feature_field</span><span class="o">=</span><span class="n">feature_field</span><span class="p">,</span> <span class="n">databases</span><span class="o">=</span><span class="n">databases</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">filter_taxonomy</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">substring</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;filter keeping only observations with taxonomy string matching taxonomy</span>
+
+<span class="sd">        if substring=True, look for partial match instead of identity.</span>
+<span class="sd">        Matching is case insensitive</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : str or list of str</span>
+<span class="sd">            the taxonomy string/strings to filter (can be partial if substring is True)</span>
+<span class="sd">        negate : bool (optional)</span>
+<span class="sd">            False (default) to keep matching taxonomies, True to remove matching taxonomies</span>
+<span class="sd">        inplace : bool (optional)</span>
+<span class="sd">            do the filtering on the original ``Experiment`` object or a copied one.</span>
+<span class="sd">        substring : bool (optional)</span>
+<span class="sd">            True (default) to do partial (substring) matching for the taxonomy string,</span>
+<span class="sd">            False to do exact matching</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ``AmpliconExperiment``</span>
+<span class="sd">            With only features with matching taxonomy</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;taxonomy&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No taxonomy field in experiment&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+
+        <span class="n">taxstr</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="n">select</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">taxstr</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cval</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">substring</span><span class="p">:</span>
+                <span class="n">select</span> <span class="o">+=</span> <span class="p">[</span><span class="n">cval</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ctax</span> <span class="k">for</span> <span class="n">ctax</span> <span class="ow">in</span> <span class="n">taxstr</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">select</span> <span class="o">+=</span> <span class="p">[</span><span class="n">cval</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">ctax</span> <span class="k">for</span> <span class="n">ctax</span> <span class="ow">in</span> <span class="n">taxstr</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">negate</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">select</span> <span class="o">=</span> <span class="o">~</span> <span class="n">select</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> remaining&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">select</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">select</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">filter_fasta</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Filter features from experiment based on fasta file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            the fasta filename containing the sequences to use for filtering</span>
+<span class="sd">        negate : bool (optional)</span>
+<span class="sd">            False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.</span>
+<span class="sd">        inplace : bool (optional)</span>
+<span class="sd">            False (default) to create a copy of the experiment, True to filter inplace</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        newexp : Experiment</span>
+<span class="sd">            filtered so contains only sequence present in exp and in the fasta file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;filter_fasta using file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">okpos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tot_seqs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cseq</span> <span class="ow">in</span> <span class="n">skbio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;fasta&#39;</span><span class="p">):</span>
+            <span class="n">tot_seqs</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">cseq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cseq</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cseq</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">cseq</span><span class="p">)</span>
+                <span class="n">okpos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loaded </span><span class="si">%d</span><span class="s1"> sequences. found </span><span class="si">%d</span><span class="s1"> sequences in experiment&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tot_seqs</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">okpos</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">negate</span><span class="p">:</span>
+            <span class="n">okpos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span> <span class="n">okpos</span><span class="p">,</span> <span class="n">assume_unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">okpos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newexp</span>
+
+    <span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+    <span class="k">def</span> <span class="nf">sort_taxonomy</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sort the features based on the taxonomy</span>
+
+<span class="sd">        Sort features based on the taxonomy (alphabetical)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inplace : bool (optional)</span>
+<span class="sd">            False (default) to create a copy</span>
+<span class="sd">            True to Replace data in exp</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        exp : Experiment</span>
+<span class="sd">            sorted by taxonomy</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;sorting by taxonomies&#39;</span><span class="p">)</span>
+        <span class="n">taxonomy</span> <span class="o">=</span> <span class="n">_get_taxonomy_string</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">remove_underscore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sort_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">taxonomy</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">)</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">sort_pos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">exp</span>
+
+    <span class="nd">@Experiment</span><span class="o">.</span><span class="n">_record_sig</span>
+    <span class="k">def</span> <span class="nf">filter_orig_reads</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">minreads</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Filter keeping only samples with &gt;= minreads in the original reads column</span>
+<span class="sd">        Note this function uses the _calour_original_abundance field rather than the current sum of sequences per sample.</span>
+<span class="sd">        So if you start with a sample with 100 reads, normalizing and filtering with other functions with not change the original reads column</span>
+<span class="sd">        (which will remain 100).</span>
+<span class="sd">        If you want to filter based on current total reads, use ``filter_by_data()`` instead</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        minreads : numeric</span>
+<span class="sd">            Keep only samples with &gt;= minreads reads (when loaded - not affected by normalization)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ``AmpliconExperiment`` - with only samples with enough original reads</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">origread_field</span> <span class="o">=</span> <span class="s1">&#39;_calour_original_abundance&#39;</span>
+        <span class="k">if</span> <span class="n">origread_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> field not initialzed. Did you load the data with calour.read_amplicon() ?&#39;</span> <span class="o">%</span> <span class="n">origread_field</span><span class="p">)</span>
+
+        <span class="n">good_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="n">origread_field</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">minreads</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">good_pos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newexp</span>
+
+    <span class="k">def</span> <span class="nf">plot_sort</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Plot bacteria after sorting by field</span>
+<span class="sd">        This is a convenience wrapper for plot()</span>
+<span class="sd">        Note: if sample_field is in **kwargs, use it as labels after sorting using field</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        field : str or None (optional)</span>
+<span class="sd">            The field to sort samples by before plotting</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sort_samples</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span>
+        <span class="k">if</span> <span class="s1">&#39;sample_field&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">newexp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">feature_field</span><span class="o">=</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newexp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sample_field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span> <span class="n">feature_field</span><span class="o">=</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

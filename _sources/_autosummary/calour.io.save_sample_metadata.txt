@@ -1,0 +1,6 @@
+calour.io.save_sample_metadata
+==============================
+
+.. currentmodule:: calour.io
+
+.. autofunction:: save_sample_metadata

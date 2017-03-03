@@ -1,0 +1,88 @@
+calour.experiment.Experiment
+============================
+
+.. currentmodule:: calour.experiment
+
+.. autoclass:: Experiment
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Experiment.__init__
+      ~Experiment.add_observation
+      ~Experiment.ax_color_bar
+      ~Experiment.binarize
+      ~Experiment.cluster_data
+      ~Experiment.cluster_features
+      ~Experiment.copy
+      ~Experiment.correlation
+      ~Experiment.create_plot_gui
+      ~Experiment.deepcopy
+      ~Experiment.diff_abundance
+      ~Experiment.diff_abundance_kw
+      ~Experiment.downsample
+      ~Experiment.filter_by_data
+      ~Experiment.filter_by_metadata
+      ~Experiment.filter_ids
+      ~Experiment.filter_mean
+      ~Experiment.filter_min_abundance
+      ~Experiment.filter_prevalence
+      ~Experiment.filter_samples
+      ~Experiment.from_pandas
+      ~Experiment.getLogger
+      ~Experiment.get_data
+      ~Experiment.get_data_md5
+      ~Experiment.get_file_md5
+      ~Experiment.get_term_features
+      ~Experiment.heatmap
+      ~Experiment.join_experiments
+      ~Experiment.join_fields
+      ~Experiment.log_n
+      ~Experiment.merge_identical
+      ~Experiment.merge_obs_tax
+      ~Experiment.multipletests
+      ~Experiment.nlargest
+      ~Experiment.normalize
+      ~Experiment.normalize_by_subset_features
+      ~Experiment.plot
+      ~Experiment.plot_hist
+      ~Experiment.plot_sort
+      ~Experiment.read
+      ~Experiment.read_amplicon
+      ~Experiment.read_open_ms
+      ~Experiment.relative_enrichment
+      ~Experiment.reorder
+      ~Experiment.rescale
+      ~Experiment.save
+      ~Experiment.save_biom
+      ~Experiment.save_commands
+      ~Experiment.save_fasta
+      ~Experiment.save_feature_metadata
+      ~Experiment.save_sample_metadata
+      ~Experiment.scale
+      ~Experiment.serialize
+      ~Experiment.sort_abundance
+      ~Experiment.sort_by_data
+      ~Experiment.sort_by_metadata
+      ~Experiment.sort_center_mass
+      ~Experiment.sort_samples
+      ~Experiment.to_pandas
+      ~Experiment.transform
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Experiment.shape
+      ~Experiment.sparse
+   
+   

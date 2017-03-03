@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.sorting.sort_by_data &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="sorting (calour.sorting)" href="../sorting.html" />
+    <link rel="next" title="calour.sorting.sort_by_metadata" href="calour.sorting.sort_by_metadata.html" />
+    <link rel="prev" title="sorting (calour.sorting)" href="../sorting.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-sorting-sort-by-data">
+<h1>calour.sorting.sort_by_data<a class="headerlink" href="#calour-sorting-sort-by-data" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.sorting.sort_by_data">
+<code class="descclassname">calour.sorting.</code><code class="descname">sort_by_data</code><span class="sig-paren">(</span><em>exp</em>, <em>axis=0</em>, <em>subset=None</em>, <em>key='log_mean'</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/sorting.html#sort_by_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.sorting.sort_by_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort features based on their mean frequency.</p>
+<p>Sort the 2-d array by sample (axis=0) or feature (axis=0). <code class="docutils literal"><span class="pre">key</span></code>
+will be applied to <code class="docutils literal"><span class="pre">subset</span></code> of each feature (axis=0) or sample
+(axis=1) and return a comparative value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>axis</strong> (<em>0 or 1</em>) &#8211; Apply <code class="docutils literal"><span class="pre">key</span></code> function on row (sort the samples) (0) or column (sort the features) (1)</li>
+<li><strong>subset</strong> (<code class="docutils literal"><span class="pre">None</span></code> or iterable of int (optional)) &#8211; Sorting using only subset of the data.</li>
+<li><strong>key</strong> (<em>str or callable</em>) &#8211; If it is a callable, it should be a function accepts 1-D array of numeric and
+returns a comparative value (like <code class="docutils literal"><span class="pre">key</span></code> in builtin <code class="docutils literal"><span class="pre">sorted</span></code> function).
+Alternatively it accepts the following str values:
+&#8220;log_mean&#8221;: sort by log of the mean
+&#8220;prevalence&#8221;: sort by the prevalence
+&#8220;mean&#8221;: sort by the mean</li>
+<li><strong>inplace</strong> (<em>bool (optional)</em>) &#8211; False (default) to create a copy
+True to Replace data in exp</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; key word parameters passed to <code class="docutils literal"><span class="pre">key</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">With features sorted by mean frequency</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Experiment</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a><ul>
+      <li>Previous: <a href="../sorting.html" title="previous chapter">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
+      <li>Next: <a href="calour.sorting.sort_by_metadata.html" title="next chapter">calour.sorting.sort_by_metadata</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.sorting.sort_by_data.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.sorting.sort_by_data.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

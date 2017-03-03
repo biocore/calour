@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.plotting.plot_hist &#8212; calour 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
+    <link rel="up" title="plotting (calour.plotting)" href="../plotting.html" />
+    <link rel="next" title="heatmap (calour.heatmap)" href="../heatmap.html" />
+    <link rel="prev" title="plotting (calour.plotting)" href="../plotting.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="calour-plotting-plot-hist">
+<h1>calour.plotting.plot_hist<a class="headerlink" href="#calour-plotting-plot-hist" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.plotting.plot_hist">
+<code class="descclassname">calour.plotting.</code><code class="descname">plot_hist</code><span class="sig-paren">(</span><em>exp</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/calour/plotting.html#plot_hist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.plotting.plot_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot histogram of all the values in data.</p>
+<p>It flattens the 2-D array and plots histogram out of it. This
+gives a sense of value distribution. Useful to guess a reasonable
+clim for heatmap.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>exp</strong> (<code class="docutils literal"><span class="pre">Experiment</span></code>) &#8211; </li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; key word arguments passing to the matplotlib <code class="docutils literal"><span class="pre">hist</span></code> plotting function.</li>
+<li><strong>Retures</strong> &#8211; </li>
+<li><strong>-------</strong> &#8211; </li>
+<li><strong>of 1-D int array, 1-D float array, Figure</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a>) &#8211; the count in each bin, the start coord of each bin, and hist figure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a><ul>
+      <li>Previous: <a href="../plotting.html" title="previous chapter">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
+      <li>Next: <a href="../heatmap.html" title="next chapter">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/calour.plotting.plot_hist.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Amnon Amir & Zech Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/_autosummary/calour.plotting.plot_hist.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

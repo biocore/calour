@@ -1,0 +1,6 @@
+calour.filtering.filter_mean
+============================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_mean

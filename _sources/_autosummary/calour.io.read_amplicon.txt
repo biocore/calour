@@ -1,0 +1,6 @@
+calour.io.read_amplicon
+=======================
+
+.. currentmodule:: calour.io
+
+.. autofunction:: read_amplicon
