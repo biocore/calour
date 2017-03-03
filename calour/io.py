@@ -63,7 +63,7 @@ def _get_md_from_biom(table):
 
     Return
     ------
-    pandas.DataFrame
+    ``pandas.DataFrame`` or ``None``
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')

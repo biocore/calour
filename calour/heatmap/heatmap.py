@@ -319,7 +319,7 @@ def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True, 
 
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
-         gui='cli', databases=('dbbact',), **kwargs):
+         gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
     '''Plot the main heatmap and its associated axis.
 
     Parameters
@@ -332,6 +332,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     feature_color_bars : list, optional
         list of column names in the feature metadata. It plots a color bar
         for each column. It doesn't plot color bars by default (``None``)
+    color_bar_label : bool, optional
+        whether to show the label for the color bars
     gui : str, optional
         GUI to use
     databases : Iterable of str
@@ -345,17 +347,18 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     exp.heatmap(axis=gui_obj.axis, **kwargs)
     barwidth = 0.3
     barspace = 0.05
+    label = color_bar_label
     if sample_color_bars is not None:
         position = 0
         for s in sample_color_bars:
             ax_color_bar(
-                gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position)
+                gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position, label=label)
             position += (barspace + barwidth)
     if feature_color_bars is not None:
         position = 0
         for f in feature_color_bars:
             ax_color_bar(
-                gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, horizontal=False)
+                gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, label=label, horizontal=False)
             position += (barspace + barwidth)
     # set up the gui ready for interaction
     gui_obj()
