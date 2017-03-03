@@ -169,6 +169,8 @@
 <span class="sd">    Plot either a simple or an interactive heatmap for the experiment. Plot features in row</span>
 <span class="sd">    and samples in column.</span>
 
+<span class="sd">    .. _heatmap-ref:</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    sample_field : str or None (optional)</span>
@@ -368,6 +370,8 @@
          <span class="n">gui</span><span class="o">=</span><span class="s1">&#39;cli&#39;</span><span class="p">,</span> <span class="n">databases</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;dbbact&#39;</span><span class="p">,),</span> <span class="n">color_bar_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Plot the main heatmap and its associated axis.</span>
 
+<span class="sd">    .. _plot-ref:</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    exp : ``Experiment``</span>
@@ -384,6 +388,8 @@
 <span class="sd">        GUI to use</span>
 <span class="sd">    databases : Iterable of str</span>
 <span class="sd">        a list of databases to access or add annotation</span>
+<span class="sd">    kwargs : dict, optional</span>
+<span class="sd">        keyword arguments passing to :ref:`heatmap&lt;heatmap-ref&gt;` function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -421,8 +427,10 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    field : str or None (optional)</span>
+<span class="sd">    field : str or None, optional</span>
 <span class="sd">        The field to sort samples by before plotting</span>
+<span class="sd">    kwargs : dict, optional</span>
+<span class="sd">        keyword arguments passing to :ref:`plot&lt;plot-ref&gt;` function.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">newexp</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sort_samples</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
