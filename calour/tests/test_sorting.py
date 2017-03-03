@@ -19,10 +19,10 @@ class SortingTests(Tests):
     def setUp(self):
         super().setUp()
         # load the simple experiment as sparse
-        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
-        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         # load the complex experiment as sparse
-        self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp)
+        self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp, normalize=None)
 
     def test_cluster_data(self):
         def log_and_scale(exp):
@@ -31,7 +31,9 @@ class SortingTests(Tests):
             return exp
         # no minimal filtering
         obs = self.test1.cluster_data(transform=log_and_scale)
-        exp = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'), self.test1_samp)
+        exp = ca.read(join(self.test_data_dir, 'test1.clustered.features.biom'),
+                      self.test1_samp,
+                      normalize=None)
         assert_experiment_equal(obs, exp, almost_equal=True)
 
     def test_sort_by_metadata_sample(self):
@@ -42,7 +44,8 @@ class SortingTests(Tests):
                     field='DAY', inplace=True)
         self.assertIs(obs, self.timeseries)
         exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'),
-                      join(self.test_data_dir, 'timeseries.sample'))
+                      join(self.test_data_dir, 'timeseries.sample'),
+                      normalize=None)
         assert_experiment_equal(obs, exp, almost_equal=True)
         self.assertListEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'].tolist(), list(range(1, 96)))
 
@@ -52,7 +55,8 @@ class SortingTests(Tests):
                     'DAY', inplace=True)
         self.assertIs(obs, self.timeseries)
         exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'),
-                      join(self.test_data_dir, 'timeseries.sample'))
+                      join(self.test_data_dir, 'timeseries.sample'),
+                      normalize=None)
         assert_experiment_equal(obs, exp, almost_equal=True)
         self.assertListEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'].tolist(), list(range(1, 96)))
 
@@ -79,7 +83,8 @@ class SortingTests(Tests):
     def test_sort_by_data_feature(self):
         obs = self.timeseries.sort_by_data(axis=1)
         exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'),
-                      join(self.test_data_dir, 'timeseries.sample'))
+                      join(self.test_data_dir, 'timeseries.sample'),
+                      normalize=None)
         assert_experiment_equal(obs, exp, almost_equal=True)
 
     def test_sort_center_mass(self):

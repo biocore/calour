@@ -139,8 +139,8 @@ def _read_table(fp, encoding=None):
 
 
 def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=None,
-                 normalize=False, rescale=10000, description=None, sparse=False, **kwargs):
-    '''Load an OpenMS metabolomics experiment
+                 description=None, sparse=False, *, normalize, **kwargs):
+    '''Load an OpenMS metabolomics experiment.
 
     Parameters
     ----------
@@ -152,19 +152,14 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     feature_metadata_file : str or None (optional)
         Name of table containing additional metadata about each feature
         None (default) to not load
-    normalize : bool (optional)
-        True to normalize each sample to constant sum,
-        False (default) to not normalize
-    rescale : int or None (optional)
-        int to rescale reads so mean total reads per sample (over
-        all samples) to value rescale,
-        None to not rescale
     description : str or None (optional)
         Name of the experiment (for display purposes).
         None (default) to assign file name
     sparse : bool (optional)
         False (default) to store data as dense matrix (faster but more memory)
         True to store as sparse (CSR)
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
@@ -172,11 +167,8 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     '''
     logger.info('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type='openms', sparse=sparse, **kwargs)
-    if normalize:
-        exp.normalize(inplace=True, total=rescale)
-    elif rescale:
-        exp.rescale(inplace=True, total=rescale)
+               data_file_type='openms', sparse=sparse,
+               normalize=normalize,  **kwargs)
 
     exp.sample_metadata['id'] = exp.sample_metadata.index.values
 
@@ -192,7 +184,7 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
 
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True, data_file_type='biom', encoding=None,
-         cls=Experiment):
+         cls=Experiment, *, normalize):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -219,6 +211,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         encoder for the metadata files. None (default) to use
         pandas default encoder, str to specify encoder name (see
          pandas.read_table() documentation)
+    cls : ``class``, optional
+        what class object to read the data into (``Experiment`` by default)
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
@@ -273,30 +269,42 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if description == '':
         description = os.path.basename(data_file)
 
-    return cls(data, sample_metadata, feature_metadata,
-               exp_metadata=exp_metadata, description=description, sparse=sparse)
+    exp = cls(data, sample_metadata, feature_metadata,
+              exp_metadata=exp_metadata, description=description, sparse=sparse)
+
+    if normalize is not None:
+        # record the original total read count into sample metadata
+        exp.normalize(total=normalize, inplace=True)
+
+    return exp
 
 
-def read_taxa(data_file, sample_metadata_file=None,
-              filter_orig_reads=1000, normalize=True, **kwargs):
+def read_amplicon(data_file, sample_metadata_file=None,
+                  *, filter_reads, normalize, **kwargs):
     '''Load an amplicon experiment.
 
-    Fix taxonomy and normalize if needed. This is a convenience function of read().
-    Also convert feature index (sequences) to upper case
+    Fix taxonomy, normalize reads, and filter low abundance
+    samples. This wraps ``read()``.  Also convert feature metadata
+    index (sequences) to upper case
 
     Parameters
     ----------
-    filter_orig_reads : int or None (optional)
-        int (default) to remove all samples with < filter_orig_reads total reads. None to not filter
-    normalize : bool (optional)
-        True (default) to normalize each sample to 10000 reads
+    sample_metadata_file : None or str (optional)
+        None (default) to just use samplenames (no additional metadata).
+    filter_reads : int or None
+        int (default) to remove all samples with less than ``filter_reads``.
+        ``None`` to not filter
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
-    exp : ``AmpliconExperiment``
+    ``AmpliconExperiment``
         after removing low read sampls and normalizing
     '''
-    exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment, **kwargs)
+    # don't do normalize before the possible filtering
+    exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
+               normalize=None, **kwargs)
 
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
@@ -305,11 +313,11 @@ def read_taxa(data_file, sample_metadata_file=None,
     else:
         exp.feature_metadata['taxonomy'] = 'NA'
 
-    if filter_orig_reads is not None:
-        exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
-    if normalize:
-        # record the original total read count into sample metadata
-        exp.normalize(inplace=True)
+    if filter_reads is not None:
+        exp.filter_by_data('sum_abundance', cutoff=filter_reads, inplace=True)
+    if normalize is not None:
+        exp.normalize(total=normalize, inplace=True)
+
     return exp
 
 

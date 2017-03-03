@@ -19,7 +19,7 @@ from calour._testing import Tests, assert_experiment_equal
 class IOTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
 
     def test_join_fields(self):
         # test the default params

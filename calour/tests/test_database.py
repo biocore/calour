@@ -18,7 +18,8 @@ class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
         self.mock_db = MockDatabase()
-        self.test1 = ca.read_taxa(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read_amplicon(self.test1_biom, self.test1_samp,
+                                      filter_reads=1000, normalize=10000)
         self.s1 = 'TACGTATGTCACAAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTGGATTAAGCGTGTTGTGAAATGTAGACGCTCAACGTCTGAATCGCAGCGCGAACTGGTTCACTTGAGTATGCACAACGTAGGCGGAATTCGTCG'
 
     def test_mock_db(self):

@@ -22,7 +22,7 @@ import calour as ca
 class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
 
     def test_record_sig(self):
         def foo(exp, axis=1, inplace=True):
@@ -94,7 +94,7 @@ class ExperimentTests(Tests):
 
     def test_reorder_round_trip(self):
         # test double permuting of a bigger data set
-        exp = ca.read(self.timeseries_biom, self.timeseries_samp)
+        exp = ca.read(self.timeseries_biom, self.timeseries_samp, normalize=None)
 
         rand_perm_samples = np.random.permutation(exp.data.shape[0])
         rand_perm_features = np.random.permutation(exp.data.shape[1])

@@ -147,7 +147,7 @@ class AmpliconExperiment(Experiment):
         '''
         origread_field = '_calour_original_abundance'
         if origread_field not in exp.sample_metadata.columns:
-            raise ValueError('%s field not initialzed. Did you load the data with calour.read_taxa() ?' % origread_field)
+            raise ValueError('%s field not initialzed. Did you load the data with calour.read_amplicon() ?' % origread_field)
 
         good_pos = (exp.sample_metadata[origread_field] >= minreads).values
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
