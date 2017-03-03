@@ -165,7 +165,7 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     -------
     exp : ``Experiment``
     '''
-    logger.info('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
+    logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
                data_file_type='openms', sparse=sparse,
                normalize=normalize,  **kwargs)
@@ -229,7 +229,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     description : str
         name of the experiment
     '''
-    logger.info('Reading experiment (%s, %s, %s)' % (
+    logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
     exp_metadata = {'map_md5': ''}
     # load the data table

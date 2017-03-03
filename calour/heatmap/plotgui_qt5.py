@@ -51,6 +51,10 @@ class PlotGUI_QT5(PlotGUI):
         super().__call__()
         try:
             self.app_window.show()
+            # move the window to the front
+            self.app_window.activateWindow()
+            self.app_window.raise_()
+            # run the event loop
             self.app.exec_()
         finally:
             # clean up when the qt app is closed

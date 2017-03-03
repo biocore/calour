@@ -130,7 +130,7 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
     -------
     ``Experiment``
     '''
-    logger.info('sorting samples by field %s' % field)
+    logger.debug('sorting samples by field %s' % field)
     if axis == 0:
         x = exp.sample_metadata
     elif axis == 1:

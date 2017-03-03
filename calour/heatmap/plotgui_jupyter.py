@@ -156,12 +156,12 @@ class PlotGUI_Jupyter(PlotGUI):
                 cstr = cannt[1]
                 details = cannt[0]
                 annt_type = details.get('annotationtype', 'None')
-                annt_id = details['annotationid']
+                annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
                 l = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
                      'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
                      '<p style="color:%s;white-space:nowrap;">'
-                     '<a href="http://dbbact.org/annotation_info/%d"'
+                     '<a href="http://dbbact.org/annotation_info/%s"'
                      '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, annt_id, cstr)
                 idata.append(l)
         except Exception as e:
