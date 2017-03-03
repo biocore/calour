@@ -152,8 +152,6 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     feature_metadata_file : str or None (optional)
         Name of table containing additional metadata about each feature
         None (default) to not load
-    normalize : bool (optional)
-        True to normalize each sample to constant sum.
     description : str or None (optional)
         Name of the experiment (for display purposes).
         None (default) to assign file name
