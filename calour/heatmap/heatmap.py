@@ -123,6 +123,8 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
     and samples in column.
 
+    .. _heatmap-ref:
+
     Parameters
     ----------
     sample_field : str or None (optional)
@@ -322,6 +324,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
     '''Plot the main heatmap and its associated axis.
 
+    .. _plot-ref:
+
     Parameters
     ----------
     exp : ``Experiment``
@@ -338,6 +342,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         GUI to use
     databases : Iterable of str
         a list of databases to access or add annotation
+    kwargs : dict, optional
+        keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
     Returns
     -------
@@ -375,8 +381,10 @@ def plot_sort(exp, field=None, **kwargs):
 
     Parameters
     ----------
-    field : str or None (optional)
+    field : str or None, optional
         The field to sort samples by before plotting
+    kwargs : dict, optional
+        keyword arguments passing to :ref:`plot<plot-ref>` function.
     '''
     if field is not None:
         newexp = exp.sort_samples(field)
