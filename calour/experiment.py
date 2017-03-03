@@ -1,3 +1,24 @@
+'''
+Experiment (:mod:`calour.experiment`)
+=====================================
+
+.. currentmodule:: calour.experiment
+
+Classes
+^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   Experiment
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   add_functions
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

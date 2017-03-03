@@ -1,3 +1,19 @@
+'''
+filtering (:mod:`calour.filtering`)
+===================================
+
+.. currentmodule:: calour.filtering
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   filter_by_data
+   filter_by_metadata
+   filter_samples
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
