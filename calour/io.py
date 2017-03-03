@@ -160,6 +160,8 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     sparse : bool (optional)
         False (default) to store data as dense matrix (faster but more memory)
         True to store as sparse (CSR)
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
@@ -213,8 +215,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          pandas.read_table() documentation)
     cls : ``class``, optional
         what class object to read the data into (``Experiment`` by default)
-    normalize : bool
-        whether to normalize the data sample-wise.
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
@@ -272,30 +274,30 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     exp = cls(data, sample_metadata, feature_metadata,
               exp_metadata=exp_metadata, description=description, sparse=sparse)
 
-    if normalize:
+    if normalize is not None:
         # record the original total read count into sample metadata
-        exp.normalize(inplace=True)
+        exp.normalize(total=normalize, inplace=True)
 
     return exp
 
 
 def read_amplicon(data_file, sample_metadata_file=None,
-                  filter_orig_reads=1000, *, normalize, **kwargs):
+                  *, filter_reads, normalize, **kwargs):
     '''Load an amplicon experiment.
 
-    Fix taxonomy, normalize reads, and filter low abundance samples by
-    default. This wraps ``read()``.  Also convert feature metadata
+    Fix taxonomy, normalize reads, and filter low abundance
+    samples. This wraps ``read()``.  Also convert feature metadata
     index (sequences) to upper case
 
     Parameters
     ----------
     sample_metadata_file : None or str (optional)
         None (default) to just use samplenames (no additional metadata).
-    filter_orig_reads : int or None (optional)
-        int (default) to remove all samples with < filter_orig_reads total reads.
-        None to not filter
-    normalize : bool
-        True to normalize each sample to 10000 reads
+    filter_reads : int or None
+        int (default) to remove all samples with less than ``filter_reads``.
+        ``None`` to not filter
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
@@ -313,8 +315,8 @@ def read_amplicon(data_file, sample_metadata_file=None,
     else:
         exp.feature_metadata['taxonomy'] = 'NA'
 
-    if filter_orig_reads is not None:
-        exp.filter_by_data('sum_abundance', cutoff=filter_orig_reads, inplace=True)
+    if filter_reads is not None:
+        exp.filter_by_data('sum_abundance', cutoff=filter_reads, inplace=True)
 
     return exp
 
