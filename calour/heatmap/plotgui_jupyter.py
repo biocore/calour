@@ -77,6 +77,7 @@ class PlotGUI_Jupyter(PlotGUI):
             'no annotation found',
             layout=ipywidgets.Layout(height='100px', overflow_y='auto'))
         display(self._ipyw_annt)
+        # display(self.figure)
 
     def _on_change(self, axis=0):
         '''Upon change in the dropdown sample or feature widgets, update their
