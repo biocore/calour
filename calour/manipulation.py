@@ -1,6 +1,6 @@
 '''
-analysis (:mod:`calour.manipulation`)
-=====================================
+manipulation (:mod:`calour.manipulation`)
+=========================================
 
 .. currentmodule:: calour.manipulation
 
