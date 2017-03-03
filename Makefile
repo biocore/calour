@@ -14,6 +14,8 @@ else
 	TEST_COMMAND = nosetests --with-doctest
 endif
 
+CMSG ?= update html doc
+
 help:
 	@echo 'Use "make test" to run all the unit tests and docstring tests.'
 	@echo 'Use "make pep8" to validate PEP8 compliance.'
@@ -26,9 +28,9 @@ pep8:
 	flake8 calour setup.py
 html:
 	make -C doc clean html
+all: test pep8 html
 doc_upload:
 	make -C doc clean
 	cd doc/_build/ && git clone -b gh-pages --single-branch git@github.com:biocore/calour.git html
 	make -C doc html
-	cd doc/_build/html && git commit -a -m 'push' && git push origin gh-pages
-all: test pep8 html
+	cd doc/_build/html && git commit -a -m "$(CMSG)" && git push origin gh-pages
