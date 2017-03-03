@@ -1,3 +1,19 @@
+'''
+analysis (:mod:`calour.analysis`)
+=================================
+
+.. currentmodule:: calour.analysis
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   correlation
+   diff_abundance
+   diff_abundance_kw
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

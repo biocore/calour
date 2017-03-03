@@ -1,3 +1,17 @@
+'''
+utilities (:mod:`calour.util`)
+==============================
+
+.. currentmodule:: calour.util
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   set_log_level
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

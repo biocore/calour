@@ -1,3 +1,18 @@
+'''
+analysis (:mod:`calour.manipulation`)
+=====================================
+
+.. currentmodule:: calour.manipulation
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   join_fields
+   join_experiments
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

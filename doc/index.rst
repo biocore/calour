@@ -12,7 +12,16 @@ Contents:
    :maxdepth: 2
 
    experiment
+   amplicon_experiment
+   io
    filtering
+   sorting
+   transforming
+   plotting
+   heatmap
+   analysis
+   manipulation
+   util
 
 
 Indices and tables

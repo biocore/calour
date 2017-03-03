@@ -1,3 +1,17 @@
+'''
+amplicon experiment (:mod:`calour.amplicon_experiment`)
+=======================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+Classes
+^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   AmpliconExperiment
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

@@ -12,6 +12,10 @@ Functions
    filter_by_data
    filter_by_metadata
    filter_samples
+   filter_ids
+   filter_mean
+   filter_prevalence
+   filter_min_abundance
 '''
 
 # ----------------------------------------------------------------------------

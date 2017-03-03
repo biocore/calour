@@ -1,3 +1,21 @@
+'''
+transforming (:mod:`calour.transforming`)
+========================================
+
+.. currentmodule:: calour.transforming
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   normalize
+   scale
+   binarize
+   log_n
+   transform
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

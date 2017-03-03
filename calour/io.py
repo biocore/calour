@@ -1,3 +1,24 @@
+'''
+read & write (:mod:`calour.io`)
+===============================
+
+.. currentmodule:: calour.io
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   read
+   read_amplicon
+   read_open_ms
+   save
+   save_biom
+   save_sample_metadata
+   save_feature_metadata
+'''
+
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

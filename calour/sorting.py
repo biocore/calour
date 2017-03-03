@@ -1,3 +1,22 @@
+'''
+sorting (:mod:`calour.sorting`)
+===============================
+
+.. currentmodule:: calour.sorting
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   sort_by_data
+   sort_by_metadata
+   sort_samples
+   sort_abundance
+   cluster_data
+   cluster_features
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #

@@ -1,3 +1,17 @@
+'''
+plotting (:mod:`calour.plotting`)
+=================================
+
+.. currentmodule:: calour.plotting
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: _autosummary
+
+   plot_hist
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2017--,  Calour development team.
 #
