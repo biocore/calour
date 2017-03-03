@@ -253,7 +253,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True):
+def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True, label=True):
     '''plot color bars along x or y axis
 
     Parameters
@@ -270,8 +270,10 @@ def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True):
         the colors for each unique value in the ``values`` list.
         if it is ``None``, it will use ``Dark2`` discrete color map
         in a cycling way.
-    horizontal : bool
+    horizontal : bool, optional
         plot the color bar horizontally or vertically
+    label : bool, optional
+        whether to label the color bars with text
 
     Returns
     -------
@@ -301,12 +303,13 @@ def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True):
             facecolor=col[value],
             label=value)
         axis.add_patch(rect)
-        rx, ry = rect.get_xy()
-        cx = rx + rect.get_width()/2.0
-        cy = ry + rect.get_height()/2.0
-        # add the text in the color bars
-        axis.annotate(value, (cx, cy), color='w', weight='bold',
-                      fontsize=7, ha='center', va='center', rotation=rotation)
+        if label is True:
+            rx, ry = rect.get_xy()
+            cx = rx + rect.get_width()/2.0
+            cy = ry + rect.get_height()/2.0
+            # add the text in the color bars
+            axis.annotate(value, (cx, cy), color='w', weight='bold',
+                          fontsize=7, ha='center', va='center', rotation=rotation)
         prev = i
     # axis.legend(
     #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
