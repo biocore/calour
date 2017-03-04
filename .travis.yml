@@ -9,7 +9,7 @@ env:
     - CONDA_PY=35
     - CONDA_PY=36
   global:
-    - secure: "pTVt8qjv5RUEEQQS+Iud9F7wrBGBT4ffo2oOpXRWNvRqANlpcBcak0RVeUtNFUwQa/PjG1+m7bQSr7+3jJgQr/7cWV0Kz25PlUEhaud6g51qheqo9McDiuQEU4EGiWViZ4IWBG3HMR2awrtYg2PPZyLq8qJ88dwIL8ZNKLHaZmYinX5bimoSgbbC5QwMVjoAacjSNyuezAtORtkJXUVcl9hvYRVyK2IMrAJJsipXpq3ah2CPwWIc+aAHs3IJonqIEv8J+tuJwErFARTDJ80l2JwNl0/9TrrgbIpMWCV5OaaGWQvKWrtUO+vsGHaxNftPm95dvU15VWtW6yRwz8Z7ZCoIzrlMNZ5VuOUrYiedObYCIJoOyfcJpfJdKUrihboIDOx7jxJJJsCkzUMsLkDqKI5kdWdiCwMVF2uHxYd6ezYNJVa7S/z6d4i+x9Y9Jt5NTxwwyuGreItdI9YhqvxfPlvdhniadhA2wSQZLTAfrTMAij3NictvhYI7oC4WKpxrQFYZZ7k8VAwpWyXQ+6QfxqfBiZwip9WnC6hmPOFTxvr1k9+SE6mIcdtmYMmhWdq5mVtzhRa1hDrFIl8+H9VvIh5QmAHvI0s5jYkRTimlJIwBcomsGw6dUik28sC8z2G3aibzFmZNTLA6be025DGB6nliy3FWKefwyXNP2wOWHB8="
+    - secure: "e/VyjGTs9HZGnu+q9ysnOsoUWdokawJGVoiFzFNJCxMgRguihAiJBEpEd1bcitI+y9/RRh+LU8LJWVVSDnQgZ3Z5Xd++xKS0z4O9Jo8zw3t8jcGQvS3BjIufyIirEJvhmz0l9ywPzBTxNMCi3N6PIDl6TZhu3UmURXOWdGFutUCcVPcJisTiNG2Pq2LIUxUSk66MqZGWGkrCpzZ0UXmzMwWx+AhR14uuROBhB8WFkIaUEVDmBmMwDnGZBRXO/joTKrHXNPo+jjXG81VuXn/joN7dWz07ghDNBlaKl/zLPhElcqOY7F/VklpUZRbxvHY/8N3k/BGQ+wFq19jEBVqWJbNFu8ObEW8gW2gcCdzQW8qJzMG2iFiFlXLchpz47WNDmDY77/kMor9Rv8amk3tR2GUOrixE+THfptFsj5hHn33wRp/Ve5gdOAplg66yaWLRdjpF6E0QPZ3Yb6Msdp6olgC37P2KlqhZQJ0Gy9xEfqScLYEDZlh0DBVpr/mpm85dNNeGwnvbUdGTP9Oev8+RN9v4CkfU8RcYfe+aw/hcPAzXW6fMiCZSql8E+21PBhKxsfGMuObxCiA5nHhGZITTEZ/rFseboPgiMe+Py5c9IsUNnjRFT/nVqiOQ4eFi1qvBgOXVMXrHtN0UwAz+wpbURqCk8WV/Huf78weXnijSqyk="
 
 before_install:
   - echo "$TRAVIS_OS_NAME"
@@ -32,6 +32,7 @@ install:
   - conda install --yes --file ci/conda_requirements.txt
   - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
+  - if [ ${TRAVIS_SECURE_ENV_VARS} == "true" ] ; then echo 'aaaaaa' ; else echo 'bbbbb' ; fi
 before_script:
   - export DISPLAY=:99.0
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
@@ -43,4 +44,4 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - if [ ${TRAVIS_SECURE_ENV_VARS} = "true" ] ; then bash publish.sh "${TRAVIS_COMMIT_MESSAGE}" ; fi
+  - if [ ${TRAVIS_SECURE_ENV_VARS} == "true" ] ; then bash publish.sh "${TRAVIS_COMMIT_MESSAGE}" ; fi
