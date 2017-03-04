@@ -211,5 +211,6 @@ class FilteringTests(Tests):
         self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)
         self.assertIs(exp, self.test1)
 
+
 if __name__ == '__main__':
     main()
