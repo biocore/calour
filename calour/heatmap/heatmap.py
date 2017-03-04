@@ -383,6 +383,10 @@ def plot_sort(exp, field=None, **kwargs):
         The field to sort samples by before plotting
     kwargs : dict, optional
         keyword arguments passing to :ref:`plot<plot-ref>` function.
+
+    Returns
+    -------
+    PlotGUI
     '''
     if field is not None:
         newexp = exp.sort_samples(field)

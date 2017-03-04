@@ -275,7 +275,9 @@ def get_term_features(seqs, sequence_annotations):
 
 
 def relative_enrichment(exp, features, feature_terms):
-    '''Get the list of enriched terms in features compared to all features in exp, given uneven distribtion of number of terms per feature
+    '''Get the list of enriched terms in features compared to all features in exp.
+
+    given uneven distribtion of number of terms per feature
 
     Parameters
     ----------
@@ -285,10 +287,8 @@ def relative_enrichment(exp, features, feature_terms):
         The features (from exp) to test for enrichmnt
     feature_terms : dict of {feature: list of terms}
         The terms associated with each feature in exp
-        feature (key) : str
-            the feature (out of exp) to which the terms relate
-        feature_terms (value) : list of str or int
-            the terms associated with this feature
+        feature (key) : str the feature (out of exp) to which the terms relate
+        feature_terms (value) : list of str or int the terms associated with this feature
 
     Returns
     -------

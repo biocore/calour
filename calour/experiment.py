@@ -59,7 +59,7 @@ class Experiment:
         The metadata on the features
     description : str
         name of experiment
-    sparse : bool
+    sparse : :class:`bool`
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
 
@@ -336,9 +336,12 @@ class Experiment:
 
     @classmethod
     def from_pandas(cls, df, exp=None):
-        '''Convert a Pandas DataFrame into an experiment
-        Can use an existing calour Experimebt (exp) (if supplied) to obtain feature and sample metadata.
-        Note currently only works with non-sparse DataFrame
+        '''Convert a Pandas DataFrame into an experiment.
+
+        Can use an existing calour Experimebt (exp) (if supplied) to
+        obtain feature and sample metadata.  Note currently only works
+        with non-sparse DataFrame
+
         Parameters
         ----------
         df : Pandas.DataFrame
@@ -349,7 +352,9 @@ class Experiment:
 
         Returns
         -------
-        ``Experiment`` with non-sparse data
+        Experiment
+            with non-sparse data
+
         '''
         if exp is None:
             sample_metadata = pd.DataFrame(index=df.index)

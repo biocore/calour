@@ -208,13 +208,14 @@ class AmpliconExperiment(Experiment):
 
     def plot_sort(exp, field=None, **kwargs):
         '''Plot bacteria after sorting by field
+
         This is a convenience wrapper for plot()
-        Note: if sample_field is in **kwargs, use it as labels after sorting using field
 
         Parameters
         ----------
         field : str or None (optional)
             The field to sort samples by before plotting
+
         '''
         if field is not None:
             newexp = exp.sort_samples(field)
