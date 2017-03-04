@@ -61,7 +61,7 @@ def _read_biom(fp, transpose=True):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : pandas DataFram
+    feature_md : :class:`pandas.DataFrame`
         the feature metadata (if availble in table)
     '''
     logger.debug('loading biom table %s' % fp)
@@ -241,7 +241,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     -------
     data : np.array or scipy.sprase.csr
         The experiment count data (each row is a sample, each column is a feature)
-    sample_metadata : pandas.DataFrame
+    sample_metadata : :class:`pandas.DataFrame`
         Metadata for the samples
     feature_metadata : pandas.DataFrame
         Metadata for the features
