@@ -32,6 +32,7 @@
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
@@ -117,7 +118,7 @@
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_min_abundance</span></code>(exp,&nbsp;min_abundance,&nbsp;...)</td>
 <td>Filter keeping only features with &gt;= min_abundance total over all samples</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_orig_reads</span></code>(exp,&nbsp;minreads,&nbsp;\*\*kwargs)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_orig_reads</span></code>(exp,&nbsp;minreads,&nbsp;**kwargs)</td>
 <td>Filter keeping only samples with &gt;= minreads in the original reads column Note this function uses the _calour_original_abundance field rather than the current sum of sequences per sample.</td>
 </tr>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">filter_prevalence</span></code>(exp[,&nbsp;fraction,&nbsp;cutoff])</td>
@@ -180,7 +181,7 @@
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code>([databases,&nbsp;feature_field])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code>(exp,&nbsp;\*\*kwargs)</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code>(exp,&nbsp;**kwargs)</td>
 <td>Plot histogram of all the values in data.</td>
 </tr>
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code>(exp[,&nbsp;field])</td>
@@ -240,7 +241,7 @@
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_center_mass</span></code>(exp[,&nbsp;transform,&nbsp;inplace])</td>
 <td>Sort the features based on the center of mass</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code>(exp,&nbsp;field,&nbsp;\*\*kwargs)</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code>(exp,&nbsp;field,&nbsp;**kwargs)</td>
 <td>Sort samples by field</td>
 </tr>
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_taxonomy</span></code>(exp[,&nbsp;inplace])</td>
@@ -314,8 +315,8 @@
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
       <a href="../_sources/_autosummary/calour.amplicon_experiment.AmpliconExperiment.rst.txt"

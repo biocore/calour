@@ -32,6 +32,7 @@
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
@@ -68,11 +69,9 @@ if not None, file path to the sample metadata (aka mapping file in QIIME).</li>
 <li><strong>file_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; the data_file format. options:
 &#8216;biom&#8217; : a biom table (biom-format.org) (default)
 &#8216;openms&#8217; : an OpenMS bucket table csv (rows are feature, columns are samples)</li>
-<li><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; <p>encoder for the metadata files. None (default) to use
-pandas default encoder, str to specify encoder name (see</p>
-<blockquote>
-<div>pandas.read_table() documentation)</div></blockquote>
-</li>
+<li><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; encoder for the metadata files. None (default) to use
+pandas default encoder, str to specify encoder name (see
+pandas.read_table() documentation)</li>
 <li><strong>cls</strong> (<code class="docutils literal"><span class="pre">class</span></code>, optional) &#8211; what class object to read the data into (<code class="docutils literal"><span class="pre">Experiment</span></code> by default)</li>
 <li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; normalize each sample to the specified reads. <code class="docutils literal"><span class="pre">None</span></code> to not normalize</li>
 </ul>
@@ -80,7 +79,7 @@ pandas default encoder, str to specify encoder name (see</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
 <li><strong>data</strong> (<em>np.array or scipy.sprase.csr</em>) &#8211; The experiment count data (each row is a sample, each column is a feature)</li>
-<li><strong>sample_metadata</strong> (<em>pandas.DataFrame</em>) &#8211; Metadata for the samples</li>
+<li><strong>sample_metadata</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a>) &#8211; Metadata for the samples</li>
 <li><strong>feature_metadata</strong> (<em>pandas.DataFrame</em>) &#8211; Metadata for the features</li>
 <li><strong>exp_metadata</strong> (<em>dict</em>) &#8211; information about the experiment (including &#8216;map_md5&#8217;, &#8216;data_md5&#8217;)</li>
 <li><strong>description</strong> (<em>str</em>) &#8211; name of the experiment</li>
@@ -135,8 +134,8 @@ pandas default encoder, str to specify encoder name (see</p>
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
       <a href="../_sources/_autosummary/calour.io.read.rst.txt"

@@ -28,9 +28,10 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="calour.experiment.add_functions" href="calour.experiment.add_functions.html" />
-    <link rel="prev" title="Experiment (calour.experiment)" href="../experiment.html" />
+    <link rel="prev" title="experiment (calour.experiment)" href="../experiment.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
@@ -57,13 +58,13 @@ metadata table, and a feature metadata.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<code class="docutils literal"><span class="pre">numpy.array</span></code> or <code class="docutils literal"><span class="pre">scipy.sparse</span></code>) &#8211; The abundance table for OTUs, metabolites, genes, etc. Samples
+<li><strong>data</strong> (<code class="docutils literal"><span class="pre">numpy.array</span></code> or <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code></a>) &#8211; The abundance table for OTUs, metabolites, genes, etc. Samples
 are in row and features in column</li>
 <li><strong>sample_metadata</strong> (<code class="docutils literal"><span class="pre">pandas.DataFrame</span></code>) &#8211; The metadata on the samples</li>
 <li><strong>feature_metadata</strong> (<code class="docutils literal"><span class="pre">pandas.DataFrame</span></code>) &#8211; The metadata on the features</li>
 <li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; name of experiment</li>
-<li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; store the data array in sparse (<code class="docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code>) matrix
-or numpy array</li>
+<li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; store the data array in <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code></a>
+or <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.12)"><code class="xref py py-func docutils literal"><span class="pre">numpy.array()</span></code></a></li>
 </ul>
 </td>
 </tr>
@@ -72,20 +73,20 @@ or numpy array</li>
 <dl class="attribute">
 <dt id="calour.experiment.Experiment.data">
 <code class="descname">data</code><a class="headerlink" href="#calour.experiment.Experiment.data" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">numpy.array</span></code> or <code class="docutils literal"><span class="pre">scipy.sparse</span></code> &#8211; The abundance table for OTUs, metabolites, genes, etc. Samples
+<dd><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html#numpy.array" title="(in NumPy v1.12)"><code class="xref py py-func docutils literal"><span class="pre">numpy.array()</span></code></a> or <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code></a> &#8211; The abundance table for OTUs, metabolites, genes, etc. Samples
 are in row and features in column</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="calour.experiment.Experiment.sample_metadata">
 <code class="descname">sample_metadata</code><a class="headerlink" href="#calour.experiment.Experiment.sample_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> &#8211; The metadata on the samples</p>
+<dd><p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a> &#8211; The metadata on the samples</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="calour.experiment.Experiment.feature_metadata">
 <code class="descname">feature_metadata</code><a class="headerlink" href="#calour.experiment.Experiment.feature_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> &#8211; The metadata on the features</p>
+<dd><p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a> &#8211; The metadata on the features</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -235,7 +236,7 @@ are in row and features in column</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code>(exp[,&nbsp;sample_color_bars,&nbsp;...])</td>
 <td>Plot the main heatmap and its associated axis.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code>(exp,&nbsp;\*\*kwargs)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code>(exp,&nbsp;**kwargs)</td>
 <td>Plot histogram of all the values in data.</td>
 </tr>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code>(exp[,&nbsp;field])</td>
@@ -295,7 +296,7 @@ are in row and features in column</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_center_mass</span></code>(exp[,&nbsp;transform,&nbsp;inplace])</td>
 <td>Sort the features based on the center of mass</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code>(exp,&nbsp;field,&nbsp;\*\*kwargs)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code>(exp,&nbsp;field,&nbsp;**kwargs)</td>
 <td>Sort samples by field</td>
 </tr>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
@@ -334,8 +335,8 @@ are in row and features in column</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="../experiment.html">Experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a><ul>
-      <li>Previous: <a href="../experiment.html" title="previous chapter">Experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
+  <li><a href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a><ul>
+      <li>Previous: <a href="../experiment.html" title="previous chapter">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
       <li>Next: <a href="calour.experiment.add_functions.html" title="next chapter">calour.experiment.add_functions</a></li>
   </ul></li>
   </ul></li>
@@ -366,8 +367,8 @@ are in row and features in column</p>
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
       <a href="../_sources/_autosummary/calour.experiment.Experiment.rst.txt"

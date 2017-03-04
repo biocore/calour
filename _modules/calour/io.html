@@ -30,6 +30,7 @@
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
@@ -82,7 +83,7 @@
 <span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">get_file_md5</span><span class="p">,</span> <span class="n">get_data_md5</span><span class="p">,</span> <span class="n">_get_taxonomy_string</span>
 
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_read_biom</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -105,7 +106,7 @@
 <span class="sd">        the feature ids</span>
 <span class="sd">    data : numpy array (2d) of float</span>
 <span class="sd">        the table</span>
-<span class="sd">    feature_md : pandas DataFram</span>
+<span class="sd">    feature_md : :class:`pandas.DataFrame`</span>
 <span class="sd">        the feature metadata (if availble in table)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading biom table </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fp</span><span class="p">)</span>
@@ -249,7 +250,7 @@
 
 <div class="viewcode-block" id="read"><a class="viewcode-back" href="../../_autosummary/calour.io.read.html#calour.io.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_metadata_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
          <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_file_type</span><span class="o">=</span><span class="s1">&#39;biom&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-         <span class="n">cls</span><span class="o">=</span><span class="n">Experiment</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">normalize</span><span class="p">):</span>
+         <span class="bp">cls</span><span class="o">=</span><span class="n">Experiment</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">normalize</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Read the files for the experiment.</span>
 
 <span class="sd">    .. note:: The order in the sample and feature metadata tables are changed</span>
@@ -275,7 +276,7 @@
 <span class="sd">    encoding : str or None (optional)</span>
 <span class="sd">        encoder for the metadata files. None (default) to use</span>
 <span class="sd">        pandas default encoder, str to specify encoder name (see</span>
-<span class="sd">         pandas.read_table() documentation)</span>
+<span class="sd">        pandas.read_table() documentation)</span>
 <span class="sd">    cls : ``class``, optional</span>
 <span class="sd">        what class object to read the data into (``Experiment`` by default)</span>
 <span class="sd">    normalize : int or None</span>
@@ -285,7 +286,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    data : np.array or scipy.sprase.csr</span>
 <span class="sd">        The experiment count data (each row is a sample, each column is a feature)</span>
-<span class="sd">    sample_metadata : pandas.DataFrame</span>
+<span class="sd">    sample_metadata : :class:`pandas.DataFrame`</span>
 <span class="sd">        Metadata for the samples</span>
 <span class="sd">    feature_metadata : pandas.DataFrame</span>
 <span class="sd">        Metadata for the features</span>
@@ -334,7 +335,7 @@
     <span class="k">if</span> <span class="n">description</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
 
-    <span class="n">exp</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="p">,</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="p">,</span>
               <span class="n">exp_metadata</span><span class="o">=</span><span class="n">exp_metadata</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -368,7 +369,7 @@
 <span class="sd">        after removing low read sampls and normalizing</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># don&#39;t do normalize before the possible filtering</span>
-    <span class="n">exp</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">AmpliconExperiment</span><span class="p">,</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">sample_metadata_file</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">AmpliconExperiment</span><span class="p">,</span>
                <span class="n">normalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
@@ -548,8 +549,8 @@
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 

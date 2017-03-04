@@ -30,6 +30,7 @@
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
@@ -61,7 +62,7 @@
 <span class="kn">from</span> <span class="nn">..transforming</span> <span class="k">import</span> <span class="n">log_n</span>
 
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_transition_index</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
@@ -419,9 +420,7 @@
 <div class="viewcode-block" id="plot_sort"><a class="viewcode-back" href="../../../_autosummary/calour.heatmap.plot_sort.html#calour.heatmap.plot_sort">[docs]</a><span class="k">def</span> <span class="nf">plot_sort</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Plot after sorting by sample field.</span>
 
-<span class="sd">    This is a convenience wrapper for plot()</span>
-
-<span class="sd">    Note: if sample_field is in **kwargs, use it as labels after sorting using field</span>
+<span class="sd">    This is a convenience wrapper for plot().</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -471,8 +470,8 @@
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 

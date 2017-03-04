@@ -30,6 +30,7 @@
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
@@ -43,7 +44,7 @@
             
   <h1>Source code for calour.experiment</h1><div class="highlight"><pre>
 <span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Experiment (:mod:`calour.experiment`)</span>
+<span class="sd">experiment (:mod:`calour.experiment`)</span>
 <span class="sd">=====================================</span>
 
 <span class="sd">.. currentmodule:: calour.experiment</span>
@@ -82,7 +83,7 @@
 <span class="kn">import</span> <span class="nn">scipy.sparse</span>
 
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Experiment"><a class="viewcode-back" href="../../_autosummary/calour.experiment.Experiment.html#calour.amplicon_experiment.Experiment">[docs]</a><span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
@@ -94,7 +95,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data : ``numpy.array`` or ``scipy.sparse``</span>
+<span class="sd">    data : ``numpy.array`` or :class:`scipy.sparse.csr_matrix`</span>
 <span class="sd">        The abundance table for OTUs, metabolites, genes, etc. Samples</span>
 <span class="sd">        are in row and features in column</span>
 <span class="sd">    sample_metadata : ``pandas.DataFrame``</span>
@@ -104,17 +105,17 @@
 <span class="sd">    description : str</span>
 <span class="sd">        name of experiment</span>
 <span class="sd">    sparse : bool</span>
-<span class="sd">        store the data array in sparse (``scipy.sparse.csr_matrix``) matrix</span>
-<span class="sd">        or numpy array</span>
+<span class="sd">        store the data array in :class:`scipy.sparse.csr_matrix`</span>
+<span class="sd">        or :func:`numpy.array`</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data : ``numpy.array`` or ``scipy.sparse``</span>
+<span class="sd">    data : :func:`numpy.array` or :class:`scipy.sparse.csr_matrix`</span>
 <span class="sd">        The abundance table for OTUs, metabolites, genes, etc. Samples</span>
 <span class="sd">        are in row and features in column</span>
-<span class="sd">    sample_metadata : ``pandas.DataFrame``</span>
+<span class="sd">    sample_metadata : :class:`pandas.DataFrame`</span>
 <span class="sd">        The metadata on the samples</span>
-<span class="sd">    feature_metadata : ``pandas.DataFrame``</span>
+<span class="sd">    feature_metadata : :class:`pandas.DataFrame`</span>
 <span class="sd">        The metadata on the features</span>
 <span class="sd">    exp_metadata : dict</span>
 <span class="sd">        metadata about the experiment (data md5, filenames, etc.)</span>
@@ -222,7 +223,7 @@
 <span class="sd">        Note this require the function decorated to return an</span>
 <span class="sd">        ``Experiment`` object.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">__qualname__</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__qualname__</span>
 
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -376,7 +377,7 @@
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_pandas</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_pandas</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convert a Pandas DataFrame into an experiment</span>
 <span class="sd">        Can use an existing calour Experimebt (exp) (if supplied) to obtain feature and sample metadata.</span>
 <span class="sd">        Note currently only works with non-sparse DataFrame</span>
@@ -404,15 +405,15 @@
             <span class="n">exp_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">exp_metadata</span>
             <span class="n">sample_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">sample_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">]</span>
             <span class="n">feature_metadata</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">]</span>
-            <span class="n">cls</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">__class__</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="vm">__class__</span>
 
         <span class="c1"># print(sample_metadata)</span>
-        <span class="n">newexp</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="p">,</span>
+        <span class="n">newexp</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sample_metadata</span><span class="p">,</span> <span class="n">feature_metadata</span><span class="p">,</span>
                      <span class="n">exp_metadata</span><span class="o">=</span><span class="n">exp_metadata</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">newexp</span></div>
 
 
-<div class="viewcode-block" id="add_functions"><a class="viewcode-back" href="../../_autosummary/calour.experiment.add_functions.html#calour.amplicon_experiment.add_functions">[docs]</a><span class="k">def</span> <span class="nf">add_functions</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span>
+<div class="viewcode-block" id="add_functions"><a class="viewcode-back" href="../../_autosummary/calour.experiment.add_functions.html#calour.amplicon_experiment.add_functions">[docs]</a><span class="k">def</span> <span class="nf">add_functions</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                   <span class="n">modules</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;.io&#39;</span><span class="p">,</span> <span class="s1">&#39;.sorting&#39;</span><span class="p">,</span> <span class="s1">&#39;.filtering&#39;</span><span class="p">,</span> <span class="s1">&#39;.analysis&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;.transforming&#39;</span><span class="p">,</span> <span class="s1">&#39;.heatmap.heatmap&#39;</span><span class="p">,</span> <span class="s1">&#39;.plotting&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;.manipulation&#39;</span><span class="p">,</span> <span class="s1">&#39;.analysis&#39;</span><span class="p">]):</span>
@@ -431,7 +432,7 @@
         <span class="k">for</span> <span class="n">fn</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
             <span class="c1"># skip private functions</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -465,8 +466,8 @@
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 
