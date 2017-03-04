@@ -14,23 +14,25 @@ else
 	TEST_COMMAND = nosetests --with-doctest
 endif
 
-CMSG ?= update html doc
+MSG ?= update html doc
 
 help:
 	@echo 'Use "make test" to run all the unit tests and docstring tests.'
 	@echo 'Use "make pep8" to validate PEP8 compliance.'
 	@echo 'Use "make html" to create html documentation with sphinx'
 	@echo 'Use "make all" to run all the targets listed above.'
-	@echo 'Use "make doc_upload" to create html documentation and upload to github pages.'
+	@echo 'Use "MSG=whatever_update_msg make publish" to create html documentation and upload to github pages.'
 test:
 	$(TEST_COMMAND)
 pep8:
 	flake8 calour setup.py
 html:
 	make -C doc clean html
-all: test pep8 html
-doc_upload:
+publish:
 	make -C doc clean
-	cd doc/_build/ && git clone -b gh-pages --single-branch https://github.com/biocore/calour.git html
+	git clone -b gh-pages --single-branch git@github.com:biocore/calour.git doc/_build/html
 	make -C doc html
-	cd doc/_build/html && git commit -a -m "$(CMSG)" && git push origin gh-pages
+	cd doc/_build/html && git add * && git commit -m "$(MSG)" && git push origin gh-pages
+
+all: test pep8 html
+
