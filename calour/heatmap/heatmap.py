@@ -375,9 +375,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
 def plot_sort(exp, field=None, **kwargs):
     '''Plot after sorting by sample field.
 
-    This is a convenience wrapper for plot()
-
-    Note: if sample_field is in **kwargs, use it as labels after sorting using field
+    This is a convenience wrapper for plot().
 
     Parameters
     ----------

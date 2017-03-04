@@ -1,5 +1,5 @@
 '''
-Experiment (:mod:`calour.experiment`)
+experiment (:mod:`calour.experiment`)
 =====================================
 
 .. currentmodule:: calour.experiment

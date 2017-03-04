@@ -1,6 +1,6 @@
 '''
 transforming (:mod:`calour.transforming`)
-========================================
+=========================================
 
 .. currentmodule:: calour.transforming
 

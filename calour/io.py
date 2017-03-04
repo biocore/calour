@@ -231,7 +231,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     encoding : str or None (optional)
         encoder for the metadata files. None (default) to use
         pandas default encoder, str to specify encoder name (see
-         pandas.read_table() documentation)
+        pandas.read_table() documentation)
     cls : ``class``, optional
         what class object to read the data into (``Experiment`` by default)
     normalize : int or None
