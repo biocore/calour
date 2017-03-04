@@ -1,0 +1,6 @@
+calour.filtering.filter_prevalence
+==================================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_prevalence

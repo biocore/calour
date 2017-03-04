@@ -1,0 +1,6 @@
+calour.io.read_open_ms
+======================
+
+.. currentmodule:: calour.io
+
+.. autofunction:: read_open_ms

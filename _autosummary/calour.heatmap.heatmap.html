@@ -17,7 +17,8 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -26,13 +27,10 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
-    <link rel="up" title="heatmap (calour.heatmap)" href="../heatmap.html" />
     <link rel="next" title="calour.heatmap.create_plot_gui" href="calour.heatmap.create_plot_gui.html" />
     <link rel="prev" title="calour.heatmap.plot_sort" href="calour.heatmap.plot_sort.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
@@ -58,23 +56,23 @@ and samples in column.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sample_field</strong> (<em>str or None (optional)</em>) &#8211; The field to display on the x-axis (sample):
+<li><strong>sample_field</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; The field to display on the x-axis (sample):
 None (default) to not show x labels.
 str to display field values for this field</li>
-<li><strong>feature_field</strong> (<em>str or None (optional)</em>) &#8211; Name of the field to display on the y-axis (features) or None not to display names</li>
-<li><strong>yticklabels_max</strong> (<em>int (optional)</em>) &#8211; The maximal number of feature names to display in the plot (when zoomed out)
+<li><strong>feature_field</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; Name of the field to display on the y-axis (features) or None not to display names</li>
+<li><strong>yticklabels_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; The maximal number of feature names to display in the plot (when zoomed out)
 0 to show all labels</li>
-<li><strong>clim</strong> (<em>tuple of (float, float) or None (optional)</em>) &#8211; the min and max values for the heatmap or None to use all range. It uses the min
+<li><strong>clim</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; the min and max values for the heatmap or None to use all range. It uses the min
 and max values in the <code class="docutils literal"><span class="pre">data</span></code> array by default.</li>
-<li><strong>xticklabel_rot</strong> (<em>float (optional)</em>) &#8211; The rotation angle for the x labels (if sample_field is supplied)</li>
-<li><strong>xticklabel_len</strong> (<em>int (optional) or None</em>) &#8211; The maximal length for the x label strings (will be cut to
+<li><strong>xticklabel_rot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; The rotation angle for the x labels (if sample_field is supplied)</li>
+<li><strong>xticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> (</em><em>optional</em><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The maximal length for the x label strings (will be cut to
 this length if longer). Used to prevent long labels from
 taking too much space. None indicates no cutting</li>
-<li><strong>cmap</strong> (<em>None or str (optional)</em>) &#8211; None (default) to use mpl default color map. str to use colormap named str.</li>
-<li><strong>title</strong> (<em>None or str (optional)</em>) &#8211; None (default) to show experiment description field as title. str to set title to str.</li>
+<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; None (default) to use mpl default color map. str to use colormap named str.</li>
+<li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; None (default) to show experiment description field as title. str to set title to str.</li>
 <li><strong>axis</strong> (matplotlib <code class="docutils literal"><span class="pre">AxesSubplot</span></code> object or None (optional)) &#8211; The axis where the heatmap is plotted. None (default) to create a new figure and
 axis to plot heatmap into the axis</li>
-<li><strong>rect</strong> (<em>tuple of (int, int, int, int) or None (optional)</em>) &#8211; None (default) to set initial zoom window to the whole experiment.
+<li><strong>rect</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; None (default) to set initial zoom window to the whole experiment.
 [x_min, x_max, y_min, y_max] to set initial zoom window</li>
 </ul>
 </td>
@@ -110,7 +108,7 @@ axis to plot heatmap into the axis</li>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/calour.heatmap.heatmap.txt"
+      <li><a href="../_sources/_autosummary/calour.heatmap.heatmap.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -132,11 +130,11 @@ axis to plot heatmap into the axis</li>
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
       
       |
-      <a href="../_sources/_autosummary/calour.heatmap.heatmap.txt"
+      <a href="../_sources/_autosummary/calour.heatmap.heatmap.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

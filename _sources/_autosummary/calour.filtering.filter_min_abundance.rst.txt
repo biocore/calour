@@ -1,0 +1,6 @@
+calour.filtering.filter_min_abundance
+=====================================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_min_abundance

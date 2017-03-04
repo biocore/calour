@@ -17,7 +17,8 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -26,13 +27,10 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
-    <link rel="up" title="read &amp; write (calour.io)" href="../io.html" />
     <link rel="next" title="calour.io.read_amplicon" href="calour.io.read_amplicon.html" />
     <link rel="prev" title="read &amp; write (calour.io)" href="../io.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
@@ -62,21 +60,21 @@ to align with biom table.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; file path to the biom table.</li>
-<li><strong>sample_metadata_file</strong> (<em>None or str (optional)</em>) &#8211; None (default) to just use samplenames (no additional metadata).
+<li><strong>sample_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; None (default) to just use samplenames (no additional metadata).
 if not None, file path to the sample metadata (aka mapping file in QIIME).</li>
 <li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; file path to the feature metadata.</li>
 <li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; description of the experiment</li>
 <li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; read the biom table into sparse or dense array</li>
-<li><strong>file_type</strong> (<em>str (optional)</em>) &#8211; the data_file format. options:
+<li><strong>file_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; the data_file format. options:
 &#8216;biom&#8217; : a biom table (biom-format.org) (default)
 &#8216;openms&#8217; : an OpenMS bucket table csv (rows are feature, columns are samples)</li>
-<li><strong>encoding</strong> (<em>str or None (optional)</em>) &#8211; <p>encoder for the metadata files. None (default) to use
+<li><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; <p>encoder for the metadata files. None (default) to use
 pandas default encoder, str to specify encoder name (see</p>
 <blockquote>
 <div>pandas.read_table() documentation)</div></blockquote>
 </li>
 <li><strong>cls</strong> (<code class="docutils literal"><span class="pre">class</span></code>, optional) &#8211; what class object to read the data into (<code class="docutils literal"><span class="pre">Experiment</span></code> by default)</li>
-<li><strong>normalize</strong> (<em>int or None</em>) &#8211; normalize each sample to the specified reads. <code class="docutils literal"><span class="pre">None</span></code> to not normalize</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; normalize each sample to the specified reads. <code class="docutils literal"><span class="pre">None</span></code> to not normalize</li>
 </ul>
 </td>
 </tr>
@@ -115,7 +113,7 @@ pandas default encoder, str to specify encoder name (see</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/calour.io.read.txt"
+      <li><a href="../_sources/_autosummary/calour.io.read.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -137,11 +135,11 @@ pandas default encoder, str to specify encoder name (see</p>
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
       
       |
-      <a href="../_sources/_autosummary/calour.io.read.txt"
+      <a href="../_sources/_autosummary/calour.io.read.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

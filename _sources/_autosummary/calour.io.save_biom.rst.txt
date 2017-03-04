@@ -1,0 +1,6 @@
+calour.io.save_biom
+===================
+
+.. currentmodule:: calour.io
+
+.. autofunction:: save_biom

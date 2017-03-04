@@ -17,7 +17,8 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -26,13 +27,10 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
-    <link rel="up" title="sorting (calour.sorting)" href="../sorting.html" />
     <link rel="next" title="calour.sorting.cluster_features" href="calour.sorting.cluster_features.html" />
     <link rel="prev" title="calour.sorting.sort_abundance" href="calour.sorting.sort_abundance.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
@@ -58,13 +56,13 @@ across samples/features) are close to each other</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>aixs</strong> (<em>0 or 1 (optional)</em>) &#8211; 0 (default) means clustering features; 1 means clustering samples</li>
+<li><strong>aixs</strong> (<em>0</em><em> or </em><em>1</em><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; 0 (default) means clustering features; 1 means clustering samples</li>
 <li><strong>transform</strong> (<em>Callable</em>) &#8211; a callable transform on a 2-d matrix. Input and output of transform are <code class="docutils literal"><span class="pre">Experiment</span></code>.
 The transform function can modify <code class="docutils literal"><span class="pre">Experiment.data</span></code> (it is a copy).
 It should not change the dimension of <code class="docutils literal"><span class="pre">data</span></code> in <code class="docutils literal"><span class="pre">Experiment</span></code>.</li>
-<li><strong>metric</strong> (<em>str or callable</em>) &#8211; the clustering metric to use. It should be able to be passed to
+<li><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.6)"><em>callable</em></a>) &#8211; the clustering metric to use. It should be able to be passed to
 <code class="docutils literal"><span class="pre">scipy.spatial.distance.pdist</span></code>.</li>
-<li><strong>inplace</strong> (<em>bool (optional)</em>) &#8211; False (default) to create a copy.
+<li><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; False (default) to create a copy.
 True to Replace data in exp.</li>
 <li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; additional keyword parameters passed to <code class="docutils literal"><span class="pre">transform</span></code>.</li>
 </ul>
@@ -101,7 +99,7 @@ True to Replace data in exp.</li>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/calour.sorting.cluster_data.txt"
+      <li><a href="../_sources/_autosummary/calour.sorting.cluster_data.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -123,11 +121,11 @@ True to Replace data in exp.</li>
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
       
       |
-      <a href="../_sources/_autosummary/calour.sorting.cluster_data.txt"
+      <a href="../_sources/_autosummary/calour.sorting.cluster_data.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

@@ -1,0 +1,6 @@
+calour.analysis.diff_abundance
+==============================
+
+.. currentmodule:: calour.analysis
+
+.. autofunction:: diff_abundance

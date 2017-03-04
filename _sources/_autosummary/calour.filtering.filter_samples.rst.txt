@@ -1,0 +1,6 @@
+calour.filtering.filter_samples
+===============================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_samples

@@ -1,0 +1,6 @@
+calour.sorting.cluster_data
+===========================
+
+.. currentmodule:: calour.sorting
+
+.. autofunction:: cluster_data

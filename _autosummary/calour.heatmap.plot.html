@@ -17,7 +17,8 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -26,13 +27,10 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="calour 0.1 documentation" href="../index.html" />
-    <link rel="up" title="heatmap (calour.heatmap)" href="../heatmap.html" />
     <link rel="next" title="calour.heatmap.plot_sort" href="calour.heatmap.plot_sort.html" />
     <link rel="prev" title="heatmap (calour.heatmap)" href="../heatmap.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
@@ -57,14 +55,14 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>exp</strong> (<code class="docutils literal"><span class="pre">Experiment</span></code>) &#8211; the object to plot</li>
-<li><strong>sample_color_bars</strong> (<em>list, optional</em>) &#8211; list of column names in the sample metadata. It plots a color bar
+<li><strong>sample_color_bars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; list of column names in the sample metadata. It plots a color bar
 for each column. It doesn&#8217;t plot color bars by default (<code class="docutils literal"><span class="pre">None</span></code>)</li>
-<li><strong>feature_color_bars</strong> (<em>list, optional</em>) &#8211; list of column names in the feature metadata. It plots a color bar
+<li><strong>feature_color_bars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; list of column names in the feature metadata. It plots a color bar
 for each column. It doesn&#8217;t plot color bars by default (<code class="docutils literal"><span class="pre">None</span></code>)</li>
-<li><strong>color_bar_label</strong> (<em>bool, optional</em>) &#8211; whether to show the label for the color bars</li>
-<li><strong>gui</strong> (<em>str, optional</em>) &#8211; GUI to use</li>
+<li><strong>color_bar_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; whether to show the label for the color bars</li>
+<li><strong>gui</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; GUI to use</li>
 <li><strong>databases</strong> (<em>Iterable of str</em>) &#8211; a list of databases to access or add annotation</li>
-<li><strong>kwargs</strong> (<em>dict, optional</em>) &#8211; keyword arguments passing to <a class="reference internal" href="calour.heatmap.heatmap.html#heatmap-ref"><span class="std std-ref">heatmap</span></a> function.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; keyword arguments passing to <a class="reference internal" href="calour.heatmap.heatmap.html#heatmap-ref"><span class="std std-ref">heatmap</span></a> function.</li>
 </ul>
 </td>
 </tr>
@@ -99,7 +97,7 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/calour.heatmap.plot.txt"
+      <li><a href="../_sources/_autosummary/calour.heatmap.plot.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -121,11 +119,11 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
       &copy;2017, Amnon Amir & Zech Xu.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
       
       |
-      <a href="../_sources/_autosummary/calour.heatmap.plot.txt"
+      <a href="../_sources/_autosummary/calour.heatmap.plot.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
