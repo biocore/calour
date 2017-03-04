@@ -7,7 +7,7 @@ analysis (:mod:`calour.analysis`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    correlation
    diff_abundance

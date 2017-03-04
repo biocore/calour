@@ -7,7 +7,7 @@ amplicon experiment (:mod:`calour.amplicon_experiment`)
 Classes
 ^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    AmpliconExperiment
 '''
@@ -33,6 +33,45 @@ logger = getLogger(__name__)
 
 
 class AmpliconExperiment(Experiment):
+    '''This class contains the data for a experiment or a meta experiment.
+
+    Parameters
+    ----------
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : :class:`pandas.DataFrame`
+        The metadata on the samples
+    feature_metadata : :class:`pandas.DataFrame`
+        The metadata on the features
+    description : str
+        name of experiment
+    sparse : bool
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
+
+    Attributes
+    ----------
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : :class:`pandas.DataFrame`
+        The metadata on the samples
+    feature_metadata : :class:`pandas.DataFrame`
+        The metadata on the features
+    exp_metadata : dict
+        metadata about the experiment (data md5, filenames, etc.)
+    shape : tuple of (int, int)
+        the dimension of data
+    sparse : bool
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+    description : str
+        name of the experiment
+
+    See Also
+    --------
+    Experiment
+    '''
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'AmpliconExperiment %s with %d samples, %d features' % (

@@ -7,7 +7,7 @@ utilities (:mod:`calour.util`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    set_log_level
 '''

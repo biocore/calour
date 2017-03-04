@@ -7,7 +7,7 @@ heatmap (:mod:`calour.heatmap`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    plot
    plot_sort

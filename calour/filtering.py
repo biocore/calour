@@ -7,7 +7,7 @@ filtering (:mod:`calour.filtering`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    filter_by_data
    filter_by_metadata

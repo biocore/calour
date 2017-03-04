@@ -7,7 +7,7 @@ transforming (:mod:`calour.transforming`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    normalize
    scale

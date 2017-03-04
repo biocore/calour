@@ -7,7 +7,7 @@ sorting (:mod:`calour.sorting`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    sort_by_data
    sort_by_metadata

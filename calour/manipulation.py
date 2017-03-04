@@ -7,7 +7,7 @@ manipulation (:mod:`calour.manipulation`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    join_fields
    join_experiments

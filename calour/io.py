@@ -7,7 +7,7 @@ read & write (:mod:`calour.io`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    read
    read_amplicon

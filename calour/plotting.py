@@ -7,7 +7,7 @@ plotting (:mod:`calour.plotting`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    plot_hist
 '''

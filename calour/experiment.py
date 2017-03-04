@@ -7,14 +7,14 @@ experiment (:mod:`calour.experiment`)
 Classes
 ^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    Experiment
 
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    add_functions
 '''
@@ -80,6 +80,10 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
+
+    See Also
+    --------
+    AmpliconExperiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -242,7 +246,6 @@ class Experiment:
 
     @property
     def shape(self):
-        '''Get the number of samples by features in the experiment. '''
         return self.get_data().shape
 
     def reorder(self, new_order, axis=0, inplace=False):
