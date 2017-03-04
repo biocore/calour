@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.binarize
+=====================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.binarize

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.amplicon_experiment.AmpliconExperiment.get_data_md5
+==========================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+.. automethod:: AmpliconExperiment.get_data_md5

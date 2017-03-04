@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.experiment.Experiment &#8212; calour 0.1.0.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="calour.experiment.add_functions" href="calour.experiment.add_functions.html" />
+    <link rel="prev" title="experiment (calour.experiment)" href="../experiment.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">calour.experiment.Experiment</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="calour-experiment-experiment">
+<h1>calour.experiment.Experiment<a class="headerlink" href="#calour-experiment-experiment" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="calour.experiment.Experiment">
+<em class="property">class </em><code class="descclassname">calour.experiment.</code><code class="descname">Experiment</code><span class="sig-paren">(</span><em>data</em>, <em>sample_metadata</em>, <em>feature_metadata=None</em>, <em>exp_metadata={}</em>, <em>description=''</em>, <em>sparse=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L44"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class contains the data for a experiment or a meta experiment.</p>
+<p>The data set includes a data table (otu table, gene table,
+metabolomic table, or all those tables combined), a sample
+metadata table, and a feature metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.12)"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></a> or <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code></a></p>
+<blockquote>
+<div><p>The abundance table for OTUs, metabolites, genes, etc. Samples
+are in row and features in column</p>
+</div></blockquote>
+<p><strong>sample_metadata</strong> : <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a></p>
+<blockquote>
+<div><p>The metadata on the samples</p>
+</div></blockquote>
+<p><strong>feature_metadata</strong> : <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a></p>
+<blockquote>
+<div><p>The metadata on the features</p>
+</div></blockquote>
+<p><strong>description</strong> : str</p>
+<blockquote>
+<div><p>name of experiment</p>
+</div></blockquote>
+<p><strong>sparse</strong> : <a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></p>
+<blockquote class="last">
+<div><p>store the data array in <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code></a>
+or <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.12)"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></a></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-obj docutils literal"><span class="pre">AmpliconExperiment</span></code></p>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>data</td>
+<td>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.12)"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></a> or <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">scipy.sparse.csr_matrix</span></code></a>) The abundance table for OTUs, metabolites, genes, etc. Samples are in row and features in column</td>
+</tr>
+<tr class="row-even"><td>sample_metadata</td>
+<td>(<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a>) The metadata on the samples</td>
+</tr>
+<tr class="row-odd"><td>feature_metadata</td>
+<td>(<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a>) The metadata on the features</td>
+</tr>
+<tr class="row-even"><td>exp_metadata</td>
+<td>(dict) metadata about the experiment (data md5, filenames, etc.)</td>
+</tr>
+<tr class="row-odd"><td>shape</td>
+<td>(tuple of (int, int)) the dimension of data</td>
+</tr>
+<tr class="row-even"><td>sparse</td>
+<td>(bool) store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.</td>
+</tr>
+<tr class="row-odd"><td>description</td>
+<td>(str) name of the experiment</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.__eq__.html#calour.experiment.Experiment.__eq__" title="calour.experiment.Experiment.__eq__"><code class="xref py py-obj docutils literal"><span class="pre">experiment1</span> <span class="pre">==</span> <span class="pre">experiment2</span></code></a></td>
+<td>Check equality.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.__ne__.html#calour.experiment.Experiment.__ne__" title="calour.experiment.Experiment.__ne__"><code class="xref py py-obj docutils literal"><span class="pre">experiment1</span> <span class="pre">!=</span> <span class="pre">experiment2</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.add_observation.html#calour.experiment.Experiment.add_observation" title="calour.experiment.Experiment.add_observation"><code class="xref py py-obj docutils literal"><span class="pre">add_observation</span></code></a>(exp,&nbsp;obs_id[,&nbsp;data])</td>
+<td>add an observation to the experiment. fill the data with 0 if values is none, or with the values of data</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.ax_color_bar.html#calour.experiment.Experiment.ax_color_bar" title="calour.experiment.Experiment.ax_color_bar"><code class="xref py py-obj docutils literal"><span class="pre">ax_color_bar</span></code></a>(axis,&nbsp;values,&nbsp;width[,&nbsp;...])</td>
+<td>plot color bars along x or y axis</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.binarize.html#calour.experiment.Experiment.binarize" title="calour.experiment.Experiment.binarize"><code class="xref py py-obj docutils literal"><span class="pre">binarize</span></code></a>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
+<td>Binarize the data with a threshold.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.cluster_data.html#calour.experiment.Experiment.cluster_data" title="calour.experiment.Experiment.cluster_data"><code class="xref py py-obj docutils literal"><span class="pre">cluster_data</span></code></a>(exp[,&nbsp;transform,&nbsp;axis,&nbsp;metric,&nbsp;...])</td>
+<td>Cluster the samples/features.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.cluster_features.html#calour.experiment.Experiment.cluster_features" title="calour.experiment.Experiment.cluster_features"><code class="xref py py-obj docutils literal"><span class="pre">cluster_features</span></code></a>(exp[,&nbsp;min_abundance,&nbsp;inplace])</td>
+<td>Cluster features following filtering of minimal abundance on features and</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.copy.html#calour.experiment.Experiment.copy" title="calour.experiment.Experiment.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.correlation.html#calour.experiment.Experiment.correlation" title="calour.experiment.Experiment.correlation"><code class="xref py py-obj docutils literal"><span class="pre">correlation</span></code></a>(exp,&nbsp;field[,&nbsp;method,&nbsp;nonzero,&nbsp;...])</td>
+<td>Find features with correlation to a numeric metadata field</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.create_plot_gui.html#calour.experiment.Experiment.create_plot_gui" title="calour.experiment.Experiment.create_plot_gui"><code class="xref py py-obj docutils literal"><span class="pre">create_plot_gui</span></code></a>(exp[,&nbsp;gui,&nbsp;databases])</td>
+<td>Create plot GUI object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.deepcopy.html#calour.experiment.Experiment.deepcopy" title="calour.experiment.Experiment.deepcopy"><code class="xref py py-obj docutils literal"><span class="pre">deepcopy</span></code></a>(x[,&nbsp;memo,&nbsp;_nil])</td>
+<td>Deep copy operation on arbitrary Python objects.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.diff_abundance.html#calour.experiment.Experiment.diff_abundance" title="calour.experiment.Experiment.diff_abundance"><code class="xref py py-obj docutils literal"><span class="pre">diff_abundance</span></code></a>(exp,&nbsp;field,&nbsp;val1[,&nbsp;val2,&nbsp;...])</td>
+<td>test the differential expression between 2 groups (val1 and val2 in field field)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.diff_abundance_kw.html#calour.experiment.Experiment.diff_abundance_kw" title="calour.experiment.Experiment.diff_abundance_kw"><code class="xref py py-obj docutils literal"><span class="pre">diff_abundance_kw</span></code></a>(exp,&nbsp;field[,&nbsp;transform,&nbsp;...])</td>
+<td>Test the differential expression between multiple sample groups using the Kruskal Wallis test.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.downsample.html#calour.experiment.Experiment.downsample" title="calour.experiment.Experiment.downsample"><code class="xref py py-obj docutils literal"><span class="pre">downsample</span></code></a>(exp,&nbsp;field[,&nbsp;axis,&nbsp;num_keep,&nbsp;inplace])</td>
+<td>Downsample the data set.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.filter_by_data.html#calour.experiment.Experiment.filter_by_data" title="calour.experiment.Experiment.filter_by_data"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_data</span></code></a>(exp,&nbsp;predicate[,&nbsp;axis,&nbsp;...])</td>
+<td>Filter samples or features by data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.filter_by_metadata.html#calour.experiment.Experiment.filter_by_metadata" title="calour.experiment.Experiment.filter_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_metadata</span></code></a>(exp,&nbsp;field,&nbsp;pick[,&nbsp;axis,&nbsp;...])</td>
+<td>Filter samples or features by metadata.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.filter_ids.html#calour.experiment.Experiment.filter_ids" title="calour.experiment.Experiment.filter_ids"><code class="xref py py-obj docutils literal"><span class="pre">filter_ids</span></code></a>(exp,&nbsp;ids[,&nbsp;axis,&nbsp;negate,&nbsp;inplace])</td>
+<td>Filter samples or features based on a list index values</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.filter_mean.html#calour.experiment.Experiment.filter_mean" title="calour.experiment.Experiment.filter_mean"><code class="xref py py-obj docutils literal"><span class="pre">filter_mean</span></code></a>(exp[,&nbsp;cutoff])</td>
+<td>Filter features with a mean at least cutoff of the mean total abundance/sample</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.filter_min_abundance.html#calour.experiment.Experiment.filter_min_abundance" title="calour.experiment.Experiment.filter_min_abundance"><code class="xref py py-obj docutils literal"><span class="pre">filter_min_abundance</span></code></a>(exp,&nbsp;min_abundance,&nbsp;...)</td>
+<td>Filter keeping only features with &gt;= min_abundance total over all samples</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.filter_prevalence.html#calour.experiment.Experiment.filter_prevalence" title="calour.experiment.Experiment.filter_prevalence"><code class="xref py py-obj docutils literal"><span class="pre">filter_prevalence</span></code></a>(exp[,&nbsp;fraction,&nbsp;cutoff])</td>
+<td>Filter features keeping only ones present in at least fraction fraction of the samples.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.filter_samples.html#calour.experiment.Experiment.filter_samples" title="calour.experiment.Experiment.filter_samples"><code class="xref py py-obj docutils literal"><span class="pre">filter_samples</span></code></a>(exp,&nbsp;field,&nbsp;values[,&nbsp;negate,&nbsp;...])</td>
+<td>Shortcut for filtering samples.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.from_pandas.html#calour.experiment.Experiment.from_pandas" title="calour.experiment.Experiment.from_pandas"><code class="xref py py-obj docutils literal"><span class="pre">from_pandas</span></code></a>(df[,&nbsp;exp])</td>
+<td>Convert a Pandas DataFrame into an experiment.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.getLogger.html#calour.experiment.Experiment.getLogger" title="calour.experiment.Experiment.getLogger"><code class="xref py py-obj docutils literal"><span class="pre">getLogger</span></code></a>([name])</td>
+<td>Return a logger with the specified name, creating it if necessary.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.get_data.html#calour.experiment.Experiment.get_data" title="calour.experiment.Experiment.get_data"><code class="xref py py-obj docutils literal"><span class="pre">get_data</span></code></a>([sparse,&nbsp;copy])</td>
+<td>Get the data as a 2d array</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.get_data_md5.html#calour.experiment.Experiment.get_data_md5" title="calour.experiment.Experiment.get_data_md5"><code class="xref py py-obj docutils literal"><span class="pre">get_data_md5</span></code></a>(data)</td>
+<td>Calculate the md5 of a dense/sparse matrix</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.get_file_md5.html#calour.experiment.Experiment.get_file_md5" title="calour.experiment.Experiment.get_file_md5"><code class="xref py py-obj docutils literal"><span class="pre">get_file_md5</span></code></a>(filename[,&nbsp;encoding])</td>
+<td>get the md5 of the text file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.get_term_features.html#calour.experiment.Experiment.get_term_features" title="calour.experiment.Experiment.get_term_features"><code class="xref py py-obj docutils literal"><span class="pre">get_term_features</span></code></a>(seqs,&nbsp;sequence_annotations)</td>
+<td>Get dict of number of appearances in each sequence keyed by term</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.heatmap.html#calour.experiment.Experiment.heatmap" title="calour.experiment.Experiment.heatmap"><code class="xref py py-obj docutils literal"><span class="pre">heatmap</span></code></a>(exp[,&nbsp;sample_field,&nbsp;feature_field,&nbsp;...])</td>
+<td>Plot a heatmap for the experiment.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.join_experiments.html#calour.experiment.Experiment.join_experiments" title="calour.experiment.Experiment.join_experiments"><code class="xref py py-obj docutils literal"><span class="pre">join_experiments</span></code></a>(exp,&nbsp;other[,&nbsp;...])</td>
+<td>Join two Experiment objects into one.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.join_fields.html#calour.experiment.Experiment.join_fields" title="calour.experiment.Experiment.join_fields"><code class="xref py py-obj docutils literal"><span class="pre">join_fields</span></code></a>(exp,&nbsp;field1,&nbsp;field2[,&nbsp;newname,&nbsp;...])</td>
+<td>Join two sample metadata fields into a single new field</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.log_n.html#calour.experiment.Experiment.log_n" title="calour.experiment.Experiment.log_n"><code class="xref py py-obj docutils literal"><span class="pre">log_n</span></code></a>(exp[,&nbsp;n,&nbsp;inplace])</td>
+<td>Log transform the data</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.merge_identical.html#calour.experiment.Experiment.merge_identical" title="calour.experiment.Experiment.merge_identical"><code class="xref py py-obj docutils literal"><span class="pre">merge_identical</span></code></a>(exp,&nbsp;field[,&nbsp;method,&nbsp;axis,&nbsp;...])</td>
+<td>Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.merge_obs_tax.html#calour.experiment.Experiment.merge_obs_tax" title="calour.experiment.Experiment.merge_obs_tax"><code class="xref py py-obj docutils literal"><span class="pre">merge_obs_tax</span></code></a>(exp[,&nbsp;tax_level,&nbsp;method])</td>
+<td>merge all observations with identical taxonomy (at level tax_level) by summing the values per sample</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.multipletests.html#calour.experiment.Experiment.multipletests" title="calour.experiment.Experiment.multipletests"><code class="xref py py-obj docutils literal"><span class="pre">multipletests</span></code></a>(pvals[,&nbsp;alpha,&nbsp;method,&nbsp;...])</td>
+<td>test results and p-value correction for multiple tests</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.nlargest.html#calour.experiment.Experiment.nlargest" title="calour.experiment.Experiment.nlargest"><code class="xref py py-obj docutils literal"><span class="pre">nlargest</span></code></a>(n,&nbsp;iterable[,&nbsp;key])</td>
+<td>Find the n largest elements in a dataset.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.normalize.html#calour.experiment.Experiment.normalize" title="calour.experiment.Experiment.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<td>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.normalize_by_subset_features.html#calour.experiment.Experiment.normalize_by_subset_features" title="calour.experiment.Experiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
+<td>Normalize each sample by their total sums without a list of features</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.plot.html#calour.experiment.Experiment.plot" title="calour.experiment.Experiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>(exp[,&nbsp;sample_color_bars,&nbsp;...])</td>
+<td>Plot the main heatmap and its associated axis.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.plot_hist.html#calour.experiment.Experiment.plot_hist" title="calour.experiment.Experiment.plot_hist"><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code></a>(exp,&nbsp;**kwargs)</td>
+<td>Plot histogram of all the values in data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.plot_sort.html#calour.experiment.Experiment.plot_sort" title="calour.experiment.Experiment.plot_sort"><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code></a>(exp[,&nbsp;field])</td>
+<td>Plot after sorting by sample field.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.read.html#calour.experiment.Experiment.read" title="calour.experiment.Experiment.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(data_file[,&nbsp;sample_metadata_file,&nbsp;...])</td>
+<td>Read the files for the experiment.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.read_amplicon.html#calour.experiment.Experiment.read_amplicon" title="calour.experiment.Experiment.read_amplicon"><code class="xref py py-obj docutils literal"><span class="pre">read_amplicon</span></code></a>(data_file[,&nbsp;sample_metadata_file])</td>
+<td>Load an amplicon experiment.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.read_open_ms.html#calour.experiment.Experiment.read_open_ms" title="calour.experiment.Experiment.read_open_ms"><code class="xref py py-obj docutils literal"><span class="pre">read_open_ms</span></code></a>(data_file[,&nbsp;...])</td>
+<td>Load an OpenMS metabolomics experiment.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.relative_enrichment.html#calour.experiment.Experiment.relative_enrichment" title="calour.experiment.Experiment.relative_enrichment"><code class="xref py py-obj docutils literal"><span class="pre">relative_enrichment</span></code></a>(exp,&nbsp;features,&nbsp;feature_terms)</td>
+<td>Get the list of enriched terms in features compared to all features in exp.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.reorder.html#calour.experiment.Experiment.reorder" title="calour.experiment.Experiment.reorder"><code class="xref py py-obj docutils literal"><span class="pre">reorder</span></code></a>(new_order[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Reorder according to indices in the new order.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.rescale.html#calour.experiment.Experiment.rescale" title="calour.experiment.Experiment.rescale"><code class="xref py py-obj docutils literal"><span class="pre">rescale</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<td>Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save.html#calour.experiment.Experiment.save" title="calour.experiment.Experiment.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(exp,&nbsp;prefix[,&nbsp;fmt])</td>
+<td>Save the experiment data to disk.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save_biom.html#calour.experiment.Experiment.save_biom" title="calour.experiment.Experiment.save_biom"><code class="xref py py-obj docutils literal"><span class="pre">save_biom</span></code></a>(exp,&nbsp;f[,&nbsp;fmt,&nbsp;add_metadata])</td>
+<td>Save experiment to biom format</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save_commands.html#calour.experiment.Experiment.save_commands" title="calour.experiment.Experiment.save_commands"><code class="xref py py-obj docutils literal"><span class="pre">save_commands</span></code></a>(exp,&nbsp;f)</td>
+<td>Save the commands used to generate the exp</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save_fasta.html#calour.experiment.Experiment.save_fasta" title="calour.experiment.Experiment.save_fasta"><code class="xref py py-obj docutils literal"><span class="pre">save_fasta</span></code></a>(exp,&nbsp;f[,&nbsp;seqs])</td>
+<td>Save a list of sequences to fasta.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save_feature_metadata.html#calour.experiment.Experiment.save_feature_metadata" title="calour.experiment.Experiment.save_feature_metadata"><code class="xref py py-obj docutils literal"><span class="pre">save_feature_metadata</span></code></a>(exp,&nbsp;f)</td>
+<td>Save feature metadata to file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save_sample_metadata.html#calour.experiment.Experiment.save_sample_metadata" title="calour.experiment.Experiment.save_sample_metadata"><code class="xref py py-obj docutils literal"><span class="pre">save_sample_metadata</span></code></a>(exp,&nbsp;f)</td>
+<td>Save sample metadata to file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.scale.html#calour.experiment.Experiment.scale" title="calour.experiment.Experiment.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Standardize a dataset along an axis</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.serialize.html#calour.experiment.Experiment.serialize" title="calour.experiment.Experiment.serialize"><code class="xref py py-obj docutils literal"><span class="pre">serialize</span></code></a>(exp,&nbsp;f)</td>
+<td>Serialize the Experiment object to disk.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_abundance.html#calour.experiment.Experiment.sort_abundance" title="calour.experiment.Experiment.sort_abundance"><code class="xref py py-obj docutils literal"><span class="pre">sort_abundance</span></code></a>(exp[,&nbsp;field,&nbsp;value,&nbsp;inplace])</td>
+<td>Sort features based on their abundance in a subset of the samples.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_by_data.html#calour.experiment.Experiment.sort_by_data" title="calour.experiment.Experiment.sort_by_data"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_data</span></code></a>(exp[,&nbsp;axis,&nbsp;subset,&nbsp;key,&nbsp;inplace])</td>
+<td>Sort features based on their mean frequency.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_by_metadata.html#calour.experiment.Experiment.sort_by_metadata" title="calour.experiment.Experiment.sort_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_metadata</span></code></a>(exp,&nbsp;field[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Sort samples or features based on metadata values in the field.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_center_mass.html#calour.experiment.Experiment.sort_center_mass" title="calour.experiment.Experiment.sort_center_mass"><code class="xref py py-obj docutils literal"><span class="pre">sort_center_mass</span></code></a>(exp[,&nbsp;transform,&nbsp;inplace])</td>
+<td>Sort the features based on the center of mass</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_samples.html#calour.experiment.Experiment.sort_samples" title="calour.experiment.Experiment.sort_samples"><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code></a>(exp,&nbsp;field,&nbsp;**kwargs)</td>
+<td>Sort samples by field</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.to_pandas.html#calour.experiment.Experiment.to_pandas" title="calour.experiment.Experiment.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
+<td>Get a pandas dataframe of the abundances Samples are rows, features are columns.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.transform.html#calour.experiment.Experiment.transform" title="calour.experiment.Experiment.transform"><code class="xref py py-obj docutils literal"><span class="pre">transform</span></code></a>(exp[,&nbsp;steps,&nbsp;inplace])</td>
+<td>Chain transformations together.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014--, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

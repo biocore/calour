@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.filter_by_metadata
+===============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.filter_by_metadata

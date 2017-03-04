@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.filter_prevalence
+==============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.filter_prevalence

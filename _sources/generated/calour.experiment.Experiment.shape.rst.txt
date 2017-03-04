@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.shape
+==================================
+
+.. currentmodule:: calour.experiment
+
+.. autoattribute:: Experiment.shape

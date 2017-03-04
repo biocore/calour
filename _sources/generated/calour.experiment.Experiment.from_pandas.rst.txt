@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.from_pandas
+========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.from_pandas

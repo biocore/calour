@@ -1,0 +1,8 @@
+:orphan:
+
+calour.amplicon_experiment.AmpliconExperiment.save_biom
+=======================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+.. automethod:: AmpliconExperiment.save_biom

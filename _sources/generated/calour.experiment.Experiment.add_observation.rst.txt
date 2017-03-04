@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.add_observation
+============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.add_observation

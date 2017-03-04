@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.relative_enrichment
+================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.relative_enrichment

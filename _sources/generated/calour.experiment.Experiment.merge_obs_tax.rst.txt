@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.merge_obs_tax
+==========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.merge_obs_tax

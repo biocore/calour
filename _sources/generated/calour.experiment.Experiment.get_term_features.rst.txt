@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.get_term_features
+==============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.get_term_features

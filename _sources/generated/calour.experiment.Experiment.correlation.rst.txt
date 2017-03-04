@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.correlation
+========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.correlation

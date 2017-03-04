@@ -1,0 +1,6 @@
+calour.transforming.normalize
+=============================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: normalize

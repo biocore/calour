@@ -1,0 +1,6 @@
+calour.transforming.log_n
+=========================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: log_n

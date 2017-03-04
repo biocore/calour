@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.filter_ids
+=======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.filter_ids

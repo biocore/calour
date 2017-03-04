@@ -1,0 +1,6 @@
+calour.filtering.filter_ids
+===========================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_ids

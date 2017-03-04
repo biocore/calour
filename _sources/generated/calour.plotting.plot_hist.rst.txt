@@ -1,0 +1,6 @@
+calour.plotting.plot_hist
+=========================
+
+.. currentmodule:: calour.plotting
+
+.. autofunction:: plot_hist

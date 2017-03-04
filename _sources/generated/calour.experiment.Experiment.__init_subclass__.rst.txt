@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.__init_subclass__
+==============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.__init_subclass__

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.filter_min_abundance
+=================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.filter_min_abundance

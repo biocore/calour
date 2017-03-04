@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.heatmap
+====================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.heatmap

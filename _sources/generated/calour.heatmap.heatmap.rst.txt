@@ -1,0 +1,6 @@
+calour.heatmap.heatmap
+======================
+
+.. currentmodule:: calour.heatmap
+
+.. autofunction:: heatmap

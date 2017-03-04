@@ -1,0 +1,6 @@
+calour.transforming.binarize
+============================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: binarize

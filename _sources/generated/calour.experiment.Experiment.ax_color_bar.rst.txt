@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.ax_color_bar
+=========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.ax_color_bar

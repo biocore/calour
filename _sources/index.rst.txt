@@ -9,7 +9,7 @@ Welcome to calour's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    experiment
    amplicon_experiment

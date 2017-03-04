@@ -1,0 +1,6 @@
+calour.heatmap.plot_sort
+========================
+
+.. currentmodule:: calour.heatmap
+
+.. autofunction:: plot_sort

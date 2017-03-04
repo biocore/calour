@@ -1,0 +1,6 @@
+calour.util.set_log_level
+=========================
+
+.. currentmodule:: calour.util
+
+.. autofunction:: set_log_level

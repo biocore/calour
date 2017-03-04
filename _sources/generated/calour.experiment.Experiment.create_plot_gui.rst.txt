@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.create_plot_gui
+============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.create_plot_gui

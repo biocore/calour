@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.getLogger
+======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.getLogger

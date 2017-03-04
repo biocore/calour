@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.cluster_data
+=========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.cluster_data

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.save_biom
+======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.save_biom

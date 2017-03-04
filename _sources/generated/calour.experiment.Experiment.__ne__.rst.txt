@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.__ne__
+===================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.__ne__

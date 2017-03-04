@@ -1,0 +1,6 @@
+calour.manipulation.join_experiments
+====================================
+
+.. currentmodule:: calour.manipulation
+
+.. autofunction:: join_experiments

@@ -1,0 +1,6 @@
+calour.analysis.correlation
+===========================
+
+.. currentmodule:: calour.analysis
+
+.. autofunction:: correlation

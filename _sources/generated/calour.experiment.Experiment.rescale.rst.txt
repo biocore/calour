@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.rescale
+====================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.rescale

@@ -1,0 +1,6 @@
+calour.sorting.sort_abundance
+=============================
+
+.. currentmodule:: calour.sorting
+
+.. autofunction:: sort_abundance

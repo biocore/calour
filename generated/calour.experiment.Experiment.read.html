@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calour.experiment.Experiment.read &#8212; calour 0.1.0.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">calour.experiment.Experiment.read</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="calour-experiment-experiment-read">
+<h1>calour.experiment.Experiment.read<a class="headerlink" href="#calour-experiment-experiment-read" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="calour.experiment.Experiment.read">
+<code class="descclassname">Experiment.</code><code class="descname">read</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=''</em>, <em>sparse=True</em>, <em>data_file_type='biom'</em>, <em>encoding=None</em>, <em>cls=&lt;class 'calour.experiment.Experiment'&gt;</em>, <em>*</em>, <em>normalize</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/io.py#L206"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the files for the experiment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The order in the sample and feature metadata tables are changed
+to align with biom table.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_file</strong> : str</p>
+<blockquote>
+<div><p>file path to the biom table.</p>
+</div></blockquote>
+<p><strong>sample_metadata_file</strong> : None or str (optional)</p>
+<blockquote>
+<div><p>None (default) to just use samplenames (no additional metadata).
+if not None, file path to the sample metadata (aka mapping file in QIIME).</p>
+</div></blockquote>
+<p><strong>feature_metadata_file</strong> : str</p>
+<blockquote>
+<div><p>file path to the feature metadata.</p>
+</div></blockquote>
+<p><strong>description</strong> : str</p>
+<blockquote>
+<div><p>description of the experiment</p>
+</div></blockquote>
+<p><strong>sparse</strong> : bool</p>
+<blockquote>
+<div><p>read the biom table into sparse or dense array</p>
+</div></blockquote>
+<p><strong>file_type</strong> : str (optional)</p>
+<blockquote>
+<div><p>the data_file format. options:
+&#8216;biom&#8217; : a biom table (biom-format.org) (default)
+&#8216;openms&#8217; : an OpenMS bucket table csv (rows are feature, columns are samples)</p>
+</div></blockquote>
+<p><strong>encoding</strong> : str or None (optional)</p>
+<blockquote>
+<div><p>encoder for the metadata files. None (default) to use
+pandas default encoder, str to specify encoder name (see
+pandas.read_table() documentation)</p>
+</div></blockquote>
+<p><strong>cls</strong> : <code class="docutils literal"><span class="pre">class</span></code>, optional</p>
+<blockquote>
+<div><p>what class object to read the data into (<code class="docutils literal"><span class="pre">Experiment</span></code> by default)</p>
+</div></blockquote>
+<p><strong>normalize</strong> : int or None</p>
+<blockquote>
+<div><p>normalize each sample to the specified reads. <code class="docutils literal"><span class="pre">None</span></code> to not normalize</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data</strong> : np.array or scipy.sprase.csr</p>
+<blockquote>
+<div><p>The experiment count data (each row is a sample, each column is a feature)</p>
+</div></blockquote>
+<p><strong>sample_metadata</strong> : <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.19.2)"><code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></a></p>
+<blockquote>
+<div><p>Metadata for the samples</p>
+</div></blockquote>
+<p><strong>feature_metadata</strong> : pandas.DataFrame</p>
+<blockquote>
+<div><p>Metadata for the features</p>
+</div></blockquote>
+<p><strong>exp_metadata</strong> : dict</p>
+<blockquote>
+<div><p>information about the experiment (including &#8216;map_md5&#8217;, &#8216;data_md5&#8217;)</p>
+</div></blockquote>
+<p><strong>description</strong> : str</p>
+<blockquote class="last">
+<div><p>name of the experiment</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014--, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

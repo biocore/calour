@@ -1,0 +1,169 @@
+calour.amplicon_experiment.AmpliconExperiment
+=============================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+.. autoclass:: AmpliconExperiment
+
+   
+
+   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
+      .. autosummary::
+         :toctree:
+      
+         
+         
+         AmpliconExperiment.__eq__
+         
+         AmpliconExperiment.__format__
+         
+         
+         AmpliconExperiment.__init_subclass__
+         
+         AmpliconExperiment.__ne__
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         AmpliconExperiment.add_observation
+         
+         AmpliconExperiment.ax_color_bar
+         
+         AmpliconExperiment.binarize
+         
+         AmpliconExperiment.cluster_data
+         
+         AmpliconExperiment.cluster_features
+         
+         AmpliconExperiment.copy
+         
+         AmpliconExperiment.correlation
+         
+         AmpliconExperiment.create_plot_gui
+         
+         AmpliconExperiment.deepcopy
+         
+         AmpliconExperiment.diff_abundance
+         
+         AmpliconExperiment.diff_abundance_kw
+         
+         AmpliconExperiment.downsample
+         
+         AmpliconExperiment.filter_by_data
+         
+         AmpliconExperiment.filter_by_metadata
+         
+         AmpliconExperiment.filter_fasta
+         
+         AmpliconExperiment.filter_ids
+         
+         AmpliconExperiment.filter_mean
+         
+         AmpliconExperiment.filter_min_abundance
+         
+         AmpliconExperiment.filter_orig_reads
+         
+         AmpliconExperiment.filter_prevalence
+         
+         AmpliconExperiment.filter_samples
+         
+         AmpliconExperiment.filter_taxonomy
+         
+         AmpliconExperiment.from_pandas
+         
+         AmpliconExperiment.getLogger
+         
+         AmpliconExperiment.get_data
+         
+         AmpliconExperiment.get_data_md5
+         
+         AmpliconExperiment.get_file_md5
+         
+         AmpliconExperiment.get_term_features
+         
+         AmpliconExperiment.heatmap
+         
+         AmpliconExperiment.join_experiments
+         
+         AmpliconExperiment.join_fields
+         
+         AmpliconExperiment.log_n
+         
+         AmpliconExperiment.merge_identical
+         
+         AmpliconExperiment.merge_obs_tax
+         
+         AmpliconExperiment.multipletests
+         
+         AmpliconExperiment.nlargest
+         
+         AmpliconExperiment.normalize
+         
+         AmpliconExperiment.normalize_by_subset_features
+         
+         AmpliconExperiment.plot
+         
+         AmpliconExperiment.plot_hist
+         
+         AmpliconExperiment.plot_sort
+         
+         AmpliconExperiment.read
+         
+         AmpliconExperiment.read_amplicon
+         
+         AmpliconExperiment.read_open_ms
+         
+         AmpliconExperiment.relative_enrichment
+         
+         AmpliconExperiment.reorder
+         
+         AmpliconExperiment.rescale
+         
+         AmpliconExperiment.save
+         
+         AmpliconExperiment.save_biom
+         
+         AmpliconExperiment.save_commands
+         
+         AmpliconExperiment.save_fasta
+         
+         AmpliconExperiment.save_feature_metadata
+         
+         AmpliconExperiment.save_sample_metadata
+         
+         AmpliconExperiment.scale
+         
+         AmpliconExperiment.serialize
+         
+         AmpliconExperiment.sort_abundance
+         
+         AmpliconExperiment.sort_by_data
+         
+         AmpliconExperiment.sort_by_metadata
+         
+         AmpliconExperiment.sort_center_mass
+         
+         AmpliconExperiment.sort_samples
+         
+         AmpliconExperiment.sort_taxonomy
+         
+         AmpliconExperiment.to_pandas
+         
+         AmpliconExperiment.transform
+
+
+
+   
+
+   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
+      .. autosummary::
+         :toctree:
+      
+         AmpliconExperiment.shape
+         AmpliconExperiment.sparse
+

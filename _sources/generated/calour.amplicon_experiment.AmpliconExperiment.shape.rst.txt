@@ -1,0 +1,8 @@
+:orphan:
+
+calour.amplicon_experiment.AmpliconExperiment.shape
+===================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+.. autoattribute:: AmpliconExperiment.shape

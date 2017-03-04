@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.multipletests
+==========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.multipletests

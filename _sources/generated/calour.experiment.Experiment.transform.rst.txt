@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.transform
+======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.transform

@@ -1,0 +1,6 @@
+calour.transforming.scale
+=========================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: scale

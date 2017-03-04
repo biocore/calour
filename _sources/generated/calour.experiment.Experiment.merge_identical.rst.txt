@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.merge_identical
+============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.merge_identical

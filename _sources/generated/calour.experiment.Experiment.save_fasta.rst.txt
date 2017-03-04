@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.save_fasta
+=======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.save_fasta

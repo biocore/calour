@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.normalize
+======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.normalize

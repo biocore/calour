@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.sort_center_mass
+=============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.sort_center_mass

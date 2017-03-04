@@ -1,0 +1,8 @@
+:orphan:
+
+calour.amplicon_experiment.AmpliconExperiment.sparse
+====================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+.. autoattribute:: AmpliconExperiment.sparse

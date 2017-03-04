@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.sparse
+===================================
+
+.. currentmodule:: calour.experiment
+
+.. autoattribute:: Experiment.sparse

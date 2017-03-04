@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.normalize_by_subset_features
+=========================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.normalize_by_subset_features

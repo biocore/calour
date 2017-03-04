@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.get_data
+=====================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.get_data
