@@ -1,15 +1,16 @@
 # Check on http://lint.travis-ci.org/ after modifying it!
-sudo: required
+# sudo: required
 language: c
 os:
   - linux
   - osx
 env:
-  - PYVERSION="3.5"
-addons:
-  apt:
-    packages:
-      - xvfb
+  matrix:
+    PYVERSION="3.5"
+    PYVERSION="3.6"
+  global:
+    secure: "pTVt8qjv5RUEEQQS+Iud9F7wrBGBT4ffo2oOpXRWNvRqANlpcBcak0RVeUtNFUwQa/PjG1+m7bQSr7+3jJgQr/7cWV0Kz25PlUEhaud6g51qheqo9McDiuQEU4EGiWViZ4IWBG3HMR2awrtYg2PPZyLq8qJ88dwIL8ZNKLHaZmYinX5bimoSgbbC5QwMVjoAacjSNyuezAtORtkJXUVcl9hvYRVyK2IMrAJJsipXpq3ah2CPwWIc+aAHs3IJonqIEv8J+tuJwErFARTDJ80l2JwNl0/9TrrgbIpMWCV5OaaGWQvKWrtUO+vsGHaxNftPm95dvU15VWtW6yRwz8Z7ZCoIzrlMNZ5VuOUrYiedObYCIJoOyfcJpfJdKUrihboIDOx7jxJJJsCkzUMsLkDqKI5kdWdiCwMVF2uHxYd6ezYNJVa7S/z6d4i+x9Y9Jt5NTxwwyuGreItdI9YhqvxfPlvdhniadhA2wSQZLTAfrTMAij3NictvhYI7oC4WKpxrQFYZZ7k8VAwpWyXQ+6QfxqfBiZwip9WnC6hmPOFTxvr1k9+SE6mIcdtmYMmhWdq5mVtzhRa1hDrFIl8+H9VvIh5QmAHvI0s5jYkRTimlJIwBcomsGw6dUik28sC8z2G3aibzFmZNTLA6be025DGB6nliy3FWKefwyXNP2wOWHB8="
+
 before_install:
   - echo "$TRAVIS_OS_NAME"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
@@ -25,6 +26,8 @@ before_install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
+  # xvfb is required to test plot and gui for linux
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y xvfb; fi
 install:
   - conda create -n test_env python=$PYVERSION --file ci/conda_requirements.txt
   - source activate test_env
@@ -41,4 +44,4 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - CMSG="${TRAVIS_COMMIT_MESSAGE}" make doc_upload
+  - if [ ${TRAVIS_SECURE_ENV_VARS} = "true" ] ; then bash publish.sh "${TRAVIS_COMMIT_MESSAGE}" ; fi
