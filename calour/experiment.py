@@ -50,22 +50,22 @@ class Experiment:
 
     Parameters
     ----------
-    data : ``numpy.array`` or :class:`scipy.sparse.csr_matrix`
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : ``pandas.DataFrame``
+    sample_metadata : :class:`pandas.DataFrame`
         The metadata on the samples
-    feature_metadata : ``pandas.DataFrame``
+    feature_metadata : :class:`pandas.DataFrame`
         The metadata on the features
     description : str
         name of experiment
     sparse : bool
         store the data array in :class:`scipy.sparse.csr_matrix`
-        or :func:`numpy.array`
+        or :class:`numpy.ndarray`
 
     Attributes
     ----------
-    data : :func:`numpy.array` or :class:`scipy.sparse.csr_matrix`
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
     sample_metadata : :class:`pandas.DataFrame`

@@ -43,4 +43,4 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - bash publish.sh
+  - source publish.sh
