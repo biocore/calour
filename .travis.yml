@@ -32,7 +32,6 @@ install:
   - conda install --yes --file ci/conda_requirements.txt
   - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
-  - if [ ${TRAVIS_SECURE_ENV_VARS} == "true" ] ; then echo 'aaaaaa' ; else echo 'bbbbb' ; fi
 before_script:
   - export DISPLAY=:99.0
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
@@ -44,4 +43,4 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - if [ ${TRAVIS_SECURE_ENV_VARS} == "true" ] ; then bash publish.sh "${TRAVIS_COMMIT_MESSAGE}" ; fi
+  - bash publish.sh
