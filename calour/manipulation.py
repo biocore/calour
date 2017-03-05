@@ -26,7 +26,7 @@ from logging import getLogger
 import pandas as pd
 import numpy as np
 
-from .experiment import Experiment, _convert_axis_name
+from .experiment import Experiment
 
 
 logger = getLogger(__name__)

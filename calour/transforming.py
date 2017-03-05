@@ -33,7 +33,7 @@ import numpy as np
 from sklearn import preprocessing
 
 from .experiment import Experiment
-from .util import _convert_axis_name
+
 
 logger = getLogger(__name__)
 

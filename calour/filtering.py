@@ -33,7 +33,6 @@ from collections import Callable
 import numpy as np
 
 from .experiment import Experiment
-from .util import _convert_axis_name
 
 
 logger = getLogger(__name__)

@@ -37,8 +37,6 @@ import pandas as pd
 import numpy as np
 import scipy.sparse
 
-from .util import _convert_axis_name
-
 
 logger = getLogger(__name__)
 
