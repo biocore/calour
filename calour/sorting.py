@@ -32,7 +32,6 @@ import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
-from .util import _convert_axis_name
 from .transforming import log_n, transform, scale
 
 
@@ -40,7 +39,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
+def sort_centroid(exp, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
 
     Assumes exp samples are sorted by some continuous field, and sort

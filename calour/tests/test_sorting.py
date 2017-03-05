@@ -87,8 +87,8 @@ class SortingTests(Tests):
                       normalize=None)
         assert_experiment_equal(obs, exp, almost_equal=True)
 
-    def test_sort_center_mass(self):
-        exp = self.test1.sort_center_mass()
+    def test_sort_centroid(self):
+        exp = self.test1.sort_centroid()
         # we didn't change the samples
         pdt.assert_frame_equal(exp.sample_metadata, self.test1.sample_metadata)
         # we did change the features but only reordered
