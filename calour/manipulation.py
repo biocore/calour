@@ -170,12 +170,6 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     return newexp
 
 
-def add_observation(exp, obs_id, data=None):
-    '''
-    add an observation to the experiment. fill the data with 0 if values is none, or with the values of data
-    '''
-
-
 def join_experiments(exp, other, orig_field_name='orig_exp', prefixes=None):
     '''Join two Experiment objects into one.
 

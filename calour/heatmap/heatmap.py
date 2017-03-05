@@ -47,7 +47,7 @@ def _transition_index(l):
     yield i + 1, item
 
 
-def create_plot_gui(exp, gui='cli', databases=('dbbact',)):
+def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
     '''Create plot GUI object.
 
     It still waits for the heatmap to be plotted and set up.
@@ -255,7 +255,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True, label=True):
+def _ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True, label=True):
     '''plot color bars along x or y axis
 
     Parameters
@@ -349,7 +349,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     -------
     ``PlottingGUI``
     '''
-    gui_obj = create_plot_gui(exp, gui, databases)
+    gui_obj = _create_plot_gui(exp, gui, databases)
     exp.heatmap(axis=gui_obj.axis, **kwargs)
     barwidth = 0.3
     barspace = 0.05
@@ -357,13 +357,13 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     if sample_color_bars is not None:
         position = 0
         for s in sample_color_bars:
-            ax_color_bar(
+            _ax_color_bar(
                 gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position, label=label)
             position += (barspace + barwidth)
     if feature_color_bars is not None:
         position = 0
         for f in feature_color_bars:
-            ax_color_bar(
+            _ax_color_bar(
                 gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, label=label, horizontal=False)
             position += (barspace + barwidth)
     # set up the gui ready for interaction

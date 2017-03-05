@@ -12,7 +12,6 @@ Functions
    plot
    plot_sort
    heatmap
-   create_plot_gui
 '''
 
 
@@ -24,7 +23,7 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from .heatmap import heatmap, plot, plot_sort, create_plot_gui
+from .heatmap import heatmap, plot, plot_sort
 
 
-__all__ = ['heatmap', 'plot', 'plot_sort', 'create_plot_gui']
+__all__ = ['heatmap', 'plot', 'plot_sort']

@@ -10,7 +10,7 @@ from unittest import main
 
 from calour._testing import Tests
 from calour.tests.mock_database import MockDatabase
-from calour.heatmap.heatmap import create_plot_gui
+from calour.heatmap.heatmap import _create_plot_gui
 import calour as ca
 
 
@@ -32,7 +32,7 @@ class ExperimentTests(Tests):
         mdb = self.mock_db
         res = mdb.get_seq_annotation_strings(self.s1)
         print(res)
-        gui = create_plot_gui(self.test1, gui='qt5', databases=[])
+        gui = _create_plot_gui(self.test1, gui='qt5', databases=[])
         gui.databases.append(mdb)
         res = gui.get_database_annotations(self.s1)
         print(res)

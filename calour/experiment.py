@@ -124,7 +124,9 @@ class Experiment:
     def __eq__(self, other):
         '''Check equality.
 
-        Need to check sparsity and do the conversion if needed first.
+        It compares ``data``, ``sample_metadata``, and
+        ``feature_metadata`` attributes.  to check sparsity and do
+        the conversion if needed first.
         '''
         if self.sparse is True:
             data = self.data.toarray()
@@ -142,6 +144,12 @@ class Experiment:
         return not (self == other)
 
     def copy(self):
+        '''Copy the object.
+
+        Returns
+        -------
+        Experiment
+        '''
         return deepcopy(self)
 
     @staticmethod

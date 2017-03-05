@@ -293,6 +293,7 @@ def filter_samples(exp, field, values, negate=False, inplace=False):
                               negate=negate, inplace=inplace)
 
 
+@Experiment._record_sig
 def filter_min_abundance(exp, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
     This is a convenience function wrapping filter_by_data()
@@ -306,6 +307,7 @@ def filter_min_abundance(exp, min_abundance, **kwargs):
     return newexp
 
 
+@Experiment._record_sig
 def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
     This is a convenience function wrapping filter_by_data()
@@ -355,7 +357,7 @@ def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
     axis : int (optional)
         1 (default) to filter features, 0 to filter samples
     negate : bool (optional)
-        False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.
+        negate the filtering
     inplace : bool (optional)
         False (default) to create a copy of the experiment, True to filter inplace
 

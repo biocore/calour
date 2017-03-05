@@ -32,8 +32,7 @@ import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
-from . import transforming
-from .transforming import log_n
+from .transforming import log_n, transform, scale
 
 
 logger = getLogger(__name__)
@@ -131,6 +130,43 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
 
 
 @Experiment._record_sig
+def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
+    '''Cluster features.
+
+    Cluster is done after filtering of minimal abundance, log
+    transforming, and scaling on features.
+
+    Parameters
+    ----------
+    min_abundance : Number, optional
+        filter away features less than ``min_abundance`` (10 by default).
+    kwargs : dict
+        keyword arguments passing to ``cluster_data``
+
+    Returns
+    -------
+    Experiment
+        object with features filtered, log transformed and scaled.
+
+    See Also
+    --------
+    cluster_data
+    transform
+    log_n
+    scale
+
+    '''
+    newexp = exp.filter_min_abundance(min_abundance, inplace=inplace)
+    return newexp.cluster_data(
+        transform=transform,
+        axis=0,
+        steps=[log_n, scale],
+        scale__axis=0,
+        inplace=inplace,
+        **kwargs)
+
+
+@Experiment._record_sig
 def sort_by_metadata(exp, field, axis=0, inplace=False):
     '''Sort samples or features based on metadata values in the field.
 
@@ -173,30 +209,31 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
     axis : 0 or 1
         Apply ``key`` function on row (sort the samples) (0) or column (sort the features) (1)
     subset : ``None`` or iterable of int (optional)
-        Sorting using only subset of the data.
+        Sorting using only subset of the data. The subsetting occurs on the opposite of
+        the specified axis.
     key : str or callable
-        If it is a callable, it should be a function accepts 1-D array of numeric and
-        returns a comparative value (like ``key`` in builtin ``sorted`` function).
-        Alternatively it accepts the following str values:
-        "log_mean": sort by log of the mean
-        "prevalence": sort by the prevalence
-        "mean": sort by the mean
+        If it is a callable, it should be a function accepts 1-D array
+        of numeric and returns a comparative value (like ``key`` in
+        builtin ``sorted`` function). Alternatively it accepts the
+        following strings: ``log_mean``: sort by log of the mean;
+        ``prevalence``: sort by the prevalence; ``mean``: sort by the
+        mean.
     inplace : bool (optional)
-        False (default) to create a copy
-        True to Replace data in exp
+        False (default) to create a copy. True to modify in place.
     kwargs : dict
         key word parameters passed to ``key``
 
     Returns
     -------
     ``Experiment``
-        With features sorted by mean frequency
+        With features sorted.
 
     '''
     if subset is None:
         data_subset = exp.data
     else:
         if axis == 0:
+            # sort samples, but subset on features
             data_subset = exp.data[:, subset]
         else:
             data_subset = exp.data[subset, :]
@@ -255,6 +292,7 @@ def _prevalence(x, cutoff=0):
     return np.sum(i >= cutoff for i in x) / len(x)
 
 
+@Experiment._record_sig
 def sort_samples(exp, field, **kwargs):
     '''Sort samples by field
     A convenience function for sort_by_metadata
@@ -272,42 +310,35 @@ def sort_samples(exp, field, **kwargs):
     return newexp
 
 
-def sort_abundance(exp, field=None, value=None, inplace=False, **kwargs):
+@Experiment._record_sig
+def sort_abundance(exp, subset=None, inplace=False, **kwargs):
     '''Sort features based on their abundance in a subset of the samples.
+
     This is a convenience wrapper for sort_by_data()
 
     Parameters
     ----------
-    field : str or None (default)
-        None (default) to sort on all samples, str to sort only on samples matching the field/value combination
-    value : str or list of str or None (default)
-        if field is not None, value is the value/list of values so sorting is only on samples matching this list
+    subset : dict or None (default)
+        None (default) to sort on all samples. Subset samples by
+        columns in sample metadata (specified by dict key) matching
+        the dict values (a list). sorting is only on samples matching this list
     inplace : bool (optional)
         False (default) to create a copy of the experiment, True to filter inplace
+    kwargs : dict
+        keyword arguments passing to ``sort_by_data``.
 
     Returns
     -------
-    ``Experiment``
+    Experiment
         with features sorted by abundance
+
     '''
-    if field is None:
-        subset = None
+    if subset is None:
+        select = None
     else:
-        if not isinstance(value, (list, tuple)):
-            value = [value]
-        subset = np.where(exp.sample_metadata[field].isin(value).values)[0]
-
-    newexp = exp.sort_by_data(axis=1, subset=subset, inplace=inplace, **kwargs)
-    return newexp
-
-
-def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
-    '''Cluster features following filtering of minimal abundance on features and
-       log transform and scaling on the data (mean 0 std 1)
-    '''
-    if min_abundance > 0:
-        newexp = exp.filter_min_abundance(min_abundance, inplace=inplace)
-    else:
-        newexp = exp
-    newexp = newexp.cluster_data(transform=transforming.transform, axis=0, steps=[transforming.log_n, transforming.scale], scale__axis=0, inplace=inplace, **kwargs)
-    return newexp
+        select = [True] * exp.shape[0]
+        for k, v in subset.items():
+            select = np.logical_and(subset, exp.sample_metadata[k].isin(v).values)
+        # convert boolean mask to index because sparse matrix can't be sliced with bools
+        select = np.where(select)[0]
+    return exp.sort_by_data(axis=1, subset=select, inplace=inplace, **kwargs)
