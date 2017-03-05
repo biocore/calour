@@ -142,28 +142,30 @@
 <h1>calour.experiment.Experiment.sort_abundance<a class="headerlink" href="#calour-experiment-experiment-sort-abundance" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.sort_abundance">
-<code class="descclassname">Experiment.</code><code class="descname">sort_abundance</code><span class="sig-paren">(</span><em>exp</em>, <em>field=None</em>, <em>value=None</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/sorting.py#L310"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.sort_abundance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sort features based on their abundance in a subset of the samples.
-This is a convenience wrapper for sort_by_data()</p>
+<code class="descclassname">Experiment.</code><code class="descname">sort_abundance</code><span class="sig-paren">(</span><em>exp</em>, <em>subset=None</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L195"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.sort_abundance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort features based on their abundance in a subset of the samples.</p>
+<p>This is a convenience wrapper for sort_by_data()</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>field</strong> : str or None (default)</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>subset</strong> : dict or None (default)</p>
 <blockquote>
-<div><p>None (default) to sort on all samples, str to sort only on samples matching the field/value combination</p>
-</div></blockquote>
-<p><strong>value</strong> : str or list of str or None (default)</p>
-<blockquote>
-<div><p>if field is not None, value is the value/list of values so sorting is only on samples matching this list</p>
+<div><p>None (default) to sort on all samples. Subset samples by
+columns in sample metadata (specified by dict key) matching
+the dict values (a list). sorting is only on samples matching this list</p>
 </div></blockquote>
 <p><strong>inplace</strong> : bool (optional)</p>
 <blockquote>
 <div><p>False (default) to create a copy of the experiment, True to filter inplace</p>
 </div></blockquote>
+<p><strong>kwargs</strong> : dict</p>
+<blockquote>
+<div><p>keyword arguments passing to <code class="docutils literal"><span class="pre">sort_by_data</span></code>.</p>
+</div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">Experiment</span></code></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Experiment</p>
 <blockquote class="last">
 <div><p>with features sorted by abundance</p>
 </div></blockquote>

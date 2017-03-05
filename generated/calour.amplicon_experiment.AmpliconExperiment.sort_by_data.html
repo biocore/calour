@@ -157,21 +157,21 @@ will be applied to <code class="docutils literal"><span class="pre">subset</span
 </div></blockquote>
 <p><strong>subset</strong> : <code class="docutils literal"><span class="pre">None</span></code> or iterable of int (optional)</p>
 <blockquote>
-<div><p>Sorting using only subset of the data.</p>
+<div><p>Sorting using only subset of the data. The subsetting occurs on the opposite of
+the specified axis.</p>
 </div></blockquote>
 <p><strong>key</strong> : str or callable</p>
 <blockquote>
-<div><p>If it is a callable, it should be a function accepts 1-D array of numeric and
-returns a comparative value (like <code class="docutils literal"><span class="pre">key</span></code> in builtin <code class="docutils literal"><span class="pre">sorted</span></code> function).
-Alternatively it accepts the following str values:
-&#8220;log_mean&#8221;: sort by log of the mean
-&#8220;prevalence&#8221;: sort by the prevalence
-&#8220;mean&#8221;: sort by the mean</p>
+<div><p>If it is a callable, it should be a function accepts 1-D array
+of numeric and returns a comparative value (like <code class="docutils literal"><span class="pre">key</span></code> in
+builtin <code class="docutils literal"><span class="pre">sorted</span></code> function). Alternatively it accepts the
+following strings: <code class="docutils literal"><span class="pre">log_mean</span></code>: sort by log of the mean;
+<code class="docutils literal"><span class="pre">prevalence</span></code>: sort by the prevalence; <code class="docutils literal"><span class="pre">mean</span></code>: sort by the
+mean.</p>
 </div></blockquote>
 <p><strong>inplace</strong> : bool (optional)</p>
 <blockquote>
-<div><p>False (default) to create a copy
-True to Replace data in exp</p>
+<div><p>False (default) to create a copy. True to modify in place.</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
 <blockquote>
@@ -181,7 +181,7 @@ True to Replace data in exp</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">Experiment</span></code></p>
 <blockquote class="last">
-<div><p>With features sorted by mean frequency</p>
+<div><p>With features sorted.</p>
 </div></blockquote>
 </td>
 </tr>
