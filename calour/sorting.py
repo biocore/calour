@@ -32,6 +32,7 @@ import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
+from .util import _convert_axis_name
 from .transforming import log_n, transform, scale
 
 
@@ -42,10 +43,12 @@ logger = getLogger(__name__)
 def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
 
-    Assumes exp samples are sorted by some continuous field, and sort the features based on their
-    center of mass along this field order:
-    For each feature calculate the center of mass (i.e. for each feature go over all samples i and calculate sum(data(i) * i / sum(data(i)) ).
-    Features are then sorted according to this center of mass
+    Assumes exp samples are sorted by some continuous field, and sort
+    the features based on their center of mass along this field order:
+    For each feature calculate the center of mass (i.e. for each
+    feature go over all samples i and calculate sum(data(i) * i /
+    sum(data(i)) ).  Features are then sorted according to this center
+    of mass
 
     Parameters
     ----------
@@ -63,6 +66,7 @@ def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
     -------
     exp : Experiment
         features sorted by center of mass
+
     '''
     logger.debug('sorting features by center of mass')
     if transform is None:

@@ -10,6 +10,7 @@ Functions
    :toctree: generated
 
    normalize
+   normalize_by_subset_features
    scale
    binarize
    log_n
@@ -31,10 +32,13 @@ from collections import defaultdict
 import numpy as np
 from sklearn import preprocessing
 
+from .experiment import Experiment
+from .util import _convert_axis_name
 
 logger = getLogger(__name__)
 
 
+@Experiment._record_sig
 def normalize(exp, total=10000, axis=1, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total
 
@@ -59,6 +63,7 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def rescale(exp, total=10000, axis=1, inplace=False):
     '''Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.
 
@@ -86,6 +91,7 @@ def rescale(exp, total=10000, axis=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def scale(exp, axis=1, inplace=False):
     '''Standardize a dataset along an axis
 
@@ -109,6 +115,7 @@ def scale(exp, axis=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def binarize(exp, threshold=1, inplace=False):
     '''Binarize the data with a threshold.
 
@@ -131,6 +138,7 @@ def binarize(exp, threshold=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def log_n(exp, n=1, inplace=False):
     '''Log transform the data
 
@@ -157,6 +165,7 @@ def log_n(exp, n=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def transform(exp, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.
 
@@ -194,7 +203,8 @@ def transform(exp, steps=[], inplace=False, **kwargs):
     return exp
 
 
-def normalize_by_subset_features(exp, features, total=10000, exclude=True, inplace=False):
+@Experiment._record_sig
+def normalize_by_subset_features(exp, features, total=10000, negate=True, inplace=False):
     '''Normalize each sample by their total sums without a list of features
 
     Normalizes all features (including in the exclude list) by the
@@ -208,10 +218,10 @@ def normalize_by_subset_features(exp, features, total=10000, exclude=True, inpla
     Parameters
     ----------
     features : list of str
-        The features to exclude (or include if exclude=False)
+        The feature IDs to exclude (or include if negate=False)
     total : int (optional)
         The total abundance for the non-excluded features per sample
-    exclude : bool (optional)
+    negate : bool (optional)
         True (default) to calculate normalization factor without features in features list.
         False to calculate normalization factor only with features in features list.
     inplace : bool (optional)
@@ -223,7 +233,7 @@ def normalize_by_subset_features(exp, features, total=10000, exclude=True, inpla
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
-    if exclude:
+    if negate:
         feature_pos = np.invert(feature_pos)
     data = exp.get_data(sparse=False)
     use_reads = np.sum(data[:, feature_pos], axis=1)

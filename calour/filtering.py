@@ -33,6 +33,7 @@ from collections import Callable
 import numpy as np
 
 from .experiment import Experiment
+from .util import _convert_axis_name
 
 
 logger = getLogger(__name__)
@@ -96,20 +97,21 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
 
 
 @Experiment._record_sig
-@Experiment._convert_axis_name
-def filter_by_metadata(exp, field, pick, axis=0, negate=False, inplace=False):
+def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
 
     Parameters
     ----------
     field : str
         the column name of the sample or feature metadata tables
-    pick : list, tuple, or Callable
-        pick what to keep based on the value in the specified field
+    select : list, tuple, or Callable
+        select what to keep based on the value in the specified field.
+        if it is a callable, it accepts a 1d array and return a
+        boolean array of the same length.
     axis : 0 or 1, optional
         the field is on samples (0) or features (1) metadata
     negate : bool, optional
-        discard instead of keep the pick if set to ``True``
+        discard instead of keep the select if set to ``True``
     inplace : bool, optional
         do the filtering on the original ``Experiment`` object or a copied one.
 
@@ -127,13 +129,10 @@ def filter_by_metadata(exp, field, pick, axis=0, negate=False, inplace=False):
     else:
         raise ValueError('unknown axis %s' % axis)
 
-    if isinstance(pick, Callable):
-        select = pick(x[field])
+    if isinstance(select, Callable):
+        select = select(x[field])
     else:
-        if not isinstance(pick, (list, tuple)):
-            pick = [pick]
-
-        select = x[field].isin(pick).values
+        select = x[field].isin(select).values
 
     if negate is True:
         select = ~ select
@@ -289,7 +288,7 @@ def _freq_ratio(x, ratio=2):
 @Experiment._record_sig
 def filter_samples(exp, field, values, negate=False, inplace=False):
     '''Shortcut for filtering samples.'''
-    return filter_by_metadata(exp, field=field, pick=values,
+    return filter_by_metadata(exp, field=field, select=values,
                               negate=negate, inplace=inplace)
 
 
@@ -327,6 +326,7 @@ def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
     return newexp
 
 
+@Experiment._record_sig
 def filter_mean(exp, cutoff=0.01, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
 
@@ -347,6 +347,7 @@ def filter_mean(exp, cutoff=0.01, **kwargs):
     return newexp
 
 
+@Experiment._record_sig
 def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
     '''Filter samples or features based on a list index values
 

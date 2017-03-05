@@ -342,10 +342,6 @@ def read_amplicon(data_file, sample_metadata_file=None,
     return exp
 
 
-def serialize(exp, f):
-    '''Serialize the Experiment object to disk.'''
-
-
 def save(exp, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
 
@@ -405,10 +401,6 @@ def save_sample_metadata(exp, f):
 def save_feature_metadata(exp, f):
     '''Save feature metadata to file. '''
     exp.feature_metadata.to_csv(f, sep='\t')
-
-
-def save_commands(exp, f):
-    '''Save the commands used to generate the exp '''
 
 
 def save_fasta(exp, f, seqs=None):
