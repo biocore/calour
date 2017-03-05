@@ -30,10 +30,6 @@ calour.experiment.Experiment
          
          
          
-         Experiment.add_observation
-         
-         Experiment.ax_color_bar
-         
          Experiment.binarize
          
          Experiment.cluster_data
@@ -43,8 +39,6 @@ calour.experiment.Experiment
          Experiment.copy
          
          Experiment.correlation
-         
-         Experiment.create_plot_gui
          
          Experiment.deepcopy
          

@@ -142,9 +142,36 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.cluster_features<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-cluster-features" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.cluster_features">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">cluster_features</code><span class="sig-paren">(</span><em>exp</em>, <em>min_abundance=10</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/sorting.py#L304"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.cluster_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cluster features following filtering of minimal abundance on features and
-log transform and scaling on the data (mean 0 std 1)</p>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">cluster_features</code><span class="sig-paren">(</span><em>exp</em>, <em>min_abundance=10</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/sorting.py#L132"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.cluster_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster features.</p>
+<p>Cluster is done after filtering of minimal abundance, log
+transforming, and scaling on features.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>min_abundance</strong> : Number, optional</p>
+<blockquote>
+<div><p>filter away features less than <code class="docutils literal"><span class="pre">min_abundance</span></code> (10 by default).</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : dict</p>
+<blockquote>
+<div><p>keyword arguments passing to <code class="docutils literal"><span class="pre">cluster_data</span></code></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Experiment</p>
+<blockquote class="last">
+<div><p>object with features filtered, log transformed and scaled.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_data.html#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="calour.amplicon_experiment.AmpliconExperiment.cluster_data"><code class="xref py py-obj docutils literal"><span class="pre">cluster_data</span></code></a>, <a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.transform.html#calour.amplicon_experiment.AmpliconExperiment.transform" title="calour.amplicon_experiment.AmpliconExperiment.transform"><code class="xref py py-obj docutils literal"><span class="pre">transform</span></code></a>, <a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.log_n.html#calour.amplicon_experiment.AmpliconExperiment.log_n" title="calour.amplicon_experiment.AmpliconExperiment.log_n"><code class="xref py py-obj docutils literal"><span class="pre">log_n</span></code></a>, <a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.scale.html#calour.amplicon_experiment.AmpliconExperiment.scale" title="calour.amplicon_experiment.AmpliconExperiment.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a></p>
+</div>
 </dd></dl>
 
 </div>
