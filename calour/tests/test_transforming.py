@@ -32,7 +32,7 @@ class TestTransforming(Tests):
 
     def test_transform_real(self):
         obs = self.test2.transform([log_n, scale], inplace=True,
-                                   log_n__n=2, scale__axis=0)
+                                   log_n__n=2, scale__axis=1)
         self.assertIs(obs, self.test2)
         assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
         # column 1, 2 and 6 are constant, so their variances are 0

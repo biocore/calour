@@ -27,7 +27,7 @@ class SortingTests(Tests):
     def test_cluster_data(self):
         def log_and_scale(exp):
             exp.log_n(inplace=True)
-            exp.scale(inplace=True, axis=0)
+            exp.scale(inplace=True, axis=1)
             return exp
         # no minimal filtering
         obs = self.test1.cluster_data(transform=log_and_scale)

@@ -85,7 +85,7 @@ def sort_centroid(exp, transform=log_n, inplace=False, **kwargs):
 
 
 @Experiment._record_sig
-def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False, **kwargs):
+def cluster_data(exp, transform=None, axis=1, metric='euclidean', inplace=False, **kwargs):
     '''Cluster the samples/features.
 
     Reorder the features/samples so that ones with similar behavior (pattern
@@ -94,7 +94,7 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
     Parameters
     ----------
     aixs : 0 or 1 (optional)
-        0 (default) means clustering features; 1 means clustering samples
+        1 (default) means clustering features; 0 means clustering samples
     transform : Callable
         a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.
         The transform function can modify ``Experiment.data`` (it is a copy).
@@ -122,14 +122,14 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).get_data(sparse=False)
 
-    if axis == 0:
+    if axis == 1:
         data = data.T
     # cluster
     dist_mat = spatial.distance.pdist(data, metric=metric)
     linkage = cluster.hierarchy.single(dist_mat)
     sort_order = cluster.hierarchy.leaves_list(linkage)
 
-    return exp.reorder(sort_order, axis=1 - axis, inplace=inplace)
+    return exp.reorder(sort_order, axis=axis, inplace=inplace)
 
 
 @Experiment._record_sig
@@ -162,9 +162,9 @@ def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
     newexp = exp.filter_min_abundance(min_abundance, inplace=inplace)
     return newexp.cluster_data(
         transform=transform,
-        axis=0,
+        axis=1,
         steps=[log_n, scale],
-        scale__axis=0,
+        scale__axis=1,
         inplace=inplace,
         **kwargs)
 

@@ -39,7 +39,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def normalize(exp, total=10000, axis=1, inplace=False):
+def normalize(exp, total=10000, axis=0, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total
 
     Parameters
@@ -48,7 +48,7 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     total : float
         the sum (along axis) to normalize to
     axis : int (optional)
-        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
+        the axis to normalize. 0 (default) is normalize each sample, 1 to normalize each feature
     inplace : bool (optional)
         False (default) to create a copy, True to replace values in exp
 
@@ -59,13 +59,13 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     '''
     if not inplace:
         exp = deepcopy(exp)
-    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=axis) * total
+    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
     return exp
 
 
 @Experiment._record_sig
-def rescale(exp, total=10000, axis=1, inplace=False):
-    '''Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.
+def rescale(exp, total=10000, axis=0, inplace=False):
+    '''Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.
 
     This function rescales by multiplying ALL entries in exp.data by same number.
 
@@ -75,7 +75,7 @@ def rescale(exp, total=10000, axis=1, inplace=False):
     total : float
         the mean sum (along axis) to normalize to
     axis : int (optional)
-        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
+        the axis to normalize. 0 (default) is normalize each sample, 1 to normalize each feature
     inplace : bool (optional)
         False (default) to create a copy, True to replace values in exp
 
@@ -86,13 +86,13 @@ def rescale(exp, total=10000, axis=1, inplace=False):
     '''
     if not inplace:
         exp = deepcopy(exp)
-    current_mean = np.mean(exp.data.sum(axis=axis))
+    current_mean = np.mean(exp.data.sum(axis=1-axis))
     exp.data = exp.data * total / current_mean
     return exp
 
 
 @Experiment._record_sig
-def scale(exp, axis=1, inplace=False):
+def scale(exp, axis=0, inplace=False):
     '''Standardize a dataset along an axis
 
     .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
@@ -100,7 +100,7 @@ def scale(exp, axis=1, inplace=False):
     Parameters
     ----------
     axis : 0 or 1
-        1 means scaling occur sample-wise; 0 feature-wise.
+        0 means scaling occur sample-wise; 1 feature-wise.
 
     Returns
     -------
@@ -111,7 +111,7 @@ def scale(exp, axis=1, inplace=False):
         exp = deepcopy(exp)
     if exp.sparse:
         exp.sparse = False
-    preprocessing.scale(exp.data, axis=axis, copy=False)
+    preprocessing.scale(exp.data, axis=1-axis, copy=False)
     return exp
 
 
