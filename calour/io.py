@@ -7,7 +7,7 @@ read & write (:mod:`calour.io`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    read
    read_amplicon
@@ -61,7 +61,7 @@ def _read_biom(fp, transpose=True):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : pandas DataFram
+    feature_md : :class:`pandas.DataFrame`
         the feature metadata (if availble in table)
     '''
     logger.debug('loading biom table %s' % fp)
@@ -231,7 +231,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     encoding : str or None (optional)
         encoder for the metadata files. None (default) to use
         pandas default encoder, str to specify encoder name (see
-         pandas.read_table() documentation)
+        pandas.read_table() documentation)
     cls : ``class``, optional
         what class object to read the data into (``Experiment`` by default)
     normalize : int or None
@@ -241,7 +241,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     -------
     data : np.array or scipy.sprase.csr
         The experiment count data (each row is a sample, each column is a feature)
-    sample_metadata : pandas.DataFrame
+    sample_metadata : :class:`pandas.DataFrame`
         Metadata for the samples
     feature_metadata : pandas.DataFrame
         Metadata for the features
@@ -342,10 +342,6 @@ def read_amplicon(data_file, sample_metadata_file=None,
     return exp
 
 
-def serialize(exp, f):
-    '''Serialize the Experiment object to disk.'''
-
-
 def save(exp, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
 
@@ -405,10 +401,6 @@ def save_sample_metadata(exp, f):
 def save_feature_metadata(exp, f):
     '''Save feature metadata to file. '''
     exp.feature_metadata.to_csv(f, sep='\t')
-
-
-def save_commands(exp, f):
-    '''Save the commands used to generate the exp '''
 
 
 def save_fasta(exp, f, seqs=None):

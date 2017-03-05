@@ -54,9 +54,9 @@ class FilteringTests(Tests):
 
     def test_filter_by_metadata_sample_edge_cases(self):
         # no group 3 - none filtered
-        obs = self.test2.filter_by_metadata('group', 3)
+        obs = self.test2.filter_by_metadata('group', [3])
         self.assertEqual(obs.shape, (0, 8))
-        obs = self.test2.filter_by_metadata('group', 3, negate=True)
+        obs = self.test2.filter_by_metadata('group', [3], negate=True)
         assert_experiment_equal(obs, self.test2)
 
         # all samples are filtered
@@ -82,9 +82,9 @@ class FilteringTests(Tests):
 
     def test_filter_by_metadata_feature_edge_cases(self):
         # none filtered
-        obs = self.test2.filter_by_metadata('oxygen', 'facultative', axis=1)
+        obs = self.test2.filter_by_metadata('oxygen', ['facultative'], axis=1)
         self.assertEqual(obs.shape, (9, 0))
-        obs = self.test2.filter_by_metadata('oxygen', 'facultative', axis=1, negate=True)
+        obs = self.test2.filter_by_metadata('oxygen', ['facultative'], axis=1, negate=True)
         assert_experiment_equal(obs, self.test2)
 
     def test_filter_by_metadata_feature(self):
@@ -93,7 +93,7 @@ class FilteringTests(Tests):
                             sparse=sparse, normalize=None)
             # only filter samples with id bewtween 3 and 7.
             obs = test2.filter_by_metadata(
-                'oxygen', 'anaerobic', axis=1, inplace=inplace)
+                'oxygen', ['anaerobic'], axis=1, inplace=inplace)
             self.assertEqual(obs.shape, (9, 2))
             self.assertEqual(
                 obs.feature_metadata.index.tolist(),
@@ -210,6 +210,7 @@ class FilteringTests(Tests):
         exp = self.test1.filter_ids(badsamples, axis=0, negate=True, inplace=True)
         self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)
         self.assertIs(exp, self.test1)
+
 
 if __name__ == '__main__':
     main()

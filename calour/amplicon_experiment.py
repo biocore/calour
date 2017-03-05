@@ -7,7 +7,7 @@ amplicon experiment (:mod:`calour.amplicon_experiment`)
 Classes
 ^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    AmpliconExperiment
 '''
@@ -33,6 +33,45 @@ logger = getLogger(__name__)
 
 
 class AmpliconExperiment(Experiment):
+    '''This class contains the data for a experiment or a meta experiment.
+
+    Parameters
+    ----------
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : :class:`pandas.DataFrame`
+        The metadata on the samples
+    feature_metadata : :class:`pandas.DataFrame`
+        The metadata on the features
+    description : str
+        name of experiment
+    sparse : bool
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
+
+    Attributes
+    ----------
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : :class:`pandas.DataFrame`
+        The metadata on the samples
+    feature_metadata : :class:`pandas.DataFrame`
+        The metadata on the features
+    exp_metadata : dict
+        metadata about the experiment (data md5, filenames, etc.)
+    shape : tuple of (int, int)
+        the dimension of data
+    sparse : bool
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+    description : str
+        name of the experiment
+
+    See Also
+    --------
+    Experiment
+    '''
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'AmpliconExperiment %s with %d samples, %d features' % (
@@ -169,13 +208,14 @@ class AmpliconExperiment(Experiment):
 
     def plot_sort(exp, field=None, **kwargs):
         '''Plot bacteria after sorting by field
+
         This is a convenience wrapper for plot()
-        Note: if sample_field is in **kwargs, use it as labels after sorting using field
 
         Parameters
         ----------
         field : str or None (optional)
             The field to sort samples by before plotting
+
         '''
         if field is not None:
             newexp = exp.sort_samples(field)

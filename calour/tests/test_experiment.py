@@ -16,6 +16,7 @@ import pandas.util.testing as pdt
 from scipy import sparse
 
 from calour._testing import Tests, assert_experiment_equal
+from calour.util import _convert_axis_name
 import calour as ca
 
 
@@ -38,14 +39,14 @@ class ExperimentTests(Tests):
     def test_convert_axis_name_other_func(self):
         def foo(exp, inplace=True):
             return inplace
-        ca.Experiment.foo = ca.Experiment._convert_axis_name(foo)
+        ca.Experiment.foo = _convert_axis_name(foo)
         self.assertEqual(self.test1.foo(), True)
 
     def test_convert_axis_name(self):
         def foo(exp, axis=1, inplace=True):
             return axis, inplace
 
-        ca.Experiment.foo = ca.Experiment._convert_axis_name(foo)
+        ca.Experiment.foo = _convert_axis_name(foo)
 
         for i in (0, 's', 'sample', 'samples'):
             obs = self.test1.foo(axis=i)
@@ -213,6 +214,7 @@ class ExperimentTests(Tests):
         exp = ca.Experiment.from_pandas(df)
         res = exp.to_pandas()
         pdt.assert_frame_equal(res, df)
+
 
 if __name__ == "__main__":
     main()

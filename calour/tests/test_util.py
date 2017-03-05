@@ -70,5 +70,6 @@ class IOTests(Tests):
         self.assertEqual(res, 'na')
         shutil.rmtree(d)
 
+
 if __name__ == "__main__":
     main()

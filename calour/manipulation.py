@@ -7,7 +7,7 @@ manipulation (:mod:`calour.manipulation`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    join_fields
    join_experiments
@@ -26,14 +26,13 @@ from logging import getLogger
 import pandas as pd
 import numpy as np
 
-from . import Experiment
+from .experiment import Experiment
 
 
 logger = getLogger(__name__)
 
 
-@Experiment._convert_axis_name
-def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplace=True):
+def join_fields(exp, field1, field2, newname=None, axis=0, sep='_', inplace=True):
     '''Join two sample metadata fields into a single new field
 
     Parameters
@@ -44,10 +43,10 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
         Name of the second sample metadata field to join
     newname : str or None (optional)
         name of the new (joined) sample metadata field
-        None (default) to name it as field1-field2
+        None (default) to name it as field1 + sep + field2
     axis : int
         0 (default) to modify sample metadata fields, 1 to modify feature metadata fields
-    separator : str (optional)
+    sep : str (optional)
         The separator between the values of the two fields when joining
     inplace : bool (optional)
         True (default) to add in current experiment, False to create a new Experiment
@@ -76,13 +75,13 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
 
     # get the new column name
     if newname is None:
-        newname = field1 + separator + field2
+        newname = field1 + sep + field2
 
     if newname in metadata.columns:
         raise ValueError('new field name %s alreay in metadata. Please use different newname value' % newname)
 
     # add the new column
-    newcol = [str(i) + separator + str(j) for i, j in zip(metadata[field1], metadata[field2])]
+    newcol = [str(i) + sep + str(j) for i, j in zip(metadata[field1], metadata[field2])]
     if axis == 0:
         newexp.sample_metadata[newname] = newcol
     else:
@@ -91,18 +90,7 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
     return newexp
 
 
-def merge_obs_tax(exp, tax_level=3, method='sum'):
-    '''
-    merge all observations with identical taxonomy (at level tax_level) by summing the values per sample
-    '''
-
-
-def _collapse_obs(exp, groups, method='sum'):
-    '''
-    collapse the observations based on values in groups (list of lists)
-    '''
-
-
+@Experiment._record_sig
 def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     '''Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field
     Methods for merge (value for each observation) are:
@@ -170,12 +158,7 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     return newexp
 
 
-def add_observation(exp, obs_id, data=None):
-    '''
-    add an observation to the experiment. fill the data with 0 if values is none, or with the values of data
-    '''
-
-
+@Experiment._record_sig
 def join_experiments(exp, other, orig_field_name='orig_exp', prefixes=None):
     '''Join two Experiment objects into one.
 

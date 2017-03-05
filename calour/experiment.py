@@ -1,5 +1,5 @@
 '''
-Experiment (:mod:`calour.experiment`)
+experiment (:mod:`calour.experiment`)
 =====================================
 
 .. currentmodule:: calour.experiment
@@ -7,14 +7,14 @@ Experiment (:mod:`calour.experiment`)
 Classes
 ^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    Experiment
 
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    add_functions
 '''
@@ -50,27 +50,27 @@ class Experiment:
 
     Parameters
     ----------
-    data : ``numpy.array`` or ``scipy.sparse``
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : ``pandas.DataFrame``
+    sample_metadata : :class:`pandas.DataFrame`
         The metadata on the samples
-    feature_metadata : ``pandas.DataFrame``
+    feature_metadata : :class:`pandas.DataFrame`
         The metadata on the features
     description : str
         name of experiment
-    sparse : bool
-        store the data array in sparse (``scipy.sparse.csr_matrix``) matrix
-        or numpy array
+    sparse : :class:`bool`
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
 
     Attributes
     ----------
-    data : ``numpy.array`` or ``scipy.sparse``
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : ``pandas.DataFrame``
+    sample_metadata : :class:`pandas.DataFrame`
         The metadata on the samples
-    feature_metadata : ``pandas.DataFrame``
+    feature_metadata : :class:`pandas.DataFrame`
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
@@ -80,6 +80,10 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
+
+    See Also
+    --------
+    AmpliconExperiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -120,7 +124,9 @@ class Experiment:
     def __eq__(self, other):
         '''Check equality.
 
-        Need to check sparsity and do the conversion if needed first.
+        It compares ``data``, ``sample_metadata``, and
+        ``feature_metadata`` attributes.  to check sparsity and do
+        the conversion if needed first.
         '''
         if self.sparse is True:
             data = self.data.toarray()
@@ -138,38 +144,13 @@ class Experiment:
         return not (self == other)
 
     def copy(self):
-        return deepcopy(self)
+        '''Copy the object.
 
-    @staticmethod
-    def _convert_axis_name(func):
-        '''Convert str value of axis to 0/1.
-
-        This allows the decorated function with ``axis`` parameter
-        to accept "sample" and "feature" as value for ``axis`` parameter.
-
-        This should be always the closest decorator to the function if
-        you have multiple decorators for this function.
+        Returns
+        -------
+        Experiment
         '''
-        conversion = {'sample': 0,
-                      's': 0,
-                      'samples': 0,
-                      'feature': 1,
-                      'f': 1,
-                      'features': 1}
-
-        @wraps(func)
-        def inner(*args, **kwargs):
-            sig = inspect.signature(func)
-            ba = sig.bind(*args, **kwargs).arguments
-            v = ba.get('axis', None)
-            if v is None:
-                return func(*args, **kwargs)
-            if isinstance(v, str):
-                ba['axis'] = conversion[v.lower()]
-            elif v not in {0, 1}:
-                raise ValueError('unknown axis `%r`' % v)
-            return func(**ba)
-        return inner
+        return deepcopy(self)
 
     @staticmethod
     def _record_sig(func):
@@ -242,7 +223,6 @@ class Experiment:
 
     @property
     def shape(self):
-        '''Get the number of samples by features in the experiment. '''
         return self.get_data().shape
 
     def reorder(self, new_order, axis=0, inplace=False):
@@ -333,9 +313,12 @@ class Experiment:
 
     @classmethod
     def from_pandas(cls, df, exp=None):
-        '''Convert a Pandas DataFrame into an experiment
-        Can use an existing calour Experimebt (exp) (if supplied) to obtain feature and sample metadata.
-        Note currently only works with non-sparse DataFrame
+        '''Convert a Pandas DataFrame into an experiment.
+
+        Can use an existing calour Experimebt (exp) (if supplied) to
+        obtain feature and sample metadata.  Note currently only works
+        with non-sparse DataFrame
+
         Parameters
         ----------
         df : Pandas.DataFrame
@@ -346,7 +329,9 @@ class Experiment:
 
         Returns
         -------
-        ``Experiment`` with non-sparse data
+        Experiment
+            with non-sparse data
+
         '''
         if exp is None:
             sample_metadata = pd.DataFrame(index=df.index)

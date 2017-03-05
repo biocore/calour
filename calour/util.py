@@ -7,7 +7,7 @@ utilities (:mod:`calour.util`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    set_log_level
 '''
@@ -21,13 +21,49 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from functools import wraps
 import hashlib
+import inspect
 import configparser
 from pkg_resources import resource_filename
 
 import scipy
 
+
 logger = getLogger(__name__)
+
+
+def _convert_axis_name(func):
+    '''Convert str value of axis to 0/1.
+
+    This allows the decorated function with ``axis`` parameter
+    to accept "sample" and "feature" as value for ``axis`` parameter.
+
+    This should be always the closest decorator to the function if
+    you have multiple decorators for this function.
+    '''
+    conversion = {'sample': 0,
+                  's': 0,
+                  'samples': 0,
+                  'feature': 1,
+                  'f': 1,
+                  'features': 1}
+
+    @wraps(func)
+    def inner(*args, **kwargs):
+        sig = inspect.signature(func)
+        ba = sig.bind(*args, **kwargs)
+        param = ba.arguments
+        v = param.get('axis', None)
+        if v is None:
+            return func(*args, **kwargs)
+        if isinstance(v, str):
+            param['axis'] = conversion[v.lower()]
+        elif v not in {0, 1}:
+            raise ValueError('unknown axis `%r`' % v)
+
+        return func(*ba.args, **ba.kwargs)
+    return inner
 
 
 def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=False):

@@ -151,5 +151,6 @@ class IOTests(Tests):
         assert_experiment_equal(newexp, exp, ignore_md_fields=['#SampleID.1'])
         shutil.rmtree(d)
 
+
 if __name__ == "__main__":
     main()

@@ -16,7 +16,7 @@ import calour as ca
 from calour._testing import Tests, assert_experiment_equal
 
 
-class IOTests(Tests):
+class MTests(Tests):
     def setUp(self):
         super().setUp()
         self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
@@ -32,7 +32,7 @@ class IOTests(Tests):
     def test_join_fields_complex(self):
         # test join feature fields with new field name, separator and inplace
         exp = deepcopy(self.test1)
-        newexp = exp.join_fields('taxonomy', 'taxonomy', newname='test', axis=1, separator=';', inplace=True)
+        newexp = exp.join_fields('taxonomy', 'taxonomy', newname='test', axis=1, sep=';', inplace=True)
         self.assertIs(newexp, exp)
         self.assertIn('test', exp.feature_metadata.columns)
         self.assertNotIn('test', exp.sample_metadata.columns)
@@ -47,7 +47,7 @@ class IOTests(Tests):
         newexp = self.test1.join_experiments(texp, prefixes=('c1', ''))
         self.assertEqual(len(newexp.feature_metadata), len(self.test1.feature_metadata))
         self.assertEqual(len(newexp.sample_metadata), len(self.test1.sample_metadata)*2)
-        fexp = newexp.filter_samples('orig_exp', 't2')
+        fexp = newexp.filter_samples('orig_exp', ['t2'])
         assert_experiment_equal(fexp, texp, ignore_md_fields=['orig_exp'])
 
     def test_merge_identical(self):

@@ -32,7 +32,7 @@ class TestTransforming(Tests):
 
     def test_transform_real(self):
         obs = self.test2.transform([log_n, scale], inplace=True,
-                                   log_n__n=2, scale__axis=0)
+                                   log_n__n=2, scale__axis=1)
         self.assertIs(obs, self.test2)
         assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
         # column 1, 2 and 6 are constant, so their variances are 0
@@ -112,7 +112,7 @@ class TestTransforming(Tests):
         exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         bad_features = [6, 7]
         features = [exp.feature_metadata.index[cbad] for cbad in bad_features]
-        newexp = exp.normalize_by_subset_features(features, 10000, exclude=True, inplace=False)
+        newexp = exp.normalize_by_subset_features(features, 10000, negate=True, inplace=False)
         # see the mean of the features we want (without 6,7) is 10k
         good_features = list(set(range(exp.data.shape[1])).difference(set(bad_features)))
         assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)

@@ -7,7 +7,7 @@ analysis (:mod:`calour.analysis`)
 Functions
 ^^^^^^^^^
 .. autosummary::
-   :toctree: _autosummary
+   :toctree: generated
 
    correlation
    diff_abundance
@@ -29,12 +29,14 @@ import pandas as pd
 from scipy import stats
 from statsmodels.sandbox.stats.multicomp import multipletests
 
+from .experiment import Experiment
 from . import dsfdr
 
 
 logger = getLogger(__name__)
 
 
+@Experiment._record_sig
 def correlation(exp, field, method='spearman', nonzero=False, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''Find features with correlation to a numeric metadata field
     With permutation based p-values and multiple hypothesis correction
@@ -93,6 +95,7 @@ def correlation(exp, field, method='spearman', nonzero=False, transform='rankdat
     return _new_experiment_from_pvals(exp, keep, odif, pvals)
 
 
+@Experiment._record_sig
 def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''
     test the differential expression between 2 groups (val1 and val2 in field field)
@@ -162,6 +165,7 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     return _new_experiment_from_pvals(exp, keep, odif, pvals)
 
 
+@Experiment._record_sig
 def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''Test the differential expression between multiple sample groups using the Kruskal Wallis test.
     uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.
@@ -200,6 +204,7 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
     return _new_experiment_from_pvals(exp, keep, odif, pvals)
 
 
+@Experiment._record_sig
 def _new_experiment_from_pvals(exp, keep, odif, pvals):
     '''Combine the pvalues and effect size into a new experiment.
     Keep only the significant features, sort the features by the effect size
@@ -275,7 +280,9 @@ def get_term_features(seqs, sequence_annotations):
 
 
 def relative_enrichment(exp, features, feature_terms):
-    '''Get the list of enriched terms in features compared to all features in exp, given uneven distribtion of number of terms per feature
+    '''Get the list of enriched terms in features compared to all features in exp.
+
+    given uneven distribtion of number of terms per feature
 
     Parameters
     ----------
@@ -285,10 +292,8 @@ def relative_enrichment(exp, features, feature_terms):
         The features (from exp) to test for enrichmnt
     feature_terms : dict of {feature: list of terms}
         The terms associated with each feature in exp
-        feature (key) : str
-            the feature (out of exp) to which the terms relate
-        feature_terms (value) : list of str or int
-            the terms associated with this feature
+        feature (key) : str the feature (out of exp) to which the terms relate
+        feature_terms (value) : list of str or int the terms associated with this feature
 
     Returns
     -------
