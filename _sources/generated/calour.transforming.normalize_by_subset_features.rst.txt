@@ -1,0 +1,6 @@
+calour.transforming.normalize_by_subset_features
+================================================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: normalize_by_subset_features

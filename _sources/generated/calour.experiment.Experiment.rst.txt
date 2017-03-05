@@ -29,7 +29,6 @@ calour.experiment.Experiment
          
          
          
-         
          Experiment.binarize
          
          Experiment.cluster_data
@@ -84,8 +83,6 @@ calour.experiment.Experiment
          
          Experiment.merge_identical
          
-         Experiment.merge_obs_tax
-         
          Experiment.multipletests
          
          Experiment.nlargest
@@ -116,8 +113,6 @@ calour.experiment.Experiment
          
          Experiment.save_biom
          
-         Experiment.save_commands
-         
          Experiment.save_fasta
          
          Experiment.save_feature_metadata
@@ -126,15 +121,13 @@ calour.experiment.Experiment
          
          Experiment.scale
          
-         Experiment.serialize
-         
          Experiment.sort_abundance
          
          Experiment.sort_by_data
          
          Experiment.sort_by_metadata
          
-         Experiment.sort_center_mass
+         Experiment.sort_centroid
          
          Experiment.sort_samples
          

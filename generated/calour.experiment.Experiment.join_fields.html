@@ -142,7 +142,7 @@
 <h1>calour.experiment.Experiment.join_fields<a class="headerlink" href="#calour-experiment-experiment-join-fields" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.join_fields">
-<code class="descclassname">Experiment.</code><code class="descname">join_fields</code><span class="sig-paren">(</span><em>exp</em>, <em>field1</em>, <em>field2</em>, <em>newname=None</em>, <em>axis=0</em>, <em>separator='_'</em>, <em>inplace=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L172"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.join_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">join_fields</code><span class="sig-paren">(</span><em>exp</em>, <em>field1</em>, <em>field2</em>, <em>newname=None</em>, <em>axis=0</em>, <em>sep='_'</em>, <em>inplace=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.join_fields" title="Permalink to this definition">¶</a></dt>
 <dd><p>Join two sample metadata fields into a single new field</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -159,13 +159,13 @@
 <p><strong>newname</strong> : str or None (optional)</p>
 <blockquote>
 <div><p>name of the new (joined) sample metadata field
-None (default) to name it as field1-field2</p>
+None (default) to name it as field1 + sep + field2</p>
 </div></blockquote>
 <p><strong>axis</strong> : int</p>
 <blockquote>
 <div><p>0 (default) to modify sample metadata fields, 1 to modify feature metadata fields</p>
 </div></blockquote>
-<p><strong>separator</strong> : str (optional)</p>
+<p><strong>sep</strong> : str (optional)</p>
 <blockquote>
 <div><p>The separator between the values of the two fields when joining</p>
 </div></blockquote>

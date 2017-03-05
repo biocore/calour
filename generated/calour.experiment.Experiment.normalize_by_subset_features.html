@@ -142,7 +142,7 @@
 <h1>calour.experiment.Experiment.normalize_by_subset_features<a class="headerlink" href="#calour-experiment-experiment-normalize-by-subset-features" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.normalize_by_subset_features">
-<code class="descclassname">Experiment.</code><code class="descname">normalize_by_subset_features</code><span class="sig-paren">(</span><em>exp</em>, <em>features</em>, <em>total=10000</em>, <em>exclude=True</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/transforming.py#L197"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.normalize_by_subset_features" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">normalize_by_subset_features</code><span class="sig-paren">(</span><em>exp</em>, <em>features</em>, <em>total=10000</em>, <em>negate=True</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.normalize_by_subset_features" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize each sample by their total sums without a list of features</p>
 <p>Normalizes all features (including in the exclude list) by the
 total sum calculated without the excluded features. This is to
@@ -159,13 +159,13 @@ features that you think are not changing across samples.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>features</strong> : list of str</p>
 <blockquote>
-<div><p>The features to exclude (or include if exclude=False)</p>
+<div><p>The feature IDs to exclude (or include if negate=False)</p>
 </div></blockquote>
 <p><strong>total</strong> : int (optional)</p>
 <blockquote>
 <div><p>The total abundance for the non-excluded features per sample</p>
 </div></blockquote>
-<p><strong>exclude</strong> : bool (optional)</p>
+<p><strong>negate</strong> : bool (optional)</p>
 <blockquote>
 <div><p>True (default) to calculate normalization factor without features in features list.
 False to calculate normalization factor only with features in features list.</p>

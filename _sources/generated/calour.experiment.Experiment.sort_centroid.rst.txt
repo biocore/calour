@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.sort_centroid
+==========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.sort_centroid

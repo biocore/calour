@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="calour.transforming.scale" href="calour.transforming.scale.html" />
+    <link rel="next" title="calour.transforming.normalize_by_subset_features" href="calour.transforming.normalize_by_subset_features.html" />
     <link rel="prev" title="transforming (calour.transforming)" href="../transforming.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -144,7 +144,7 @@
 <h1>calour.transforming.normalize<a class="headerlink" href="#calour-transforming-normalize" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.transforming.normalize">
-<code class="descclassname">calour.transforming.</code><code class="descname">normalize</code><span class="sig-paren">(</span><em>exp</em>, <em>total=10000</em>, <em>axis=1</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/transforming.py#L38"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.transforming.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.transforming.</code><code class="descname">normalize</code><span class="sig-paren">(</span><em>exp</em>, <em>total=10000</em>, <em>axis=0</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L164"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.transforming.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -157,7 +157,7 @@
 </div></blockquote>
 <p><strong>axis</strong> : int (optional)</p>
 <blockquote>
-<div><p>the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature</p>
+<div><p>the axis to normalize. 0 (default) is normalize each sample, 1 to normalize each feature</p>
 </div></blockquote>
 <p><strong>inplace</strong> : bool (optional)</p>
 <blockquote>

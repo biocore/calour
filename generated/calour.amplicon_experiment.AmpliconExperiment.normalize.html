@@ -142,7 +142,7 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.normalize<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-normalize" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.normalize">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">normalize</code><span class="sig-paren">(</span><em>exp</em>, <em>total=10000</em>, <em>axis=1</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/transforming.py#L38"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">normalize</code><span class="sig-paren">(</span><em>exp</em>, <em>total=10000</em>, <em>axis=0</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -155,7 +155,7 @@
 </div></blockquote>
 <p><strong>axis</strong> : int (optional)</p>
 <blockquote>
-<div><p>the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature</p>
+<div><p>the axis to normalize. 0 (default) is normalize each sample, 1 to normalize each feature</p>
 </div></blockquote>
 <p><strong>inplace</strong> : bool (optional)</p>
 <blockquote>

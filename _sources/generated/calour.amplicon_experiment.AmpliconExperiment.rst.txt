@@ -29,7 +29,6 @@ calour.amplicon_experiment.AmpliconExperiment
          
          
          
-         
          AmpliconExperiment.binarize
          
          AmpliconExperiment.cluster_data
@@ -90,8 +89,6 @@ calour.amplicon_experiment.AmpliconExperiment
          
          AmpliconExperiment.merge_identical
          
-         AmpliconExperiment.merge_obs_tax
-         
          AmpliconExperiment.multipletests
          
          AmpliconExperiment.nlargest
@@ -122,8 +119,6 @@ calour.amplicon_experiment.AmpliconExperiment
          
          AmpliconExperiment.save_biom
          
-         AmpliconExperiment.save_commands
-         
          AmpliconExperiment.save_fasta
          
          AmpliconExperiment.save_feature_metadata
@@ -132,15 +127,13 @@ calour.amplicon_experiment.AmpliconExperiment
          
          AmpliconExperiment.scale
          
-         AmpliconExperiment.serialize
-         
          AmpliconExperiment.sort_abundance
          
          AmpliconExperiment.sort_by_data
          
          AmpliconExperiment.sort_by_metadata
          
-         AmpliconExperiment.sort_center_mass
+         AmpliconExperiment.sort_centroid
          
          AmpliconExperiment.sort_samples
          

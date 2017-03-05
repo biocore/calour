@@ -142,7 +142,7 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.cluster_data<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-cluster-data" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.cluster_data">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">cluster_data</code><span class="sig-paren">(</span><em>exp</em>, <em>transform=None</em>, <em>axis=0</em>, <em>metric='euclidean'</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L195"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">cluster_data</code><span class="sig-paren">(</span><em>exp</em>, <em>transform=None</em>, <em>axis=1</em>, <em>metric='euclidean'</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster the samples/features.</p>
 <p>Reorder the features/samples so that ones with similar behavior (pattern
 across samples/features) are close to each other</p>
@@ -152,7 +152,7 @@ across samples/features) are close to each other</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>aixs</strong> : 0 or 1 (optional)</p>
 <blockquote>
-<div><p>0 (default) means clustering features; 1 means clustering samples</p>
+<div><p>1 (default) means clustering features; 0 means clustering samples</p>
 </div></blockquote>
 <p><strong>transform</strong> : Callable</p>
 <blockquote>

@@ -142,7 +142,7 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-filter-by-metadata" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">filter_by_metadata</code><span class="sig-paren">(</span><em>exp</em>, <em>field</em>, <em>pick</em>, <em>axis=0</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L195"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">filter_by_metadata</code><span class="sig-paren">(</span><em>exp</em>, <em>field</em>, <em>select</em>, <em>axis=0</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter samples or features by metadata.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -152,9 +152,11 @@
 <blockquote>
 <div><p>the column name of the sample or feature metadata tables</p>
 </div></blockquote>
-<p><strong>pick</strong> : list, tuple, or Callable</p>
+<p><strong>select</strong> : list, tuple, or Callable</p>
 <blockquote>
-<div><p>pick what to keep based on the value in the specified field</p>
+<div><p>select what to keep based on the value in the specified field.
+if it is a callable, it accepts a 1d array and return a
+boolean array of the same length.</p>
 </div></blockquote>
 <p><strong>axis</strong> : 0 or 1, optional</p>
 <blockquote>
@@ -162,7 +164,7 @@
 </div></blockquote>
 <p><strong>negate</strong> : bool, optional</p>
 <blockquote>
-<div><p>discard instead of keep the pick if set to <code class="docutils literal"><span class="pre">True</span></code></p>
+<div><p>discard instead of keep the select if set to <code class="docutils literal"><span class="pre">True</span></code></p>
 </div></blockquote>
 <p><strong>inplace</strong> : bool, optional</p>
 <blockquote>

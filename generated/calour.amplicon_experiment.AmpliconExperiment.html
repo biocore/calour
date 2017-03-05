@@ -253,7 +253,7 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_by_data.html#calour.amplicon_experiment.AmpliconExperiment.filter_by_data" title="calour.amplicon_experiment.AmpliconExperiment.filter_by_data"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_data</span></code></a>(exp,&nbsp;predicate[,&nbsp;axis,&nbsp;...])</td>
 <td>Filter samples or features by data.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_metadata</span></code></a>(exp,&nbsp;field,&nbsp;pick[,&nbsp;axis,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.filter_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">filter_by_metadata</span></code></a>(exp,&nbsp;field,&nbsp;select[,&nbsp;...])</td>
 <td>Filter samples or features by metadata.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_fasta.html#calour.amplicon_experiment.AmpliconExperiment.filter_fasta" title="calour.amplicon_experiment.AmpliconExperiment.filter_fasta"><code class="xref py py-obj docutils literal"><span class="pre">filter_fasta</span></code></a>(exp,&nbsp;filename[,&nbsp;negate,&nbsp;inplace])</td>
@@ -313,56 +313,50 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.merge_identical.html#calour.amplicon_experiment.AmpliconExperiment.merge_identical" title="calour.amplicon_experiment.AmpliconExperiment.merge_identical"><code class="xref py py-obj docutils literal"><span class="pre">merge_identical</span></code></a>(exp,&nbsp;field[,&nbsp;method,&nbsp;axis,&nbsp;...])</td>
 <td>Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.merge_obs_tax.html#calour.amplicon_experiment.AmpliconExperiment.merge_obs_tax" title="calour.amplicon_experiment.AmpliconExperiment.merge_obs_tax"><code class="xref py py-obj docutils literal"><span class="pre">merge_obs_tax</span></code></a>(exp[,&nbsp;tax_level,&nbsp;method])</td>
-<td>merge all observations with identical taxonomy (at level tax_level) by summing the values per sample</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.multipletests.html#calour.amplicon_experiment.AmpliconExperiment.multipletests" title="calour.amplicon_experiment.AmpliconExperiment.multipletests"><code class="xref py py-obj docutils literal"><span class="pre">multipletests</span></code></a>(pvals[,&nbsp;alpha,&nbsp;method,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.multipletests.html#calour.amplicon_experiment.AmpliconExperiment.multipletests" title="calour.amplicon_experiment.AmpliconExperiment.multipletests"><code class="xref py py-obj docutils literal"><span class="pre">multipletests</span></code></a>(pvals[,&nbsp;alpha,&nbsp;method,&nbsp;...])</td>
 <td>test results and p-value correction for multiple tests</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.nlargest.html#calour.amplicon_experiment.AmpliconExperiment.nlargest" title="calour.amplicon_experiment.AmpliconExperiment.nlargest"><code class="xref py py-obj docutils literal"><span class="pre">nlargest</span></code></a>(n,&nbsp;iterable[,&nbsp;key])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.nlargest.html#calour.amplicon_experiment.AmpliconExperiment.nlargest" title="calour.amplicon_experiment.AmpliconExperiment.nlargest"><code class="xref py py-obj docutils literal"><span class="pre">nlargest</span></code></a>(n,&nbsp;iterable[,&nbsp;key])</td>
 <td>Find the n largest elements in a dataset.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize.html#calour.amplicon_experiment.AmpliconExperiment.normalize" title="calour.amplicon_experiment.AmpliconExperiment.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize.html#calour.amplicon_experiment.AmpliconExperiment.normalize" title="calour.amplicon_experiment.AmpliconExperiment.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
 <td>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features.html#calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features" title="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features.html#calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features" title="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
 <td>Normalize each sample by their total sums without a list of features</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot.html#calour.amplicon_experiment.AmpliconExperiment.plot" title="calour.amplicon_experiment.AmpliconExperiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([databases,&nbsp;feature_field])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot.html#calour.amplicon_experiment.AmpliconExperiment.plot" title="calour.amplicon_experiment.AmpliconExperiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([databases,&nbsp;feature_field])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_hist.html#calour.amplicon_experiment.AmpliconExperiment.plot_hist" title="calour.amplicon_experiment.AmpliconExperiment.plot_hist"><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code></a>(exp,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_hist.html#calour.amplicon_experiment.AmpliconExperiment.plot_hist" title="calour.amplicon_experiment.AmpliconExperiment.plot_hist"><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code></a>(exp,&nbsp;**kwargs)</td>
 <td>Plot histogram of all the values in data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_sort.html#calour.amplicon_experiment.AmpliconExperiment.plot_sort" title="calour.amplicon_experiment.AmpliconExperiment.plot_sort"><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code></a>(exp[,&nbsp;field])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_sort.html#calour.amplicon_experiment.AmpliconExperiment.plot_sort" title="calour.amplicon_experiment.AmpliconExperiment.plot_sort"><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code></a>(exp[,&nbsp;field])</td>
 <td>Plot bacteria after sorting by field</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read.html#calour.amplicon_experiment.AmpliconExperiment.read" title="calour.amplicon_experiment.AmpliconExperiment.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(data_file[,&nbsp;sample_metadata_file,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read.html#calour.amplicon_experiment.AmpliconExperiment.read" title="calour.amplicon_experiment.AmpliconExperiment.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(data_file[,&nbsp;sample_metadata_file,&nbsp;...])</td>
 <td>Read the files for the experiment.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read_amplicon.html#calour.amplicon_experiment.AmpliconExperiment.read_amplicon" title="calour.amplicon_experiment.AmpliconExperiment.read_amplicon"><code class="xref py py-obj docutils literal"><span class="pre">read_amplicon</span></code></a>(data_file[,&nbsp;sample_metadata_file])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read_amplicon.html#calour.amplicon_experiment.AmpliconExperiment.read_amplicon" title="calour.amplicon_experiment.AmpliconExperiment.read_amplicon"><code class="xref py py-obj docutils literal"><span class="pre">read_amplicon</span></code></a>(data_file[,&nbsp;sample_metadata_file])</td>
 <td>Load an amplicon experiment.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read_open_ms.html#calour.amplicon_experiment.AmpliconExperiment.read_open_ms" title="calour.amplicon_experiment.AmpliconExperiment.read_open_ms"><code class="xref py py-obj docutils literal"><span class="pre">read_open_ms</span></code></a>(data_file[,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read_open_ms.html#calour.amplicon_experiment.AmpliconExperiment.read_open_ms" title="calour.amplicon_experiment.AmpliconExperiment.read_open_ms"><code class="xref py py-obj docutils literal"><span class="pre">read_open_ms</span></code></a>(data_file[,&nbsp;...])</td>
 <td>Load an OpenMS metabolomics experiment.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.relative_enrichment.html#calour.amplicon_experiment.AmpliconExperiment.relative_enrichment" title="calour.amplicon_experiment.AmpliconExperiment.relative_enrichment"><code class="xref py py-obj docutils literal"><span class="pre">relative_enrichment</span></code></a>(exp,&nbsp;features,&nbsp;feature_terms)</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.relative_enrichment.html#calour.amplicon_experiment.AmpliconExperiment.relative_enrichment" title="calour.amplicon_experiment.AmpliconExperiment.relative_enrichment"><code class="xref py py-obj docutils literal"><span class="pre">relative_enrichment</span></code></a>(exp,&nbsp;features,&nbsp;feature_terms)</td>
 <td>Get the list of enriched terms in features compared to all features in exp.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.reorder.html#calour.amplicon_experiment.AmpliconExperiment.reorder" title="calour.amplicon_experiment.AmpliconExperiment.reorder"><code class="xref py py-obj docutils literal"><span class="pre">reorder</span></code></a>(new_order[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.reorder.html#calour.amplicon_experiment.AmpliconExperiment.reorder" title="calour.amplicon_experiment.AmpliconExperiment.reorder"><code class="xref py py-obj docutils literal"><span class="pre">reorder</span></code></a>(new_order[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Reorder according to indices in the new order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.rescale.html#calour.amplicon_experiment.AmpliconExperiment.rescale" title="calour.amplicon_experiment.AmpliconExperiment.rescale"><code class="xref py py-obj docutils literal"><span class="pre">rescale</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
-<td>Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.rescale.html#calour.amplicon_experiment.AmpliconExperiment.rescale" title="calour.amplicon_experiment.AmpliconExperiment.rescale"><code class="xref py py-obj docutils literal"><span class="pre">rescale</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<td>Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.save.html#calour.amplicon_experiment.AmpliconExperiment.save" title="calour.amplicon_experiment.AmpliconExperiment.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(exp,&nbsp;prefix[,&nbsp;fmt])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.save.html#calour.amplicon_experiment.AmpliconExperiment.save" title="calour.amplicon_experiment.AmpliconExperiment.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(exp,&nbsp;prefix[,&nbsp;fmt])</td>
 <td>Save the experiment data to disk.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.save_biom.html#calour.amplicon_experiment.AmpliconExperiment.save_biom" title="calour.amplicon_experiment.AmpliconExperiment.save_biom"><code class="xref py py-obj docutils literal"><span class="pre">save_biom</span></code></a>(exp,&nbsp;f[,&nbsp;fmt,&nbsp;add_metadata])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.save_biom.html#calour.amplicon_experiment.AmpliconExperiment.save_biom" title="calour.amplicon_experiment.AmpliconExperiment.save_biom"><code class="xref py py-obj docutils literal"><span class="pre">save_biom</span></code></a>(exp,&nbsp;f[,&nbsp;fmt,&nbsp;add_metadata])</td>
 <td>Save experiment to biom format</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.save_commands.html#calour.amplicon_experiment.AmpliconExperiment.save_commands" title="calour.amplicon_experiment.AmpliconExperiment.save_commands"><code class="xref py py-obj docutils literal"><span class="pre">save_commands</span></code></a>(exp,&nbsp;f)</td>
-<td>Save the commands used to generate the exp</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.save_fasta.html#calour.amplicon_experiment.AmpliconExperiment.save_fasta" title="calour.amplicon_experiment.AmpliconExperiment.save_fasta"><code class="xref py py-obj docutils literal"><span class="pre">save_fasta</span></code></a>(exp,&nbsp;f[,&nbsp;seqs])</td>
 <td>Save a list of sequences to fasta.</td>
@@ -376,31 +370,28 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.scale.html#calour.amplicon_experiment.AmpliconExperiment.scale" title="calour.amplicon_experiment.AmpliconExperiment.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Standardize a dataset along an axis</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.serialize.html#calour.amplicon_experiment.AmpliconExperiment.serialize" title="calour.amplicon_experiment.AmpliconExperiment.serialize"><code class="xref py py-obj docutils literal"><span class="pre">serialize</span></code></a>(exp,&nbsp;f)</td>
-<td>Serialize the Experiment object to disk.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_abundance.html#calour.amplicon_experiment.AmpliconExperiment.sort_abundance" title="calour.amplicon_experiment.AmpliconExperiment.sort_abundance"><code class="xref py py-obj docutils literal"><span class="pre">sort_abundance</span></code></a>(exp[,&nbsp;subset,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_abundance.html#calour.amplicon_experiment.AmpliconExperiment.sort_abundance" title="calour.amplicon_experiment.AmpliconExperiment.sort_abundance"><code class="xref py py-obj docutils literal"><span class="pre">sort_abundance</span></code></a>(exp[,&nbsp;subset,&nbsp;inplace])</td>
 <td>Sort features based on their abundance in a subset of the samples.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_data.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_data" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_data"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_data</span></code></a>(exp[,&nbsp;axis,&nbsp;subset,&nbsp;key,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_data.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_data" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_data"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_data</span></code></a>(exp[,&nbsp;axis,&nbsp;subset,&nbsp;key,&nbsp;inplace])</td>
 <td>Sort features based on their mean frequency.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_metadata</span></code></a>(exp,&nbsp;field[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_metadata</span></code></a>(exp,&nbsp;field[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Sort samples or features based on metadata values in the field.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_center_mass.html#calour.amplicon_experiment.AmpliconExperiment.sort_center_mass" title="calour.amplicon_experiment.AmpliconExperiment.sort_center_mass"><code class="xref py py-obj docutils literal"><span class="pre">sort_center_mass</span></code></a>(exp[,&nbsp;transform,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_centroid.html#calour.amplicon_experiment.AmpliconExperiment.sort_centroid" title="calour.amplicon_experiment.AmpliconExperiment.sort_centroid"><code class="xref py py-obj docutils literal"><span class="pre">sort_centroid</span></code></a>(exp[,&nbsp;transform,&nbsp;inplace])</td>
 <td>Sort the features based on the center of mass</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_samples.html#calour.amplicon_experiment.AmpliconExperiment.sort_samples" title="calour.amplicon_experiment.AmpliconExperiment.sort_samples"><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code></a>(exp,&nbsp;field,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_samples.html#calour.amplicon_experiment.AmpliconExperiment.sort_samples" title="calour.amplicon_experiment.AmpliconExperiment.sort_samples"><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code></a>(exp,&nbsp;field,&nbsp;**kwargs)</td>
 <td>Sort samples by field</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy"><code class="xref py py-obj docutils literal"><span class="pre">sort_taxonomy</span></code></a>(exp[,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy"><code class="xref py py-obj docutils literal"><span class="pre">sort_taxonomy</span></code></a>(exp[,&nbsp;inplace])</td>
 <td>Sort the features based on the taxonomy</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.to_pandas.html#calour.amplicon_experiment.AmpliconExperiment.to_pandas" title="calour.amplicon_experiment.AmpliconExperiment.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.to_pandas.html#calour.amplicon_experiment.AmpliconExperiment.to_pandas" title="calour.amplicon_experiment.AmpliconExperiment.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
 <td>Get a pandas dataframe of the abundances Samples are rows, features are columns.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.transform.html#calour.amplicon_experiment.AmpliconExperiment.transform" title="calour.amplicon_experiment.AmpliconExperiment.transform"><code class="xref py py-obj docutils literal"><span class="pre">transform</span></code></a>(exp[,&nbsp;steps,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.transform.html#calour.amplicon_experiment.AmpliconExperiment.transform" title="calour.amplicon_experiment.AmpliconExperiment.transform"><code class="xref py py-obj docutils literal"><span class="pre">transform</span></code></a>(exp[,&nbsp;steps,&nbsp;inplace])</td>
 <td>Chain transformations together.</td>
 </tr>
 </tbody>
