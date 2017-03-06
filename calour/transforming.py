@@ -57,6 +57,10 @@ def normalize(exp, total=10000, axis=0, inplace=False):
     ``Experiment``
         the normalized experiment
     '''
+    if isinstance(total, bool):
+        raise ValueError('Normalization total (%s) not numeric' % total)
+    if total <= 0:
+        raise ValueError('Normalization total (%s) must be positive' % total)
     if not inplace:
         exp = deepcopy(exp)
     exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
@@ -84,6 +88,8 @@ def rescale(exp, total=10000, axis=0, inplace=False):
     ``Experiment``
         the normalized experiment
     '''
+    if isinstance(total, bool):
+        raise ValueError('Rescaling total (%s) not numeric' % total)
     if not inplace:
         exp = deepcopy(exp)
     current_mean = np.mean(exp.data.sum(axis=1-axis))

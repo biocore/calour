@@ -117,7 +117,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
-            axis=None, rect=None,  transform=log_n, **kwargs):
+            plot_axis=None, rect=None,  transform=log_n, **kwargs):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
@@ -172,10 +172,10 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         logger.debug('transform exp with %r with param %r' % (transform, kwargs))
         data = transform(exp, inplace=False, **kwargs).data
 
-    if axis is None:
+    if plot_axis is None:
         fig, ax = plt.subplots()
     else:
-        fig, ax = axis.get_figure(), axis
+        fig, ax = plot_axis.get_figure(), plot_axis
 
     # step 2. plot heatmap.
     # init the default colormap
@@ -350,7 +350,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     ``PlottingGUI``
     '''
     gui_obj = _create_plot_gui(exp, gui, databases)
-    exp.heatmap(axis=gui_obj.axis, **kwargs)
+    exp.heatmap(plot_axis=gui_obj.axis, **kwargs)
     barwidth = 0.3
     barspace = 0.05
     label = color_bar_label
