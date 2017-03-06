@@ -287,6 +287,8 @@ def _freq_ratio(x, ratio=2):
 @Experiment._record_sig
 def filter_samples(exp, field, values, negate=False, inplace=False):
     '''Shortcut for filtering samples.'''
+    if isinstance(values, str):
+        values = [values]
     return filter_by_metadata(exp, field=field, select=values,
                               negate=negate, inplace=inplace)
 
