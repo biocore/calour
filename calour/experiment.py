@@ -234,8 +234,9 @@ class Experiment:
         ----------
         new_order : Iterable of int or boolean mask
             the order of new indices
-        axis : 0 for samples or 1 for features
-            the axis where the reorder occurs
+        axis : 0, 1, 's', or 'f'
+            the axis where the reorder occurs. 0 or 's' means reodering samples;
+            1 or 'f' means reordering features.
         inplace : bool, optional
             reorder in place.
 

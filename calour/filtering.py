@@ -51,8 +51,8 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
     field : str
         The name of the column in samples metadata table. This column
         should has categorical values
-    axis : 0 / 1 (optional)
-        0 (default) to filter samples, 1 to filter features
+    axis : 0, 1, 's', or 'f'
+        0 or 's' (default) to filter samples; 1 or 'f' to filter features
     num_keep : int or None (optional)
         None (default) to downsample to minimal group size.
         int : downsample to num_keep samples/features per group, drop values
@@ -107,8 +107,8 @@ def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
         select what to keep based on the value in the specified field.
         if it is a callable, it accepts a 1d array and return a
         boolean array of the same length.
-    axis : 0 or 1, optional
-        the field is on samples (0) or features (1) metadata
+    axis : 0, 1, 's', or 'f', optional
+        the field is on samples (0 or 's') or features (1 or 'f') metadata
     negate : bool, optional
         discard instead of keep the select if set to ``True``
     inplace : bool, optional
@@ -152,7 +152,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
         'unique_cut': calls ``_unique_cut``,
         'mean_abundance': calls ``_mean_abundance``,
         'prevalence': calls ``_prevalence``
-    axis : 0 or 1
+    axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
     negate : bool
         negate the predicate for selection
@@ -356,8 +356,8 @@ def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
     ----------
     ids : iterable of str
         the feature/sample ids to filter (index values)
-    axis : int (optional)
-        1 (default) to filter features, 0 to filter samples
+    axis : 0, 1, 's', or 'f', optional
+        1 or 'f' (default) to filter features; 0 or 's' to filter samples
     negate : bool (optional)
         negate the filtering
     inplace : bool (optional)
