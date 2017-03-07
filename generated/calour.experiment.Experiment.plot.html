@@ -143,7 +143,67 @@
 <dl class="method">
 <dt id="calour.experiment.Experiment.plot">
 <code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=('dbbact'</em>, <em>)</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the main heatmap and its associated axes.</p>
+<dd><p>Plot the interactive heatmap and its associated axes.</p>
+<p>The heatmap is interactive and can be dynamically updated with
+following key and mouse events:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Event</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><cite>+</cite> or <cite>⇧ →</cite></td>
+<td>zoom in on x axis</td>
+</tr>
+<tr class="row-odd"><td><cite>_</cite> or <cite>⇧ ←</cite></td>
+<td>zoom out on x axis</td>
+</tr>
+<tr class="row-even"><td><cite>=</cite> or <cite>⇧ ↑</cite></td>
+<td>zoom in on y axis</td>
+</tr>
+<tr class="row-odd"><td><cite>-</cite> or <cite>⇧ ↓</cite></td>
+<td>zoom out on y axis</td>
+</tr>
+<tr class="row-even"><td><cite>left mouse click</cite></td>
+<td>select the current row and column</td>
+</tr>
+<tr class="row-odd"><td><cite>⇧</cite> and <cite>left mouse click</cite></td>
+<td>select all the rows between
+previous selected and current rows</td>
+</tr>
+<tr class="row-even"><td><cite>.</cite></td>
+<td>move the selection down by one row</td>
+</tr>
+<tr class="row-odd"><td><cite>,</cite></td>
+<td>move the selection up by one row</td>
+</tr>
+<tr class="row-even"><td><cite>&lt;</cite></td>
+<td>move the selection left by one
+column</td>
+</tr>
+<tr class="row-odd"><td><cite>&gt;</cite></td>
+<td>move the selection right by one
+column</td>
+</tr>
+<tr class="row-even"><td><cite>↑</cite> or <cite>=</cite></td>
+<td>scroll the heatmap up on y axis</td>
+</tr>
+<tr class="row-odd"><td><cite>↓</cite> or <cite>-</cite></td>
+<td>scroll the heatmap down on y axis</td>
+</tr>
+<tr class="row-even"><td><cite>←</cite> or <cite>&lt;</cite></td>
+<td>scroll the heatmap left on x axis</td>
+</tr>
+<tr class="row-odd"><td><cite>→</cite> or <cite>&gt;</cite></td>
+<td>scroll the heatmap right on x axis</td>
+</tr>
+</tbody>
+</table>
 <table class="docutils field-list" frame="void" id="plot-ref" rules="none">
 <col class="field-name" />
 <col class="field-body" />
