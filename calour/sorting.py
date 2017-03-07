@@ -93,8 +93,8 @@ def cluster_data(exp, transform=None, axis=1, metric='euclidean', inplace=False,
 
     Parameters
     ----------
-    aixs : 0 or 1 (optional)
-        1 (default) means clustering features; 0 means clustering samples
+    aixs : 0, 1, 's', or 'f' (optional)
+        'f' or 1 (default) means clustering features; 's' or 0 means clustering samples
     transform : Callable
         a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.
         The transform function can modify ``Experiment.data`` (it is a copy).
@@ -177,9 +177,9 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
     ----------
     field : str
         Name of the field to sort by
-    axis : 0 or 1
-        sort by samples (0) or by features (1), i.e. the ``field`` is a column
-        in ``sample_metadata`` (0) or ``feature_metadata`` (1)
+    axis : 0, 1, 's', or 'f'
+        sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
+        in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
@@ -209,8 +209,8 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
 
     Parameters
     ----------
-    axis : 0 or 1
-        Apply ``key`` function on row (sort the samples) (0) or column (sort the features) (1)
+    axis : 0, 1, 's', or 'f'
+        Apply ``key`` function on row (sort the samples) (0 or 's') or column (sort the features) (1 or 'f')
     subset : ``None`` or iterable of int (optional)
         Sorting using only subset of the data. The subsetting occurs on the opposite of
         the specified axis.
