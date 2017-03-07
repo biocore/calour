@@ -324,7 +324,50 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
-    '''Plot the main heatmap and its associated axes.
+    '''Plot the interactive heatmap and its associated axes.
+
+    The heatmap is interactive and can be dynamically updated with
+    following key and mouse events:
+
+    +---------------------------+-----------------------------------+
+    |Event                      |Description                        |
+    +===========================+===================================+
+    |`+` or `⇧ →`               |zoom in on x axis                  |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`_` or `⇧ ←`               |zoom out on x axis                 |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`=` or `⇧ ↑`               |zoom in on y axis                  |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`-` or `⇧ ↓`               |zoom out on y axis                 |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`left mouse click`         |select the current row and column  |
+    +---------------------------+-----------------------------------+
+    |`⇧` and `left mouse click` |select all the rows between        |
+    |                           |previous selected and current rows |
+    +---------------------------+-----------------------------------+
+    |`.`                        |move the selection down by one row |
+    +---------------------------+-----------------------------------+
+    |`,`                        |move the selection up by one row   |
+    +---------------------------+-----------------------------------+
+    |`<`                        |move the selection left by one     |
+    |                           |column                             |
+    +---------------------------+-----------------------------------+
+    |`>`                        |move the selection right by one    |
+    |                           |column                             |
+    +---------------------------+-----------------------------------+
+    |`↑` or `=`                 |scroll the heatmap up on y axis    |
+    +---------------------------+-----------------------------------+
+    |`↓` or `-`                 |scroll the heatmap down on y axis  |
+    +---------------------------+-----------------------------------+
+    |`←` or `<`                 |scroll the heatmap left on x axis  |
+    +---------------------------+-----------------------------------+
+    |`→` or `>`                 |scroll the heatmap right on x axis |
+    +---------------------------+-----------------------------------+
+
 
     .. _plot-ref:
 
@@ -350,6 +393,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     Returns
     -------
     ``PlottingGUI``
+
     '''
     gui_obj = _create_plot_gui(exp, gui, databases)
     exp.heatmap(axes=gui_obj.axes, **kwargs)
