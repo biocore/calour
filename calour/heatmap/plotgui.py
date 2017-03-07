@@ -20,9 +20,6 @@ logger = getLogger(__name__)
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
-    Keys:
-
-
     Attributes
     ----------
     exp : ``Experiment``
