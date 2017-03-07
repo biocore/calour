@@ -255,7 +255,7 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def _ax_color_bar(axes, values, width, position=0, colors=None, horizontal=True, label=True):
+def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=True):
     '''plot color bars along x or y axis
 
     Parameters
@@ -289,11 +289,13 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, horizontal=True,
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
-        if horizontal is True:
+        if axis == 0:
+            # plot the color bar along x axis
             pos = prev - offset, position
             w, h = i - prev, width
             rotation = 0
         else:
+            # plot the color bar along y axis
             pos = position, prev - offset
             w, h = width, i - prev
             rotation = 90
@@ -358,13 +360,13 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         position = 0
         for s in sample_color_bars:
             _ax_color_bar(
-                gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position, label=label)
+                gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position, label=label, axis=0)
             position += (barspace + barwidth)
     if feature_color_bars is not None:
         position = 0
         for f in feature_color_bars:
             _ax_color_bar(
-                gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, label=label, horizontal=False)
+                gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, label=label, axis=1)
             position += (barspace + barwidth)
     # set up the gui ready for interaction
     gui_obj()
