@@ -117,7 +117,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
-            plot_axis=None, rect=None,  transform=log_n, **kwargs):
+            axes=None, rect=None,  transform=log_n, **kwargs):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
@@ -149,9 +149,9 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         None (default) to use mpl default color map. str to use colormap named str.
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
-    axis : matplotlib ``AxesSubplot`` object or None (optional)
-        The axis where the heatmap is plotted. None (default) to create a new figure and
-        axis to plot heatmap into the axis
+    axes : matplotlib ``AxesSubplot`` object or None (optional)
+        The axes where the heatmap is plotted. None (default) to create a new figure and
+        axes to plot heatmap into the axes
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
@@ -172,10 +172,10 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         logger.debug('transform exp with %r with param %r' % (transform, kwargs))
         data = transform(exp, inplace=False, **kwargs).data
 
-    if plot_axis is None:
+    if axes is None:
         fig, ax = plt.subplots()
     else:
-        fig, ax = plot_axis.get_figure(), plot_axis
+        fig, ax = axes.get_figure(), axes
 
     # step 2. plot heatmap.
     # init the default colormap
@@ -255,13 +255,13 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     return fig
 
 
-def _ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True, label=True):
+def _ax_color_bar(axes, values, width, position=0, colors=None, horizontal=True, label=True):
     '''plot color bars along x or y axis
 
     Parameters
     ----------
-    axis : ``matplotlib`` axis
-        the axis to plot the color bars in.
+    axes : ``matplotlib`` axes
+        the axes to plot the color bars in.
     values : list/tuple
         the values informing the colors on the bar
     width : float
@@ -279,7 +279,7 @@ def _ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True,
 
     Returns
     -------
-    ``matplotlib`` axis
+    ``matplotlib`` axes
     '''
     uniques = np.unique(values)
     if colors is None:
@@ -304,25 +304,25 @@ def _ax_color_bar(axis, values, width, position=0, colors=None, horizontal=True,
             edgecolor="none",  # No border
             facecolor=col[value],
             label=value)
-        axis.add_patch(rect)
+        axes.add_patch(rect)
         if label is True:
             rx, ry = rect.get_xy()
             cx = rx + rect.get_width()/2.0
             cy = ry + rect.get_height()/2.0
             # add the text in the color bars
-            axis.annotate(value, (cx, cy), color='w', weight='bold',
+            axes.annotate(value, (cx, cy), color='w', weight='bold',
                           fontsize=7, ha='center', va='center', rotation=rotation)
         prev = i
-    # axis.legend(
+    # axes.legend(
     #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
     #     bbox_to_anchor=(0, 1.2),
     #     ncol=len(col))
-    return axis
+    return axes
 
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
-    '''Plot the main heatmap and its associated axis.
+    '''Plot the main heatmap and its associated axes.
 
     .. _plot-ref:
 
@@ -350,7 +350,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     ``PlottingGUI``
     '''
     gui_obj = _create_plot_gui(exp, gui, databases)
-    exp.heatmap(plot_axis=gui_obj.axis, **kwargs)
+    exp.heatmap(axes=gui_obj.axes, **kwargs)
     barwidth = 0.3
     barspace = 0.05
     label = color_bar_label
