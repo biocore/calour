@@ -44,3 +44,7 @@ A sample jupyter notebook is located in:
 
 Full Documentation is located in:
 [http://biocore.github.io/calour/](http://biocore.github.io/calour/)
+
+
+Keys and mouses instructions is [here](http://biocore.github.io/calour/generated/calour.heatmap.plot.html#calour.heatmap.plot)
+

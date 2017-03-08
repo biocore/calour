@@ -20,9 +20,6 @@ logger = getLogger(__name__)
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
-    Keys:
-
-
     Attributes
     ----------
     exp : ``Experiment``
@@ -43,7 +40,7 @@ class PlotGUI(ABC):
         >0 : scroll than constant amount of bacteria per keypress
     figure : ``matplotlib.figure.Figure``
         The figure where the heatmap will be plotted into. It creates one by default.
-    axis : matplotlib axes obtained from ``figure``.
+    axes : matplotlib axes obtained from ``figure``.
     databases : list
         the database to interact with
 
@@ -82,7 +79,7 @@ class PlotGUI(ABC):
         self.xax.axis('off')
         self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
         self.yax.axis('off')
-        self.axis = hm_ax
+        self.axes = hm_ax
 
     def get_selection_info(self):
         '''Get the current selection information
@@ -297,11 +294,11 @@ class PlotGUI(ABC):
     def clear_selection(self):
         '''Delete all shown selection lines '''
         for cline in self.selected_samples.values():
-            self.axis.lines.remove(cline)
+            self.axes.lines.remove(cline)
             logger.debug('remove sample selection %r' % cline)
         self.selected_samples = {}
         for cline in self.selected_features.values():
-            self.axis.lines.remove(cline)
+            self.axes.lines.remove(cline)
             logger.debug('remove sample selection %r' % cline)
         self.selected_features = {}
 
@@ -320,21 +317,21 @@ class PlotGUI(ABC):
         '''
         for cpos in samplepos:
             if cpos not in self.selected_samples:
-                self.selected_samples[cpos] = self.axis.axvline(
+                self.selected_samples[cpos] = self.axes.axvline(
                     x=cpos, color='white', linestyle='dotted')
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.axis.lines.remove(self.selected_samples[cpos])
+                    self.axes.lines.remove(self.selected_samples[cpos])
                     del self.selected_samples[cpos]
         for cpos in featurepos:
             if cpos not in self.selected_features:
-                self.selected_features[cpos] = self.axis.axhline(
+                self.selected_features[cpos] = self.axes.axhline(
                     y=cpos, color='white', linestyle='dotted')
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.axis.lines.remove(self.selected_features[cpos])
+                    self.axes.lines.remove(self.selected_features[cpos])
                     del self.selected_features[cpos]
         self.figure.canvas.draw()
 

@@ -47,8 +47,9 @@ def normalize(exp, total=10000, axis=0, inplace=False):
     exp : Experiment
     total : float
         the sum (along axis) to normalize to
-    axis : int (optional)
-        the axis to normalize. 0 (default) is normalize each sample, 1 to normalize each feature
+    axis : 0, 1, 's', or 'f', optional
+        the axis to normalize. 0 or 's' (default) is normalize each sample;
+        1 or 'f' to normalize each feature
     inplace : bool (optional)
         False (default) to create a copy, True to replace values in exp
 
@@ -78,8 +79,9 @@ def rescale(exp, total=10000, axis=0, inplace=False):
     exp : Experiment
     total : float
         the mean sum (along axis) to normalize to
-    axis : int (optional)
-        the axis to normalize. 0 (default) is normalize each sample, 1 to normalize each feature
+    axis : 0, 1, 's', or 'f', optional
+        the axis to normalize. 0 or 's' (default) is normalize each sample;
+        1 or 'f' to normalize each feature
     inplace : bool (optional)
         False (default) to create a copy, True to replace values in exp
 
@@ -105,8 +107,8 @@ def scale(exp, axis=0, inplace=False):
 
     Parameters
     ----------
-    axis : 0 or 1
-        0 means scaling occur sample-wise; 1 feature-wise.
+    axis : 0, 1, 's', or 'f'
+        0 or 's'  means scaling occur sample-wise; 1 or 'f' feature-wise.
 
     Returns
     -------

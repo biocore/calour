@@ -44,8 +44,8 @@ def join_fields(exp, field1, field2, newname=None, axis=0, sep='_', inplace=True
     newname : str or None (optional)
         name of the new (joined) sample metadata field
         None (default) to name it as field1 + sep + field2
-    axis : int
-        0 (default) to modify sample metadata fields, 1 to modify feature metadata fields
+    axis : 0, 1, 's', or 'f', optional
+        0 or 's' (default) to modify sample metadata fields; 1 or 'f' to modify feature metadata fields
     sep : str (optional)
         The separator between the values of the two fields when joining
     inplace : bool (optional)
@@ -106,8 +106,8 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
         'mean' : the mean of all samples/features
         'random' : a random sample/feature out of the group (same sample/feature for all observations)
         'sum' : the sum of values in all the samples/features
-    axis : 0/1 (optional)
-        0 (default) to merge samples, 1 to merge features
+    axis : 0, 1, 's', or 'f', optional
+        0 or 's' (default) to merge samples; 1 or 'f' to merge features
     inplace : bool (optional)
         False (default) to create new Experiment, True to perform inplace
 

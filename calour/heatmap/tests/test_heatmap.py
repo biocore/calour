@@ -61,7 +61,7 @@ class PlotTests(Tests):
         self.assertListEqual(obs_yticklabels,
                              self.test1.feature_metadata['ph'].astype(str).tolist())
 
-    def test__ax_color_bar(self):
+    def test_ax_color_bar(self):
         fig, ax = plt.subplots()
         colors = [(1.0, 0.0, 0.0, 1), (0.0, 0.5, 0.0, 1)]
         axes = _ax_color_bar(ax, ['a', 'a', 'b'], 0.3, 0, colors)
