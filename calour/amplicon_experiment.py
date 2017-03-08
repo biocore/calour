@@ -215,6 +215,18 @@ class AmpliconExperiment(Experiment):
         ----------
         field : str or None (optional)
             The field to sort samples by before plotting
+        sample_color_bars : list, optional
+            list of column names in the sample metadata. It plots a color bar
+            for each column. It doesn't plot color bars by default (``None``)
+        feature_color_bars : list, optional
+            list of column names in the feature metadata. It plots a color bar
+            for each column. It doesn't plot color bars by default (``None``)
+        color_bar_label : bool, optional
+            whether to show the label for the color bars
+        gui : str, optional
+            GUI to use
+        databases : Iterable of str
+            a list of databases to access or add annotation
 
         '''
         if field is not None:

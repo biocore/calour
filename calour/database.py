@@ -71,7 +71,8 @@ class Database(ABC):
         Parameters
         ----------
         annotation : dict
-            See dbBact REST API /annotations/get_annotation for keys / values
+            keys/values are database specific.
+            E.g. See dbBact REST API /annotations/get_annotation for keys / values
         '''
         # open in a new tab, if possible
         logger.debug('Generic function for show annotation info')
@@ -93,7 +94,24 @@ class Database(ABC):
             empty if ok, otherwise the error encountered
         '''
         logger.debug('Generic function for add_annotations')
-        raise NotImplemented
+        raise NotImplementedError
+
+    def upadte_annotation(self, annotation, exp=None):
+        '''Update an existing annotation
+
+        Parameters
+        ----------
+        annotation : dict
+            The annotation to update (keys/values are database specific)
+        exp : ``Experiment`` (optional)
+            The calour experiment from which the annotation is coming from
+        Returns
+        -------
+        str
+            empty if ok, otherwise the error encountered
+        '''
+        logger.debug('Generic function for update_annotation')
+        raise NotImplementedError
 
     def delete_annotation(self, annotation_details):
         '''Delete an annotation from the database (if allowed)
