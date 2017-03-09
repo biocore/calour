@@ -26,7 +26,7 @@ import numpy as np
 import skbio
 
 from .experiment import Experiment
-from .util import _get_taxonomy_string
+from .util import _get_taxonomy_string, _to_list
 
 
 logger = getLogger(__name__)
@@ -206,15 +206,18 @@ class AmpliconExperiment(Experiment):
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
         return newexp
 
-    def plot_sort(exp, field=None, **kwargs):
+    def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
+                  gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
         '''Plot bacteria after sorting by field
 
         This is a convenience wrapper for plot()
 
         Parameters
         ----------
-        field : str or None (optional)
+        field : str or list of str or None (optional)
             The field to sort samples by before plotting
+            If list of str, sort by each field according to order in list
+            if None, do not sort
         sample_color_bars : list, optional
             list of column names in the sample metadata. It plots a color bar
             for each column. It doesn't plot color bars by default (``None``)
@@ -223,17 +226,30 @@ class AmpliconExperiment(Experiment):
             for each column. It doesn't plot color bars by default (``None``)
         color_bar_label : bool, optional
             whether to show the label for the color bars
-        gui : str, optional
-            GUI to use
+        gui : str or None, optional
+            GUI to use:
+            'cli' : simple command line gui
+            'jupyter' : jupyter notebook interactive gui
+            'qt5' : qt5 based interactive gui
+            None : no interactivity - just a matplotlib figure
         databases : Iterable of str
             a list of databases to access or add annotation
+        kwargs : dict, optional
+            keyword arguments passing to :ref:`plot<plot-ref>` function.
 
         '''
         if field is not None:
-            newexp = exp.sort_samples(field)
+            newexp = exp.copy()
+            field = _to_list(field)
+            for cfield in field:
+                newexp.sort_samples(cfield, inplace=True)
+            plot_field = cfield
         else:
             newexp = exp
+            plot_field = None
         if 'sample_field' in kwargs:
-            newexp.plot(feature_field='taxonomy', **kwargs)
+            newexp.plot(feature_field='taxonomy', sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                        gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
         else:
-            newexp.plot(sample_field=field, feature_field='taxonomy', **kwargs)
+            newexp.plot(sample_field=plot_field, feature_field='taxonomy', sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                        gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)

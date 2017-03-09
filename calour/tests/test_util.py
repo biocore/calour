@@ -70,6 +70,11 @@ class IOTests(Tests):
         self.assertEqual(res, 'na')
         shutil.rmtree(d)
 
+    def test_to_list(self):
+        self.assertEqual(util._to_list(5), [5])
+        self.assertEqual(util._to_list([5]), [5])
+        self.assertEqual(util._to_list('test'), ['test'])
+        self.assertEqual(util._to_list(range(5)), range(5))
 
 if __name__ == "__main__":
     main()

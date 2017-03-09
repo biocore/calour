@@ -16,6 +16,7 @@ import numpy as np
 
 from ..transforming import log_n
 
+from ..util import _to_list
 
 logger = getLogger(__name__)
 
@@ -437,7 +438,11 @@ def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
     color_bar_label : bool, optional
         whether to show the label for the color bars
     gui : str, optional
-        GUI to use
+        GUI to use:
+        'cli' : simple command line gui
+        'jupyter' : jupyter notebook interactive gui
+        'qt5' : qt5 based interactive gui
+        None : no interactivity - just a matplotlib figure
     databases : Iterable of str
         a list of databases to access or add annotation
     kwargs : dict, optional
@@ -448,10 +453,17 @@ def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
     PlotGUI
     '''
     if field is not None:
-        newexp = exp.sort_samples(field)
+        newexp = exp.copy()
+        field = _to_list(field)
+        for cfield in field:
+            newexp.sort_samples(cfield, inplace=True)
+        plot_field = cfield
     else:
         newexp = exp
+        plot_field = None
     if 'sample_field' in kwargs:
-        newexp.plot(**kwargs)
+        newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                    gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
     else:
-        newexp.plot(sample_field=field, **kwargs)
+        newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                    gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
