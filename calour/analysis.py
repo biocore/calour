@@ -219,7 +219,6 @@ def _new_experiment_from_pvals(exp, keep, odif, pvals):
     keep = np.where(keep)
     if len(keep[0]) == 0:
         logger.warn('no significant features found')
-        # return None
     newexp = exp.reorder(keep[0], axis=1)
     odif = odif[keep[0]]
     pvals = pvals[keep[0]]
