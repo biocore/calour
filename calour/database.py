@@ -1,7 +1,55 @@
 from logging import getLogger
 from abc import ABC
+import importlib
+
+from .util import get_config_value, get_config_file, get_config_sections
 
 logger = getLogger(__name__)
+
+
+def _get_database_class(dbname, config_file_name=None):
+    '''Get the database class for the given database name
+
+    Uses the calour config file (calour.config) keys
+
+    Parameters
+    ----------
+    dbname : str
+        the database name. common options are:
+            'dbbact' : the amplicon sequence manual annotation database
+            'spongeworld' : the sponge microbiome database
+            'redbiome' : the qiita automatic amplicon sequence database
+    config_file_name: str or None (optional)
+        None (default) to use the default calour condig file.
+        str to use the file names str as the conig file
+
+
+    Returns
+    -------
+    calour.database.Database
+    A ``Database`` class for the requested dbname
+    '''
+    class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
+    module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
+    if class_name is not None and module_name is not None:
+        # import the database module
+        db_module = importlib.import_module(module_name)
+        # get the class
+        DBClass = getattr(db_module, class_name)
+        cdb = DBClass()
+        return cdb
+    # not found, so print available database names
+    databases = []
+    sections = get_config_sections()
+    for csection in sections:
+        class_name = get_config_value('class_name', section=csection, config_file_name=config_file_name)
+        module_name = get_config_value('class_name', section=csection, config_file_name=config_file_name)
+        if class_name is not None and module_name is not None:
+            databases.append(csection)
+    if len(databases) == 0:
+        raise ValueError('calour config file %s does not contain any database sections.' % get_config_file())
+    raise ValueError('Database %s not found in config file (%s).\n'
+                     'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
 class Database(ABC):

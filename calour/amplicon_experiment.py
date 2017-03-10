@@ -108,8 +108,7 @@ class AmpliconExperiment(Experiment):
             logger.warn('No taxonomy field in experiment')
             return None
 
-        if not isinstance(values, (list, tuple)):
-            values = [values]
+        values = _to_list(values)
 
         taxstr = exp.feature_metadata['taxonomy'].str.lower()
 

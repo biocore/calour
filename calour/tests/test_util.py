@@ -57,6 +57,12 @@ class IOTests(Tests):
         fp = util.get_config_file()
         self.assertEqual(basename(fp), 'calour.config')
 
+    def test_get_config_sections(self):
+        sections = util.get_config_sections()
+        self.assertIn('dbbact', sections)
+        self.assertIn('sponge', sections)
+        self.assertNotIn('username', sections)
+
     def test_config_file_value(self):
         # test the set and get config file values
         # create the tmp config file path
@@ -75,6 +81,7 @@ class IOTests(Tests):
         self.assertEqual(util._to_list([5]), [5])
         self.assertEqual(util._to_list('test'), ['test'])
         self.assertEqual(util._to_list(range(5)), range(5))
+
 
 if __name__ == "__main__":
     main()

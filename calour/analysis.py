@@ -30,6 +30,7 @@ from scipy import stats
 from statsmodels.sandbox.stats.multicomp import multipletests
 
 from .experiment import Experiment
+from .util import _to_list
 from . import dsfdr
 
 
@@ -136,11 +137,9 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     '''
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
-    if not isinstance(val1, (list, tuple)):
-        val1 = [val1]
+    val1 = _to_list(val1)
     if val2 is not None:
-        if not isinstance(val2, (list, tuple)):
-            val2 = [val2]
+        val2 = _to_list(val2)
         cexp = exp.filter_samples(field, val1+val2, negate=False)
         logger.info('%d samples with both values' % cexp.shape[0])
     else:

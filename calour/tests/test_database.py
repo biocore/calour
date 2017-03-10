@@ -7,10 +7,15 @@
 # ----------------------------------------------------------------------------
 
 from unittest import main
+from os.path import join
+from tempfile import mkdtemp
+import shutil
 
 from calour._testing import Tests
 from calour.tests.mock_database import MockDatabase
 from calour.heatmap.heatmap import _create_plot_gui
+import calour.util
+from calour.database import _get_database_class
 import calour as ca
 
 
@@ -36,6 +41,17 @@ class ExperimentTests(Tests):
         gui.databases.append(mdb)
         res = gui.get_database_annotations(self.s1)
         print(res)
+
+    def test_get_database_class(self):
+        d = mkdtemp()
+        f = join(d, 'config.txt')
+        calour.util.set_config_value('class_name', 'MockDatabase', section='testdb', config_file_name=f)
+        calour.util.set_config_value('module_name', 'calour.tests.mock_database', section='testdb', config_file_name=f)
+        db = _get_database_class('testdb', config_file_name=f)
+        self.assertEqual(db.get_name(), 'mock_db')
+        with self.assertRaises(ValueError):
+            _get_database_class('mock')
+        shutil.rmtree(d)
 
 
 if __name__ == "__main__":

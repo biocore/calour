@@ -226,6 +226,27 @@ def set_config_value(key, value, section='DEFAULT', config_file_name=None):
     logger.debug('wrote key %s value %s to config file' % (key, value))
 
 
+def get_config_sections(config_file_name=None):
+    '''Get a list of the sections in the config file
+
+    Parameters
+    ----------
+     config_file_name : str (optional)
+        the full path to the config file or None to use default config file
+
+    Returns
+    -------
+    list of str
+        List of the sections in the config file
+    '''
+    if config_file_name is None:
+        config_file_name = get_config_file()
+    config = configparser.ConfigParser()
+    config.read(config_file_name)
+
+    return config.sections()
+
+
 def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=None):
     '''Get the value from the calour config file
 
