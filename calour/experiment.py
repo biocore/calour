@@ -260,7 +260,11 @@ class Experiment:
         # In [126]: a[np.array([False, False, False]), :]
         # Out[126]:
         # <0x4 sparse matrix of type '<class 'numpy.int8'>'
-        new_order = np.array(new_order)
+
+        # if new_order is empty, we want to return empty experiment
+        # it doesn't work for dense data is we use np.array([]) for the indexing
+        if len(new_order) > 0:
+            new_order = np.array(new_order)
         if axis == 0:
             exp.data = exp.data[new_order, :]
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
