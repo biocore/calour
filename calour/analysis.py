@@ -146,19 +146,10 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
         cexp = exp
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
-    # prepare the labels. If correlation method, get the values, otherwise the group
+    # prepare the labels.
     labels = np.zeros(len(cexp.sample_metadata))
-    if method in ['spearman', 'pearson', 'nonzerospearman', 'nonzeropearson']:
-        labels = pd.to_numeric(cexp.sample_metadata[field], errors='coerce').values
-        # remove the nans
-        nanpos = np.where(np.isnan(labels))[0]
-        if len(nanpos) > 0:
-            logger.warn('NaN values encountered in labels for correlation. Ignoring these samples')
-            labels = np.delete(labels, nanpos)
-            data = np.delete(data, nanpos, axis=1)
-    else:
-        labels[cexp.sample_metadata[field].isin(val1).values] = 1
-        logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
+    labels[cexp.sample_metadata[field].isin(val1).values] = 1
+    logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
     return _new_experiment_from_pvals(exp, keep, odif, pvals)

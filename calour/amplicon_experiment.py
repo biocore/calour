@@ -205,7 +205,7 @@ class AmpliconExperiment(Experiment):
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
         return newexp
 
-    def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
+    def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
                   gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
         '''Plot bacteria after sorting by field
 
@@ -213,7 +213,7 @@ class AmpliconExperiment(Experiment):
 
         Parameters
         ----------
-        field : str or list of str or None (optional)
+        fields : str or list of str or None (optional)
             The field to sort samples by before plotting
             If list of str, sort by each field according to order in list
             if None, do not sort
@@ -237,10 +237,10 @@ class AmpliconExperiment(Experiment):
             keyword arguments passing to :ref:`plot<plot-ref>` function.
 
         '''
-        if field is not None:
+        if fields is not None:
             newexp = exp.copy()
-            field = _to_list(field)
-            for cfield in field:
+            fields = _to_list(fields)
+            for cfield in fields:
                 newexp.sort_samples(cfield, inplace=True)
             plot_field = cfield
         else:

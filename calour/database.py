@@ -1,5 +1,6 @@
 from logging import getLogger
 from abc import ABC
+from collections import defaultdict
 import importlib
 
 from .util import get_config_value, get_config_file, get_config_sections
@@ -50,6 +51,40 @@ def _get_database_class(dbname, config_file_name=None):
         raise ValueError('calour config file %s does not contain any database sections.' % get_config_file())
     raise ValueError('Database %s not found in config file (%s).\n'
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
+
+
+def add_terms_do_features(exp, dbname, term_list=None, field_name='common_term'):
+    '''Add a field to the feature metadata, with most common term for each feature
+
+    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
+    Note : Adds annotations in-place.
+
+    Parameters
+    ----------
+    term_list : list of str or None (optional)
+        Use only terms appearing in this list
+        None (default) to use all terms
+    field_name : str (optional)
+        Name of feature_metadata field to store the annotatiosn.
+
+    Returns
+    -------
+    exp : Experiment
+    '''
+    db = _get_database_class(dbname)
+    features = exp.feature_metadata.index.values
+    term_list = db.get_feature_terms(features, exp=exp)
+    feature_terms = []
+    for cfeature in features:
+        term_count = defaultdict(int)
+        for cterm in term_list[cfeature]:
+            for clist_term in term_list:
+                if clist_term in cterm:
+                    term_count[clist_term] += 1
+        max_term = max(term_count, key=term_count.get)
+        feature_terms.append(max_term)
+    exp.feature_metadata[field_name] = feature_terms
+    return exp
 
 
 class Database(ABC):

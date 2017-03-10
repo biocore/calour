@@ -406,7 +406,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     return gui
 
 
-def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
+def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
               gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
     '''Plot after sorting by sample field.
 
@@ -414,7 +414,7 @@ def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
 
     Parameters
     ----------
-    field : str or None, optional
+    fields : str or None, optional
         The field to sort samples by before plotting
     sample_color_bars : list, optional
         list of column names in the sample metadata. It plots a color bar
@@ -439,10 +439,10 @@ def plot_sort(exp, field=None, sample_color_bars=None, feature_color_bars=None,
     -------
     PlotGUI
     '''
-    if field is not None:
+    if fields is not None:
         newexp = exp.copy()
-        field = _to_list(field)
-        for cfield in field:
+        fields = _to_list(fields)
+        for cfield in fields:
             newexp.sort_samples(cfield, inplace=True)
         plot_field = cfield
     else:
