@@ -18,6 +18,11 @@ and activate it using:
 source activate calour
 ```
 
+Install biom-format and scikit-bio:
+```
+conda install -c biocore biom-format scikit-bio
+```
+
 Install calour:
 ```
 conda install -c zechxu calour
