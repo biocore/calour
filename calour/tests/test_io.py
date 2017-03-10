@@ -80,6 +80,10 @@ class IOTests(Tests):
         exp = ca.read_open_ms(self.openms_csv, sparse=True, normalize=None)
         self.assertEqual(exp.sparse, True)
 
+    def test_read_qiim2(self):
+        exp = ca.read(self.qiime2table, data_file_type='qiime2', normalize=None)
+        self.assertEqual(exp.shape, (104, 658))
+
     def test_read_not_sparse(self):
         # load the simple dataset as dense
         exp = ca.read(self.test1_biom, self.test1_samp, sparse=False, normalize=None)
