@@ -10,7 +10,7 @@ Install
 =======
 Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment for calour:
 ```
-conda create -n calour python=3 matplotlib numpy scipy pandas qt jupyter scikit-learn
+conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn
 ```
 
 and activate it using:
