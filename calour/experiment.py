@@ -246,7 +246,7 @@ class Experiment:
             experiment with reordered samples
         '''
         if inplace is False:
-            exp = deepcopy(self)
+            exp = self.copy()
         else:
             exp = self
         # make it a np array; otherwise the slicing won't work if the new_order is
