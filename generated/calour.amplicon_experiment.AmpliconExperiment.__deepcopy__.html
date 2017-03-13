@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>calour.analysis.diff_abundance_kw &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>calour.amplicon_experiment.AmpliconExperiment.__deepcopy__ &#8212; calour 0.1.0.dev0 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -34,8 +34,6 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="manipulation (calour.manipulation)" href="../manipulation.html" />
-    <link rel="prev" title="calour.analysis.diff_abundance" href="calour.analysis.diff_abundance.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -85,7 +83,7 @@
      href="../index.html">Site <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><ul class="current">
+      aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
@@ -94,7 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
 </ul>
@@ -110,7 +108,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">calour.analysis.diff_abundance_kw</a></li>
+<li><a class="reference internal" href="#">calour.amplicon_experiment.AmpliconExperiment.__deepcopy__</a></li>
 </ul>
 </ul>
 </li>
@@ -140,48 +138,14 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="calour-analysis-diff-abundance-kw">
-<h1>calour.analysis.diff_abundance_kw<a class="headerlink" href="#calour-analysis-diff-abundance-kw" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="calour.analysis.diff_abundance_kw">
-<code class="descclassname">calour.analysis.</code><code class="descname">diff_abundance_kw</code><span class="sig-paren">(</span><em>exp</em>, <em>field</em>, <em>transform='rankdata'</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L182"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.analysis.diff_abundance_kw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test the differential expression between multiple sample groups using the Kruskal Wallis test.
-uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exp: calour.Experiment</strong></p>
-<p><strong>field: str</strong></p>
-<blockquote>
-<div><p>The field to test by</p>
-</div></blockquote>
-<p><strong>transform</strong> : str or None</p>
-<blockquote>
-<div><p>transformation to apply to the data before caluculating the statistic
-&#8216;rankdata&#8217; : rank transfrom each OTU reads
-&#8216;log2data&#8217; : calculate log2 for each OTU using minimal cutoff of 2
-&#8216;normdata&#8217; : normalize the data to constant sum per samples
-&#8216;binarydata&#8217; : convert to binary absence/presence</p>
-</div></blockquote>
-<p><strong>alpha</strong> : float</p>
-<blockquote>
-<div><p>the desired FDR control level</p>
-</div></blockquote>
-<p><strong>numperm</strong> : int</p>
-<blockquote>
-<div><p>number of permutations to perform</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>newexp</strong> : calour.Experiment</p>
-<blockquote class="last">
-<div><p>The experiment with only significant (FDR&lt;=maxfval) difference, sorted according to difference</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="calour-amplicon-experiment-ampliconexperiment-deepcopy">
+<h1>calour.amplicon_experiment.AmpliconExperiment.__deepcopy__<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-deepcopy" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="calour.amplicon_experiment.AmpliconExperiment.__deepcopy__">
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">__deepcopy__</code><span class="sig-paren">(</span><em>memo</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.__deepcopy__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the deepcopy since pandas has problem deepcopy empty dataframe</p>
+<p>Happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
+So we manually copy for empty dataframes</p>
 </dd></dl>
 
 </div>

@@ -12,6 +12,8 @@ calour.amplicon_experiment.AmpliconExperiment
          :toctree:
       
          
+         AmpliconExperiment.__deepcopy__
+         
          
          AmpliconExperiment.__eq__
          

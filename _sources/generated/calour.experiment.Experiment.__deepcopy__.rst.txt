@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.__deepcopy__
+=========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.__deepcopy__

@@ -12,6 +12,8 @@ calour.experiment.Experiment
          :toctree:
       
          
+         Experiment.__deepcopy__
+         
          
          Experiment.__eq__
          
