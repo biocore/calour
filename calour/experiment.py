@@ -246,7 +246,7 @@ class Experiment:
             experiment with reordered samples
         '''
         if inplace is False:
-            exp = deepcopy(self)
+            exp = self.copy()
         else:
             exp = self
         # make it a np array; otherwise the slicing won't work if the new_order is
@@ -260,7 +260,11 @@ class Experiment:
         # In [126]: a[np.array([False, False, False]), :]
         # Out[126]:
         # <0x4 sparse matrix of type '<class 'numpy.int8'>'
-        new_order = np.array(new_order)
+
+        # if new_order is empty, we want to return empty experiment
+        # it doesn't work for dense data is we use np.array([]) for the indexing
+        if len(new_order) > 0:
+            new_order = np.array(new_order)
         if axis == 0:
             exp.data = exp.data[new_order, :]
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
@@ -357,7 +361,7 @@ class Experiment:
 def add_functions(cls,
                   modules=['.io', '.sorting', '.filtering', '.analysis',
                            '.transforming', '.heatmap.heatmap', '.plotting',
-                           '.manipulation', '.analysis']):
+                           '.manipulation', '.database']):
     '''Dynamically add functions to the class as methods.
 
     Parameters

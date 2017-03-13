@@ -15,7 +15,9 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 from ..transforming import log_n
+from ..database import _get_database_class
 
+from ..util import _to_list
 
 logger = getLogger(__name__)
 
@@ -72,14 +74,11 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
     ``PlotGUI`` or its child class
     '''
     # load the gui module to handle gui events & link with annotation databases
-    if gui == 'qt5':
-        gui = 'PlotGUI_QT5'
-    elif gui == 'cli':
-        gui = 'PlotGUI_CLI'
-    elif gui == 'jupyter':
-        gui = 'PlotGUI_Jupyter'
+    possible_gui = {'qt5': 'PlotGUI_QT5', 'cli': 'PlotGUI_CLI', 'jupyter': 'PlotGUI_Jupyter'}
+    if gui in possible_gui:
+        gui = possible_gui[gui]
     else:
-        raise ValueError('Unknown GUI specified: %r' % gui)
+        raise ValueError('Unknown GUI specified: %r. Possible values are: %s' % (gui, list(possible_gui.keys())))
     gui_module_name = 'calour.heatmap.' + gui.lower()
     gui_module = importlib.import_module(gui_module_name)
     GUIClass = getattr(gui_module, gui)
@@ -87,20 +86,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 
     # link gui with the databases requested
     for cdatabase in databases:
-        if cdatabase == 'dbbact':
-            db_name = 'DBBact'
-            db_module_name = 'dbbact_calour.dbbact'
-        elif cdatabase == 'spongeworld':
-            db_name = 'SpongeWorld'
-            db_module_name = 'spongeworld_calour'
-        else:
-            raise ValueError('Unknown Database specified: %r' % cdatabase)
-
-        # import the database module
-        db_module = importlib.import_module(db_module_name)
-        # get the class
-        DBClass = getattr(db_module, db_name)
-        cdb = DBClass()
+        cdb = _get_database_class(cdatabase)
         gui_obj.databases.append(cdb)
         # select the database for use with the annotate button
         if cdb.annotatable:
@@ -375,10 +361,10 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     ----------
     exp : ``Experiment``
         the object to plot
-    sample_color_bars : list, optional
+    sample_color_bars : list or str, optional
         list of column names in the sample metadata. It plots a color bar
         for each column. It doesn't plot color bars by default (``None``)
-    feature_color_bars : list, optional
+    feature_color_bars : list or str, optional
         list of column names in the feature metadata. It plots a color bar
         for each column. It doesn't plot color bars by default (``None``)
     color_bar_label : bool, optional
@@ -401,12 +387,14 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     barspace = 0.05
     label = color_bar_label
     if sample_color_bars is not None:
+        sample_color_bars = _to_list(sample_color_bars)
         position = 0
         for s in sample_color_bars:
             _ax_color_bar(
                 gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position, label=label, axis=0)
             position += (barspace + barwidth)
     if feature_color_bars is not None:
+        feature_color_bars = _to_list(feature_color_bars)
         position = 0
         for f in feature_color_bars:
             _ax_color_bar(
@@ -418,15 +406,32 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     return gui
 
 
-def plot_sort(exp, field=None, **kwargs):
+def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
+              gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
     '''Plot after sorting by sample field.
 
     This is a convenience wrapper for plot().
 
     Parameters
     ----------
-    field : str or None, optional
+    fields : str or None, optional
         The field to sort samples by before plotting
+    sample_color_bars : list, optional
+        list of column names in the sample metadata. It plots a color bar
+        for each column. It doesn't plot color bars by default (``None``)
+    feature_color_bars : list, optional
+        list of column names in the feature metadata. It plots a color bar
+        for each column. It doesn't plot color bars by default (``None``)
+    color_bar_label : bool, optional
+        whether to show the label for the color bars
+    gui : str, optional
+        GUI to use:
+        'cli' : simple command line gui
+        'jupyter' : jupyter notebook interactive gui
+        'qt5' : qt5 based interactive gui
+        None : no interactivity - just a matplotlib figure
+    databases : Iterable of str
+        a list of databases to access or add annotation
     kwargs : dict, optional
         keyword arguments passing to :ref:`plot<plot-ref>` function.
 
@@ -434,11 +439,18 @@ def plot_sort(exp, field=None, **kwargs):
     -------
     PlotGUI
     '''
-    if field is not None:
-        newexp = exp.sort_samples(field)
+    if fields is not None:
+        newexp = exp.copy()
+        fields = _to_list(fields)
+        for cfield in fields:
+            newexp.sort_samples(cfield, inplace=True)
+        plot_field = cfield
     else:
         newexp = exp
+        plot_field = None
     if 'sample_field' in kwargs:
-        newexp.plot(**kwargs)
+        newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                    gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
     else:
-        newexp.plot(sample_field=field, **kwargs)
+        newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                    gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)

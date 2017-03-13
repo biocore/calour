@@ -30,6 +30,7 @@ from scipy import stats
 from statsmodels.sandbox.stats.multicomp import multipletests
 
 from .experiment import Experiment
+from .util import _to_list
 from . import dsfdr
 
 
@@ -136,30 +137,19 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     '''
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
-    if not isinstance(val1, (list, tuple)):
-        val1 = [val1]
+    val1 = _to_list(val1)
     if val2 is not None:
-        if not isinstance(val2, (list, tuple)):
-            val2 = [val2]
+        val2 = _to_list(val2)
         cexp = exp.filter_samples(field, val1+val2, negate=False)
         logger.info('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
-    # prepare the labels. If correlation method, get the values, otherwise the group
+    # prepare the labels.
     labels = np.zeros(len(cexp.sample_metadata))
-    if method in ['spearman', 'pearson', 'nonzerospearman', 'nonzeropearson']:
-        labels = pd.to_numeric(cexp.sample_metadata[field], errors='coerce').values
-        # remove the nans
-        nanpos = np.where(np.isnan(labels))[0]
-        if len(nanpos) > 0:
-            logger.warn('NaN values encountered in labels for correlation. Ignoring these samples')
-            labels = np.delete(labels, nanpos)
-            data = np.delete(data, nanpos, axis=1)
-    else:
-        labels[cexp.sample_metadata[field].isin(val1).values] = 1
-        logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
+    labels[cexp.sample_metadata[field].isin(val1).values] = 1
+    logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
     return _new_experiment_from_pvals(exp, keep, odif, pvals)
@@ -229,7 +219,6 @@ def _new_experiment_from_pvals(exp, keep, odif, pvals):
     keep = np.where(keep)
     if len(keep[0]) == 0:
         logger.warn('no significant features found')
-        return None
     newexp = exp.reorder(keep[0], axis=1)
     odif = odif[keep[0]]
     pvals = pvals[keep[0]]

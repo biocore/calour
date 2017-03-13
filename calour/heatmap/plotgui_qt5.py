@@ -277,6 +277,8 @@ class ApplicationWindow(QMainWindow):
         menu_details = self.listMenu.addAction("Details")
         menu_details.triggered.connect(lambda: self.right_menu_details(item))
         if db.annotatable:
+            menu_details = self.listMenu.addAction("Update annotation")
+            menu_details.triggered.connect(lambda: self.right_menu_update(item))
             menu_delete = self.listMenu.addAction("Delete annotation")
             menu_delete.triggered.connect(lambda: self.right_menu_delete(item))
             menu_remove = self.listMenu.addAction("Remove seq. from annotation")
@@ -299,6 +301,12 @@ class ApplicationWindow(QMainWindow):
         if err:
             logger.error('Annotation not deleted. Error: %s' % err)
         self.gui.show_info()
+
+    def right_menu_update(self, item):
+        logger.debug('update annotation %s' % item.text)
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        db.upadte_annotation(data, self.gui.exp)
 
     def right_menu_remove_feature(self, item):
         features = self.gui.get_selected_seqs()

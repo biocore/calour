@@ -79,6 +79,48 @@ def _read_biom(fp, transpose=True):
     return sid, oid, data, feature_md
 
 
+def _read_qiime2(fp, transpose=True):
+    '''Read in a qiime2 .qza biom table file.
+
+    Parameters
+    ----------
+    fp : str
+        file path to the qiime2 (.qza) biom table
+    transpose : bool (True by default)
+        Transpose the table or not. The biom table has samples in
+        column while sklearn and other packages require samples in
+        row. So you should transpose the data table.
+
+    Returns
+    -------
+    sid : list of str
+        the sample ids
+    oid : list of str
+        the feature ids
+    data : numpy array (2d) of float
+        the table
+    feature_md : :class:`pandas.DataFrame`
+        the feature metadata (if availble in table)
+    '''
+    import qiime2
+    logger.debug('loading qiime2 biom table %s' % fp)
+
+    q2table = qiime2.Artifact.load(fp)
+    table = q2table.view(biom.Table)
+
+    sid = table.ids(axis='sample')
+    oid = table.ids(axis='observation')
+    logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
+    data = table.matrix_data
+    feature_md = _get_md_from_biom(table)
+
+    if transpose:
+        logger.debug('transposing table')
+        data = data.transpose()
+
+    return sid, oid, data, feature_md
+
+
 def _get_md_from_biom(table):
     '''Get the metadata of last column in the biom table.
 
@@ -228,6 +270,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
+        'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     encoding : str or None (optional)
         encoder for the metadata files. None (default) to use
         pandas default encoder, str to specify encoder name (see
@@ -258,6 +301,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         sid, oid, data, md = _read_biom(data_file)
     elif data_file_type == 'openms':
         sid, oid, data = _read_open_ms(data_file)
+    elif data_file_type == 'qiime2':
+        sid, oid, data, md = _read_qiime2(data_file)
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
     # load the sample metadata file

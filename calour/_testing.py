@@ -33,6 +33,8 @@ class Tests(TestCase):
         self.openms_csv = join(test_data_dir, 'openms_bucket_table.csv')
         # a fasta file for testing the AmpliconExperiment
         self.seqs1_fasta = join(test_data_dir, 'seqs1.fasta')
+        # a qiime2 biom table artifact
+        self.qiime2table = join(test_data_dir, 'feature-table.qza')
 
 
 def assertIsInstance(obj, cls, msg=''):

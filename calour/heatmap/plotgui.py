@@ -105,7 +105,7 @@ class PlotGUI(ABC):
 
         Returns
         -------
-        annotations : list of tuple of (dict, str)
+        list of tuple of (dict, str)
             dict : annotation key/value pairs
             str : a string summarizing the annotations
         '''
