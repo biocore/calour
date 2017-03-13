@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.get_config_sections
+================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.get_config_sections

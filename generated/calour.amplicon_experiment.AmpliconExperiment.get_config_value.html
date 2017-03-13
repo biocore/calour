@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>calour.amplicon_experiment.AmpliconExperiment.filter_fasta &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>calour.amplicon_experiment.AmpliconExperiment.get_config_value &#8212; calour 0.1.0.dev0 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -108,7 +108,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">calour.amplicon_experiment.AmpliconExperiment.filter_fasta</a></li>
+<li><a class="reference internal" href="#">calour.amplicon_experiment.AmpliconExperiment.get_config_value</a></li>
 </ul>
 </ul>
 </li>
@@ -138,33 +138,37 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="calour-amplicon-experiment-ampliconexperiment-filter-fasta">
-<h1>calour.amplicon_experiment.AmpliconExperiment.filter_fasta<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-filter-fasta" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="calour-amplicon-experiment-ampliconexperiment-get-config-value">
+<h1>calour.amplicon_experiment.AmpliconExperiment.get_config_value<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-get-config-value" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
-<dt id="calour.amplicon_experiment.AmpliconExperiment.filter_fasta">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">filter_fasta</code><span class="sig-paren">(</span><em>exp</em>, <em>filename</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/amplicon_experiment.py#L128"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.filter_fasta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter features from experiment based on fasta file</p>
+<dt id="calour.amplicon_experiment.AmpliconExperiment.get_config_value">
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">get_config_value</code><span class="sig-paren">(</span><em>key</em>, <em>fallback=None</em>, <em>section='DEFAULT'</em>, <em>config_file_name=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.get_config_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value from the calour config file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : str</p>
 <blockquote>
-<div><p>the fasta filename containing the sequences to use for filtering</p>
+<div><p>the key to get the value for</p>
 </div></blockquote>
-<p><strong>negate</strong> : bool (optional)</p>
+<p><strong>fallback</strong> : str (optional)</p>
 <blockquote>
-<div><p>False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.</p>
+<div><p>the fallback value if the key/section/file does not exist</p>
 </div></blockquote>
-<p><strong>inplace</strong> : bool (optional)</p>
+<p><strong>section</strong> : str (optional)</p>
 <blockquote>
-<div><p>False (default) to create a copy of the experiment, True to filter inplace</p>
+<div><p>the section to get the value from</p>
+</div></blockquote>
+<p><strong>config_file_name</strong> : str (optional)</p>
+<blockquote>
+<div><p>the full path to the config file or None to use default config file</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>newexp</strong> : Experiment</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>value</strong> : str</p>
 <blockquote class="last">
-<div><p>filtered so contains only sequence present in exp and in the fasta file</p>
+<div><p>value of the key or fallback if file/section/key does not exist</p>
 </div></blockquote>
 </td>
 </tr>

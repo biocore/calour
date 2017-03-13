@@ -29,6 +29,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
          
          
+         AmpliconExperiment.add_terms_to_features
+         
          AmpliconExperiment.binarize
          
          AmpliconExperiment.cluster_data
@@ -70,6 +72,12 @@ calour.amplicon_experiment.AmpliconExperiment
          AmpliconExperiment.from_pandas
          
          AmpliconExperiment.getLogger
+         
+         AmpliconExperiment.get_config_file
+         
+         AmpliconExperiment.get_config_sections
+         
+         AmpliconExperiment.get_config_value
          
          AmpliconExperiment.get_data
          

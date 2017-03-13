@@ -29,6 +29,8 @@ calour.experiment.Experiment
          
          
          
+         Experiment.add_terms_to_features
+         
          Experiment.binarize
          
          Experiment.cluster_data
@@ -64,6 +66,12 @@ calour.experiment.Experiment
          Experiment.from_pandas
          
          Experiment.getLogger
+         
+         Experiment.get_config_file
+         
+         Experiment.get_config_sections
+         
+         Experiment.get_config_value
          
          Experiment.get_data
          

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.get_config_value
+=============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.get_config_value
