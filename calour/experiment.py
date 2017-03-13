@@ -28,7 +28,7 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from copy import deepcopy
+from copy import deepcopy, copy
 from importlib import import_module
 from functools import wraps
 import inspect
@@ -151,6 +151,24 @@ class Experiment:
         Experiment
         '''
         return deepcopy(self)
+
+    def __deepcopy__(self, memo):
+        '''Implement the deepcopy since pandas has problem deepcopy empty dataframe
+
+        Happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
+        So we manually copy for empty dataframes
+        '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            try:
+                setattr(result, k, deepcopy(v, memo))
+            except:
+                logger.debug('Failed to copy attribute %r, doing shallow copy on it' % k)
+                setattr(result, k, copy(v))
+                memo[id(k)] = v
+        return result
 
     @staticmethod
     def _record_sig(func):
