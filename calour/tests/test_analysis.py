@@ -50,11 +50,10 @@ class TestAnalysis(Tests):
             print(self.test1.feature_metadata.index[cid])
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
 
-    # def test_diff_abundance_alpha0(self):
-    #     # Test when we should get 0 features (setting FDR level to 0)
-    #     dd = diff_abundance(self.test1, 'group', val1='1', val2='2', alpha=0)
-    #     # NOTE: problem with deepcopy of empty pandas dataframe in pandas 0.19.2 np112py35_1
-    #     self.assertEqual(dd.shape, (self.test1.shape[0], 0))
+    def test_diff_abundance_alpha0(self):
+        # Test when we should get 0 features (setting FDR level to 0)
+        dd = diff_abundance(self.test1, 'group', val1='1', val2='2', alpha=0)
+        self.assertEqual(dd.shape, (self.test1.shape[0], 0))
 
     def test_correlation_default(self):
         # set the seed as we are testing random permutations
