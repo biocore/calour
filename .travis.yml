@@ -30,7 +30,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y xvfb; fi
 install:
   - conda install --yes --file ci/conda_requirements.txt
-  # - pip install -r ci/pip_requirements.txt
+  - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
 before_script:
   - export DISPLAY=:99.0
