@@ -44,8 +44,8 @@ Using calour
 ============
 Calour can be used from within an ipython session / jupyter notebook or as a standalone GUI (EZCalour).
 
-A sample jupyter notebook is located in:
-[https://github.com/amnona/calour/blob/master/notebooks/demo.ipynb](https://github.com/amnona/calour/blob/master/notebooks/demo.ipynb)
+Sample jupyter notebooks are located in:
+[https://github.com/amnona/calour/blob/master/notebooks](https://github.com/amnona/calour/blob/master/notebooks)
 
 Full Documentation is located in:
 [http://biocore.github.io/calour/](http://biocore.github.io/calour/)
