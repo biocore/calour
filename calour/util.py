@@ -288,15 +288,16 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
 def set_log_level(level):
     '''Set the debug level for calour
 
+    You can see the logging levels at:
+    https://docs.python.org/3.5/library/logging.html#levels
+
     Parameters
     ----------
-    level : int
+    level : int or str
         10 for debug, 20 for info, 30 for warn, etc.
+        It is passing to ``logger.setLevel``.
     '''
-
     clog = getLogger('calour')
-    if level < 10:
-        level = 10
     clog.setLevel(level)
 
 

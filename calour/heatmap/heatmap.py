@@ -227,6 +227,8 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
             # set the maximal number of feature labels
             ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_fn))
             ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(yticklabels_max, integer=True))
+    else:
+        ax.get_yaxis().set_visible(False)
 
     # set the mouse hover string to the value of abundance
     def format_coord(x, y):
@@ -275,31 +277,34 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
-        if axis == 0:
-            # plot the color bar along x axis
-            pos = prev - offset, position
-            w, h = i - prev, width
-            rotation = 0
-        else:
-            # plot the color bar along y axis
-            pos = position, prev - offset
-            w, h = width, i - prev
-            rotation = 90
-        rect = mpatches.Rectangle(
-            pos,               # position
-            w,                 # width (size along x axis)
-            h,                 # height (size along y axis)
-            edgecolor="none",  # No border
-            facecolor=col[value],
-            label=value)
-        axes.add_patch(rect)
-        if label is True:
-            rx, ry = rect.get_xy()
-            cx = rx + rect.get_width()/2.0
-            cy = ry + rect.get_height()/2.0
-            # add the text in the color bars
-            axes.annotate(value, (cx, cy), color='w', weight='bold',
-                          fontsize=7, ha='center', va='center', rotation=rotation)
+        if value != '':
+            # do not plot the current segment of the bar
+            # if the value is empty
+            if axis == 0:
+                # plot the color bar along x axis
+                pos = prev - offset, position
+                w, h = i - prev, width
+                rotation = 0
+            else:
+                # plot the color bar along y axis
+                pos = position, prev - offset
+                w, h = width, i - prev
+                rotation = 90
+            rect = mpatches.Rectangle(
+                pos,               # position
+                w,                 # width (size along x axis)
+                h,                 # height (size along y axis)
+                edgecolor="none",  # No border
+                facecolor=col[value],
+                label=value)
+            axes.add_patch(rect)
+            if label is True:
+                rx, ry = rect.get_xy()
+                cx = rx + rect.get_width()/2.0
+                cy = ry + rect.get_height()/2.0
+                # add the text in the color bars
+                axes.annotate(value, (cx, cy), color='w', weight='bold',
+                              fontsize=7, ha='center', va='center', rotation=rotation)
         prev = i
     # axes.legend(
     #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
@@ -390,15 +395,18 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         sample_color_bars = _to_list(sample_color_bars)
         position = 0
         for s in sample_color_bars:
+            # convert to string and leave it as empty if it is None
+            values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
-                gui_obj.xax, values=exp.sample_metadata[s], width=barwidth, position=position, label=label, axis=0)
+                gui_obj.xax, values=values, width=barwidth, position=position, label=label, axis=0)
             position += (barspace + barwidth)
     if feature_color_bars is not None:
         feature_color_bars = _to_list(feature_color_bars)
         position = 0
         for f in feature_color_bars:
+            values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
             _ax_color_bar(
-                gui_obj.yax, values=exp.feature_metadata[f], width=barwidth, position=position, label=label, axis=1)
+                gui_obj.yax, values=values, width=barwidth, position=position, label=label, axis=1)
             position += (barspace + barwidth)
     # set up the gui ready for interaction
     gui_obj()
