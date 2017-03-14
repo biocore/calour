@@ -39,6 +39,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
          AmpliconExperiment.cluster_features
          
+         AmpliconExperiment.collapse_taxonomy
+         
          AmpliconExperiment.copy
          
          AmpliconExperiment.correlation
