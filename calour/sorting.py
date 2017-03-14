@@ -27,6 +27,7 @@ Functions
 
 from logging import getLogger
 from copy import deepcopy
+from numbers import Number
 
 import numpy as np
 from scipy import cluster, spatial
@@ -195,8 +196,36 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
         x = exp.feature_metadata
     else:
         raise ValueError('unknown axis %s' % axis)
-    idx = np.argsort(x[field].values, kind='mergesort')
+    idx = _argsort(x[field].values)
     return exp.reorder(idx, axis=axis, inplace=inplace)
+
+
+def _argsort(values):
+    '''Do an argsort separately on numeric and non-numeric values, then combine (numeric first)
+
+    Used to overcome the problem when using numpy.argsort on a pandas series values with missing values
+
+    Parameters
+    ----------
+    values : iterable
+        the values to sort
+
+    Returns
+    -------
+    tuple of ints
+        the positions of the sorted values
+    '''
+    v = zip(values, list(range(len(values))))
+    nums = [x for x in v if isinstance(x[0], Number)]
+    v = zip(values, list(range(len(values))))
+    strs = [x for x in v if not isinstance(x[0], Number)]
+    if len(nums) > 0 and len(strs) > 0:
+        logger.warn('Values contain mixed numbers and strings. Sorted separately.')
+    nums = sorted(nums, key=lambda x: x[0])
+    strs = sorted(strs, key=lambda x: str(x[0]))
+    allvals = [x[1] for x in nums]
+    allvals.extend([x[1] for x in strs])
+    return allvals
 
 
 @Experiment._record_sig

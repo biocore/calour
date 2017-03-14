@@ -13,6 +13,7 @@ import pandas.util.testing as pdt
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
+from calour.sorting import _argsort
 
 
 class SortingTests(Tests):
@@ -35,6 +36,11 @@ class SortingTests(Tests):
                       self.test1_samp,
                       normalize=None)
         assert_experiment_equal(obs, exp, almost_equal=True)
+
+    def test__argsort(self):
+        vals = [1, 'C', 3.22, 'A', 1]
+        idx = _argsort(vals)
+        self.assertEqual(idx, [0, 4, 2, 3, 1])
 
     def test_sort_by_metadata_sample(self):
         # test sorting various fields (keeping the order)
