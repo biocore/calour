@@ -252,3 +252,40 @@ class AmpliconExperiment(Experiment):
         else:
             newexp.plot(sample_field=plot_field, feature_field='taxonomy', sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
                         gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+
+    def collapse_taxonomy(exp, level='genus', inplace=False):
+        '''Collapse all features sharing the same taxonomy up to level into a single feature
+
+        Sums abundances of all features sharing the same taxonomy up to level.
+
+        Parameters
+        ----------
+        level: str or int (optional)
+            the level to bin the taxonmies. can be int (0=kingdom, 1=phylum,...6=species)
+            or a string ('kingdom' or 'k' etc.)
+        inplace : bool (optional)
+            False (default) to create a copy
+            True to Replace data in exp
+        '''
+        level_dict = {'kingdom': 0, 'k': 0, 'phylum': 1, 'p': 1, 'class': 2, 'c': 2, 'order': 3, 'o': 3, 'family': 4, 'f': 4, 'genus': 5, 'g': 5, 'species': 6, 's': 6}
+        if not isinstance(level, int):
+            if level not in level_dict:
+                raise ValueError('Unsupported taxonomy level %s. Please use out of %s' % (level, list(level_dict.keys())))
+            level = level_dict[level]
+        if inplace:
+            newexp = exp
+        else:
+            newexp = exp.copy()
+
+        def _tax_level(tax_str, level):
+            # local function to get taxonomy up to given level
+            ctax = tax_str.split(';')
+            level += 1
+            if len(ctax) < level:
+                ctax.extend(['other'] * (level - len(ctax)))
+            return ';'.join(ctax[:level])
+
+        newexp.feature_metadata['_calour_tax_group'] = newexp.feature_metadata['taxonomy'].apply(_tax_level, level=level)
+        newexp.merge_identical('_calour_tax_group', method='sum', axis=1, inplace=True)
+        newexp.feature_metadata['taxonomy'] = newexp.feature_metadata['_calour_tax_group']
+        return newexp

@@ -94,6 +94,23 @@ class ExperimentTests(Tests):
         self.assertIn('S20', obs.sample_metadata.index)
         self.assertEqual(obs.shape[1], self.test1.shape[1])
 
+    def test_collapse_taxonomy_kingdom(self):
+        res = self.test1.collapse_taxonomy(level=0)
+        self.assertCountEqual(res.feature_metadata['taxonomy'].values, ['k__Bacteria', 'Unknown', 'bad_bacteria'])
+        # test we did't lose any reads when grouping
+        npt.assert_array_almost_equal(res.get_data(sparse=False).sum(axis=1), self.test1.get_data(sparse=False).sum(axis=1))
+        # and all samples are there
+        npt.assert_equal(res.shape[0], self.test1.shape[0])
+
+    def test_collapse_taxonomy_phylum(self):
+        res = self.test1.collapse_taxonomy(level='phylum')
+        self.assertCountEqual(res.feature_metadata['taxonomy'].values, ['k__Bacteria; p__Actinobacteria', 'k__Bacteria; p__Firmicutes',
+                                                                        'k__Bacteria; p__Proteobacteria', 'k__Bacteria; p__Tenericutes',
+                                                                        'k__Bacteria; p__Bacteroidetes', 'Unknown;other', 'bad_bacteria;other'])
+        # test we did't lose any reads when grouping
+        npt.assert_array_almost_equal(res.get_data(sparse=False).sum(axis=1), self.test1.get_data(sparse=False).sum(axis=1))
+        # and all samples are there
+        npt.assert_equal(res.shape[0], self.test1.shape[0])
 
 if __name__ == "__main__":
     main()
