@@ -71,7 +71,7 @@ def sort_centroid(exp, transform=log_n, inplace=False, **kwargs):
     if transform is None:
         data = exp.data
     else:
-        logger.debug('tansforming data using %r' % transform)
+        logger.debug('transforming data using %r' % transform)
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).data
     data = data.T
