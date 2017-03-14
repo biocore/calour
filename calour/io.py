@@ -138,7 +138,7 @@ def _get_md_from_biom(table):
     return md_df
 
 
-def _read_open_ms(fp, transpose=True):
+def _read_open_ms(fp, transpose=True, label_transpose=True):
     '''Read an OpenMS bucket table csv file
 
     Parameters
@@ -149,6 +149,8 @@ def _read_open_ms(fp, transpose=True):
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
+    label_transpose : bool (optional)
+        True to transpose the pandas dataframe (use if csv has samples as rows)
 
     Returns
     -------
@@ -166,6 +168,8 @@ def _read_open_ms(fp, transpose=True):
     # a known bug in pandas (see #11166)
     table = pd.read_csv(fp, header=0, engine='python')
     table.set_index(table.columns[0], drop=True, inplace=True)
+    if label_transpose:
+        table = table.transpose()
     logger.info('loaded %d observations, %d  samples' % table.shape)
     sid = table.columns
     oid = table.index
