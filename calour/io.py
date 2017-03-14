@@ -205,7 +205,7 @@ def _read_table(fp, encoding=None):
     return table
 
 
-def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=None,
+def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
                  description=None, sparse=False, rows_are_samples=False, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
 
@@ -216,6 +216,9 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     sample_metadata_file : str or None (optional)
         None (default) to not load metadata per sample
         str to specify name of sample mapping file (tsv)
+    gnps_file : str or None (optional)
+        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file
+        for use with the 'gnps' database in plot
     feature_metadata_file : str or None (optional)
         Name of table containing additional metadata about each feature
         None (default) to not load
@@ -252,6 +255,10 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     mzdata.columns = ['MZ', 'RT']
     mzdata = mzdata.astype(float)
     exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
+
+    if gnps_file:
+        gnps_data = pd.read_table(gnps_file, sep='\t')
+        exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
 
     return exp
 
