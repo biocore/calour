@@ -112,5 +112,6 @@ class ExperimentTests(Tests):
         # and all samples are there
         npt.assert_equal(res.shape[0], self.test1.shape[0])
 
+
 if __name__ == "__main__":
     main()
