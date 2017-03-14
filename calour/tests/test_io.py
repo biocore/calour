@@ -66,6 +66,16 @@ class IOTests(Tests):
         self.assertEqual(exp.data[:, 1].sum(), 13795540)
         self.assertEqual(exp.sparse, False)
 
+    def test_read_openms_bucket_table_samples_are_rows(self):
+        # load the openms bucket table with no metadata
+        exp = ca.read(self.openms_samples_rows_csv, data_file_type='openms_transpose', sparse=False, normalize=None)
+        self.assertEqual(len(exp.sample_metadata), 9)
+        self.assertEqual(len(exp.feature_metadata), 10)
+        self.assertEqual(exp.shape, (9, 10))
+        self.assertEqual(exp.data[0, :].sum(), 8554202)
+        self.assertEqual(exp.data[:, 1].sum(), 13795540)
+        self.assertEqual(exp.sparse, False)
+
     def test_read_open_ms(self):
         exp = ca.read_open_ms(self.openms_csv, normalize=None)
         # test we get the MZ and RT correct
@@ -79,6 +89,14 @@ class IOTests(Tests):
         # test load sparse
         exp = ca.read_open_ms(self.openms_csv, sparse=True, normalize=None)
         self.assertEqual(exp.sparse, True)
+
+    def test_read_open_ms_samples_rows(self):
+        exp = ca.read_open_ms(self.openms_samples_rows_csv, normalize=None, rows_are_samples=True)
+        # test we get the MZ and RT correct
+        self.assertIn('MZ', exp.feature_metadata)
+        self.assertIn('RT', exp.feature_metadata)
+        self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
+        self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
 
     def test_read_qiim2(self):
         # problem with travis and qiime2 install - skipping

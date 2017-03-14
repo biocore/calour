@@ -138,7 +138,7 @@ def _get_md_from_biom(table):
     return md_df
 
 
-def _read_open_ms(fp, transpose=True, label_transpose=True):
+def _read_open_ms(fp, transpose=True, label_transpose=False):
     '''Read an OpenMS bucket table csv file
 
     Parameters
@@ -206,7 +206,7 @@ def _read_table(fp, encoding=None):
 
 
 def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=None,
-                 description=None, sparse=False, *, normalize, **kwargs):
+                 description=None, sparse=False, rows_are_samples=False, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
 
     Parameters
@@ -225,6 +225,9 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     sparse : bool (optional)
         False (default) to store data as dense matrix (faster but more memory)
         True to store as sparse (CSR)
+    rows_are_samples : bool (optional)
+        True to treat csv data file rows as samples,
+        False (default) to treat csv data files rows as features
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
@@ -233,8 +236,12 @@ def read_open_ms(data_file, sample_metadata_file=None, feature_metadata_file=Non
     exp : ``Experiment``
     '''
     logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
+    if rows_are_samples:
+        data_file_type = 'openms_transpose'
+    else:
+        data_file_type = 'openms'
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type='openms', sparse=sparse,
+               data_file_type=data_file_type, sparse=sparse,
                normalize=normalize,  **kwargs)
 
     exp.sample_metadata['id'] = exp.sample_metadata.index.values
@@ -274,6 +281,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
+        'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     encoding : str or None (optional)
         encoder for the metadata files. None (default) to use
@@ -304,7 +312,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if data_file_type == 'biom':
         sid, oid, data, md = _read_biom(data_file)
     elif data_file_type == 'openms':
-        sid, oid, data = _read_open_ms(data_file)
+        sid, oid, data = _read_open_ms(data_file, label_transpose=False)
+    elif data_file_type == 'openms_transpose':
+        sid, oid, data = _read_open_ms(data_file, label_transpose=True)
     elif data_file_type == 'qiime2':
         sid, oid, data, md = _read_qiime2(data_file)
     else:
