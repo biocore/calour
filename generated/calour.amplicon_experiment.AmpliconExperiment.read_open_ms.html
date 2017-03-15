@@ -142,7 +142,7 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.read_open_ms<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-read-open-ms" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.read_open_ms">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">read_open_ms</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>gnps_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=None</em>, <em>sparse=False</em>, <em>rows_are_samples=False</em>, <em>*</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.read_open_ms" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">read_open_ms</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>gnps_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=None</em>, <em>sparse=False</em>, <em>rows_are_samples=False</em>, <em>mz_separator=None</em>, <em>*</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.read_open_ms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an OpenMS metabolomics experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -181,6 +181,12 @@ True to store as sparse (CSR)</p>
 <blockquote>
 <div><p>True to treat csv data file rows as samples,
 False (default) to treat csv data files rows as features</p>
+</div></blockquote>
+<p><strong>mz_separator: str or None (optional)</strong></p>
+<blockquote>
+<div><p>The separator for the mz/rt fields in the feature name.
+None (default) for autodetect
+&#8216;_&#8217; or &#8216; &#8216; are typical options</p>
 </div></blockquote>
 <p><strong>normalize</strong> : int or None</p>
 <blockquote>
