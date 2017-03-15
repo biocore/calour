@@ -8,7 +8,7 @@ from .util import get_config_value, get_config_file, get_config_sections
 logger = getLogger(__name__)
 
 
-def _get_database_class(dbname, config_file_name=None):
+def _get_database_class(dbname, exp=None, config_file_name=None):
     '''Get the database class for the given database name
 
     Uses the calour config file (calour.config) keys
@@ -37,7 +37,7 @@ def _get_database_class(dbname, config_file_name=None):
         db_module = importlib.import_module(module_name)
         # get the class
         DBClass = getattr(db_module, class_name)
-        cdb = DBClass()
+        cdb = DBClass(exp)
         return cdb
     # not found, so print available database names
     databases = []
@@ -98,11 +98,13 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
 
 
 class Database(ABC):
-    def __init__(self, database_name='generic', methods=['get', 'annotate', 'feature_terms']):
+    def __init__(self, exp=None, database_name='generic', methods=['get', 'annotate', 'feature_terms']):
         '''Initialize the database interface
 
         Parameters
         ----------
+        exp : Experiment or None (optional)
+            The experiment link for the database (if needed)
         database_name : str (optional)
             name of the database
         methods : list of str (optional)
@@ -112,6 +114,7 @@ class Database(ABC):
         '''
         self._database_name = database_name
         self._methods = set(methods)
+        self._exp = exp
 
     def get_name(self):
         '''Get the name of the database.

@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 
 
 class MockDatabase(Database):
-    def __init__(self):
+    def __init__(self, exp=None):
         '''Initialize the database interface
 
         Parameters

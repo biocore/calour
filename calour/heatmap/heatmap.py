@@ -86,7 +86,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 
     # link gui with the databases requested
     for cdatabase in databases:
-        cdb = _get_database_class(cdatabase)
+        cdb = _get_database_class(cdatabase, exp=exp)
         gui_obj.databases.append(cdb)
         # select the database for use with the annotate button
         if cdb.annotatable:
