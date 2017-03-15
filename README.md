@@ -10,12 +10,17 @@ Install
 =======
 Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment for calour:
 ```
-conda create -n calour python=3 matplotlib numpy scipy pandas qt jupyter sklearn scikit-learn
+conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn
 ```
 
 and activate it using:
 ```
 source activate calour
+```
+
+Install biom-format and scikit-bio:
+```
+conda install -c biocore biom-format scikit-bio
 ```
 
 Install calour:
@@ -39,8 +44,8 @@ Using calour
 ============
 Calour can be used from within an ipython session / jupyter notebook or as a standalone GUI (EZCalour).
 
-A sample jupyter notebook is located in:
-[https://github.com/amnona/calour/blob/master/notebooks/demo.ipynb](https://github.com/amnona/calour/blob/master/notebooks/demo.ipynb)
+Sample jupyter notebooks are located in:
+[https://github.com/amnona/calour/blob/master/notebooks](https://github.com/amnona/calour/blob/master/notebooks)
 
 Full Documentation is located in:
 [http://biocore.github.io/calour/](http://biocore.github.io/calour/)
