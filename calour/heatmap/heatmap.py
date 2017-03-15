@@ -12,6 +12,7 @@ import itertools
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import numpy as np
 
 from ..transforming import log_n
@@ -30,6 +31,9 @@ def _transition_index(l):
     >>> l = ['a', 'a', 'b']
     >>> list(_transition_index(l))
     [(2, 'a'), (3, 'b')]
+    >>> l = ['a', 'a', 'b', 1, 2, None, None]
+    >>> list(_transition_index(l))
+    [(2, 'a'), (3, 'b'), (4, 1), (5, 2), (7, None)]
 
     Parameters
     ----------
@@ -42,11 +46,13 @@ def _transition_index(l):
     '''
     it = enumerate(l)
     i, item = next(it)
+    item = str(type(item)), item
     for i, current in it:
+        current = str(type(current)), current
         if item != current:
-            yield i, item
+            yield i, item[1]
             item = current
-    yield i + 1, item
+    yield i + 1, item[1]
 
 
 def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
@@ -150,8 +156,6 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     ``matplotlib.figure.Figure``
 
     '''
-    import matplotlib.pyplot as plt
-
     logger.debug('plot heatmap')
     numrows, numcols = exp.shape
     # step 1. transform data
