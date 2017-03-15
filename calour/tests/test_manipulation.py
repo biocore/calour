@@ -58,8 +58,10 @@ class MTests(Tests):
         self.assertIsNot(newexp, self.test1)
         self.assertEqual(newexp.shape[1], self.test1.shape[1])
         # test the counts/original samples per merge value
-        self.assertCountEqual(newexp.sample_metadata['_calour_merge_ids']['S1'], ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11'])
-        self.assertCountEqual(newexp.sample_metadata['_calour_merge_ids']['S12'], ['S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19', 'S20'])
+        self.assertCountEqual(newexp.sample_metadata['_calour_merge_ids']['S1'],
+                              ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11'])
+        self.assertCountEqual(newexp.sample_metadata['_calour_merge_ids']['S12'],
+                              ['S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19', 'S20'])
         self.assertEqual(newexp.sample_metadata['_calour_merge_number']['S1'], 11)
         self.assertEqual(newexp.sample_metadata['_calour_merge_number']['S12'], 9)
 
