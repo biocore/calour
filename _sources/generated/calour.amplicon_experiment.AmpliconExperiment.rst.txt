@@ -12,6 +12,8 @@ calour.amplicon_experiment.AmpliconExperiment
          :toctree:
       
          
+         AmpliconExperiment.__deepcopy__
+         
          
          AmpliconExperiment.__eq__
          
@@ -36,6 +38,8 @@ calour.amplicon_experiment.AmpliconExperiment
          AmpliconExperiment.cluster_data
          
          AmpliconExperiment.cluster_features
+         
+         AmpliconExperiment.collapse_taxonomy
          
          AmpliconExperiment.copy
          

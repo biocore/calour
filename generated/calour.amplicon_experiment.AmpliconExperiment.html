@@ -217,23 +217,29 @@ or <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarr
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.__eq__.html#calour.amplicon_experiment.AmpliconExperiment.__eq__" title="calour.amplicon_experiment.AmpliconExperiment.__eq__"><code class="xref py py-obj docutils literal"><span class="pre">ae1</span> <span class="pre">==</span> <span class="pre">ae2</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.__deepcopy__.html#calour.amplicon_experiment.AmpliconExperiment.__deepcopy__" title="calour.amplicon_experiment.AmpliconExperiment.__deepcopy__"><code class="xref py py-obj docutils literal"><span class="pre">copy.deepcopy(ae)</span></code></a></td>
+<td>Implement the deepcopy since pandas has problem deepcopy empty dataframe</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.__eq__.html#calour.amplicon_experiment.AmpliconExperiment.__eq__" title="calour.amplicon_experiment.AmpliconExperiment.__eq__"><code class="xref py py-obj docutils literal"><span class="pre">ae1</span> <span class="pre">==</span> <span class="pre">ae2</span></code></a></td>
 <td>Check equality.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.__ne__.html#calour.amplicon_experiment.AmpliconExperiment.__ne__" title="calour.amplicon_experiment.AmpliconExperiment.__ne__"><code class="xref py py-obj docutils literal"><span class="pre">ae1</span> <span class="pre">!=</span> <span class="pre">ae2</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.__ne__.html#calour.amplicon_experiment.AmpliconExperiment.__ne__" title="calour.amplicon_experiment.AmpliconExperiment.__ne__"><code class="xref py py-obj docutils literal"><span class="pre">ae1</span> <span class="pre">!=</span> <span class="pre">ae2</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features.html#calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features" title="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features"><code class="xref py py-obj docutils literal"><span class="pre">add_terms_to_features</span></code></a>(exp,&nbsp;dbname[,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features.html#calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features" title="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features"><code class="xref py py-obj docutils literal"><span class="pre">add_terms_to_features</span></code></a>(exp,&nbsp;dbname[,&nbsp;...])</td>
 <td>Add a field to the feature metadata, with most common term for each feature</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.binarize.html#calour.amplicon_experiment.AmpliconExperiment.binarize" title="calour.amplicon_experiment.AmpliconExperiment.binarize"><code class="xref py py-obj docutils literal"><span class="pre">binarize</span></code></a>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.binarize.html#calour.amplicon_experiment.AmpliconExperiment.binarize" title="calour.amplicon_experiment.AmpliconExperiment.binarize"><code class="xref py py-obj docutils literal"><span class="pre">binarize</span></code></a>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
 <td>Binarize the data with a threshold.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_data.html#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="calour.amplicon_experiment.AmpliconExperiment.cluster_data"><code class="xref py py-obj docutils literal"><span class="pre">cluster_data</span></code></a>(exp[,&nbsp;transform,&nbsp;axis,&nbsp;metric,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_data.html#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="calour.amplicon_experiment.AmpliconExperiment.cluster_data"><code class="xref py py-obj docutils literal"><span class="pre">cluster_data</span></code></a>(exp[,&nbsp;transform,&nbsp;axis,&nbsp;metric,&nbsp;...])</td>
 <td>Cluster the samples/features.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_features.html#calour.amplicon_experiment.AmpliconExperiment.cluster_features" title="calour.amplicon_experiment.AmpliconExperiment.cluster_features"><code class="xref py py-obj docutils literal"><span class="pre">cluster_features</span></code></a>(exp[,&nbsp;min_abundance,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_features.html#calour.amplicon_experiment.AmpliconExperiment.cluster_features" title="calour.amplicon_experiment.AmpliconExperiment.cluster_features"><code class="xref py py-obj docutils literal"><span class="pre">cluster_features</span></code></a>(exp[,&nbsp;min_abundance,&nbsp;inplace])</td>
 <td>Cluster features.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy"><code class="xref py py-obj docutils literal"><span class="pre">collapse_taxonomy</span></code></a>(exp[,&nbsp;level,&nbsp;inplace])</td>
+<td>Collapse all features sharing the same taxonomy up to level into a single feature</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.copy.html#calour.amplicon_experiment.AmpliconExperiment.copy" title="calour.amplicon_experiment.AmpliconExperiment.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>()</td>
 <td>Copy the object.</td>
