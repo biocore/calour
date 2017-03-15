@@ -188,8 +188,8 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         x_pos = np.array([0.] + list(x_pos))
         # samples position - 0.5 before and go to 0.5 after
         x_pos -= 0.5
-        for pos in x_pos[1:-1]:
-            ax.axvline(x=pos, color='white')
+        # for pos in x_pos[1:-1]:
+        #     ax.axvline(x=pos, color='white')
         # set tick/label at the middle of each sample group
         ax.set_xticks(x_pos[:-1] + (x_pos[1:] - x_pos[:-1]) / 2)
         xticklabels = [str(i) for i in x_val]
@@ -200,6 +200,8 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
                            if len(i) > xticklabel_len else i
                            for i in xticklabels]
         ax.set_xticklabels(xticklabels, rotation=xticklabel_rot, ha='right')
+    else:
+        ax.get_xaxis().set_visible(False)
 
     # plot y tick labels dynamically
     if feature_field is not None:
