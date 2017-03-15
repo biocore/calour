@@ -28,6 +28,7 @@ class PlotTests(Tests):
             obs = _create_plot_gui(self.test1, gui=gui, databases=[])
             obs.current_select = row, col
             sid, fid, abd, annt = obs.get_info()
+            obs.save_figure('/tmp/a.png')
             self.assertListEqual(annt, [])
             self.assertEqual(abd, self.test1.data[row, col])
             self.assertEqual(sid, self.test1.sample_metadata.index[row])
@@ -78,6 +79,10 @@ class PlotTests(Tests):
         self.assertListEqual(
             [i.get_text() for i in axes.texts],
             ['a', 'b'])
+
+    def test_plot(self):
+        obs = self.test1.plot()
+        obs.save_figure('/tmp/a.png')
 
 
 if __name__ == '__main__':

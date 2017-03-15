@@ -77,10 +77,6 @@ class AmpliconExperiment(Experiment):
         return 'AmpliconExperiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
-    def plot(self, databases=('dbbact',), feature_field='taxonomy', **kwargs):
-        # plot the experiment using taxonmy field and dbbact database
-        super().plot(feature_field=feature_field, databases=databases, **kwargs)
-
     def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
 

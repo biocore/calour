@@ -109,6 +109,9 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
     and samples in column.
 
+    .. note:: By default it log transforms the abundance values and then plot heatmap.
+       The original object is not modified.
+
     .. _heatmap-ref:
 
     Parameters
@@ -411,7 +414,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     # set up the gui ready for interaction
     gui_obj()
 
-    return gui
+    return gui_obj
 
 
 def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
@@ -420,10 +423,12 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
 
     This is a convenience wrapper for plot().
 
+    .. note:: Sorting occurs on a copy, the original ``Experiment`` object is not modified.
+
     Parameters
     ----------
-    fields : str or None, optional
-        The field to sort samples by before plotting
+    fields : str, list, or None, optional
+        The fields to sort samples by before plotting
     sample_color_bars : list, optional
         list of column names in the sample metadata. It plots a color bar
         for each column. It doesn't plot color bars by default (``None``)
