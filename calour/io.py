@@ -206,7 +206,7 @@ def _read_table(fp, encoding=None):
 
 
 def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
-                 description=None, sparse=False, rows_are_samples=False, *, normalize, **kwargs):
+                 description=None, sparse=False, rows_are_samples=False, mz_separator=None, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
 
     Parameters
@@ -231,6 +231,10 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     rows_are_samples : bool (optional)
         True to treat csv data file rows as samples,
         False (default) to treat csv data files rows as features
+    mz_separator: str or None (optional)
+        The separator for the mz/rt fields in the feature name.
+        None (default) for autodetect
+        '_' or ' ' are typical options
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
@@ -251,9 +255,25 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     # generate nice M/Z (MZ) and retention time (RT) columns for each feature
     exp.feature_metadata['id'] = exp.feature_metadata.index.values
-    mzdata = exp.feature_metadata['id'].str.split('_', expand=True)
-    mzdata.columns = ['MZ', 'RT']
+
+    if mz_separator is None:
+        # autodetect the mz/rt separator
+        tmp = exp.feature_metadata['id'].iloc[0].split('_')
+        if len(tmp) > 1:
+            logger.debug('Autodetcted "_" as mz/rt separator')
+            mz_separator = '_'
+        else:
+            tmp = exp.feature_metadata['id'].iloc[0].split(' ')
+            if len(tmp) > 1:
+                logger.debug('Autodetcted " " as mz/rt separator')
+                mz_separator = ' '
+            else:
+                raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_separator parameter')
+
+    mzdata = exp.feature_metadata['id'].str.split(mz_separator, expand=True)
+    mzdata = mzdata[[0, 1]]
     mzdata = mzdata.astype(float)
+    mzdata.columns = ['MZ', 'RT']
     exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
 
     if gnps_file:
