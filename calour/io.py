@@ -35,7 +35,7 @@ import biom
 
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
-from .ms1_experiment import Ms1Experiment
+from .ms1_experiment import MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 
 
@@ -139,7 +139,7 @@ def _get_md_from_biom(table):
     return md_df
 
 
-def _read_open_ms(fp, transpose=True, label_transpose=False):
+def _read_open_ms(fp, transpose=True, rows_are_samples=False):
     '''Read an OpenMS bucket table csv file
 
     Parameters
@@ -150,8 +150,9 @@ def _read_open_ms(fp, transpose=True, label_transpose=False):
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
-    label_transpose : bool (optional)
-        True to transpose the pandas dataframe (use if csv has samples as rows)
+    rows_are_samples : bool (optional)
+        True to csv datafile has samples as rows,
+        False (default) if columns are samples (rows are features)
 
     Returns
     -------
@@ -169,7 +170,7 @@ def _read_open_ms(fp, transpose=True, label_transpose=False):
     # a known bug in pandas (see #11166)
     table = pd.read_csv(fp, header=0, engine='python')
     table.set_index(table.columns[0], drop=True, inplace=True)
-    if label_transpose:
+    if rows_are_samples:
         table = table.transpose()
     logger.info('loaded %d observations, %d  samples' % table.shape)
     sid = table.columns
@@ -207,7 +208,7 @@ def _read_table(fp, encoding=None):
 
 
 def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
-                 description=None, sparse=False, rows_are_samples=False, mz_separator=None, *, normalize, **kwargs):
+                 description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
 
     Parameters
@@ -232,8 +233,8 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     rows_are_samples : bool (optional)
         True to treat csv data file rows as samples,
         False (default) to treat csv data files rows as features
-    mz_separator: str or None (optional)
-        The separator for the mz/rt fields in the feature name.
+    mz_rt_sep: str or None (optional)
+        The separator for the mz/rt fields in the feature names in data_file.
         None (default) for autodetect
         '_' or ' ' are typical options
     normalize : int or None
@@ -250,36 +251,39 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
         data_file_type = 'openms'
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
                data_file_type=data_file_type, sparse=sparse,
-               normalize=normalize, cls=Ms1Experiment, **kwargs)
+               normalize=normalize, cls=MS1Experiment, **kwargs)
 
     exp.sample_metadata['id'] = exp.sample_metadata.index.values
 
     # generate nice M/Z (MZ) and retention time (RT) columns for each feature
     exp.feature_metadata['id'] = exp.feature_metadata.index.values
 
-    if mz_separator is None:
+    if mz_rt_sep is None:
         # autodetect the mz/rt separator
         tmp = exp.feature_metadata['id'].iloc[0].split('_')
         if len(tmp) > 1:
             logger.debug('Autodetcted "_" as mz/rt separator')
-            mz_separator = '_'
+            mz_rt_sep = '_'
         else:
             tmp = exp.feature_metadata['id'].iloc[0].split(' ')
             if len(tmp) > 1:
                 logger.debug('Autodetcted " " as mz/rt separator')
-                mz_separator = ' '
+                mz_rt_sep = ' '
             else:
-                raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_separator parameter')
+                raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
 
-    mzdata = exp.feature_metadata['id'].str.split(mz_separator, expand=True)
+    mzdata = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
     mzdata = mzdata[[0, 1]]
     mzdata = mzdata.astype(float)
     mzdata.columns = ['MZ', 'RT']
     exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
 
     if gnps_file:
+        # load the gnps table
         gnps_data = pd.read_table(gnps_file, sep='\t')
         exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
+        # add gnps names to the features
+        exp._prepare_gnps()
 
     return exp
 
@@ -340,9 +344,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if data_file_type == 'biom':
         sid, oid, data, md = _read_biom(data_file)
     elif data_file_type == 'openms':
-        sid, oid, data = _read_open_ms(data_file, label_transpose=False)
+        sid, oid, data = _read_open_ms(data_file, rows_are_samples=False)
     elif data_file_type == 'openms_transpose':
-        sid, oid, data = _read_open_ms(data_file, label_transpose=True)
+        sid, oid, data = _read_open_ms(data_file, rows_are_samples=True)
     elif data_file_type == 'qiime2':
         sid, oid, data, md = _read_qiime2(data_file)
     else:

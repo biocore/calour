@@ -80,6 +80,8 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
+    heatmap_feature_field : str or None
+        The default field used for the y-axis labels (feature lables)
 
     See Also
     --------
@@ -104,6 +106,12 @@ class Experiment:
         # remeber how many reads per sample/feature before any procesing
         self.sample_metadata['_calour_original_abundance'] = self.data.sum(axis=1)
         # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
+
+        # the default y-axis field used for plotting
+        self.heatmap_feature_field = 'taxonomy'
+
+        # the default databases to use for feature information
+        self.heatmap_databases = []
 
     @property
     def sparse(self):
@@ -155,8 +163,9 @@ class Experiment:
     def __deepcopy__(self, memo):
         '''Implement the deepcopy since pandas has problem deepcopy empty dataframe
 
-        Happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
-        So we manually copy for empty dataframes
+        When using the default deepcopy on an empty dataframe (columns but no rows), we get an error.
+        This happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
+        So we manually use copy instead of deepcopy for empty dataframes
         '''
         cls = self.__class__
         result = cls.__new__(cls)

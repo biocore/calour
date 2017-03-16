@@ -72,14 +72,15 @@ class AmpliconExperiment(Experiment):
     --------
     Experiment
     '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.heatmap_feature_field = 'taxonomy'
+        self.heatmap_databases = ('dbbact',)
+
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'AmpliconExperiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
-
-    def plot(self, databases=('dbbact',), feature_field='taxonomy', **kwargs):
-        # plot the experiment using taxonmy field and dbbact database
-        super().plot(feature_field=feature_field, databases=databases, **kwargs)
 
     def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
@@ -204,54 +205,6 @@ class AmpliconExperiment(Experiment):
         good_pos = (exp.sample_metadata[origread_field] >= minreads).values
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
         return newexp
-
-    def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
-                  gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
-        '''Plot bacteria after sorting by field
-
-        This is a convenience wrapper for plot()
-
-        Parameters
-        ----------
-        fields : str or list of str or None (optional)
-            The field to sort samples by before plotting
-            If list of str, sort by each field according to order in list
-            if None, do not sort
-        sample_color_bars : list, optional
-            list of column names in the sample metadata. It plots a color bar
-            for each column. It doesn't plot color bars by default (``None``)
-        feature_color_bars : list, optional
-            list of column names in the feature metadata. It plots a color bar
-            for each column. It doesn't plot color bars by default (``None``)
-        color_bar_label : bool, optional
-            whether to show the label for the color bars
-        gui : str or None, optional
-            GUI to use:
-            'cli' : simple command line gui
-            'jupyter' : jupyter notebook interactive gui
-            'qt5' : qt5 based interactive gui
-            None : no interactivity - just a matplotlib figure
-        databases : Iterable of str
-            a list of databases to access or add annotation
-        kwargs : dict, optional
-            keyword arguments passing to :ref:`plot<plot-ref>` function.
-
-        '''
-        if fields is not None:
-            newexp = exp.copy()
-            fields = _to_list(fields)
-            for cfield in fields:
-                newexp.sort_samples(cfield, inplace=True)
-            plot_field = cfield
-        else:
-            newexp = exp
-            plot_field = None
-        if 'sample_field' in kwargs:
-            newexp.plot(feature_field='taxonomy', sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                        gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
-        else:
-            newexp.plot(sample_field=plot_field, feature_field='taxonomy', sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                        gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
 
     def collapse_taxonomy(exp, level='genus', inplace=False):
         '''Collapse all features sharing the same taxonomy up to level into a single feature

@@ -342,13 +342,3 @@ def _argsort(values):
     v = zip(values, list(range(len(values))))
     res = sorted(v, key=lambda x: (str(type(x[0])), x))
     return [x[1] for x in res]
-    # nums = [x for x in v if isinstance(x[0], Number)]
-    # v = zip(values, list(range(len(values))))
-    # strs = [x for x in v if not isinstance(x[0], Number)]
-    # if len(nums) > 0 and len(strs) > 0:
-    #     logger.warn('Values contain mixed numbers and strings. Sorted separately.')
-    # nums = sorted(nums, key=lambda x: x[0])
-    # strs = sorted(strs, key=lambda x: str(x[0]))
-    # allvals = [x[1] for x in nums]
-    # allvals.extend([x[1] for x in strs])
-    # return allvals

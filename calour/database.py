@@ -98,7 +98,7 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
 
 
 class Database(ABC):
-    def __init__(self, exp=None, database_name='generic', methods=['get', 'annotate', 'feature_terms']):
+    def __init__(self, exp=None, database_name=None, methods=['get', 'annotate', 'feature_terms']):
         '''Initialize the database interface
 
         Parameters
@@ -112,20 +112,9 @@ class Database(ABC):
             'annotate' if database interface supports add_annotation()
             'enrichment' if database interface supports get_feature_terms()
         '''
-        self._database_name = database_name
+        self.database_name = database_name
         self._methods = set(methods)
         self._exp = exp
-
-    def get_name(self):
-        '''Get the name of the database.
-        Used for displaying when no annotations are found
-
-        Returns
-        -------
-        dbname : str
-            nice name of the database
-        '''
-        return self._database_name
 
     @property
     def annotatable(self):

@@ -104,9 +104,10 @@ class ExperimentTests(Tests):
 
     def test_collapse_taxonomy_phylum(self):
         res = self.test1.collapse_taxonomy(level='phylum')
-        self.assertCountEqual(res.feature_metadata['taxonomy'].values, ['k__Bacteria; p__Actinobacteria', 'k__Bacteria; p__Firmicutes',
-                                                                        'k__Bacteria; p__Proteobacteria', 'k__Bacteria; p__Tenericutes',
-                                                                        'k__Bacteria; p__Bacteroidetes', 'Unknown;other', 'bad_bacteria;other'])
+        self.assertCountEqual(res.feature_metadata['taxonomy'].values,
+                              ['k__Bacteria; p__Actinobacteria', 'k__Bacteria; p__Firmicutes',
+                               'k__Bacteria; p__Proteobacteria', 'k__Bacteria; p__Tenericutes',
+                               'k__Bacteria; p__Bacteroidetes', 'Unknown;other', 'bad_bacteria;other'])
         # test we did't lose any reads when grouping
         npt.assert_array_almost_equal(res.get_data(sparse=False).sum(axis=1), self.test1.get_data(sparse=False).sum(axis=1))
         # and all samples are there
