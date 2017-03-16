@@ -31,7 +31,7 @@ class ExperimentTests(Tests):
         mdb = self.mock_db
         self.assertTrue(mdb.annotatable)
         self.assertTrue(mdb.can_get_feature_terms)
-        self.assertEqual(mdb.get_name(), 'mock_db')
+        self.assertEqual(mdb.database_name, 'mock_db')
 
     def test_gui_interface(self):
         mdb = self.mock_db
@@ -48,7 +48,7 @@ class ExperimentTests(Tests):
         calour.util.set_config_value('class_name', 'MockDatabase', section='testdb', config_file_name=f)
         calour.util.set_config_value('module_name', 'calour.tests.mock_database', section='testdb', config_file_name=f)
         db = _get_database_class('testdb', config_file_name=f)
-        self.assertEqual(db.get_name(), 'mock_db')
+        self.assertEqual(db.database_name, 'mock_db')
         with self.assertRaises(ValueError):
             _get_database_class('mock')
         shutil.rmtree(d)

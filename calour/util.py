@@ -27,6 +27,8 @@ import inspect
 import configparser
 from pkg_resources import resource_filename
 from collections import Iterable
+from numbers import Number
+
 import scipy
 
 
@@ -318,3 +320,25 @@ def _to_list(x):
     if isinstance(x, Iterable):
         return x
     return [x]
+
+
+def _argsort(values):
+    '''Do an argsort separately on numeric and non-numeric values, then combine (numeric first)
+
+    Used to overcome the problem when using numpy.argsort on a pandas series values with missing values
+
+    Parameters
+    ----------
+    values : iterable
+        the values to sort
+
+    Returns
+    -------
+    tuple of ints
+        the positions of the sorted values
+    '''
+    # convert all numbers to float otherwise int will be sorted different place
+    values = [float(x) if isinstance(x, Number) else x for x in values]
+    v = zip(values, list(range(len(values))))
+    res = sorted(v, key=lambda x: (str(type(x[0])), x))
+    return [x[1] for x in res]

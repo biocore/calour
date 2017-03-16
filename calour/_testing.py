@@ -31,6 +31,10 @@ class Tests(TestCase):
         self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
         # a simple openms bucket table csv file
         self.openms_csv = join(test_data_dir, 'openms_bucket_table.csv')
+        # a simple openms bucket table csv file with samples as rows
+        self.openms_samples_rows_csv = join(test_data_dir, 'openms_bucket_table_samples_rows.csv')
+        # a simple gnps data file for ms1 test data
+        self.ms1_gnps = join(test_data_dir, 'ms1.gnps.txt')
         # a fasta file for testing the AmpliconExperiment
         self.seqs1_fasta = join(test_data_dir, 'seqs1.fasta')
         # a qiime2 biom table artifact
