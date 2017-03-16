@@ -391,7 +391,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     Returns
     -------
     ``PlottingGUI``
-        Contains the figure of the output plot in fig parameter
+        Contains the figure of the output plot in .figure parameter
     '''
     # set the databases if default requested (i.e. False)
     if databases is False:

@@ -108,7 +108,7 @@ class Experiment:
         # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
 
         # the default y-axis field used for plotting
-        self.heatmap_feature_field = 'taxonomy'
+        self.heatmap_feature_field = None
 
         # the default databases to use for feature information
         self.heatmap_databases = []

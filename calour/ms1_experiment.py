@@ -22,10 +22,7 @@ Classes
 
 from logging import getLogger
 
-import numpy as np
-
 from .experiment import Experiment
-from .util import _get_taxonomy_string, _to_list
 
 
 logger = getLogger(__name__)
@@ -73,13 +70,22 @@ class MS1Experiment(Experiment):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.heatmap_feature_field = 'gnps'
         self.heatmap_databases = ('gnps',)
 
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'MS1Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
+
+    @property
+    def heatmap_feature_field(self):
+        if 'gnps' in self.feature_metadata.columns:
+            return 'gnps'
+        return 'id'
+
+    @heatmap_feature_field.setter
+    def heatmap_feature_field(self, val):
+        pass
 
     def _prepare_gnps(self):
         if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
