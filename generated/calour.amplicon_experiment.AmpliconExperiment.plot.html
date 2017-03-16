@@ -142,8 +142,115 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.plot<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-plot" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.plot">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>databases=('dbbact'</em>, <em>)</em>, <em>feature_field='taxonomy'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/amplicon_experiment.py#L80"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the interactive heatmap and its associated axes.</p>
+<p>The heatmap is interactive and can be dynamically updated with
+following key and mouse events:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Event</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><cite>+</cite> or <cite>⇧ →</cite></td>
+<td>zoom in on x axis</td>
+</tr>
+<tr class="row-odd"><td><cite>_</cite> or <cite>⇧ ←</cite></td>
+<td>zoom out on x axis</td>
+</tr>
+<tr class="row-even"><td><cite>=</cite> or <cite>⇧ ↑</cite></td>
+<td>zoom in on y axis</td>
+</tr>
+<tr class="row-odd"><td><cite>-</cite> or <cite>⇧ ↓</cite></td>
+<td>zoom out on y axis</td>
+</tr>
+<tr class="row-even"><td><cite>left mouse click</cite></td>
+<td>select the current row and column</td>
+</tr>
+<tr class="row-odd"><td><cite>⇧</cite> and <cite>left mouse click</cite></td>
+<td>select all the rows between
+previous selected and current rows</td>
+</tr>
+<tr class="row-even"><td><cite>.</cite></td>
+<td>move the selection down by one row</td>
+</tr>
+<tr class="row-odd"><td><cite>,</cite></td>
+<td>move the selection up by one row</td>
+</tr>
+<tr class="row-even"><td><cite>&lt;</cite></td>
+<td>move the selection left by one
+column</td>
+</tr>
+<tr class="row-odd"><td><cite>&gt;</cite></td>
+<td>move the selection right by one
+column</td>
+</tr>
+<tr class="row-even"><td><cite>↑</cite> or <cite>=</cite></td>
+<td>scroll the heatmap up on y axis</td>
+</tr>
+<tr class="row-odd"><td><cite>↓</cite> or <cite>-</cite></td>
+<td>scroll the heatmap down on y axis</td>
+</tr>
+<tr class="row-even"><td><cite>←</cite> or <cite>&lt;</cite></td>
+<td>scroll the heatmap left on x axis</td>
+</tr>
+<tr class="row-odd"><td><cite>→</cite> or <cite>&gt;</cite></td>
+<td>scroll the heatmap right on x axis</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" id="plot-ref" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exp</strong> : <code class="docutils literal"><span class="pre">Experiment</span></code></p>
+<blockquote>
+<div><p>the object to plot</p>
+</div></blockquote>
+<p><strong>sample_color_bars</strong> : list or str, optional</p>
+<blockquote>
+<div><p>list of column names in the sample metadata. It plots a color bar
+for each column. It doesn&#8217;t plot color bars by default (<code class="docutils literal"><span class="pre">None</span></code>)</p>
+</div></blockquote>
+<p><strong>feature_color_bars</strong> : list or str, optional</p>
+<blockquote>
+<div><p>list of column names in the feature metadata. It plots a color bar
+for each column. It doesn&#8217;t plot color bars by default (<code class="docutils literal"><span class="pre">None</span></code>)</p>
+</div></blockquote>
+<p><strong>color_bar_label</strong> : bool, optional</p>
+<blockquote>
+<div><p>whether to show the label for the color bars</p>
+</div></blockquote>
+<p><strong>gui</strong> : str, optional</p>
+<blockquote>
+<div><p>GUI to use</p>
+</div></blockquote>
+<p><strong>databases</strong> : Iterable of str or None or False (optional)</p>
+<blockquote>
+<div><p>a list of databases to access or add annotation
+False (default) to use the default field based on the experiment subclass
+None to not use databases</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : dict, optional</p>
+<blockquote>
+<div><p>keyword arguments passing to <a class="reference internal" href="calour.heatmap.heatmap.html#heatmap-ref"><span class="std std-ref">heatmap</span></a> function.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">PlottingGUI</span></code></p>
+<blockquote class="last">
+<div><p>Contains the figure of the output plot in .figure parameter</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 

@@ -144,7 +144,7 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="calour.amplicon_experiment.AmpliconExperiment">
-<em class="property">class </em><code class="descclassname">calour.amplicon_experiment.</code><code class="descname">AmpliconExperiment</code><span class="sig-paren">(</span><em>data</em>, <em>sample_metadata</em>, <em>feature_metadata=None</em>, <em>exp_metadata={}</em>, <em>description=''</em>, <em>sparse=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/amplicon_experiment.py#L35"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">calour.amplicon_experiment.</code><code class="descname">AmpliconExperiment</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/amplicon_experiment.py#L35"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class contains the data for a experiment or a meta experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -343,14 +343,14 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features.html#calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features" title="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
 <td>Normalize each sample by their total sums without a list of features</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot.html#calour.amplicon_experiment.AmpliconExperiment.plot" title="calour.amplicon_experiment.AmpliconExperiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([databases,&nbsp;feature_field])</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot.html#calour.amplicon_experiment.AmpliconExperiment.plot" title="calour.amplicon_experiment.AmpliconExperiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>(exp[,&nbsp;sample_color_bars,&nbsp;...])</td>
+<td>Plot the interactive heatmap and its associated axes.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_hist.html#calour.amplicon_experiment.AmpliconExperiment.plot_hist" title="calour.amplicon_experiment.AmpliconExperiment.plot_hist"><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code></a>(exp,&nbsp;**kwargs)</td>
 <td>Plot histogram of all the values in data.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_sort.html#calour.amplicon_experiment.AmpliconExperiment.plot_sort" title="calour.amplicon_experiment.AmpliconExperiment.plot_sort"><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code></a>(exp[,&nbsp;fields,&nbsp;sample_color_bars,&nbsp;...])</td>
-<td>Plot bacteria after sorting by field</td>
+<td>Plot after sorting by sample field.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.read.html#calour.amplicon_experiment.AmpliconExperiment.read" title="calour.amplicon_experiment.AmpliconExperiment.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(data_file[,&nbsp;sample_metadata_file,&nbsp;...])</td>
 <td>Read the files for the experiment.</td>

@@ -144,8 +144,9 @@
 <dt id="calour.amplicon_experiment.AmpliconExperiment.__deepcopy__">
 <code class="descclassname">AmpliconExperiment.</code><code class="descname">__deepcopy__</code><span class="sig-paren">(</span><em>memo</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.__deepcopy__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement the deepcopy since pandas has problem deepcopy empty dataframe</p>
-<p>Happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
-So we manually copy for empty dataframes</p>
+<p>When using the default deepcopy on an empty dataframe (columns but no rows), we get an error.
+This happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
+So we manually use copy instead of deepcopy for empty dataframes</p>
 </dd></dl>
 
 </div>

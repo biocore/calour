@@ -144,7 +144,7 @@
 <h1>calour.io.read_open_ms<a class="headerlink" href="#calour-io-read-open-ms" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.io.read_open_ms">
-<code class="descclassname">calour.io.</code><code class="descname">read_open_ms</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>gnps_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=None</em>, <em>sparse=False</em>, <em>rows_are_samples=False</em>, <em>mz_separator=None</em>, <em>*</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/io.py#L208"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read_open_ms" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.io.</code><code class="descname">read_open_ms</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>gnps_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=None</em>, <em>sparse=False</em>, <em>rows_are_samples=False</em>, <em>mz_rt_sep=None</em>, <em>*</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/io.py#L210"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read_open_ms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an OpenMS metabolomics experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -184,9 +184,9 @@ True to store as sparse (CSR)</p>
 <div><p>True to treat csv data file rows as samples,
 False (default) to treat csv data files rows as features</p>
 </div></blockquote>
-<p><strong>mz_separator: str or None (optional)</strong></p>
+<p><strong>mz_rt_sep: str or None (optional)</strong></p>
 <blockquote>
-<div><p>The separator for the mz/rt fields in the feature name.
+<div><p>The separator for the mz/rt fields in the feature names in data_file.
 None (default) for autodetect
 &#8216;_&#8217; or &#8216; &#8216; are typical options</p>
 </div></blockquote>

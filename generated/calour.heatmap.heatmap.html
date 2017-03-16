@@ -144,7 +144,7 @@
 <h1>calour.heatmap.heatmap<a class="headerlink" href="#calour-heatmap-heatmap" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.heatmap.heatmap">
-<code class="descclassname">calour.heatmap.</code><code class="descname">heatmap</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_field=None</em>, <em>feature_field=None</em>, <em>yticklabels_max=100</em>, <em>xticklabel_rot=45</em>, <em>xticklabel_len=10</em>, <em>yticklabel_len=15</em>, <em>title=None</em>, <em>clim=None</em>, <em>cmap=None</em>, <em>axes=None</em>, <em>rect=None</em>, <em>transform=&lt;function log_n&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/heatmap/heatmap.py#L103"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.heatmap" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.heatmap.</code><code class="descname">heatmap</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_field=None</em>, <em>feature_field=False</em>, <em>yticklabels_max=100</em>, <em>xticklabel_rot=45</em>, <em>xticklabel_len=10</em>, <em>yticklabel_len=15</em>, <em>title=None</em>, <em>clim=None</em>, <em>cmap=None</em>, <em>axes=None</em>, <em>rect=None</em>, <em>transform=&lt;function log_n&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/heatmap/heatmap.py#L103"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.heatmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a heatmap for the experiment.</p>
 <p>Plot either a simple or an interactive heatmap for the experiment. Plot features in row
 and samples in column.</p>
@@ -158,9 +158,10 @@ and samples in column.</p>
 None (default) to not show x labels.
 str to display field values for this field</p>
 </div></blockquote>
-<p><strong>feature_field</strong> : str or None (optional)</p>
+<p><strong>feature_field</strong> : str or None or False(optional)</p>
 <blockquote>
-<div><p>Name of the field to display on the y-axis (features) or None not to display names</p>
+<div><p>Name of the field to display on the y-axis (features) or None not to display names
+Flase (default) to use the experiment subclass default field</p>
 </div></blockquote>
 <p><strong>yticklabels_max</strong> : int (optional)</p>
 <blockquote>

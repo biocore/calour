@@ -142,18 +142,16 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.plot_sort<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-plot-sort" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.plot_sort">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">plot_sort</code><span class="sig-paren">(</span><em>exp</em>, <em>fields=None</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=('dbbact'</em>, <em>)</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/amplicon_experiment.py#L208"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot_sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot bacteria after sorting by field</p>
-<p>This is a convenience wrapper for plot()</p>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">plot_sort</code><span class="sig-paren">(</span><em>exp</em>, <em>fields=None</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot after sorting by sample field.</p>
+<p>This is a convenience wrapper for plot().</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fields</strong> : str or list of str or None (optional)</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fields</strong> : str or None, optional</p>
 <blockquote>
-<div><p>The field to sort samples by before plotting
-If list of str, sort by each field according to order in list
-if None, do not sort</p>
+<div><p>The field to sort samples by before plotting</p>
 </div></blockquote>
 <p><strong>sample_color_bars</strong> : list, optional</p>
 <blockquote>
@@ -169,7 +167,7 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
 <blockquote>
 <div><p>whether to show the label for the color bars</p>
 </div></blockquote>
-<p><strong>gui</strong> : str or None, optional</p>
+<p><strong>gui</strong> : str, optional</p>
 <blockquote>
 <div><p>GUI to use:
 &#8216;cli&#8217; : simple command line gui
@@ -177,14 +175,19 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
 &#8216;qt5&#8217; : qt5 based interactive gui
 None : no interactivity - just a matplotlib figure</p>
 </div></blockquote>
-<p><strong>databases</strong> : Iterable of str</p>
+<p><strong>databases</strong> : Iterable of str or None or False (optional)</p>
 <blockquote>
-<div><p>a list of databases to access or add annotation</p>
+<div><p>a list of databases to access or add annotation
+False (default) to use the default field based on the experiment subclass
+None to not use databases</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>keyword arguments passing to <a class="reference internal" href="calour.heatmap.plot.html#plot-ref"><span class="std std-ref">plot</span></a> function.</p>
 </div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">PlotGUI</p>
 </td>
 </tr>
 </tbody>

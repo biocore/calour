@@ -142,7 +142,7 @@
 <h1>calour.experiment.Experiment.plot<a class="headerlink" href="#calour-experiment-experiment-plot" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.plot">
-<code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=('dbbact'</em>, <em>)</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the interactive heatmap and its associated axes.</p>
 <p>The heatmap is interactive and can be dynamically updated with
 following key and mouse events:</p>
@@ -230,9 +230,11 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
 <blockquote>
 <div><p>GUI to use</p>
 </div></blockquote>
-<p><strong>databases</strong> : Iterable of str</p>
+<p><strong>databases</strong> : Iterable of str or None or False (optional)</p>
 <blockquote>
-<div><p>a list of databases to access or add annotation</p>
+<div><p>a list of databases to access or add annotation
+False (default) to use the default field based on the experiment subclass
+None to not use databases</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict, optional</p>
 <blockquote>
@@ -240,7 +242,10 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">PlottingGUI</span></code></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">PlottingGUI</span></code></p>
+<blockquote class="last">
+<div><p>Contains the figure of the output plot in .figure parameter</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
