@@ -35,6 +35,7 @@ import biom
 
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
+from .ms1_experiment import Ms1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 
 
@@ -249,7 +250,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
         data_file_type = 'openms'
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
                data_file_type=data_file_type, sparse=sparse,
-               normalize=normalize,  **kwargs)
+               normalize=normalize, cls=Ms1Experiment, **kwargs)
 
     exp.sample_metadata['id'] = exp.sample_metadata.index.values
 

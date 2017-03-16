@@ -71,7 +71,7 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
     -------
     exp : Experiment
     '''
-    db = _get_database_class(dbname)
+    db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
     term_list = db.get_feature_terms(features, exp=exp)
     feature_terms = []
