@@ -25,11 +25,6 @@ conda install -c biocore biom-format scikit-bio
 
 Install calour:
 ```
-conda install -c zechxu calour
-```
-
-or (for the latest develop version):
-```
 pip install git+git://github.com/amnona/calour.git
 ```
 
@@ -39,6 +34,15 @@ pip install git+git://github.com/amnona/dbbact-calour
 ```
 
 Optionally, can also install the calour GUI interface [EZCalour](https://github.com/amnona/EZCalour):
+```
+pip install git+git://github.com/amnona/EZCalour
+```
+
+
+For metabolomics, also install the [GNPS](http://gnps.ucsd.edu/) calour interface:
+```
+pip install git+git://github.com/amnona/gnps-calour
+```
 
 Using calour
 ============
