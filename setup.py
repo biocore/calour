@@ -57,7 +57,7 @@ setup(name='calour',
       url='http://microbio.me/calour',
       test_suite='nose.collector',
       packages=find_packages(),
-      package_data={'calour': ['log.cfg', 'calour.cfg']},
+      package_data={'calour': ['log.cfg', 'calour.config']},
       install_requires=[
           'numpy',
           'scipy',
