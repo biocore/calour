@@ -53,7 +53,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term'):
+def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term', term_type=None):
     '''Add a field to the feature metadata, with most common term for each feature
 
     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
@@ -66,14 +66,16 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
         None (default) to use all terms
     field_name : str (optional)
         Name of feature_metadata field to store the annotatiosn.
-
+    term_type : str or None (optional)
+        type of the annotation summary to get from the database (db specific)
+        None to get default type
     Returns
     -------
     exp : Experiment
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
-    term_list = db.get_feature_terms(features, exp=exp)
+    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type)
     feature_terms = []
     for cfeature in features:
         term_count = defaultdict(int)
