@@ -346,7 +346,7 @@ class ApplicationWindow(QMainWindow):
         for cdb in self.gui.databases:
             if not cdb.can_get_feature_terms:
                 continue
-            logger.debug('Database: %s' % cdb.get_name())
+            logger.debug('Database: %s' % cdb.database_name)
             feature_terms = cdb.get_feature_terms(allseqs, self.gui.exp)
             logger.debug('got %d terms' % len(feature_terms))
             res = analysis.relative_enrichment(self.gui.exp, group1_seqs, feature_terms)

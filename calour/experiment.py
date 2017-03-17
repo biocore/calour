@@ -28,7 +28,7 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from copy import deepcopy
+from copy import deepcopy, copy
 from importlib import import_module
 from functools import wraps
 import inspect
@@ -80,6 +80,8 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
+    heatmap_feature_field : str or None
+        The default field used for the y-axis labels (feature lables)
 
     See Also
     --------
@@ -104,6 +106,12 @@ class Experiment:
         # remeber how many reads per sample/feature before any procesing
         self.sample_metadata['_calour_original_abundance'] = self.data.sum(axis=1)
         # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
+
+        # the default y-axis field used for plotting
+        self.heatmap_feature_field = None
+
+        # the default databases to use for feature information
+        self.heatmap_databases = []
 
     @property
     def sparse(self):
@@ -151,6 +159,25 @@ class Experiment:
         Experiment
         '''
         return deepcopy(self)
+
+    def __deepcopy__(self, memo):
+        '''Implement the deepcopy since pandas has problem deepcopy empty dataframe
+
+        When using the default deepcopy on an empty dataframe (columns but no rows), we get an error.
+        This happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
+        So we manually use copy instead of deepcopy for empty dataframes
+        '''
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            try:
+                setattr(result, k, deepcopy(v, memo))
+            except:
+                logger.debug('Failed to copy attribute %r, doing shallow copy on it' % k)
+                setattr(result, k, copy(v))
+                memo[id(k)] = v
+        return result
 
     @staticmethod
     def _record_sig(func):

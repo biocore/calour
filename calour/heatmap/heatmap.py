@@ -92,7 +92,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 
     # link gui with the databases requested
     for cdatabase in databases:
-        cdb = _get_database_class(cdatabase)
+        cdb = _get_database_class(cdatabase, exp=exp)
         gui_obj.databases.append(cdb)
         # select the database for use with the annotate button
         if cdb.annotatable:
@@ -102,11 +102,11 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
                 logger.warning(
                     'More than one database with annotation capability.'
                     'Using first database (%s) for annotation'
-                    '.' % gui_obj._annotation_db.get_name())
+                    '.' % gui_obj._annotation_db.database_name)
     return gui_obj
 
 
-def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
+def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
             axes=None, rect=None,  transform=log_n, **kwargs):
@@ -126,8 +126,9 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
         The field to display on the x-axis (sample):
         None (default) to not show x labels.
         str to display field values for this field
-    feature_field : str or None (optional)
+    feature_field : str or None or False(optional)
         Name of the field to display on the y-axis (features) or None not to display names
+        Flase (default) to use the experiment subclass default field
     yticklabels_max : int (optional)
         The maximal number of feature names to display in the plot (when zoomed out)
         0 to show all labels
@@ -157,6 +158,10 @@ def heatmap(exp, sample_field=None, feature_field=None, yticklabels_max=100,
 
     '''
     logger.debug('plot heatmap')
+
+    # get the default feature field if not specified (i.e. False)
+    if feature_field is False:
+        feature_field = exp.heatmap_feature_field
     numrows, numcols = exp.shape
     # step 1. transform data
     if transform is None:
@@ -323,7 +328,7 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
 
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
-         gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
+         gui='cli', databases=False, color_bar_label=True, **kwargs):
     '''Plot the interactive heatmap and its associated axes.
 
     The heatmap is interactive and can be dynamically updated with
@@ -385,16 +390,21 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         whether to show the label for the color bars
     gui : str, optional
         GUI to use
-    databases : Iterable of str
+    databases : Iterable of str or None or False (optional)
         a list of databases to access or add annotation
+        False (default) to use the default field based on the experiment subclass
+        None to not use databases
     kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
     Returns
     -------
     ``PlottingGUI``
-
+        Contains the figure of the output plot in .figure parameter
     '''
+    # set the databases if default requested (i.e. False)
+    if databases is False:
+        databases = exp.heatmap_databases
     gui_obj = _create_plot_gui(exp, gui, databases)
     exp.heatmap(axes=gui_obj.axes, **kwargs)
     barwidth = 0.3
@@ -424,7 +434,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
 
 
 def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
-              gui='cli', databases=('dbbact',), color_bar_label=True, **kwargs):
+              gui='cli', databases=False, color_bar_label=True, **kwargs):
     '''Plot after sorting by sample field.
 
     This is a convenience wrapper for plot().
@@ -449,8 +459,10 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
         'jupyter' : jupyter notebook interactive gui
         'qt5' : qt5 based interactive gui
         None : no interactivity - just a matplotlib figure
-    databases : Iterable of str
+    databases : Iterable of str or None or False (optional)
         a list of databases to access or add annotation
+        False (default) to use the default field based on the experiment subclass
+        None to not use databases
     kwargs : dict, optional
         keyword arguments passing to :ref:`plot<plot-ref>` function.
 
@@ -468,8 +480,8 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
         newexp = exp
         plot_field = None
     if 'sample_field' in kwargs:
-        newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                    gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+        return newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                           gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
     else:
-        newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                    gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+        return newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
+                           gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)

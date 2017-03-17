@@ -98,6 +98,9 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     'random' : a random sample/feature out of the group (same sample/feature for all observations)
     'sum' : the sum of values in all the samples/features
 
+    The number of samples/features in each group and their identities are stored in new metadata columns
+    '_calour_merge_number', '_calour_merge_ids' respectively
+
     Parameters
     ----------
     field : str
@@ -131,6 +134,8 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     newexp.sparse = False
     data = newexp.get_data()
     keep_pos = []
+    merge_number = []
+    merge_ids = []
     for cval in metadata[field].unique():
         # in case the sample had nan is the value
         if pd.isnull(cval):
@@ -148,6 +153,8 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
         elif method == 'random':
             random_pos = np.random.randint(np.sum(pos))
             newdat = cdata[random_pos]
+        merge_number.append(pos.sum())
+        merge_ids.append(metadata.index.values[pos])
         replace_pos = np.where(pos)[0][0]
         keep_pos.append(replace_pos)
         if axis == 0:
@@ -155,6 +162,11 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
         else:
             newexp.data[:, replace_pos] = newdat
     newexp.reorder(keep_pos, inplace=True, axis=axis)
+
+    if axis == 0:
+        newexp.sample_metadata = newexp.sample_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
+    else:
+        newexp.feature_metadata = newexp.feature_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
     return newexp
 
 

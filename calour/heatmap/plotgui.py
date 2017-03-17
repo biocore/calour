@@ -128,12 +128,12 @@ class PlotGUI(ABC):
                 cannt = cdatabase.get_seq_annotation_strings(feature)
                 if len(cannt) == 0:
                     cannt = [[{'annotationtype': 'not found'},
-                              'No annotation found in database %s' % cdatabase.get_name()]]
+                              'No annotation found in database %s' % cdatabase.database_name]]
                 else:
                     for cannotation in cannt:
                         cannotation[0]['_db_interface'] = cdatabase
             except:
-                cannt = 'error connecting to db %s' % cdatabase.get_name()
+                cannt = 'error connecting to db %s' % cdatabase.database_name
             annt.extend(cannt)
         return annt
 
