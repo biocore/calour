@@ -241,7 +241,7 @@ html_theme_options = {
     #
     # Options are nothing with "" (default) or the name of a valid theme
     # such as "amelia" or "cosmo".
-    'bootswatch_theme': 'united',
+    'bootswatch_theme': 'sandstone',
 
     # Location of link to source.
     # Options are "nav" (default), "footer" or anything else to exclude.
@@ -539,5 +539,4 @@ linkcheck_timeout = 30
 # examples, originally taken from scikit-learn's doc/conf.py
 def setup(app):
     app.add_javascript('copybutton.js')
-    app.add_stylesheet('style.css')
 

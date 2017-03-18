@@ -27,7 +27,7 @@ import inspect
 import configparser
 from pkg_resources import resource_filename
 from collections import Iterable
-from numbers import Number
+from numbers import Real
 
 import scipy
 
@@ -323,9 +323,20 @@ def _to_list(x):
 
 
 def _argsort(values):
-    '''Do an argsort separately on numeric and non-numeric values, then combine (numeric first)
+    '''Sort a sequence of values of heterogeneous variable types.
 
-    Used to overcome the problem when using numpy.argsort on a pandas series values with missing values
+    Used to overcome the problem when using numpy.argsort on a pandas
+    series values with missing values
+
+    Examples
+    --------
+    >>> l = [10, 'b', 2.5, 'a']
+    >>> idx = _argsort(l)
+    >>> idx
+    [2, 0, 3, 1]
+    >>> l_sorted = [l[i] for i in idx]
+    >>> l_sorted
+    [2.5, 10, 'a', 'b']
 
     Parameters
     ----------
@@ -334,11 +345,12 @@ def _argsort(values):
 
     Returns
     -------
-    tuple of ints
+    list of ints
         the positions of the sorted values
+
     '''
     # convert all numbers to float otherwise int will be sorted different place
-    values = [float(x) if isinstance(x, Number) else x for x in values]
-    v = zip(values, list(range(len(values))))
-    res = sorted(v, key=lambda x: (str(type(x[0])), x))
-    return [x[1] for x in res]
+    values = [float(x) if isinstance(x, Real) else x for x in values]
+    # make values ordered by type and sort inside each var type
+    values = [(str(type(x)), x) for x in values]
+    return sorted(range(len(values)), key=values.__getitem__)

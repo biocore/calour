@@ -30,6 +30,9 @@ def _transition_index(l):
     >>> l = ['a', 'a', 'b']
     >>> list(_transition_index(l))
     [(2, 'a'), (3, 'b')]
+    >>> l = ['a', 'a', 'b', 1, 2, None, None]
+    >>> list(_transition_index(l))
+    [(2, 'a'), (3, 'b'), (4, 1), (5, 2), (7, None)]
 
     Parameters
     ----------
@@ -42,11 +45,13 @@ def _transition_index(l):
     '''
     it = enumerate(l)
     i, item = next(it)
+    item = str(type(item)), item
     for i, current in it:
+        current = str(type(current)), current
         if item != current:
-            yield i, item
+            yield i, item[1]
             item = current
-    yield i + 1, item
+    yield i + 1, item[1]
 
 
 def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
@@ -109,6 +114,9 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
     and samples in column.
 
+    .. note:: By default it log transforms the abundance values and then plot heatmap.
+       The original object is not modified.
+
     .. _heatmap-ref:
 
     Parameters
@@ -148,10 +156,9 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     ``matplotlib.figure.Figure``
 
     '''
-    import matplotlib.pyplot as plt
-
     logger.debug('plot heatmap')
-
+    # import pyplot is less polite. do it locally
+    import matplotlib.pyplot as plt
     # get the default feature field if not specified (i.e. False)
     if feature_field is False:
         feature_field = exp.heatmap_feature_field
@@ -202,6 +209,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
                            if len(i) > xticklabel_len else i
                            for i in xticklabels]
         ax.set_xticklabels(xticklabels, rotation=xticklabel_rot, ha='right')
+    else:
+        ax.get_xaxis().set_visible(False)
 
     # plot y tick labels dynamically
     if feature_field is not None:
@@ -430,10 +439,12 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
 
     This is a convenience wrapper for plot().
 
+    .. note:: Sorting occurs on a copy, the original ``Experiment`` object is not modified.
+
     Parameters
     ----------
-    fields : str or None, optional
-        The field to sort samples by before plotting
+    fields : str, list, or None, optional
+        The fields to sort samples by before plotting
     sample_color_bars : list, optional
         list of column names in the sample metadata. It plots a color bar
         for each column. It doesn't plot color bars by default (``None``)
