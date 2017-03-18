@@ -90,8 +90,11 @@ class PlotGUI(ABC):
         args, kwargs: tuple, dict
             arguments passing to ``matplotlib.Figure.savefig`` function.
         '''
-        # create color bar for the heatmap before saving
-        self.figure.colorbar(self.axes.images[0])
+        try:
+            # create color bar for the heatmap before saving
+            self.figure.colorbar(self.axes.images[0])
+        except IndexError:
+            logger.warning('no heatmap are plotted')
         self.figure.savefig(*args, **kwargs)
 
     def get_selection_info(self):
