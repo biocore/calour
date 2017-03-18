@@ -9,8 +9,7 @@
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/united/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/sandstone/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
@@ -145,13 +144,17 @@
 <code class="descclassname">AmpliconExperiment.</code><code class="descname">plot_sort</code><span class="sig-paren">(</span><em>exp</em>, <em>fields=None</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot_sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot after sorting by sample field.</p>
 <p>This is a convenience wrapper for plot().</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Sorting occurs on a copy, the original <code class="docutils literal"><span class="pre">Experiment</span></code> object is not modified.</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fields</strong> : str or None, optional</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fields</strong> : str, list, or None, optional</p>
 <blockquote>
-<div><p>The field to sort samples by before plotting</p>
+<div><p>The fields to sort samples by before plotting</p>
 </div></blockquote>
 <p><strong>sample_color_bars</strong> : list, optional</p>
 <blockquote>
