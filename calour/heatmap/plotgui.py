@@ -10,7 +10,6 @@ from logging import getLogger
 from abc import ABC
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 
@@ -52,6 +51,7 @@ class PlotGUI(ABC):
     databases : the databases to interact with
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None):
+        import matplotlib.pyplot as plt
         # the Experiment being plotted
         self.exp = exp
         # how much zooming in on key press

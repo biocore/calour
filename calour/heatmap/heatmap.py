@@ -12,7 +12,6 @@ import itertools
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
 import numpy as np
 
 from ..transforming import log_n
@@ -158,7 +157,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
 
     '''
     logger.debug('plot heatmap')
-
+    # import pyplot is less polite. do it locally
+    import matplotlib.pyplot as plt
     # get the default feature field if not specified (i.e. False)
     if feature_field is False:
         feature_field = exp.heatmap_feature_field
