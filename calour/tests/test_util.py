@@ -82,11 +82,6 @@ class IOTests(Tests):
         self.assertEqual(util._to_list('test'), ['test'])
         self.assertEqual(util._to_list(range(5)), range(5))
 
-    def test__argsort(self):
-        vals = [1, 'C', 3.22, 'A', 1]
-        idx = util._argsort(vals)
-        self.assertEqual(idx, [0, 4, 2, 3, 1])
-
 
 if __name__ == "__main__":
     main()
