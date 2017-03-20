@@ -52,13 +52,23 @@ class IOTests(Tests):
 
     def test_read(self):
         # load the simple dataset as sparse
-        exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat)
+        exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
         self.assertTrue(scipy.sparse.issparse(exp.data))
         self._validate_read(exp)
 
     def test_read_openms_bucket_table(self):
         # load the openms bucket table with no metadata
-        exp = ca.read(self.openms_csv, data_file_type='openms', sparse=False)
+        exp = ca.read(self.openms_csv, data_file_type='openms', sparse=False, normalize=None)
+        self.assertEqual(len(exp.sample_metadata), 9)
+        self.assertEqual(len(exp.feature_metadata), 10)
+        self.assertEqual(exp.shape, (9, 10))
+        self.assertEqual(exp.data[0, :].sum(), 8554202)
+        self.assertEqual(exp.data[:, 1].sum(), 13795540)
+        self.assertEqual(exp.sparse, False)
+
+    def test_read_openms_bucket_table_samples_are_rows(self):
+        # load the openms bucket table with no metadata
+        exp = ca.read(self.openms_samples_rows_csv, data_file_type='openms_transpose', sparse=False, normalize=None)
         self.assertEqual(len(exp.sample_metadata), 9)
         self.assertEqual(len(exp.feature_metadata), 10)
         self.assertEqual(exp.shape, (9, 10))
@@ -67,46 +77,56 @@ class IOTests(Tests):
         self.assertEqual(exp.sparse, False)
 
     def test_read_open_ms(self):
-        exp = ca.read_open_ms(self.openms_csv)
+        exp = ca.read_open_ms(self.openms_csv, normalize=None)
         # test we get the MZ and RT correct
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
         self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
         self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
-        # test data is rescaled
-        self.assertAlmostEqual(exp.data.sum(axis=1).mean(), 10000)
-        # test rescaling
-        exp = ca.read_open_ms(self.openms_csv, rescale=1000)
-        self.assertAlmostEqual(exp.data.sum(axis=1).mean(), 1000)
         # test normalizing
-        exp = ca.read_open_ms(self.openms_csv, normalize=True)
+        exp = ca.read_open_ms(self.openms_csv, normalize=10000)
         assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
         # test load sparse
-        exp = ca.read_open_ms(self.openms_csv, sparse=True)
+        exp = ca.read_open_ms(self.openms_csv, sparse=True, normalize=None)
         self.assertEqual(exp.sparse, True)
+
+    def test_read_open_ms_samples_rows(self):
+        exp = ca.read_open_ms(self.openms_samples_rows_csv, normalize=None, rows_are_samples=True)
+        # test we get the MZ and RT correct
+        self.assertIn('MZ', exp.feature_metadata)
+        self.assertIn('RT', exp.feature_metadata)
+        self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
+        self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
+
+    def test_read_qiim2(self):
+        # problem with travis and qiime2 install - skipping
+
+        # exp = ca.read(self.qiime2table, data_file_type='qiime2', normalize=None)
+        # self.assertEqual(exp.shape, (104, 658))
+        pass
 
     def test_read_not_sparse(self):
         # load the simple dataset as dense
-        exp = ca.read(self.test1_biom, self.test1_samp, sparse=False)
+        exp = ca.read(self.test1_biom, self.test1_samp, sparse=False, normalize=None)
         self.assertFalse(scipy.sparse.issparse(exp.data))
         self._validate_read(exp)
 
     def test_read_no_sample_metadata(self):
         # test loading without a mapping file
-        exp = ca.read(self.test1_biom)
+        exp = ca.read(self.test1_biom, normalize=None)
         self._validate_read(exp, validate_sample_metadata=False)
 
-    def test_read_taxa(self):
+    def test_read_amplicon(self):
         # test loading a taxonomy biom table and filtering/normalizing
-        exp = ca.read_taxa(self.test1_biom)
-        exp2 = ca.read(self.test1_biom)
+        exp = ca.read_amplicon(self.test1_biom, filter_reads=1000, normalize=10000)
+        exp2 = ca.read(self.test1_biom, normalize=None)
         exp2.filter_by_data('sum_abundance', cutoff=1000, inplace=True)
         exp2.normalize(inplace=True)
         assert_experiment_equal(exp, exp2)
         self.assertIn('taxonomy', exp.feature_metadata)
 
     def test_create_biom_table_from_exp(self):
-        exp = ca.read(self.test1_biom, self.test1_samp)
+        exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         table = _create_biom_table_from_exp(exp)
         self.assertCountEqual(table.ids(axis='observation'), exp.feature_metadata.index.values)
         self.assertCountEqual(table.ids(axis='sample'), exp.sample_metadata.index.values)
@@ -115,7 +135,7 @@ class IOTests(Tests):
         self.assertEqual(metadata['taxonomy'], exp.feature_metadata['taxonomy'].iloc[1])
 
     def test_save_fasta(self):
-        exp = ca.read(self.test1_biom, self.test1_samp)
+        exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         d = mkdtemp()
         f = join(d, 'test1.fasta')
         exp.save_fasta(f)
@@ -128,33 +148,34 @@ class IOTests(Tests):
     def test_save_biom(self):
         # NOTE: Currently not testing the save biom hdf with taxonomy
         # as there is a bug there!
-        exp = ca.read(self.test1_biom, self.test1_samp)
+        exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         d = mkdtemp()
         f = join(d, 'test1.save.biom')
         # test the json biom format
         exp.save_biom(f, fmt='json')
-        newexp = ca.read(f, self.test1_samp)
+        newexp = ca.read(f, self.test1_samp, normalize=None)
         assert_experiment_equal(newexp, exp)
         # test the txt biom format
         exp.save_biom(f, fmt='txt')
-        newexp = ca.read(f, self.test1_samp)
+        newexp = ca.read(f, self.test1_samp, normalize=None)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         # test the hdf5 biom format with no taxonomy
-        exp.save_biom(f, addtax=False)
-        newexp = ca.read(f, self.test1_samp)
+        exp.save_biom(f, add_metadata=None)
+        newexp = ca.read(f, self.test1_samp, normalize=None)
         self.assertTrue('taxonomy' not in newexp.feature_metadata)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         shutil.rmtree(d)
 
     def test_save(self):
-        exp = ca.read(self.test2_biom, self.test2_samp)
+        exp = ca.read(self.test2_biom, self.test2_samp, normalize=None)
         d = mkdtemp()
         f = join(d, 'test1.save')
         # test the json biom format
         exp.save(f, fmt='json')
-        newexp = ca.read(f+'.biom', f+'_sample.txt')
+        newexp = ca.read(f+'.biom', f+'_sample.txt', normalize=None)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['#SampleID.1'])
         shutil.rmtree(d)
+
 
 if __name__ == "__main__":
     main()

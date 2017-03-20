@@ -1,3 +1,22 @@
+'''
+transforming (:mod:`calour.transforming`)
+=========================================
+
+.. currentmodule:: calour.transforming
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   normalize
+   normalize_by_subset_features
+   scale
+   binarize
+   log_n
+   transform
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -13,11 +32,14 @@ from collections import defaultdict
 import numpy as np
 from sklearn import preprocessing
 
+from .experiment import Experiment
+
 
 logger = getLogger(__name__)
 
 
-def normalize(exp, total=10000, axis=1, inplace=False):
+@Experiment._record_sig
+def normalize(exp, total=10000, axis=0, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total
 
     Parameters
@@ -25,8 +47,9 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     exp : Experiment
     total : float
         the sum (along axis) to normalize to
-    axis : int (optional)
-        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
+    axis : 0, 1, 's', or 'f', optional
+        the axis to normalize. 0 or 's' (default) is normalize each sample;
+        1 or 'f' to normalize each feature
     inplace : bool (optional)
         False (default) to create a copy, True to replace values in exp
 
@@ -35,14 +58,19 @@ def normalize(exp, total=10000, axis=1, inplace=False):
     ``Experiment``
         the normalized experiment
     '''
+    if isinstance(total, bool):
+        raise ValueError('Normalization total (%s) not numeric' % total)
+    if total <= 0:
+        raise ValueError('Normalization total (%s) must be positive' % total)
     if not inplace:
         exp = deepcopy(exp)
-    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=axis) * total
+    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
     return exp
 
 
-def rescale(exp, total=10000, axis=1, inplace=False):
-    '''Rescale the data to mean sum of all samples (axis=1) or features (axis=0) to be total.
+@Experiment._record_sig
+def rescale(exp, total=10000, axis=0, inplace=False):
+    '''Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.
 
     This function rescales by multiplying ALL entries in exp.data by same number.
 
@@ -51,8 +79,9 @@ def rescale(exp, total=10000, axis=1, inplace=False):
     exp : Experiment
     total : float
         the mean sum (along axis) to normalize to
-    axis : int (optional)
-        the axis to normalize. 1 (default) is normalize each sample, 0 to normalize each feature
+    axis : 0, 1, 's', or 'f', optional
+        the axis to normalize. 0 or 's' (default) is normalize each sample;
+        1 or 'f' to normalize each feature
     inplace : bool (optional)
         False (default) to create a copy, True to replace values in exp
 
@@ -61,22 +90,25 @@ def rescale(exp, total=10000, axis=1, inplace=False):
     ``Experiment``
         the normalized experiment
     '''
+    if isinstance(total, bool):
+        raise ValueError('Rescaling total (%s) not numeric' % total)
     if not inplace:
         exp = deepcopy(exp)
-    current_mean = np.mean(exp.data.sum(axis=axis))
+    current_mean = np.mean(exp.data.sum(axis=1-axis))
     exp.data = exp.data * total / current_mean
     return exp
 
 
-def scale(exp, axis=1, inplace=False):
+@Experiment._record_sig
+def scale(exp, axis=0, inplace=False):
     '''Standardize a dataset along an axis
 
     .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
 
     Parameters
     ----------
-    axis : 0 or 1
-        1 means scaling occur sample-wise; 0 feature-wise.
+    axis : 0, 1, 's', or 'f'
+        0 or 's'  means scaling occur sample-wise; 1 or 'f' feature-wise.
 
     Returns
     -------
@@ -87,10 +119,11 @@ def scale(exp, axis=1, inplace=False):
         exp = deepcopy(exp)
     if exp.sparse:
         exp.sparse = False
-    preprocessing.scale(exp.data, axis=axis, copy=False)
+    preprocessing.scale(exp.data, axis=1-axis, copy=False)
     return exp
 
 
+@Experiment._record_sig
 def binarize(exp, threshold=1, inplace=False):
     '''Binarize the data with a threshold.
 
@@ -113,6 +146,7 @@ def binarize(exp, threshold=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def log_n(exp, n=1, inplace=False):
     '''Log transform the data
 
@@ -139,6 +173,7 @@ def log_n(exp, n=1, inplace=False):
     return exp
 
 
+@Experiment._record_sig
 def transform(exp, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.
 
@@ -176,7 +211,8 @@ def transform(exp, steps=[], inplace=False, **kwargs):
     return exp
 
 
-def normalize_by_subset_features(exp, features, total=10000, exclude=True, inplace=False):
+@Experiment._record_sig
+def normalize_by_subset_features(exp, features, total=10000, negate=True, inplace=False):
     '''Normalize each sample by their total sums without a list of features
 
     Normalizes all features (including in the exclude list) by the
@@ -190,10 +226,10 @@ def normalize_by_subset_features(exp, features, total=10000, exclude=True, inpla
     Parameters
     ----------
     features : list of str
-        The features to exclude (or include if exclude=False)
+        The feature IDs to exclude (or include if negate=False)
     total : int (optional)
         The total abundance for the non-excluded features per sample
-    exclude : bool (optional)
+    negate : bool (optional)
         True (default) to calculate normalization factor without features in features list.
         False to calculate normalization factor only with features in features list.
     inplace : bool (optional)
@@ -205,7 +241,7 @@ def normalize_by_subset_features(exp, features, total=10000, exclude=True, inpla
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
-    if exclude:
+    if negate:
         feature_pos = np.invert(feature_pos)
     data = exp.get_data(sparse=False)
     use_reads = np.sum(data[:, feature_pos], axis=1)

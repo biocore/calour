@@ -20,7 +20,7 @@ from calour.transforming import log_n, scale
 class TestTransforming(Tests):
     def setUp(self):
         super().setUp()
-        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
 
     def test_transform(self):
         obs = self.test2.transform()
@@ -32,7 +32,7 @@ class TestTransforming(Tests):
 
     def test_transform_real(self):
         obs = self.test2.transform([log_n, scale], inplace=True,
-                                   log_n__n=2, scale__axis=0)
+                                   log_n__n=2, scale__axis=1)
         self.assertIs(obs, self.test2)
         assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
         # column 1, 2 and 6 are constant, so their variances are 0
@@ -90,6 +90,10 @@ class TestTransforming(Tests):
         obs = self.test2.normalize(total, inplace=True)
         self.assertIs(obs, self.test2)
 
+    def test_normalize_non_numeric(self):
+        with self.assertRaises(ValueError):
+            self.test2.normalize(False)
+
     def test_rescale(self):
         total = 1000
         obs = self.test2.rescale(total)
@@ -97,15 +101,18 @@ class TestTransforming(Tests):
         self.assertIsNot(obs, self.test2)
         self.assertNotAlmostEqual(obs.data.sum(axis=1).A1[0], 1000)
 
-        obs = self.test2.normalize(total, inplace=True)
-        self.assertIs(obs, self.test2)
+    def test_rescale_non_numeric(self):
+        with self.assertRaises(ValueError):
+            self.test2.normalize(False)
+        with self.assertRaises(ValueError):
+            self.test2.normalize(0)
 
     def test_normalize_by_subset_features(self):
         # test the filtering in standard mode (remove a few features, normalize to 10k)
-        exp = ca.read(self.test1_biom, self.test1_samp)
+        exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         bad_features = [6, 7]
         features = [exp.feature_metadata.index[cbad] for cbad in bad_features]
-        newexp = exp.normalize_by_subset_features(features, 10000, exclude=True, inplace=False)
+        newexp = exp.normalize_by_subset_features(features, 10000, negate=True, inplace=False)
         # see the mean of the features we want (without 6,7) is 10k
         good_features = list(set(range(exp.data.shape[1])).difference(set(bad_features)))
         assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)

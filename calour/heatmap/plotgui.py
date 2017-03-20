@@ -10,7 +10,7 @@ from logging import getLogger
 from abc import ABC
 
 import numpy as np
-import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 
 logger = getLogger(__name__)
@@ -18,9 +18,6 @@ logger = getLogger(__name__)
 
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
-
-    Keys:
-
 
     Attributes
     ----------
@@ -37,22 +34,24 @@ class PlotGUI(ABC):
     zoom_scale : numeric
         the scaling factor for zooming
     scroll_offset : numeric (optional)
-        The amount of bacteria/samples to scroll when arrow key pressed
+        The amount of columns/rows to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
-        >0 : scroll than constant amount of bacteria per keypress
+        >0 : scroll than constant number of columns/rows per keypress
     figure : ``matplotlib.figure.Figure``
-        The figure where the heatmap will be plotted into. It creates one by default.
-    axis : matplotlib axes obtained from ``figure``.
+        The figure where the heatmap and other axes will be plotted into.
+    axes : the matplotlib axes from ``figure`` to plot heatmap into.
     databases : list
-        the database to interact with
+        the databases to interact with
 
     Parameters
     ----------
-    exp :
-    zoom_scale :
-    scroll_offset :
+    exp : the ``Experiment`` object associated with this GUI
+    zoom_scale : the scaling factor for zooming
+    scroll_offset : The amount of columns/rows to scroll when arrow key pressed
+    databases : the databases to interact with
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None):
+        import matplotlib.pyplot as plt
         # the Experiment being plotted
         self.exp = exp
         # how much zooming in on key press
@@ -70,14 +69,33 @@ class PlotGUI(ABC):
             self.databases = []
         # the default database used when annotating features
         self._annotation_db = None
-
         # create the figure to plot the heatmap into
-        self.figure = plt.figure()
+        self._set_figure(plt.figure())
 
-    @property
-    def axis(self):
-        # this attr has to be property so it is updated on mouse/key events
-        return self.figure.gca()
+    def _set_figure(self, figure):
+        self.figure = figure
+        gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
+        hm_ax = self.figure.add_subplot(gs[2])
+        self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+        self.xax.axis('off')
+        self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
+        self.yax.axis('off')
+        self.axes = hm_ax
+
+    def save_figure(self, *args, **kwargs):
+        '''Save the figure to file.
+
+        Parameters
+        ----------
+        args, kwargs: tuple, dict
+            arguments passing to ``matplotlib.Figure.savefig`` function.
+        '''
+        try:
+            # create color bar for the heatmap before saving
+            self.figure.colorbar(self.axes.images[0])
+        except IndexError:
+            logger.warning('no heatmap are plotted')
+        self.figure.savefig(*args, **kwargs)
 
     def get_selection_info(self):
         '''Get the current selection information
@@ -103,7 +121,7 @@ class PlotGUI(ABC):
 
         Returns
         -------
-        annotations : list of tuple of (dict, str)
+        list of tuple of (dict, str)
             dict : annotation key/value pairs
             str : a string summarizing the annotations
         '''
@@ -113,12 +131,12 @@ class PlotGUI(ABC):
                 cannt = cdatabase.get_seq_annotation_strings(feature)
                 if len(cannt) == 0:
                     cannt = [[{'annotationtype': 'not found'},
-                              'No annotation found in database %s' % cdatabase.get_name()]]
+                              'No annotation found in database %s' % cdatabase.database_name]]
                 else:
                     for cannotation in cannt:
                         cannotation[0]['_db_interface'] = cdatabase
             except:
-                cannt = 'error connecting to db %s' % cdatabase.get_name()
+                cannt = 'error connecting to db %s' % cdatabase.database_name
             annt.extend(cannt)
         return annt
 
@@ -141,6 +159,9 @@ class PlotGUI(ABC):
     def __call__(self):
         '''Run the GUI.'''
         self.connect_functions()
+        self.figure.tight_layout()
+        # squeeze color bars close to the heatmap
+        self.figure.subplots_adjust(hspace=0.01, wspace=0.01)
 
     def connect_functions(self):
         '''Connect to the matplotlib callbacks for key and mouse '''
@@ -281,7 +302,7 @@ class PlotGUI(ABC):
                 samplepos=[self.current_select[0]], featurepos=[self.current_select[1]])
             self.show_info()
         else:
-            logger.warning('Unrecoginzed key: %s' % event.key)
+            logger.debug('Unrecoginzed key: %s' % event.key)
             return
 
         self.figure.canvas.draw()
@@ -289,11 +310,11 @@ class PlotGUI(ABC):
     def clear_selection(self):
         '''Delete all shown selection lines '''
         for cline in self.selected_samples.values():
-            self.axis.lines.remove(cline)
+            self.axes.lines.remove(cline)
             logger.debug('remove sample selection %r' % cline)
         self.selected_samples = {}
         for cline in self.selected_features.values():
-            self.axis.lines.remove(cline)
+            self.axes.lines.remove(cline)
             logger.debug('remove sample selection %r' % cline)
         self.selected_features = {}
 
@@ -312,21 +333,21 @@ class PlotGUI(ABC):
         '''
         for cpos in samplepos:
             if cpos not in self.selected_samples:
-                self.selected_samples[cpos] = self.axis.axvline(
+                self.selected_samples[cpos] = self.axes.axvline(
                     x=cpos, color='white', linestyle='dotted')
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.axis.lines.remove(self.selected_samples[cpos])
+                    self.axes.lines.remove(self.selected_samples[cpos])
                     del self.selected_samples[cpos]
         for cpos in featurepos:
             if cpos not in self.selected_features:
-                self.selected_features[cpos] = self.axis.axhline(
+                self.selected_features[cpos] = self.axes.axhline(
                     y=cpos, color='white', linestyle='dotted')
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.axis.lines.remove(self.selected_features[cpos])
+                    self.axes.lines.remove(self.selected_features[cpos])
                     del self.selected_features[cpos]
         self.figure.canvas.draw()
 

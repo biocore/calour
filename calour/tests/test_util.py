@@ -21,7 +21,7 @@ from calour._testing import Tests
 class IOTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
 
     def test_get_taxonomy_string(self):
         orig_tax = list(self.test1.feature_metadata['taxonomy'].values)
@@ -57,6 +57,12 @@ class IOTests(Tests):
         fp = util.get_config_file()
         self.assertEqual(basename(fp), 'calour.config')
 
+    def test_get_config_sections(self):
+        sections = util.get_config_sections()
+        self.assertIn('dbbact', sections)
+        self.assertIn('sponge', sections)
+        self.assertNotIn('username', sections)
+
     def test_config_file_value(self):
         # test the set and get config file values
         # create the tmp config file path
@@ -69,6 +75,13 @@ class IOTests(Tests):
         res = util.get_config_value('test2', fallback='na', config_file_name=f)
         self.assertEqual(res, 'na')
         shutil.rmtree(d)
+
+    def test_to_list(self):
+        self.assertEqual(util._to_list(5), [5])
+        self.assertEqual(util._to_list([5]), [5])
+        self.assertEqual(util._to_list('test'), ['test'])
+        self.assertEqual(util._to_list(range(5)), range(5))
+
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,17 @@
+'''
+amplicon experiment (:mod:`calour.amplicon_experiment`)
+=======================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+Classes
+^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   AmpliconExperiment
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -12,21 +26,61 @@ import numpy as np
 import skbio
 
 from .experiment import Experiment
-from .util import _get_taxonomy_string
+from .util import _get_taxonomy_string, _to_list
 
 
 logger = getLogger(__name__)
 
 
 class AmpliconExperiment(Experiment):
+    '''This class contains the data for a experiment or a meta experiment.
+
+    Parameters
+    ----------
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : :class:`pandas.DataFrame`
+        The metadata on the samples
+    feature_metadata : :class:`pandas.DataFrame`
+        The metadata on the features
+    description : str
+        name of experiment
+    sparse : bool
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
+
+    Attributes
+    ----------
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+        The abundance table for OTUs, metabolites, genes, etc. Samples
+        are in row and features in column
+    sample_metadata : :class:`pandas.DataFrame`
+        The metadata on the samples
+    feature_metadata : :class:`pandas.DataFrame`
+        The metadata on the features
+    exp_metadata : dict
+        metadata about the experiment (data md5, filenames, etc.)
+    shape : tuple of (int, int)
+        the dimension of data
+    sparse : bool
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+    description : str
+        name of the experiment
+
+    See Also
+    --------
+    Experiment
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.heatmap_feature_field = 'taxonomy'
+        self.heatmap_databases = ('dbbact',)
+
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'AmpliconExperiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
-
-    def plot(self, databases=('dbbact',), feature_field='taxonomy', **kwargs):
-        # plot the experiment using taxonmy field and dbbact database
-        super().plot(feature_field=feature_field, databases=databases, **kwargs)
 
     def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
@@ -55,8 +109,7 @@ class AmpliconExperiment(Experiment):
             logger.warn('No taxonomy field in experiment')
             return None
 
-        if not isinstance(values, (list, tuple)):
-            values = [values]
+        values = _to_list(values)
 
         taxstr = exp.feature_metadata['taxonomy'].str.lower()
 
@@ -147,27 +200,46 @@ class AmpliconExperiment(Experiment):
         '''
         origread_field = '_calour_original_abundance'
         if origread_field not in exp.sample_metadata.columns:
-            raise ValueError('%s field not initialzed. Did you load the data with calour.read_taxa() ?' % origread_field)
+            raise ValueError('%s field not initialzed. Did you load the data with calour.read_amplicon() ?' % origread_field)
 
         good_pos = (exp.sample_metadata[origread_field] >= minreads).values
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
         return newexp
 
-    def plot_sort(exp, field=None, **kwargs):
-        '''Plot bacteria after sorting by field
-        This is a convenience wrapper for plot()
-        Note: if sample_field is in **kwargs, use it as labels after sorting using field
+    def collapse_taxonomy(exp, level='genus', inplace=False):
+        '''Collapse all features sharing the same taxonomy up to level into a single feature
+
+        Sums abundances of all features sharing the same taxonomy up to level.
 
         Parameters
         ----------
-        field : str or None (optional)
-            The field to sort samples by before plotting
+        level: str or int (optional)
+            the level to bin the taxonmies. can be int (0=kingdom, 1=phylum,...6=species)
+            or a string ('kingdom' or 'k' etc.)
+        inplace : bool (optional)
+            False (default) to create a copy
+            True to Replace data in exp
         '''
-        if field is not None:
-            newexp = exp.sort_samples(field)
-        else:
+        level_dict = {'kingdom': 0, 'k': 0, 'phylum': 1, 'p': 1, 'class': 2, 'c': 2, 'order': 3, 'o': 3,
+                      'family': 4, 'f': 4, 'genus': 5, 'g': 5, 'species': 6, 's': 6}
+        if not isinstance(level, int):
+            if level not in level_dict:
+                raise ValueError('Unsupported taxonomy level %s. Please use out of %s' % (level, list(level_dict.keys())))
+            level = level_dict[level]
+        if inplace:
             newexp = exp
-        if 'sample_field' in kwargs:
-            newexp.plot(feature_field='taxonomy', **kwargs)
         else:
-            newexp.plot(sample_field=field, feature_field='taxonomy', **kwargs)
+            newexp = exp.copy()
+
+        def _tax_level(tax_str, level):
+            # local function to get taxonomy up to given level
+            ctax = tax_str.split(';')
+            level += 1
+            if len(ctax) < level:
+                ctax.extend(['other'] * (level - len(ctax)))
+            return ';'.join(ctax[:level])
+
+        newexp.feature_metadata['_calour_tax_group'] = newexp.feature_metadata['taxonomy'].apply(_tax_level, level=level)
+        newexp.merge_identical('_calour_tax_group', method='sum', axis=1, inplace=True)
+        newexp.feature_metadata['taxonomy'] = newexp.feature_metadata['_calour_tax_group']
+        return newexp

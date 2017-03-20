@@ -12,16 +12,18 @@ from copy import copy, deepcopy
 import numpy as np
 import pandas as pd
 import numpy.testing as npt
+import pandas.util.testing as pdt
 from scipy import sparse
 
 from calour._testing import Tests, assert_experiment_equal
+from calour.util import _convert_axis_name
 import calour as ca
 
 
 class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
 
     def test_record_sig(self):
         def foo(exp, axis=1, inplace=True):
@@ -37,14 +39,14 @@ class ExperimentTests(Tests):
     def test_convert_axis_name_other_func(self):
         def foo(exp, inplace=True):
             return inplace
-        ca.Experiment.foo = ca.Experiment._convert_axis_name(foo)
+        ca.Experiment.foo = _convert_axis_name(foo)
         self.assertEqual(self.test1.foo(), True)
 
     def test_convert_axis_name(self):
         def foo(exp, axis=1, inplace=True):
             return axis, inplace
 
-        ca.Experiment.foo = ca.Experiment._convert_axis_name(foo)
+        ca.Experiment.foo = _convert_axis_name(foo)
 
         for i in (0, 's', 'sample', 'samples'):
             obs = self.test1.foo(axis=i)
@@ -93,7 +95,7 @@ class ExperimentTests(Tests):
 
     def test_reorder_round_trip(self):
         # test double permuting of a bigger data set
-        exp = ca.read(self.timeseries_biom, self.timeseries_samp)
+        exp = ca.read(self.timeseries_biom, self.timeseries_samp, normalize=None)
 
         rand_perm_samples = np.random.permutation(exp.data.shape[0])
         rand_perm_features = np.random.permutation(exp.data.shape[1])
@@ -109,8 +111,20 @@ class ExperimentTests(Tests):
     def test_copy_experiment(self):
         exp = copy(self.test1)
         assert_experiment_equal(exp, self.test1)
+        self.assertIsNot(exp, self.test1)
+
+    def test_deep_copy_experiment(self):
         exp = deepcopy(self.test1)
         assert_experiment_equal(exp, self.test1)
+        self.assertIsNot(exp, self.test1)
+
+    def test_copy(self):
+        exp = self.test1.copy()
+        assert_experiment_equal(exp, self.test1)
+        self.assertIsNot(exp, self.test1)
+        # make sure it is a deep copy - not sharing the data
+        exp.data[0, 0] = exp.data[0, 0] + 1
+        self.assertNotEqual(exp.data[0, 0], self.test1.data[0, 0])
 
     def test_get_data_default(self):
         # default - do not modify the data
@@ -169,6 +183,37 @@ class ExperimentTests(Tests):
         data = self.test1.get_data(sparse=False)
         self.assertIsInstance(df, pd.SparseDataFrame)
         npt.assert_array_almost_equal(df.to_dense().values, data)
+
+    def test_from_pands(self):
+        df = self.test1.to_pandas(sparse=False)
+        res = ca.Experiment.from_pandas(df)
+        self.assertIsInstance(res, ca.Experiment)
+        npt.assert_array_equal(res.feature_metadata.index.values, self.test1.feature_metadata.index.values)
+        npt.assert_array_equal(res.sample_metadata.index.values, self.test1.sample_metadata.index.values)
+        npt.assert_array_equal(res.get_data(sparse=False), self.test1.get_data(sparse=False))
+
+    def test_from_pandas_with_experiment(self):
+        df = self.test1.to_pandas(sparse=False)
+        res = ca.Experiment.from_pandas(df, self.test1)
+        assert_experiment_equal(res, self.test1)
+
+    def test_from_pandas_reorder(self):
+        df = self.test1.to_pandas(sparse=False)
+        # let's reorder the dataframe
+        df = df.sort_values(self.test1.feature_metadata.index.values[10])
+        df = df.sort_values(df.index.values[0], axis=1)
+        res = ca.Experiment.from_pandas(df, self.test1)
+        # we need to reorder the original experiment
+        exp = self.test1.sort_by_data(subset=[10], key='mean')
+        exp = exp.sort_by_data(subset=[0], key='mean', axis=1)
+        assert_experiment_equal(res, exp)
+
+    def test_from_pandas_round_trip(self):
+        data = np.array([[1, 2], [3, 4]])
+        df = pd.DataFrame(data, index=['s1', 's2'], columns=['AAA', 'CCC'], copy=True)
+        exp = ca.Experiment.from_pandas(df)
+        res = exp.to_pandas()
+        pdt.assert_frame_equal(res, df)
 
 
 if __name__ == "__main__":

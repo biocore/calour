@@ -1,3 +1,17 @@
+'''
+utilities (:mod:`calour.util`)
+==============================
+
+.. currentmodule:: calour.util
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   set_log_level
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -7,13 +21,51 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from functools import wraps
 import hashlib
+import inspect
 import configparser
 from pkg_resources import resource_filename
+from collections import Iterable
+from numbers import Real
 
 import scipy
 
+
 logger = getLogger(__name__)
+
+
+def _convert_axis_name(func):
+    '''Convert str value of axis to 0/1.
+
+    This allows the decorated function with ``axis`` parameter
+    to accept "sample" and "feature" as value for ``axis`` parameter.
+
+    This should be always the closest decorator to the function if
+    you have multiple decorators for this function.
+    '''
+    conversion = {'sample': 0,
+                  's': 0,
+                  'samples': 0,
+                  'feature': 1,
+                  'f': 1,
+                  'features': 1}
+
+    @wraps(func)
+    def inner(*args, **kwargs):
+        sig = inspect.signature(func)
+        ba = sig.bind(*args, **kwargs)
+        param = ba.arguments
+        v = param.get('axis', None)
+        if v is None:
+            return func(*args, **kwargs)
+        if isinstance(v, str):
+            param['axis'] = conversion[v.lower()]
+        elif v not in {0, 1}:
+            raise ValueError('unknown axis `%r`' % v)
+
+        return func(*ba.args, **ba.kwargs)
+    return inner
 
 
 def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=False):
@@ -176,6 +228,27 @@ def set_config_value(key, value, section='DEFAULT', config_file_name=None):
     logger.debug('wrote key %s value %s to config file' % (key, value))
 
 
+def get_config_sections(config_file_name=None):
+    '''Get a list of the sections in the config file
+
+    Parameters
+    ----------
+     config_file_name : str (optional)
+        the full path to the config file or None to use default config file
+
+    Returns
+    -------
+    list of str
+        List of the sections in the config file
+    '''
+    if config_file_name is None:
+        config_file_name = get_config_file()
+    config = configparser.ConfigParser()
+    config.read(config_file_name)
+
+    return config.sections()
+
+
 def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=None):
     '''Get the value from the calour config file
 
@@ -217,13 +290,67 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
 def set_log_level(level):
     '''Set the debug level for calour
 
+    You can see the logging levels at:
+    https://docs.python.org/3.5/library/logging.html#levels
+
     Parameters
     ----------
-    level : int
+    level : int or str
         10 for debug, 20 for info, 30 for warn, etc.
+        It is passing to ``logger.setLevel``.
     '''
-
     clog = getLogger('calour')
-    if level < 10:
-        level = 10
     clog.setLevel(level)
+
+
+def _to_list(x):
+    '''if x is non iterable or string, convert to iterable [x]
+
+    Parameters
+    ----------
+    x : any type (can be iterable)
+
+    Returns
+    -------
+    iterable
+        With the same values as x
+    '''
+    if isinstance(x, str):
+        return [x]
+    if isinstance(x, Iterable):
+        return x
+    return [x]
+
+
+def _argsort(values):
+    '''Sort a sequence of values of heterogeneous variable types.
+
+    Used to overcome the problem when using numpy.argsort on a pandas
+    series values with missing values
+
+    Examples
+    --------
+    >>> l = [10, 'b', 2.5, 'a']
+    >>> idx = _argsort(l)
+    >>> idx
+    [2, 0, 3, 1]
+    >>> l_sorted = [l[i] for i in idx]
+    >>> l_sorted
+    [2.5, 10, 'a', 'b']
+
+    Parameters
+    ----------
+    values : iterable
+        the values to sort
+
+    Returns
+    -------
+    list of ints
+        the positions of the sorted values
+
+    '''
+    # convert all numbers to float otherwise int will be sorted different place
+    values = [float(x) if isinstance(x, Real) else x for x in values]
+    # make values ordered by type and sort inside each var type
+    values = [(str(type(x)), x) for x in values]
+    return sorted(range(len(values)), key=values.__getitem__)

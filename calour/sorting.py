@@ -1,3 +1,22 @@
+'''
+sorting (:mod:`calour.sorting`)
+===============================
+
+.. currentmodule:: calour.sorting
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   sort_by_data
+   sort_by_metadata
+   sort_samples
+   sort_abundance
+   cluster_data
+   cluster_features
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -13,21 +32,22 @@ import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
-from . import transforming
-from .transforming import log_n
-
+from .transforming import log_n, transform, scale
+from .util import _argsort
 
 logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
+def sort_centroid(exp, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
 
-    Assumes exp samples are sorted by some continuous field, and sort the features based on their
-    center of mass along this field order:
-    For each feature calculate the center of mass (i.e. for each feature go over all samples i and calculate sum(data(i) * i / sum(data(i)) ).
-    Features are then sorted according to this center of mass
+    Assumes exp samples are sorted by some continuous field, and sort
+    the features based on their center of mass along this field order:
+    For each feature calculate the center of mass (i.e. for each
+    feature go over all samples i and calculate sum(data(i) * i /
+    sum(data(i)) ).  Features are then sorted according to this center
+    of mass
 
     Parameters
     ----------
@@ -45,12 +65,13 @@ def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
     -------
     exp : Experiment
         features sorted by center of mass
+
     '''
     logger.debug('sorting features by center of mass')
     if transform is None:
         data = exp.data
     else:
-        logger.debug('tansforming data using %r' % transform)
+        logger.debug('transforming data using %r' % transform)
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).data
     data = data.T
@@ -64,7 +85,7 @@ def sort_center_mass(exp, transform=log_n, inplace=False, **kwargs):
 
 
 @Experiment._record_sig
-def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False, **kwargs):
+def cluster_data(exp, transform=None, axis=1, metric='euclidean', inplace=False, **kwargs):
     '''Cluster the samples/features.
 
     Reorder the features/samples so that ones with similar behavior (pattern
@@ -72,8 +93,8 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
 
     Parameters
     ----------
-    aixs : 0 or 1 (optional)
-        0 (default) means clustering features; 1 means clustering samples
+    aixs : 0, 1, 's', or 'f' (optional)
+        'f' or 1 (default) means clustering features; 's' or 0 means clustering samples
     transform : Callable
         a callable transform on a 2-d matrix. Input and output of transform are ``Experiment``.
         The transform function can modify ``Experiment.data`` (it is a copy).
@@ -101,14 +122,51 @@ def cluster_data(exp, transform=None, axis=0, metric='euclidean', inplace=False,
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).get_data(sparse=False)
 
-    if axis == 0:
+    if axis == 1:
         data = data.T
     # cluster
     dist_mat = spatial.distance.pdist(data, metric=metric)
     linkage = cluster.hierarchy.single(dist_mat)
     sort_order = cluster.hierarchy.leaves_list(linkage)
 
-    return exp.reorder(sort_order, axis=1 - axis, inplace=inplace)
+    return exp.reorder(sort_order, axis=axis, inplace=inplace)
+
+
+@Experiment._record_sig
+def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
+    '''Cluster features.
+
+    Cluster is done after filtering of minimal abundance, log
+    transforming, and scaling on features.
+
+    Parameters
+    ----------
+    min_abundance : Number, optional
+        filter away features less than ``min_abundance`` (10 by default).
+    kwargs : dict
+        keyword arguments passing to ``cluster_data``
+
+    Returns
+    -------
+    Experiment
+        object with features filtered, log transformed and scaled.
+
+    See Also
+    --------
+    cluster_data
+    transform
+    log_n
+    scale
+
+    '''
+    newexp = exp.filter_min_abundance(min_abundance, inplace=inplace)
+    return newexp.cluster_data(
+        transform=transform,
+        axis=1,
+        steps=[log_n, scale],
+        scale__axis=1,
+        inplace=inplace,
+        **kwargs)
 
 
 @Experiment._record_sig
@@ -119,9 +177,9 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
     ----------
     field : str
         Name of the field to sort by
-    axis : 0 or 1
-        sort by samples (0) or by features (1), i.e. the ``field`` is a column
-        in ``sample_metadata`` (0) or ``feature_metadata`` (1)
+    axis : 0, 1, 's', or 'f'
+        sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
+        in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp
@@ -130,14 +188,14 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
     -------
     ``Experiment``
     '''
-    logger.info('sorting samples by field %s' % field)
+    logger.debug('sorting samples by field %s' % field)
     if axis == 0:
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
     else:
         raise ValueError('unknown axis %s' % axis)
-    idx = np.argsort(x[field].values, kind='mergesort')
+    idx = _argsort(x[field].values)
     return exp.reorder(idx, axis=axis, inplace=inplace)
 
 
@@ -151,33 +209,34 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
 
     Parameters
     ----------
-    axis : 0 or 1
-        Apply ``key`` function on row (sort the samples) (0) or column (sort the features) (1)
+    axis : 0, 1, 's', or 'f'
+        Apply ``key`` function on row (sort the samples) (0 or 's') or column (sort the features) (1 or 'f')
     subset : ``None`` or iterable of int (optional)
-        Sorting using only subset of the data.
+        Sorting using only subset of the data. The subsetting occurs on the opposite of
+        the specified axis.
     key : str or callable
-        If it is a callable, it should be a function accepts 1-D array of numeric and
-        returns a comparative value (like ``key`` in builtin ``sorted`` function).
-        Alternatively it accepts the following str values:
-        "log_mean": sort by log of the mean
-        "prevalence": sort by the prevalence
-        "mean": sort by the mean
+        If it is a callable, it should be a function accepts 1-D array
+        of numeric and returns a comparative value (like ``key`` in
+        builtin ``sorted`` function). Alternatively it accepts the
+        following strings: ``log_mean``: sort by log of the mean;
+        ``prevalence``: sort by the prevalence; ``mean``: sort by the
+        mean.
     inplace : bool (optional)
-        False (default) to create a copy
-        True to Replace data in exp
+        False (default) to create a copy. True to modify in place.
     kwargs : dict
         key word parameters passed to ``key``
 
     Returns
     -------
     ``Experiment``
-        With features sorted by mean frequency
+        With features sorted.
 
     '''
     if subset is None:
         data_subset = exp.data
     else:
         if axis == 0:
+            # sort samples, but subset on features
             data_subset = exp.data[:, subset]
         else:
             data_subset = exp.data[subset, :]
@@ -236,30 +295,7 @@ def _prevalence(x, cutoff=0):
     return np.sum(i >= cutoff for i in x) / len(x)
 
 
-def sort_obs_center_mass(exp, field=None, numeric=True, uselog=True, inplace=False):
-    '''
-    sort observations based on center of mass after sorting samples by field (or None not to pre sort)
-    '''
-
-
-def reverse_obs(exp, inplace=False):
-    '''
-    reverse the order of the observations
-    '''
-
-
-def sort_samples_by_seqs(exp, seqs, inplace=False):
-    '''
-    sort the samples based on the frequencies of sequences in seqs
-    '''
-
-
-def sort_niche(exp, field):
-    '''
-    sort by niches - jamie
-    '''
-
-
+@Experiment._record_sig
 def sort_samples(exp, field, **kwargs):
     '''Sort samples by field
     A convenience function for sort_by_metadata
@@ -277,42 +313,35 @@ def sort_samples(exp, field, **kwargs):
     return newexp
 
 
-def sort_abundance(exp, field=None, value=None, inplace=False, **kwargs):
+@Experiment._record_sig
+def sort_abundance(exp, subset=None, inplace=False, **kwargs):
     '''Sort features based on their abundance in a subset of the samples.
+
     This is a convenience wrapper for sort_by_data()
 
     Parameters
     ----------
-    field : str or None (default)
-        None (default) to sort on all samples, str to sort only on samples matching the field/value combination
-    value : str or list of str or None (default)
-        if field is not None, value is the value/list of values so sorting is only on samples matching this list
+    subset : dict or None (default)
+        None (default) to sort on all samples. Subset samples by
+        columns in sample metadata (specified by dict key) matching
+        the dict values (a list). sorting is only on samples matching this list
     inplace : bool (optional)
         False (default) to create a copy of the experiment, True to filter inplace
+    kwargs : dict
+        keyword arguments passing to ``sort_by_data``.
 
     Returns
     -------
-    ``Experiment``
+    Experiment
         with features sorted by abundance
+
     '''
-    if field is None:
-        subset = None
+    if subset is None:
+        select = None
     else:
-        if not isinstance(value, (list, tuple)):
-            value = [value]
-        subset = np.where(exp.sample_metadata[field].isin(value).values)[0]
-
-    newexp = exp.sort_by_data(axis=1, subset=subset, inplace=inplace, **kwargs)
-    return newexp
-
-
-def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
-    '''Cluster features following filtering of minimal abundance on features and
-       log transform and scaling on the data (mean 0 std 1)
-    '''
-    if min_abundance > 0:
-        newexp = exp.filter_min_abundance(min_abundance, inplace=inplace)
-    else:
-        newexp = exp
-    newexp = newexp.cluster_data(transform=transforming.transform, axis=0, steps=[transforming.log_n, transforming.scale], scale__axis=0, inplace=inplace, **kwargs)
-    return newexp
+        select = [True] * exp.shape[0]
+        for k, v in subset.items():
+            select = np.logical_and(subset, exp.sample_metadata[k].isin(v).values)
+        # convert boolean mask to index because sparse matrix can't be sliced with bools
+        select = np.where(select)[0]
+    return exp.sort_by_data(axis=1, subset=select, inplace=inplace, **kwargs)

@@ -1,3 +1,24 @@
+'''
+experiment (:mod:`calour.experiment`)
+=====================================
+
+.. currentmodule:: calour.experiment
+
+Classes
+^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   Experiment
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   add_functions
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -7,7 +28,7 @@
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from copy import deepcopy
+from copy import deepcopy, copy
 from importlib import import_module
 from functools import wraps
 import inspect
@@ -29,27 +50,27 @@ class Experiment:
 
     Parameters
     ----------
-    data : ``numpy.array`` or ``scipy.sparse``
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : ``pandas.DataFrame``
+    sample_metadata : :class:`pandas.DataFrame`
         The metadata on the samples
-    feature_metadata : ``pandas.DataFrame``
+    feature_metadata : :class:`pandas.DataFrame`
         The metadata on the features
     description : str
         name of experiment
-    sparse : bool
-        store the data array in sparse (``scipy.sparse.csr_matrix``) matrix
-        or numpy array
+    sparse : :class:`bool`
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
 
     Attributes
     ----------
-    data : ``numpy.array`` or ``scipy.sparse``
+    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : ``pandas.DataFrame``
+    sample_metadata : :class:`pandas.DataFrame`
         The metadata on the samples
-    feature_metadata : ``pandas.DataFrame``
+    feature_metadata : :class:`pandas.DataFrame`
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
@@ -59,6 +80,12 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
+    heatmap_feature_field : str or None
+        The default field used for the y-axis labels (feature lables)
+
+    See Also
+    --------
+    AmpliconExperiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -80,6 +107,12 @@ class Experiment:
         self.sample_metadata['_calour_original_abundance'] = self.data.sum(axis=1)
         # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
 
+        # the default y-axis field used for plotting
+        self.heatmap_feature_field = None
+
+        # the default databases to use for feature information
+        self.heatmap_databases = []
+
     @property
     def sparse(self):
         return scipy.sparse.issparse(self.data)
@@ -99,7 +132,9 @@ class Experiment:
     def __eq__(self, other):
         '''Check equality.
 
-        Need to check sparsity and do the conversion if needed first.
+        It compares ``data``, ``sample_metadata``, and
+        ``feature_metadata`` attributes.  to check sparsity and do
+        the conversion if needed first.
         '''
         if self.sparse is True:
             data = self.data.toarray()
@@ -116,52 +151,33 @@ class Experiment:
     def __ne__(self, other):
         return not (self == other)
 
-    def __copy__(self):
-        '''Return a copy of Experiment'''
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__dict__.update(self.__dict__)
-        return result
+    def copy(self):
+        '''Copy the object.
+
+        Returns
+        -------
+        Experiment
+        '''
+        return deepcopy(self)
 
     def __deepcopy__(self, memo):
-        '''Return a deep copy of Experiment. '''
+        '''Implement the deepcopy since pandas has problem deepcopy empty dataframe
+
+        When using the default deepcopy on an empty dataframe (columns but no rows), we get an error.
+        This happens when dataframe has 0 rows in pandas 0.19.2 np112py35_1.
+        So we manually use copy instead of deepcopy for empty dataframes
+        '''
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
         for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo))
+            try:
+                setattr(result, k, deepcopy(v, memo))
+            except:
+                logger.debug('Failed to copy attribute %r, doing shallow copy on it' % k)
+                setattr(result, k, copy(v))
+                memo[id(k)] = v
         return result
-
-    @staticmethod
-    def _convert_axis_name(func):
-        '''Convert str value of axis to 0/1.
-
-        This allows the decorated function with ``axis`` parameter
-        to accept "sample" and "feature" as value for ``axis`` parameter.
-
-        This should be always the closest decorator to the function if
-        you have multiple decorators for this function.
-        '''
-        conversion = {'sample': 0,
-                      's': 0,
-                      'samples': 0,
-                      'feature': 1,
-                      'f': 1,
-                      'features': 1}
-
-        @wraps(func)
-        def inner(*args, **kwargs):
-            sig = inspect.signature(func)
-            ba = sig.bind(*args, **kwargs).arguments
-            v = ba.get('axis', None)
-            if v is None:
-                return func(*args, **kwargs)
-            if isinstance(v, str):
-                ba['axis'] = conversion[v.lower()]
-            elif v not in {0, 1}:
-                raise ValueError('unknown axis `%r`' % v)
-            return func(**ba)
-        return inner
 
     @staticmethod
     def _record_sig(func):
@@ -234,7 +250,6 @@ class Experiment:
 
     @property
     def shape(self):
-        '''Get the number of samples by features in the experiment. '''
         return self.get_data().shape
 
     def reorder(self, new_order, axis=0, inplace=False):
@@ -246,8 +261,9 @@ class Experiment:
         ----------
         new_order : Iterable of int or boolean mask
             the order of new indices
-        axis : 0 for samples or 1 for features
-            the axis where the reorder occurs
+        axis : 0, 1, 's', or 'f'
+            the axis where the reorder occurs. 0 or 's' means reodering samples;
+            1 or 'f' means reordering features.
         inplace : bool, optional
             reorder in place.
 
@@ -257,7 +273,7 @@ class Experiment:
             experiment with reordered samples
         '''
         if inplace is False:
-            exp = deepcopy(self)
+            exp = self.copy()
         else:
             exp = self
         # make it a np array; otherwise the slicing won't work if the new_order is
@@ -271,7 +287,11 @@ class Experiment:
         # In [126]: a[np.array([False, False, False]), :]
         # Out[126]:
         # <0x4 sparse matrix of type '<class 'numpy.int8'>'
-        new_order = np.array(new_order)
+
+        # if new_order is empty, we want to return empty experiment
+        # it doesn't work for dense data is we use np.array([]) for the indexing
+        if len(new_order) > 0:
+            new_order = np.array(new_order)
         if axis == 0:
             exp.data = exp.data[new_order, :]
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
@@ -323,11 +343,52 @@ class Experiment:
             df = pd.DataFrame(self.data, index=ind, columns=cols, copy=True)
         return df
 
+    @classmethod
+    def from_pandas(cls, df, exp=None):
+        '''Convert a Pandas DataFrame into an experiment.
+
+        Can use an existing calour Experimebt (exp) (if supplied) to
+        obtain feature and sample metadata.  Note currently only works
+        with non-sparse DataFrame
+
+        Parameters
+        ----------
+        df : Pandas.DataFrame
+            The dataframe to use. should contain samples in rows, features in columns.
+            Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
+        exp : Experiment (optional)
+            If not None, use sample and feature metadata from the experiment
+
+        Returns
+        -------
+        Experiment
+            with non-sparse data
+
+        '''
+        if exp is None:
+            sample_metadata = pd.DataFrame(index=df.index)
+            sample_metadata['id'] = sample_metadata.index
+            feature_metadata = pd.DataFrame(index=df.columns)
+            feature_metadata['id'] = feature_metadata.index
+            exp_metadata = {}
+            description = 'From Pandas DataFrame'
+        else:
+            description = exp.description + ' From Pandas'
+            exp_metadata = exp.exp_metadata
+            sample_metadata = exp.sample_metadata.loc[df.index.values, ]
+            feature_metadata = exp.feature_metadata.loc[df.columns.values, ]
+            cls = exp.__class__
+
+        # print(sample_metadata)
+        newexp = cls(df.values, sample_metadata, feature_metadata,
+                     exp_metadata=exp_metadata, description=description, sparse=False)
+        return newexp
+
 
 def add_functions(cls,
                   modules=['.io', '.sorting', '.filtering', '.analysis',
-                           '.transforming', '.heatmap.heatmap',
-                           '.manipulation', '.analysis']):
+                           '.transforming', '.heatmap.heatmap', '.plotting',
+                           '.manipulation', '.database']):
     '''Dynamically add functions to the class as methods.
 
     Parameters
@@ -340,7 +401,6 @@ def add_functions(cls,
     for module_name in modules:
         module = import_module(module_name, 'calour')
         functions = inspect.getmembers(module, inspect.isfunction)
-        # import ipdb; ipdb.set_trace()
         for fn, f in functions:
             # skip private functions
             if not fn.startswith('_'):

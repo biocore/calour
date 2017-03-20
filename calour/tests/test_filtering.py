@@ -17,8 +17,8 @@ import calour as ca
 class FilteringTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat)
-        self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
 
     def test_downsample_sample(self):
         obs = self.test2.downsample('group')
@@ -54,9 +54,9 @@ class FilteringTests(Tests):
 
     def test_filter_by_metadata_sample_edge_cases(self):
         # no group 3 - none filtered
-        obs = self.test2.filter_by_metadata('group', 3)
+        obs = self.test2.filter_by_metadata('group', [3])
         self.assertEqual(obs.shape, (0, 8))
-        obs = self.test2.filter_by_metadata('group', 3, negate=True)
+        obs = self.test2.filter_by_metadata('group', [3], negate=True)
         assert_experiment_equal(obs, self.test2)
 
         # all samples are filtered
@@ -67,7 +67,8 @@ class FilteringTests(Tests):
 
     def test_filter_by_metadata_sample(self):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
-            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse)
+            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
+                            sparse=sparse, normalize=None)
             # only filter samples bewtween 3 and 7.
             obs = test2.filter_by_metadata(
                 'ori.order', lambda l: [7 > i > 3 for i in l], inplace=inplace)
@@ -81,17 +82,18 @@ class FilteringTests(Tests):
 
     def test_filter_by_metadata_feature_edge_cases(self):
         # none filtered
-        obs = self.test2.filter_by_metadata('oxygen', 'facultative', axis=1)
+        obs = self.test2.filter_by_metadata('oxygen', ['facultative'], axis=1)
         self.assertEqual(obs.shape, (9, 0))
-        obs = self.test2.filter_by_metadata('oxygen', 'facultative', axis=1, negate=True)
+        obs = self.test2.filter_by_metadata('oxygen', ['facultative'], axis=1, negate=True)
         assert_experiment_equal(obs, self.test2)
 
     def test_filter_by_metadata_feature(self):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
-            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse)
+            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
+                            sparse=sparse, normalize=None)
             # only filter samples with id bewtween 3 and 7.
             obs = test2.filter_by_metadata(
-                'oxygen', 'anaerobic', axis=1, inplace=inplace)
+                'oxygen', ['anaerobic'], axis=1, inplace=inplace)
             self.assertEqual(obs.shape, (9, 2))
             self.assertEqual(
                 obs.feature_metadata.index.tolist(),
@@ -117,7 +119,8 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_sample(self):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
-            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse)
+            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
+                            sparse=sparse, normalize=None)
             # filter out samples with abundance < 1200. only the last sample is filtered out.
             obs = test2.filter_by_data(
                 'sum_abundance', axis=0, inplace=inplace, cutoff=1200)
@@ -125,7 +128,8 @@ class FilteringTests(Tests):
             exp = ca.read(*[get_data_path(i) for i in [
                 'test2.biom.filter.sample',
                 'test2.sample',
-                'test2.feature']])
+                'test2.feature']],
+                          normalize=None)
             assert_experiment_equal(obs, exp)
             if inplace:
                 self.assertIs(obs, test2)
@@ -151,7 +155,8 @@ class FilteringTests(Tests):
             exp = ca.read(*[get_data_path(i) for i in [
                 'test2.biom.filter.feature',
                 'test2.sample',
-                'test2.feature']])
+                'test2.feature']],
+                          normalize=None)
             assert_experiment_equal(obs, exp)
             if inplace:
                 self.assertIs(obs, self.test2)
@@ -205,6 +210,7 @@ class FilteringTests(Tests):
         exp = self.test1.filter_ids(badsamples, axis=0, negate=True, inplace=True)
         self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)
         self.assertIs(exp, self.test1)
+
 
 if __name__ == '__main__':
     main()

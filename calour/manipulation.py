@@ -1,3 +1,18 @@
+'''
+manipulation (:mod:`calour.manipulation`)
+=========================================
+
+.. currentmodule:: calour.manipulation
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   join_fields
+   join_experiments
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -11,14 +26,13 @@ from logging import getLogger
 import pandas as pd
 import numpy as np
 
-from . import Experiment
+from .experiment import Experiment
 
 
 logger = getLogger(__name__)
 
 
-@Experiment._convert_axis_name
-def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplace=True):
+def join_fields(exp, field1, field2, newname=None, axis=0, sep='_', inplace=True):
     '''Join two sample metadata fields into a single new field
 
     Parameters
@@ -29,10 +43,10 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
         Name of the second sample metadata field to join
     newname : str or None (optional)
         name of the new (joined) sample metadata field
-        None (default) to name it as field1-field2
-    axis : int
-        0 (default) to modify sample metadata fields, 1 to modify feature metadata fields
-    separator : str (optional)
+        None (default) to name it as field1 + sep + field2
+    axis : 0, 1, 's', or 'f', optional
+        0 or 's' (default) to modify sample metadata fields; 1 or 'f' to modify feature metadata fields
+    sep : str (optional)
         The separator between the values of the two fields when joining
     inplace : bool (optional)
         True (default) to add in current experiment, False to create a new Experiment
@@ -61,13 +75,13 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
 
     # get the new column name
     if newname is None:
-        newname = field1 + separator + field2
+        newname = field1 + sep + field2
 
     if newname in metadata.columns:
         raise ValueError('new field name %s alreay in metadata. Please use different newname value' % newname)
 
     # add the new column
-    newcol = [str(i) + separator + str(j) for i, j in zip(metadata[field1], metadata[field2])]
+    newcol = [str(i) + sep + str(j) for i, j in zip(metadata[field1], metadata[field2])]
     if axis == 0:
         newexp.sample_metadata[newname] = newcol
     else:
@@ -76,24 +90,16 @@ def join_fields(exp, field1, field2, newname=None, axis=0, separator='_', inplac
     return newexp
 
 
-def merge_obs_tax(exp, tax_level=3, method='sum'):
-    '''
-    merge all observations with identical taxonomy (at level tax_level) by summing the values per sample
-    '''
-
-
-def _collapse_obs(exp, groups, method='sum'):
-    '''
-    collapse the observations based on values in groups (list of lists)
-    '''
-
-
+@Experiment._record_sig
 def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     '''Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field
     Methods for merge (value for each observation) are:
     'mean' : the mean of all samples/features
     'random' : a random sample/feature out of the group (same sample/feature for all observations)
     'sum' : the sum of values in all the samples/features
+
+    The number of samples/features in each group and their identities are stored in new metadata columns
+    '_calour_merge_number', '_calour_merge_ids' respectively
 
     Parameters
     ----------
@@ -103,8 +109,8 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
         'mean' : the mean of all samples/features
         'random' : a random sample/feature out of the group (same sample/feature for all observations)
         'sum' : the sum of values in all the samples/features
-    axis : 0/1 (optional)
-        0 (default) to merge samples, 1 to merge features
+    axis : 0, 1, 's', or 'f', optional
+        0 or 's' (default) to merge samples; 1 or 'f' to merge features
     inplace : bool (optional)
         False (default) to create new Experiment, True to perform inplace
 
@@ -128,6 +134,8 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
     newexp.sparse = False
     data = newexp.get_data()
     keep_pos = []
+    merge_number = []
+    merge_ids = []
     for cval in metadata[field].unique():
         # in case the sample had nan is the value
         if pd.isnull(cval):
@@ -145,6 +153,8 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
         elif method == 'random':
             random_pos = np.random.randint(np.sum(pos))
             newdat = cdata[random_pos]
+        merge_number.append(pos.sum())
+        merge_ids.append(metadata.index.values[pos])
         replace_pos = np.where(pos)[0][0]
         keep_pos.append(replace_pos)
         if axis == 0:
@@ -152,15 +162,15 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
         else:
             newexp.data[:, replace_pos] = newdat
     newexp.reorder(keep_pos, inplace=True, axis=axis)
+
+    if axis == 0:
+        newexp.sample_metadata = newexp.sample_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
+    else:
+        newexp.feature_metadata = newexp.feature_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
     return newexp
 
 
-def add_observation(exp, obs_id, data=None):
-    '''
-    add an observation to the experiment. fill the data with 0 if values is none, or with the values of data
-    '''
-
-
+@Experiment._record_sig
 def join_experiments(exp, other, orig_field_name='orig_exp', prefixes=None):
     '''Join two Experiment objects into one.
 

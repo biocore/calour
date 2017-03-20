@@ -44,13 +44,17 @@ class PlotGUI_QT5(PlotGUI):
         self.app_window = ApplicationWindow(self)
         app.references.add(self.app_window)
         self.app_window.setWindowTitle("Calour")
-        self.figure = self.app_window.plotfigure
+        self._set_figure(self.app_window.plotfigure)
 
     def __call__(self):
         logger.debug('opening Qt5 window')
         super().__call__()
         try:
             self.app_window.show()
+            # move the window to the front
+            self.app_window.activateWindow()
+            self.app_window.raise_()
+            # run the event loop
             self.app.exec_()
         finally:
             # clean up when the qt app is closed
@@ -122,7 +126,8 @@ class MplCanvas(FigureCanvas):
     """
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
+        # comment out because it draws frame on the whole plotting area
+        # self.axes = fig.add_subplot(111)
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
@@ -272,6 +277,8 @@ class ApplicationWindow(QMainWindow):
         menu_details = self.listMenu.addAction("Details")
         menu_details.triggered.connect(lambda: self.right_menu_details(item))
         if db.annotatable:
+            menu_details = self.listMenu.addAction("Update annotation")
+            menu_details.triggered.connect(lambda: self.right_menu_update(item))
             menu_delete = self.listMenu.addAction("Delete annotation")
             menu_delete.triggered.connect(lambda: self.right_menu_delete(item))
             menu_remove = self.listMenu.addAction("Remove seq. from annotation")
@@ -294,6 +301,12 @@ class ApplicationWindow(QMainWindow):
         if err:
             logger.error('Annotation not deleted. Error: %s' % err)
         self.gui.show_info()
+
+    def right_menu_update(self, item):
+        logger.debug('update annotation %s' % item.text)
+        data = item.data(QtCore.Qt.UserRole)
+        db = data.get('_db_interface', None)
+        db.upadte_annotation(data, self.gui.exp)
 
     def right_menu_remove_feature(self, item):
         features = self.gui.get_selected_seqs()
@@ -333,7 +346,7 @@ class ApplicationWindow(QMainWindow):
         for cdb in self.gui.databases:
             if not cdb.can_get_feature_terms:
                 continue
-            logger.debug('Database: %s' % cdb.get_name())
+            logger.debug('Database: %s' % cdb.database_name)
             feature_terms = cdb.get_feature_terms(allseqs, self.gui.exp)
             logger.debug('got %d terms' % len(feature_terms))
             res = analysis.relative_enrichment(self.gui.exp, group1_seqs, feature_terms)

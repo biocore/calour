@@ -1,3 +1,23 @@
+'''
+filtering (:mod:`calour.filtering`)
+===================================
+
+.. currentmodule:: calour.filtering
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   filter_by_data
+   filter_by_metadata
+   filter_samples
+   filter_ids
+   filter_mean
+   filter_prevalence
+   filter_min_abundance
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -13,7 +33,7 @@ from collections import Callable
 import numpy as np
 
 from .experiment import Experiment
-
+from .util import _to_list
 
 logger = getLogger(__name__)
 
@@ -31,8 +51,8 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
     field : str
         The name of the column in samples metadata table. This column
         should has categorical values
-    axis : 0 / 1 (optional)
-        0 (default) to filter samples, 1 to filter features
+    axis : 0, 1, 's', or 'f'
+        0 or 's' (default) to filter samples; 1 or 'f' to filter features
     num_keep : int or None (optional)
         None (default) to downsample to minimal group size.
         int : downsample to num_keep samples/features per group, drop values
@@ -76,20 +96,21 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
 
 
 @Experiment._record_sig
-@Experiment._convert_axis_name
-def filter_by_metadata(exp, field, pick, axis=0, negate=False, inplace=False):
+def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
 
     Parameters
     ----------
     field : str
         the column name of the sample or feature metadata tables
-    pick : list, tuple, or Callable
-        pick what to keep based on the value in the specified field
-    axis : 0 or 1, optional
-        the field is on samples (0) or features (1) metadata
+    select : list, tuple, or Callable
+        select what to keep based on the value in the specified field.
+        if it is a callable, it accepts a 1d array and return a
+        boolean array of the same length.
+    axis : 0, 1, 's', or 'f', optional
+        the field is on samples (0 or 's') or features (1 or 'f') metadata
     negate : bool, optional
-        discard instead of keep the pick if set to ``True``
+        discard instead of keep the select if set to ``True``
     inplace : bool, optional
         do the filtering on the original ``Experiment`` object or a copied one.
 
@@ -107,13 +128,10 @@ def filter_by_metadata(exp, field, pick, axis=0, negate=False, inplace=False):
     else:
         raise ValueError('unknown axis %s' % axis)
 
-    if isinstance(pick, Callable):
-        select = pick(x[field])
+    if isinstance(select, Callable):
+        select = select(x[field])
     else:
-        if not isinstance(pick, (list, tuple)):
-            pick = [pick]
-
-        select = x[field].isin(pick).values
+        select = x[field].isin(select).values
 
     if negate is True:
         select = ~ select
@@ -134,7 +152,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
         'unique_cut': calls ``_unique_cut``,
         'mean_abundance': calls ``_mean_abundance``,
         'prevalence': calls ``_prevalence``
-    axis : 0 or 1
+    axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
     negate : bool
         negate the predicate for selection
@@ -269,10 +287,12 @@ def _freq_ratio(x, ratio=2):
 @Experiment._record_sig
 def filter_samples(exp, field, values, negate=False, inplace=False):
     '''Shortcut for filtering samples.'''
-    return filter_by_metadata(exp, field=field, pick=values,
+    values = _to_list(values)
+    return filter_by_metadata(exp, field=field, select=values,
                               negate=negate, inplace=inplace)
 
 
+@Experiment._record_sig
 def filter_min_abundance(exp, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
     This is a convenience function wrapping filter_by_data()
@@ -286,6 +306,7 @@ def filter_min_abundance(exp, min_abundance, **kwargs):
     return newexp
 
 
+@Experiment._record_sig
 def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
     This is a convenience function wrapping filter_by_data()
@@ -305,6 +326,7 @@ def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
     return newexp
 
 
+@Experiment._record_sig
 def filter_mean(exp, cutoff=0.01, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
 
@@ -325,6 +347,7 @@ def filter_mean(exp, cutoff=0.01, **kwargs):
     return newexp
 
 
+@Experiment._record_sig
 def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
     '''Filter samples or features based on a list index values
 
@@ -332,10 +355,10 @@ def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
     ----------
     ids : iterable of str
         the feature/sample ids to filter (index values)
-    axis : int (optional)
-        1 (default) to filter features, 0 to filter samples
+    axis : 0, 1, 's', or 'f', optional
+        1 or 'f' (default) to filter features; 0 or 's' to filter samples
     negate : bool (optional)
-        False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.
+        negate the filtering
     inplace : bool (optional)
         False (default) to create a copy of the experiment, True to filter inplace
 
