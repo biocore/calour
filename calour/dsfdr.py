@@ -291,16 +291,17 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
     # pseudo p-values for permutated test statistic u
     for crow in range(numbact):
         allstat = np.hstack([t[crow], u[crow, :]])
-        allstat = 1 - (sp.stats.rankdata(allstat, method='min') / len(allstat))
+        stat_rank = sp.stats.rankdata(allstat, method='min')
+        allstat = 1 - ((stat_rank - 1) / len(allstat))
+        # assign ranks to t from biggest as 1
         pvals[crow] = allstat[0]
         pvals_u[crow, :] = allstat[1:]
 
     # calculate FDR
     if fdr_method == 'dsfdr':
-        # sort p-values for original test statistics from biggest to smallest
-        sortp = list(set(pvals))
-        sortp = np.sort(sortp)
-        sortp = sortp[::-1]
+        # sort unique p-values for original test statistics biggest to smallest
+        pvals_unique = np.unique(pvals)
+        sortp = pvals_unique[np.argsort(-pvals_unique)]
 
         # find a data-dependent threshold for the p-value
         foundit = False
