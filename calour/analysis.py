@@ -22,6 +22,7 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
+from collections import defaultdict
 from logging import getLogger
 
 import numpy as np
@@ -352,3 +353,113 @@ def relative_enrichment(exp, features, feature_terms):
         newplist.append(plist[si[idx]])
 
     return(newplist)
+
+
+def get_term_features_new(features, feature_terms):
+    '''Get dict of number of appearances in each sequence keyed by term
+
+    Parameters
+    ----------
+    seqs : list of str
+        A list of DNA sequences
+    feature_terms : dict of {feature: list of tuples of (term, amount)}
+        The terms associated with each feature in exp
+        feature (key) : str the feature (out of exp) to which the terms relate
+        feature_terms (value) : list of tuples of (str or int the terms associated with this feature, count)
+
+    Returns
+    -------
+    numpy array of T (terms) * F (features)
+        total counts of each term (row) in each feature (column)
+    list of str
+        list of the terms corresponding to the numpy array rows
+    '''
+    # get all terms
+    terms = {}
+    cpos = 0
+    for cfeature, ctermlist in feature_terms.items():
+        for cterm, ccount in ctermlist:
+            if cterm not in terms:
+                terms[cterm] = cpos
+                cpos += 1
+
+    tot_features_inflated = 0
+    feature_pos = {}
+    for cfeature in features:
+        ctermlist = feature_terms[cfeature]
+        feature_pos[cfeature] = tot_features_inflated
+        tot_features_inflated += len(ctermlist)
+
+    res = np.zeros([len(terms), tot_features_inflated])
+
+    for cfeature in features:
+        for cterm, ctermcount in feature_terms[cfeature]:
+            res[terms[cterm], feature_pos[cfeature]] += ctermcount
+    term_list = sorted(terms, key=terms.get)
+    return res, term_list
+
+
+def relative_enrichment_new(exp, features, feature_terms):
+    '''Get the list of enriched terms in features compared to all features in exp.
+
+    given uneven distribtion of number of terms per feature
+
+    Parameters
+    ----------
+    exp : calour.Experiment
+        The experiment to compare the features to
+    features : list of str
+        The features (from exp) to test for enrichmnt
+    feature_terms : dict of {feature: list of tuples of (term, amount)}
+        The terms associated with each feature in exp
+        feature (key) : str the feature (out of exp) to which the terms relate
+        feature_terms (value) : list of tuples of (str or int the terms associated with this feature, count)
+
+    Returns
+    -------
+    pandas.DataFrame with  info about significantly enriched terms.
+        columns:
+            feature : str the feature
+            pval : the p-value for the enrichment (float)
+            observed : the number of observations of this term in group1 (int)
+            expected : the expected (based on all features) number of observations of this term in group1 (float)
+            frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+            frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+            num_group1 : number of total terms in group 1 which are the specific term (float)
+            num_group2 : number of total terms in group 2 which are the specific term (float)
+            description : the term (str)
+    '''
+    exp_features = set(exp.feature_metadata.index.values)
+    bg_features = np.array(list(exp_features.difference(features)))
+
+    feature_array, term_list = get_term_features_new(features, feature_terms)
+    bg_array, term_list = get_term_features_new(bg_features, feature_terms)
+
+    all_feature_array = np.hstack([feature_array, bg_array])
+
+    tpos = term_list.index('skin')
+    print(tpos)
+    print(all_feature_array[tpos,:])
+    ipos = np.where(all_feature_array[tpos,:]>0)[0]
+    print(ipos)
+    print(all_feature_array[tpos,ipos])
+    print(feature_array.shape)
+    print(bg_array.shape)
+    print(all_feature_array.shape)
+    print(feature_array[tpos,:].mean())
+    print(bg_array[tpos,:].mean())
+
+    labels = np.zeros(all_feature_array.shape[1])
+    labels[:feature_array.shape[1]] = 1
+
+    print(labels.sum())
+
+    keep, odif, pvals = dsfdr.dsfdr(all_feature_array, labels, method='meandiff', transform_type=None, alpha=0.1, numperm=1000, fdr_method='dsfdr')
+    keep = np.where(keep)[0]
+    if len(keep) == 0:
+        logger.info('no enriched terms found')
+    term_list = np.array(term_list)[keep]
+    odif = odif[keep]
+    pvals = pvals[keep]
+    res = pd.DataFrame({'term': term_list, 'odif': odif, 'pvals': pvals})
+    return res
