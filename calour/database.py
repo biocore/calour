@@ -84,9 +84,8 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
             continue
         for cterm in term_list[cfeature]:
             if use_term_list is not None:
-                for clist_term in use_term_list:
-                    if clist_term in cterm:
-                        term_count[clist_term] += 1
+                if cterm in use_term_list:
+                    term_count[cterm] += 1
             else:
                 term_count[cterm] += 1
         if len(term_count) == 0:
@@ -94,7 +93,6 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
         else:
             max_term = max(term_count, key=term_count.get)
         feature_terms.append(max_term)
-        # feature_terms.append('%d:%s' % (term_count[max_term],max_term))
     exp.feature_metadata[field_name] = feature_terms
     return exp
 
