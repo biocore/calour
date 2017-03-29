@@ -164,31 +164,41 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     ``Experiment``
         the filtered object
     '''
-    func = {'sum_abundance': _sum_abundance,
-            'freq_ratio': _freq_ratio,
-            'unique_cut': _unique_cut,
-            'mean_abundance': _mean_abundance,
-            'prevalence': _prevalence}
-    if isinstance(predicate, str):
-        predicate = func[predicate]
-
-    logger.debug('filter_by_data using function %r' % predicate)
-
-    if exp.sparse:
-        n = exp.data.shape[axis]
-        select = np.ones(n, dtype=bool)
-        if axis == 0:
-            for row in range(n):
-                # convert the row from sparse to dense, and cast to 1d array
-                select[row] = predicate(exp.data[row, :].todense().A1, **kwargs)
-        elif axis == 1:
-            for col in range(n):
-                # convert the column from sparse to dense, and cast to 1d array
-                select[col] = predicate(exp.data[:, col].todense().A1, **kwargs)
-        else:
-            raise ValueError('unknown axis %s' % axis)
+    # test for functions that can be applied to full matrix
+    # this is much faster
+    fast_func = {'sum_abundance': _sum_abundance,
+                 'mean_abundance': _mean_abundance}
+    if predicate in fast_func:
+        logger.debug('filter_by_data using fast function %r' % predicate)
+        select = fast_func[predicate](exp.data, axis=1-axis, **kwargs)
+        if exp.sparse:
+            select = select.A1
     else:
-        select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
+        func = {'sum_abundance': _sum_abundance,
+                'freq_ratio': _freq_ratio,
+                'unique_cut': _unique_cut,
+                'mean_abundance': _mean_abundance,
+                'prevalence': _prevalence}
+        if isinstance(predicate, str):
+            predicate = func[predicate]
+
+        logger.debug('filter_by_data using function %r' % predicate)
+
+        if exp.sparse:
+            n = exp.data.shape[axis]
+            select = np.ones(n, dtype=bool)
+            if axis == 0:
+                for row in range(n):
+                    # convert the row from sparse to dense, and cast to 1d array
+                    select[row] = predicate(exp.data[row, :].todense().A1, **kwargs)
+            elif axis == 1:
+                for col in range(n):
+                    # convert the column from sparse to dense, and cast to 1d array
+                    select[col] = predicate(exp.data[:, col].todense().A1, **kwargs)
+            else:
+                raise ValueError('unknown axis %s' % axis)
+        else:
+            select = np.apply_along_axis(predicate, 1 - axis, exp.data, **kwargs)
 
     if negate is True:
         select = ~ select
@@ -197,7 +207,24 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def _sum_abundance(x, cutoff=10):
+# def _sum_abundance(x, cutoff=10):
+#     '''Check if the sum abundance larger than cutoff.
+
+#     It can be used filter features with at least "cutoff" abundance
+#     total over all samples
+
+#     Examples
+#     --------
+#     >>> _sum_abundance(np.array([0, 1, 1]), 2)
+#     True
+#     >>> _sum_abundance(np.array([0, 1, 1]), 2.01)
+#     False
+
+#     '''
+#     return x.sum() >= cutoff
+
+
+def _sum_abundance(data, axis, cutoff=10):
     '''Check if the sum abundance larger than cutoff.
 
     It can be used filter features with at least "cutoff" abundance
@@ -211,10 +238,27 @@ def _sum_abundance(x, cutoff=10):
     False
 
     '''
-    return x.sum() >= cutoff
+    return data.sum(axis=axis) >= cutoff
 
 
-def _mean_abundance(x, cutoff=0.01):
+# def _mean_abundance(x, cutoff=0.01):
+#     '''Check if the mean abundance larger than cutoff.
+
+#     Can be used to keep features with means at least "cutoff" in all
+#     samples
+
+#     Examples
+#     --------
+#     >>> _mean_abundance(np.array([0, 0, 1, 1]), 0.51)
+#     False
+#     >>> _mean_abundance(np.array([0, 0, 1, 1]), 0.5)
+#     True
+
+#     '''
+#     return x.mean() >= cutoff
+
+
+def _mean_abundance(data, axis, cutoff=0.01):
     '''Check if the mean abundance larger than cutoff.
 
     Can be used to keep features with means at least "cutoff" in all
@@ -228,7 +272,7 @@ def _mean_abundance(x, cutoff=0.01):
     True
 
     '''
-    return x.mean() >= cutoff
+    return data.mean(axis=axis) >= cutoff
 
 
 def _prevalence(x, cutoff=1/10000, fraction=0.5):
