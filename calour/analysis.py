@@ -26,8 +26,6 @@ from logging import getLogger
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-from statsmodels.sandbox.stats.multicomp import multipletests
 
 from .experiment import Experiment
 from .util import _to_list

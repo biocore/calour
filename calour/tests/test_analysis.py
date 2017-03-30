@@ -9,7 +9,6 @@
 import unittest
 
 import numpy as np
-import numpy.testing as npt
 
 import calour as ca
 from calour.analysis import diff_abundance
