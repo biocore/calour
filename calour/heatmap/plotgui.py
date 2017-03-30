@@ -10,7 +10,6 @@ from logging import getLogger
 from abc import ABC
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 
@@ -35,22 +34,24 @@ class PlotGUI(ABC):
     zoom_scale : numeric
         the scaling factor for zooming
     scroll_offset : numeric (optional)
-        The amount of bacteria/samples to scroll when arrow key pressed
+        The amount of columns/rows to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
-        >0 : scroll than constant amount of bacteria per keypress
+        >0 : scroll than constant number of columns/rows per keypress
     figure : ``matplotlib.figure.Figure``
-        The figure where the heatmap will be plotted into. It creates one by default.
-    axes : matplotlib axes obtained from ``figure``.
+        The figure where the heatmap and other axes will be plotted into.
+    axes : the matplotlib axes from ``figure`` to plot heatmap into.
     databases : list
-        the database to interact with
+        the databases to interact with
 
     Parameters
     ----------
-    exp :
-    zoom_scale :
-    scroll_offset :
+    exp : the ``Experiment`` object associated with this GUI
+    zoom_scale : the scaling factor for zooming
+    scroll_offset : The amount of columns/rows to scroll when arrow key pressed
+    databases : the databases to interact with
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None):
+        import matplotlib.pyplot as plt
         # the Experiment being plotted
         self.exp = exp
         # how much zooming in on key press
@@ -80,6 +81,21 @@ class PlotGUI(ABC):
         self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
         self.yax.axis('off')
         self.axes = hm_ax
+
+    def save_figure(self, *args, **kwargs):
+        '''Save the figure to file.
+
+        Parameters
+        ----------
+        args, kwargs: tuple, dict
+            arguments passing to ``matplotlib.Figure.savefig`` function.
+        '''
+        try:
+            # create color bar for the heatmap before saving
+            self.figure.colorbar(self.axes.images[0])
+        except IndexError:
+            logger.warning('no heatmap are plotted')
+        self.figure.savefig(*args, **kwargs)
 
     def get_selection_info(self):
         '''Get the current selection information

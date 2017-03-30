@@ -22,6 +22,7 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
+from collections import defaultdict
 from logging import getLogger
 
 import numpy as np
