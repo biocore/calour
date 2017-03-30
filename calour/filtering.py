@@ -31,6 +31,7 @@ from logging import getLogger
 from collections import Callable
 
 import numpy as np
+from scipy.sparse import issparse
 
 from .experiment import Experiment
 from .util import _to_list
@@ -171,8 +172,6 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     if predicate in fast_func:
         logger.debug('filter_by_data using fast function %r' % predicate)
         select = fast_func[predicate](exp.data, axis=1-axis, **kwargs)
-        if exp.sparse:
-            select = select.A1
     else:
         func = {'sum_abundance': _sum_abundance,
                 'freq_ratio': _freq_ratio,
@@ -207,55 +206,38 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-# def _sum_abundance(x, cutoff=10):
-#     '''Check if the sum abundance larger than cutoff.
-
-#     It can be used filter features with at least "cutoff" abundance
-#     total over all samples
-
-#     Examples
-#     --------
-#     >>> _sum_abundance(np.array([0, 1, 1]), 2)
-#     True
-#     >>> _sum_abundance(np.array([0, 1, 1]), 2.01)
-#     False
-
-#     '''
-#     return x.sum() >= cutoff
-
-
 def _sum_abundance(data, axis, cutoff=10):
     '''Check if the sum abundance larger than cutoff.
 
     It can be used filter features with at least "cutoff" abundance
     total over all samples
+    NOTE: this is a "fast" function working on the whole matrix at once
+
+    Parameters
+    ----------
+    data : numpy 2d array or scipy.Sparse matrix
+    axis : int
+        0 to sum each feature, 1 to sum each sample
+    cutoff : float
+        keep features with sum>=cutoff
+
+    Returns
+    -------
+    np.array (bool)
+        with one entry per feature (axis=0) or sample (axis=1), True if sum>=cutoff.
 
     Examples
     --------
-    >>> _sum_abundance(np.array([0, 1, 1]), 2)
-    True
-    >>> _sum_abundance(np.array([0, 1, 1]), 2.01)
-    False
+    >>> _sum_abundance(np.array([[0, 1, 1]]), axis=1, 2)
+    [True]
+    >>> _sum_abundance(np.array([[0, 1, 1]]), axis=1, 2.01)
+    [False]
 
     '''
-    return data.sum(axis=axis) >= cutoff
-
-
-# def _mean_abundance(x, cutoff=0.01):
-#     '''Check if the mean abundance larger than cutoff.
-
-#     Can be used to keep features with means at least "cutoff" in all
-#     samples
-
-#     Examples
-#     --------
-#     >>> _mean_abundance(np.array([0, 0, 1, 1]), 0.51)
-#     False
-#     >>> _mean_abundance(np.array([0, 0, 1, 1]), 0.5)
-#     True
-
-#     '''
-#     return x.mean() >= cutoff
+    res = data.sum(axis=axis) >= cutoff
+    if issparse(data):
+        res = res.A1
+    return res
 
 
 def _mean_abundance(data, axis, cutoff=0.01):
@@ -263,6 +245,21 @@ def _mean_abundance(data, axis, cutoff=0.01):
 
     Can be used to keep features with means at least "cutoff" in all
     samples
+
+    NOTE: this is a "fast" function working on the whole matrix at once
+
+    Parameters
+    ----------
+    data : numpy 2d array or scipy.Sparse matrix
+    axis : int
+        0 to sum each feature, 1 to sum each sample
+    cutoff : float
+        keep features with mean>=cutoff
+
+    Returns
+    -------
+    np.array (bool)
+        with one entry per feature (axis=0) or sample (axis=1), True if mean>=cutoff.
 
     Examples
     --------
@@ -272,7 +269,10 @@ def _mean_abundance(data, axis, cutoff=0.01):
     True
 
     '''
-    return data.mean(axis=axis) >= cutoff
+    res = data.mean(axis=axis) >= cutoff
+    if issparse(data):
+        res = res.A1
+    return res
 
 
 def _prevalence(x, cutoff=1/10000, fraction=0.5):

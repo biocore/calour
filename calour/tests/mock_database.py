@@ -22,7 +22,7 @@ class MockDatabase(Database):
             'annotate' if database interface supports add_annotation()
             'enrichment' if database interface supports get_feature_terms()
         '''
-        super().__init__(exp=exp, database_name='mock_db', methods=['get', 'annotate', 'feature_terms'])
+        super().__init__(exp=exp, database_name='mock_db', methods=['get', 'annotate', 'enrichment'])
         self.dbinfo = {
                        'TACGTATGTCACAAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTGGATTAAGCGTGTTGTGAAATGTAGACGCTCAACGTCTGAATCGCAGCGCGAACTGGTTCACTTGAGTATGCACAACGTAGGCGGAATTCGTCG': ['seq1', 'nice'],
                        'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT': ['seq2'],
