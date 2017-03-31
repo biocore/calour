@@ -274,11 +274,11 @@ def _mean_abundance(data, axis, cutoff=0.01, strict=False):
 
     Examples
     --------
-    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.51)) == 0
+    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), axis=0, cutoff=0.51)) == 0
     True
-    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.5)) == 1
+    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), axis=0, cutoff=0.5)) == 1
     True
-    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.5, strict=True)) == 0
+    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), axis=0, cutoff=0.5, strict=True)) == 0
     True
 
     '''
