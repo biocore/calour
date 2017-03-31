@@ -232,11 +232,11 @@ def _sum_abundance(data, axis, cutoff=10, strict=False):
     Examples
     --------
     >>> np.sum(_sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2)) == 1
-    [True]
+    True
     >>> np.sum(_sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2, strict=True)) == 0
-    [True]
+    True
     >>> np.sum(_sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2.01)) == 0
-    [False]
+    True
 
     '''
     if strict:
@@ -275,7 +275,7 @@ def _mean_abundance(data, axis, cutoff=0.01, strict=False):
     Examples
     --------
     >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.51)) == 0
-    False
+    True
     >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.5)) == 1
     True
     >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.5, strict=True)) == 0
