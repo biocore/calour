@@ -53,6 +53,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
          AmpliconExperiment.downsample
          
+         AmpliconExperiment.enrichment
+         
          AmpliconExperiment.filter_by_data
          
          AmpliconExperiment.filter_by_metadata
@@ -89,9 +91,9 @@ calour.amplicon_experiment.AmpliconExperiment
          
          AmpliconExperiment.get_file_md5
          
-         AmpliconExperiment.get_term_features
-         
          AmpliconExperiment.heatmap
+         
+         AmpliconExperiment.issparse
          
          AmpliconExperiment.join_experiments
          
@@ -100,8 +102,6 @@ calour.amplicon_experiment.AmpliconExperiment
          AmpliconExperiment.log_n
          
          AmpliconExperiment.merge_identical
-         
-         AmpliconExperiment.multipletests
          
          AmpliconExperiment.nlargest
          
@@ -120,8 +120,6 @@ calour.amplicon_experiment.AmpliconExperiment
          AmpliconExperiment.read_amplicon
          
          AmpliconExperiment.read_open_ms
-         
-         AmpliconExperiment.relative_enrichment
          
          AmpliconExperiment.reorder
          

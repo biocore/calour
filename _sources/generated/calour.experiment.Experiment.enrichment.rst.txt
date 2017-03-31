@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.enrichment
+=======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.enrichment

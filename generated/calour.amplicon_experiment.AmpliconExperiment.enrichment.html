@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>calour.amplicon_experiment.AmpliconExperiment.enrichment &#8212; calour 0.1.0.dev0 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -107,7 +107,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features</a></li>
+<li><a class="reference internal" href="#">calour.amplicon_experiment.AmpliconExperiment.enrichment</a></li>
 </ul>
 </ul>
 </li>
@@ -137,35 +137,48 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="calour-amplicon-experiment-ampliconexperiment-add-terms-to-features">
-<h1>calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-add-terms-to-features" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="calour-amplicon-experiment-ampliconexperiment-enrichment">
+<h1>calour.amplicon_experiment.AmpliconExperiment.enrichment<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-enrichment" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
-<dt id="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">add_terms_to_features</code><span class="sig-paren">(</span><em>exp</em>, <em>dbname</em>, <em>use_term_list=None</em>, <em>field_name='common_term'</em>, <em>term_type=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a field to the feature metadata, with most common term for each feature</p>
-<p>Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
-Note : Adds annotations in-place.</p>
+<dt id="calour.amplicon_experiment.AmpliconExperiment.enrichment">
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">enrichment</code><span class="sig-paren">(</span><em>exp</em>, <em>features</em>, <em>dbname</em>, <em>*kargs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.enrichment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of enriched annotation terms in features compared to all features in exp.</p>
+<p>Uses the database specific enrichment analysis method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>use_term_list</strong> : list of str or None (optional)</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>features</strong> : list of str</p>
 <blockquote>
-<div><p>Use only terms appearing in this list
-None (default) to use all terms</p>
+<div><p>The features to test for enrichment (compared to all other features in exp)</p>
 </div></blockquote>
-<p><strong>field_name</strong> : str (optional)</p>
+<p><strong>dbname</strong> : str</p>
 <blockquote>
-<div><p>Name of feature_metadata field to store the annotatiosn.</p>
+<div><p>the database to use for the annotation terms and enrichment analysis</p>
 </div></blockquote>
-<p><strong>term_type</strong> : str or None (optional)</p>
+<p><strong>*kargs, **kwargs</strong></p>
 <blockquote>
-<div><p>type of the annotation summary to get from the database (db specific)
-None to get default type</p>
+<div><p>Additional database specific parameters</p>
 </div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>&#8212;&#8212;-</strong></p>
-<p class="last"><strong>exp</strong> : Experiment</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">pandas.DataFrame</p>
+<p>with info about significantly enriched terms.</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>columns:</dt>
+<dd><p class="first last">feature : str the feature
+pval : the p-value for the enrichment (float)
+observed : the number of observations of this term in group1 (int)
+expected : the expected (based on all features) number of observations of this term in group1 (float)
+frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+num_group1 : number of total terms in group 1 which are the specific term (float)
+num_group2 : number of total terms in group 2 which are the specific term (float)
+description : the term (str)</p>
+</dd>
+</dl>
+</div></blockquote>
 </td>
 </tr>
 </tbody>

@@ -51,6 +51,8 @@ calour.experiment.Experiment
          
          Experiment.downsample
          
+         Experiment.enrichment
+         
          Experiment.filter_by_data
          
          Experiment.filter_by_metadata
@@ -81,9 +83,9 @@ calour.experiment.Experiment
          
          Experiment.get_file_md5
          
-         Experiment.get_term_features
-         
          Experiment.heatmap
+         
+         Experiment.issparse
          
          Experiment.join_experiments
          
@@ -92,8 +94,6 @@ calour.experiment.Experiment
          Experiment.log_n
          
          Experiment.merge_identical
-         
-         Experiment.multipletests
          
          Experiment.nlargest
          
@@ -112,8 +112,6 @@ calour.experiment.Experiment
          Experiment.read_amplicon
          
          Experiment.read_open_ms
-         
-         Experiment.relative_enrichment
          
          Experiment.reorder
          
