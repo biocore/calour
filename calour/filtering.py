@@ -206,7 +206,7 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-def _sum_abundance(data, axis, cutoff=10):
+def _sum_abundance(data, axis, cutoff=10, strict=False):
     '''Check if the sum abundance larger than cutoff.
 
     It can be used filter features with at least "cutoff" abundance
@@ -220,6 +220,9 @@ def _sum_abundance(data, axis, cutoff=10):
         0 to sum each feature, 1 to sum each sample
     cutoff : float
         keep features with sum>=cutoff
+    strict : bool (optional)
+        False (default) to use sum >=cutoff
+        True to use sum>cutoff (for removing 0 reads)
 
     Returns
     -------
@@ -230,17 +233,22 @@ def _sum_abundance(data, axis, cutoff=10):
     --------
     >>> np.sum(_sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2)) == 1
     [True]
+    >>> np.sum(_sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2, strict=True)) == 0
+    [True]
     >>> np.sum(_sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2.01)) == 0
     [False]
 
     '''
-    res = data.sum(axis=axis) >= cutoff
+    if strict:
+        res = data.sum(axis=axis) > cutoff
+    else:
+        res = data.sum(axis=axis) >= cutoff
     if issparse(data):
         res = res.A1
     return res
 
 
-def _mean_abundance(data, axis, cutoff=0.01):
+def _mean_abundance(data, axis, cutoff=0.01, strict=False):
     '''Check if the mean abundance larger than cutoff.
 
     Can be used to keep features with means at least "cutoff" in all
@@ -255,6 +263,9 @@ def _mean_abundance(data, axis, cutoff=0.01):
         0 to sum each feature, 1 to sum each sample
     cutoff : float
         keep features with mean>=cutoff
+    strict : bool (optional)
+        False (default) to use mean >=cutoff
+        True to use mean>cutoff
 
     Returns
     -------
@@ -267,9 +278,14 @@ def _mean_abundance(data, axis, cutoff=0.01):
     False
     >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.5)) == 1
     True
+    >>> np.sum(_mean_abundance(np.array([0, 0, 1, 1]), 0.5, strict=True)) == 0
+    True
 
     '''
-    res = data.mean(axis=axis) >= cutoff
+    if strict:
+        res = data.mean(axis=axis) > cutoff
+    else:
+        res = data.mean(axis=axis) >= cutoff
     if issparse(data):
         res = res.A1
     return res

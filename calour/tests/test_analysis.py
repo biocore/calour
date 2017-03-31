@@ -30,6 +30,7 @@ class TestAnalysis(Tests):
         # test using defulat values
         dd = diff_abundance(self.test1, 'group', val1='1', val2='2')
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
+        print(self.test1.feature_metadata.index.values)
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)

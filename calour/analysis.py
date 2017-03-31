@@ -71,7 +71,11 @@ def correlation(exp, field, method='spearman', nonzero=False, transform='rankdat
     newexp : calour.Experiment
         The experiment with only significant (FDR<=maxfval) correlated features, sorted according to correlation size
     '''
-    data = exp.get_data(copy=True, sparse=False).transpose()
+    # remove features not present in both groups
+    cexp = exp.filter_min_abundance(0, strict=True)
+
+    data = cexp.get_data(copy=True, sparse=False).transpose()
+
     labels = pd.to_numeric(exp.sample_metadata[field], errors='coerce').values
     # remove the nans
     nanpos = np.where(np.isnan(labels))[0]
@@ -91,7 +95,7 @@ def correlation(exp, field, method='spearman', nonzero=False, transform='rankdat
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s for field %s. Positive correlated features : %d. Negative correlated features : %d. total %d'
                 % (method, field, np.sum(odif[keep] > 0), np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
 @Experiment._record_sig
@@ -139,11 +143,12 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     if val2 is not None:
         val2 = _to_list(val2)
         cexp = exp.filter_samples(field, val1+val2, negate=False)
-        # remove features not present in both groups
-        cexp = cexp.filter_min_abundance(0.0000000001)
         logger.info('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
+
+    # remove features not present in both groups
+    cexp = cexp.filter_min_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels.
@@ -152,7 +157,7 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
 @Experiment._record_sig
@@ -182,7 +187,11 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
     logger.debug('diff_abundance_kw for field %s' % field)
-    data = exp.get_data(copy=True, sparse=False).transpose()
+
+    # remove features with 0 abundance
+    cexp = exp.filter_min_abundance(0, strict=True)
+
+    data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels. If correlation method, get the values, otherwise the group
     labels = np.zeros(len(exp.sample_metadata))
     for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
@@ -191,18 +200,20 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     print(keep)
     logger.info('Found %d significant features' % (np.sum(keep)))
-    return _new_experiment_from_pvals(exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
 @Experiment._record_sig
-def _new_experiment_from_pvals(exp, keep, odif, pvals):
+def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
     '''Combine the pvalues and effect size into a new experiment.
     Keep only the significant features, sort the features by the effect size
 
     Parameters
     ----------
+    cexp : ``Experiment``
+        The experiment used for the actual diff. abundance (filtered for relevant samples/non-zero features)
     exp : ``Experiment``
-        The experiment being analysed
+        The original experiment being analysed (with all samples/features)
     keep : np.array of bool
         One entry per exp feature. True for the features which are significant (following FDR correction)
     odif : np.array of float
@@ -219,7 +230,10 @@ def _new_experiment_from_pvals(exp, keep, odif, pvals):
     keep = np.where(keep)
     if len(keep[0]) == 0:
         logger.warn('no significant features found')
-    newexp = exp.reorder(keep[0], axis=1)
+    newexp = cexp.reorder(keep[0], axis=1)
+    if exp is not None:
+        # we want all samples (rather than the subset in cexp) so use the original exp
+        newexp = exp.filter_ids(newexp.feature_metadata.index.values)
     odif = odif[keep[0]]
     pvals = pvals[keep[0]]
     si = np.argsort(odif, kind='mergesort')
