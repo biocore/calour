@@ -228,9 +228,9 @@ def _sum_abundance(data, axis, cutoff=10):
 
     Examples
     --------
-    >>> _sum_abundance(np.array([[0, 1, 1]]), axis=1, 2)
+    >>> _sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2)
     [True]
-    >>> _sum_abundance(np.array([[0, 1, 1]]), axis=1, 2.01)
+    >>> _sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2.01)
     [False]
 
     '''

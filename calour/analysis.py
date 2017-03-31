@@ -22,7 +22,6 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from collections import defaultdict
 from logging import getLogger
 
 import numpy as np
@@ -140,6 +139,8 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     if val2 is not None:
         val2 = _to_list(val2)
         cexp = exp.filter_samples(field, val1+val2, negate=False)
+        # remove features not present in both groups
+        cexp = cexp.filter_min_abundance(0.0000000001)
         logger.info('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
