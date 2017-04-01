@@ -343,7 +343,7 @@ class ApplicationWindow(QMainWindow):
         group2_seqs = list(set(allseqs).difference(set(group1_seqs)))
 
         for cdb in self.gui.databases:
-            if not cdb.can_get_feature_terms:
+            if not cdb.can_do_enrichment:
                 continue
             logger.debug('Database: %s' % cdb.database_name)
             enriched = cdb.enrichment(exp, group1_seqs, term_type='term')
