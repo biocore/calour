@@ -346,7 +346,8 @@ class ApplicationWindow(QMainWindow):
             if not cdb.can_get_feature_terms:
                 continue
             logger.debug('Database: %s' % cdb.database_name)
-            enriched = cdb.enrichment(exp, group1_seqs, term_type='annotation')
+            enriched = cdb.enrichment(exp, group1_seqs, term_type='term')
+            # enriched = cdb.enrichment(exp, group1_seqs, term_type='annotation')
             logger.debug('Got %d enriched terms' % len(enriched))
             if len(enriched) == 0:
                 QtWidgets.QMessageBox.information(self, "No enriched terms found",
