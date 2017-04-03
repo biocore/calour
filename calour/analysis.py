@@ -203,7 +203,6 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
     return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
-@Experiment._record_sig
 def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
     '''Combine the pvalues and effect size into a new experiment.
     Keep only the significant features, sort the features by the effect size
