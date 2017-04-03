@@ -95,8 +95,8 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap with 1 pixel per feature/sample, no axes/lines
-    fig = plt.figure(frameon=False, dpi=1)
-    fig.set_size_inches(exp.shape[0], exp.shape[1])
+    fig = plt.figure(frameon=False, dpi=300)
+    fig.set_size_inches(exp.shape[0]/300, exp.shape[1]/300)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
@@ -148,7 +148,7 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
 
     # embed the figure png into the html page
     figfile = BytesIO()
-    fig.savefig(figfile, format='png', dpi=1)
+    fig.savefig(figfile, format='png', dpi=300)
     figfile.seek(0)  # rewind to beginning of file
     import base64
     figdata_png = base64.b64encode(figfile.getvalue())
