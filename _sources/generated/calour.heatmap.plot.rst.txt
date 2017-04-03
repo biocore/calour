@@ -1,5 +1,5 @@
-calour.heatmap.plot
-===================
+calour\.heatmap\.plot
+=====================
 
 .. currentmodule:: calour.heatmap
 

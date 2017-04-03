@@ -1,5 +1,5 @@
-calour.filtering.filter_by_metadata
-===================================
+calour\.filtering\.filter\_by\_metadata
+=======================================
 
 .. currentmodule:: calour.filtering
 

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.normalize_compositional
+====================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.normalize_compositional

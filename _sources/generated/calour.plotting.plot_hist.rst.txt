@@ -1,5 +1,5 @@
-calour.plotting.plot_hist
-=========================
+calour\.plotting\.plot\_hist
+============================
 
 .. currentmodule:: calour.plotting
 

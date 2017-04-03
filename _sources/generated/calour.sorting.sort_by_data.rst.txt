@@ -1,5 +1,5 @@
-calour.sorting.sort_by_data
-===========================
+calour\.sorting\.sort\_by\_data
+===============================
 
 .. currentmodule:: calour.sorting
 

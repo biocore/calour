@@ -1,5 +1,5 @@
-calour.io.save_sample_metadata
-==============================
+calour\.io\.save\_sample\_metadata
+==================================
 
 .. currentmodule:: calour.io
 

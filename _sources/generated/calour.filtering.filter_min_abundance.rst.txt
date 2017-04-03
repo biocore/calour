@@ -1,5 +1,5 @@
-calour.filtering.filter_min_abundance
-=====================================
+calour\.filtering\.filter\_min\_abundance
+=========================================
 
 .. currentmodule:: calour.filtering
 

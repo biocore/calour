@@ -1,5 +1,5 @@
-calour.experiment.add_functions
-===============================
+calour\.experiment\.add\_functions
+==================================
 
 .. currentmodule:: calour.experiment
 

@@ -1,5 +1,5 @@
-calour.io.save
-==============
+calour\.io\.save
+================
 
 .. currentmodule:: calour.io
 

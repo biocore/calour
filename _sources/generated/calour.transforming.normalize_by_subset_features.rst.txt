@@ -1,5 +1,5 @@
-calour.transforming.normalize_by_subset_features
-================================================
+calour\.transforming\.normalize\_by\_subset\_features
+=====================================================
 
 .. currentmodule:: calour.transforming
 

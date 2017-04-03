@@ -1,5 +1,5 @@
-calour.io.read_amplicon
-=======================
+calour\.io\.read\_amplicon
+==========================
 
 .. currentmodule:: calour.io
 

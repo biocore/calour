@@ -1,5 +1,5 @@
-calour.analysis.diff_abundance_kw
-=================================
+calour\.analysis\.diff\_abundance\_kw
+=====================================
 
 .. currentmodule:: calour.analysis
 

@@ -1,5 +1,5 @@
-calour.transforming.scale
-=========================
+calour\.transforming\.scale
+===========================
 
 .. currentmodule:: calour.transforming
 

@@ -1,5 +1,5 @@
-calour.transforming.log_n
-=========================
+calour\.transforming\.log\_n
+============================
 
 .. currentmodule:: calour.transforming
 

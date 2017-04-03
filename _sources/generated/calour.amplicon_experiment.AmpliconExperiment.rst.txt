@@ -1,5 +1,5 @@
-calour.amplicon_experiment.AmpliconExperiment
-=============================================
+calour\.amplicon\_experiment\.AmpliconExperiment
+================================================
 
 .. currentmodule:: calour.amplicon_experiment
 
@@ -108,6 +108,8 @@ calour.amplicon_experiment.AmpliconExperiment
          AmpliconExperiment.normalize
          
          AmpliconExperiment.normalize_by_subset_features
+         
+         AmpliconExperiment.normalize_compositional
          
          AmpliconExperiment.plot
          

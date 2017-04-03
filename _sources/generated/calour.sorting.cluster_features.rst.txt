@@ -1,5 +1,5 @@
-calour.sorting.cluster_features
-===============================
+calour\.sorting\.cluster\_features
+==================================
 
 .. currentmodule:: calour.sorting
 

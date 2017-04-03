@@ -1,5 +1,5 @@
-calour.sorting.sort_abundance
-=============================
+calour\.sorting\.sort\_abundance
+================================
 
 .. currentmodule:: calour.sorting
 

@@ -1,5 +1,5 @@
-calour.filtering.filter_ids
-===========================
+calour\.filtering\.filter\_ids
+==============================
 
 .. currentmodule:: calour.filtering
 

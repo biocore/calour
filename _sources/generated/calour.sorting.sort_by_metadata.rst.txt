@@ -1,5 +1,5 @@
-calour.sorting.sort_by_metadata
-===============================
+calour\.sorting\.sort\_by\_metadata
+===================================
 
 .. currentmodule:: calour.sorting
 

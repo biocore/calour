@@ -1,5 +1,5 @@
-calour.io.save_biom
-===================
+calour\.io\.save\_biom
+======================
 
 .. currentmodule:: calour.io
 

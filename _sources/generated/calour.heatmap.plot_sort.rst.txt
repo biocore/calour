@@ -1,5 +1,5 @@
-calour.heatmap.plot_sort
-========================
+calour\.heatmap\.plot\_sort
+===========================
 
 .. currentmodule:: calour.heatmap
 

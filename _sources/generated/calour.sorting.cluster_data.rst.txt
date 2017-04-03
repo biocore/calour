@@ -1,5 +1,5 @@
-calour.sorting.cluster_data
-===========================
+calour\.sorting\.cluster\_data
+==============================
 
 .. currentmodule:: calour.sorting
 

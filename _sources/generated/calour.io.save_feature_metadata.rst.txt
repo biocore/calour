@@ -1,5 +1,5 @@
-calour.io.save_feature_metadata
-===============================
+calour\.io\.save\_feature\_metadata
+===================================
 
 .. currentmodule:: calour.io
 

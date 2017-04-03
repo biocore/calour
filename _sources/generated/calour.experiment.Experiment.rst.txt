@@ -1,5 +1,5 @@
-calour.experiment.Experiment
-============================
+calour\.experiment\.Experiment
+==============================
 
 .. currentmodule:: calour.experiment
 
@@ -100,6 +100,8 @@ calour.experiment.Experiment
          Experiment.normalize
          
          Experiment.normalize_by_subset_features
+         
+         Experiment.normalize_compositional
          
          Experiment.plot
          
