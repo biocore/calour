@@ -95,7 +95,7 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap with 1 pixel per feature/sample, no axes/lines
-    fig = plt.figure(frameon=False)
+    fig = plt.figure(frameon=False, dpi=1)
     fig.set_size_inches(exp.shape[0], exp.shape[1])
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
