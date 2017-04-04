@@ -9,6 +9,7 @@
 from logging import getLogger
 from io import BytesIO
 import urllib
+from pkg_resources import resource_filename
 
 import numpy as np
 
@@ -43,7 +44,7 @@ def _list_to_string(l):
 
 def export_html(exp, sample_field=None, feature_field=False, title=None,
                 xticklabel_len=50, cmap=None, clim=None, transform=log_n,
-                output_file='out', html_template='calour/export_html_template.html', **kwargs):
+                output_file='out', html_template=None, **kwargs):
     '''Export an interactive html heatmap for the experiment.
 
     Creates a standalone html file with interactive d3.js heatmap of the experiment and interface to dbBact.
@@ -72,10 +73,14 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
         The transform function to apply to the data before plotting. default is log_n
     output_file : str (optional)
         Name of the output html file (no .html ending - it will be appended).
-    html_template : str (optional)
-        Name of the html template to use
+    html_template : str or None (optional)
+        Name of the html template to use. None to use the default export_html_template.html template
     '''
     import matplotlib.pyplot as plt
+
+    if html_template is None:
+        html_template = resource_filename(__package__, 'export_html_template.html')
+        logger.debug('using default template file %s' % html_template)
 
     logger.debug('export_html heatmap')
 
@@ -155,7 +160,11 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
     figfile.close()
     html_page = html_page.replace('**image_goes_here**', urllib.parse.quote(figdata_png))
 
+    if output_file[-5:] != '.html':
+        output_file = output_file + '.html'
+
     # save the output html export
-    with open(output_file+'.html', 'w') as fl:
+    with open(output_file, 'w') as fl:
         fl.write(html_page)
+    logger.info('exported experiment to html file %s' % output_file)
     return
