@@ -337,10 +337,17 @@ class ApplicationWindow(QMainWindow):
         self.gui.exp.save_fasta(str(filename), seqs)
 
     def enrichment(self):
+        '''Get and display the list of enriched database terms for the selected features.
+
+        Iterate over all databases that support enrichment analysis. For each such database,
+        get the list of enriched terms in the selected set of features (compared to the other features
+        in the experiment). Then display the list of these terms in a new qt5 window with blue terms
+        for ones enriched in the selected group, red terms for ones enriched in the unselected set of features
+        '''
         exp = self.gui.exp
         group1_seqs = self.gui.get_selected_seqs()
         allseqs = exp.feature_metadata.index.values
-        group2_seqs = list(set(allseqs).difference(set(group1_seqs)))
+        group2_seqs = list(set(allseqs) - set(group1_seqs))
 
         for cdb in self.gui.databases:
             if not cdb.can_do_enrichment:

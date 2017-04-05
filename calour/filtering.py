@@ -173,10 +173,8 @@ def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs
         logger.debug('filter_by_data using fast function %r' % predicate)
         select = fast_func[predicate](exp.data, axis=1-axis, **kwargs)
     else:
-        func = {'sum_abundance': _sum_abundance,
-                'freq_ratio': _freq_ratio,
+        func = {'freq_ratio': _freq_ratio,
                 'unique_cut': _unique_cut,
-                'mean_abundance': _mean_abundance,
                 'prevalence': _prevalence}
         if isinstance(predicate, str):
             predicate = func[predicate]

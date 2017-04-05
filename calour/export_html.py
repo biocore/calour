@@ -152,13 +152,13 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
                                       _list_to_string(xticklabels))
 
     # embed the figure png into the html page
-    figfile = BytesIO()
-    fig.savefig(figfile, format='png', dpi=300)
-    figfile.seek(0)  # rewind to beginning of file
-    import base64
-    figdata_png = base64.b64encode(figfile.getvalue())
-    figfile.close()
-    html_page = html_page.replace('**image_goes_here**', urllib.parse.quote(figdata_png))
+    with BytesIO() as figfile:
+        fig.savefig(figfile, format='png', dpi=300)
+        figfile.seek(0)  # rewind to beginning of file
+        import base64
+        figdata_png = base64.b64encode(figfile.getvalue())
+        figdata_png = urllib.parse.quote(figdata_png)
+    html_page = html_page.replace('**image_goes_here**', figdata_png)
 
     if output_file[-5:] != '.html':
         output_file = output_file + '.html'

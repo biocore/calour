@@ -255,6 +255,7 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
 
 def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     '''Normalize each sample by ignoring the features with mean>=min_frac in all the experiment
+
     This assumes that the majority of features have less than min_frac mean, and that the majority of features don't change
     between samples in a constant direction
 
@@ -274,5 +275,6 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     '''
     comp_features = exp.filter_mean(min_frac)
     logger.info('ignoring %d features' % comp_features.shape[1])
-    newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values, total=total, negate=True, inplace=inplace)
+    newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values,
+                                              total=total, negate=True, inplace=inplace)
     return newexp
