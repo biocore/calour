@@ -30,7 +30,7 @@ class ExperimentTests(Tests):
     def test_mock_db(self):
         mdb = self.mock_db
         self.assertTrue(mdb.annotatable)
-        self.assertTrue(mdb.can_get_feature_terms)
+        self.assertTrue(mdb.can_do_enrichment)
         self.assertEqual(mdb.database_name, 'mock_db')
 
     def test_gui_interface(self):

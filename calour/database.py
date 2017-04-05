@@ -97,8 +97,43 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
     return exp
 
 
+def enrichment(exp, features, dbname, *kargs, **kwargs):
+    '''Get the list of enriched annotation terms in features compared to all features in exp.
+
+    Uses the database specific enrichment analysis method.
+
+    Parameters
+    ----------
+    features : list of str
+        The features to test for enrichment (compared to all other features in exp)
+    dbname : str
+        the database to use for the annotation terms and enrichment analysis
+    *kargs, **kwargs
+        Additional database specific parameters
+
+    Returns
+    -------
+    pandas.DataFrame
+    with info about significantly enriched terms.
+        columns:
+            feature : str the feature
+            pval : the p-value for the enrichment (float)
+            observed : the number of observations of this term in group1 (int)
+            expected : the expected (based on all features) number of observations of this term in group1 (float)
+            frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+            frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+            num_group1 : number of total terms in group 1 which are the specific term (float)
+            num_group2 : number of total terms in group 2 which are the specific term (float)
+            description : the term (str)
+    '''
+    db = _get_database_class(dbname, exp=exp)
+    if not db.can_do_enrichment():
+        raise ValueError('database %s does not support enrichment analysis' % dbname)
+    return db.enrichment(exp, features, *kargs, **kwargs)
+
+
 class Database(ABC):
-    def __init__(self, exp=None, database_name=None, methods=['get', 'annotate', 'feature_terms']):
+    def __init__(self, exp=None, database_name=None, methods=['get', 'annotate', 'enrichment']):
         '''Initialize the database interface
 
         Parameters
@@ -123,10 +158,10 @@ class Database(ABC):
         return 'annotate' in self._methods
 
     @property
-    def can_get_feature_terms(self):
+    def can_do_enrichment(self):
         '''True if the database supports getting a dict of terms per feature via the get_feature_terms() function
         '''
-        return 'feature_terms' in self._methods
+        return 'enrichment' in self._methods
 
     def get_seq_annotation_strings(self, sequence):
         '''Get nice string summaries of annotations for a given sequence
@@ -251,3 +286,30 @@ class Database(ABC):
         '''
         logger.debug('Generic function for get_feature_terms')
         return {}
+
+    def enrichment(self, exp, features, *kargs, **kwargs):
+        '''Get the list of enriched terms in features compared to all features in exp.
+
+        Parameters
+        ----------
+        exp : calour.Experiment
+            The experiment to compare the features to
+        features : list of str
+            The features (from exp) to test for enrichmnt
+        *kargs, **kwargs : additional dtabase specific parameters
+
+        Returns
+        -------
+        pandas.DataFrame with  info about significantly enriched terms.
+            columns:
+                feature : str
+                    the feature
+                pval : float
+                    the p-value for the enrichment
+                odif : float
+                    the effect size for the enrichment
+                term : str
+                    the enriched term
+        '''
+        logger.debug('Generic function for enrichment')
+        return None

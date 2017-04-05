@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
 from PyQt5.QtCore import Qt
 
 from .plotgui import PlotGUI
-from .. import analysis
 
 
 logger = getLogger(__name__)
@@ -338,32 +337,39 @@ class ApplicationWindow(QMainWindow):
         self.gui.exp.save_fasta(str(filename), seqs)
 
     def enrichment(self):
-        group1_seqs = self.gui.get_selected_seqs()
-        allseqs = self.gui.exp.feature_metadata.index.values
-        group2_seqs = list(set(allseqs).difference(set(group1_seqs)))
+        '''Get and display the list of enriched database terms for the selected features.
 
-        logger.debug('Getting experiment annotations for %d features' % len(allseqs))
+        Iterate over all databases that support enrichment analysis. For each such database,
+        get the list of enriched terms in the selected set of features (compared to the other features
+        in the experiment). Then display the list of these terms in a new qt5 window with blue terms
+        for ones enriched in the selected group, red terms for ones enriched in the unselected set of features
+        '''
+        exp = self.gui.exp
+        group1_seqs = self.gui.get_selected_seqs()
+        allseqs = exp.feature_metadata.index.values
+        group2_seqs = set(allseqs) - set(group1_seqs)
+
         for cdb in self.gui.databases:
-            if not cdb.can_get_feature_terms:
+            if not cdb.can_do_enrichment:
                 continue
             logger.debug('Database: %s' % cdb.database_name)
-            feature_terms = cdb.get_feature_terms(allseqs, self.gui.exp)
-            logger.debug('got %d terms' % len(feature_terms))
-            res = analysis.relative_enrichment(self.gui.exp, group1_seqs, feature_terms)
-            logger.debug('Got %d enriched terms' % len(res))
-            if len(res) == 0:
+            enriched = cdb.enrichment(exp, group1_seqs, term_type='term')
+            # enriched = cdb.enrichment(exp, group1_seqs, term_type='annotation')
+            logger.debug('Got %d enriched terms' % len(enriched))
+            if len(enriched) == 0:
                 QtWidgets.QMessageBox.information(self, "No enriched terms found",
                                                   "No enriched annotations found when comparing\n%d selected sequences to %d "
                                                   "other sequences" % (len(group1_seqs), len(group2_seqs)))
                 return
+            enriched = enriched.sort_values('odif')
             listwin = SListWindow(listname='enriched ontology terms')
-            for cres in res:
-                if cres['group1'] > cres['group2']:
+            for idx, cres in enriched.iterrows():
+                if cres['odif'] > 0:
                     ccolor = 'blue'
                 else:
                     ccolor = 'red'
-                cname = cres['description']
-                listwin.add_item('%s - %f (selected %f, other %f) ' % (cname, cres['pval'], cres['group1'], cres['group2']), color=ccolor)
+                cname = cres['term']
+                listwin.add_item('%s - effect %f, pval %f ' % (cname, cres['odif'], cres['pvals']), color=ccolor)
             listwin.exec_()
 
     def double_click_annotation(self, item):
