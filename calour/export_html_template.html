@@ -118,7 +118,14 @@
 
       var yAxis = d3.axisLeft(yScale)
           .ticks(50)
-          .tickFormat(function(d) {return yticklabels[Math.round(d)];});
+          .tickFormat(function(d) {
+            var taxa = yticklabels[Math.round(d)].replace(/;+$/, '').split(';');
+            var label = taxa.pop();
+            if (label[0] != label[0].toUpperCase() && taxa.length > 0) {
+              label = taxa.pop() + ' ' + label;
+            }
+            return label;
+          });
       yAxis.ticks(customTickFunction());
 
       var gX = svg.append('g')
@@ -376,24 +383,29 @@
       function get_xyratio() {
         return (hheight / ids.length) * (samples.length / hwidth);
       }
+
+      $(window).on('resize', function(){
+        $('body').height('calc(100vh - 50px)');
+      });
     });
   </script>
 </head>
-<body style="height: calc(100vh - 50px)">
-  <div id="div-title" style="text-align: center">
-    &nbsp;
-  </div>
-  <div id="div-annotation" class="panel panel-default" style="float: right; margin: 5px; width: 360px; height: auto; overflow: auto; white-space: nowrap;">
+<body style="height: calc(100vh - 50px); min-height: 600px; min-width: 1080px;">
+  <div>&nbsp;</div>
+  <div id="div-annotation" class="panel panel-default" style="float: right; margin: 10px; width: 360px; height: auto; white-space: nowrap;">
     <!--Here goes the annotations!-->
     <div class="panel-heading">
       <b>dbBact annotations</b>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="overflow: auto;">
       <p id="p-annotation">Click on heatmap to see annotations</p>
+    </div>
+    <div class="panel-footer">
+      For more analysis options, download <a href='https://github.com/amnona/calour' target='_blank'>Calour</a>.
     </div>
   </div>
 
-  <div class="panel panel-default" style="margin: 5px; width: auto; height: 100%; overflow: hidden;">
+  <div class="panel panel-default" style="margin: 10px; width: auto; height: 100%; overflow: hidden;">
     <div id="div-title" class="panel-heading">
       <b><span id="title_text">Experiment</span></b>
       (sorted by field: <b><span id='field_name'> NA </span></b>)
@@ -406,15 +418,15 @@
         <button id="btn-help" class="btn btn-default btn-xs" onclick="$('#div-help').toggle();">Help</button>
       </span>
     </div>
-    <div id="div-heatmap" class="panel-body" style="height: calc(100% - 85px);">
+    <div id="div-heatmap" class="panel-body" style="height: calc(100% - 80px);">
       <svg id="heatmap" style="width: 100%; height: 100%;)"></svg>
     </div>
     <div id="div-selection" class="panel-footer">
       <!--Here goes the selection!-->
-      <span style="display: inline-block; overflow: hidden;"><b>Sample:&nbsp;&nbsp;</b></span>
-      <span id="sampleid" style="display: inline-block; width: 150px; overflow: auto;">NA</span>
-      <span style="display: inline-block; overflow: hidden;">&nbsp;&nbsp;<b>Taxonomy:&nbsp;&nbsp;</b></span>
-      <span id="taxonomy" style="display: inline-block; width: auto; overflow: auto;">NA</span>
+      <span style="display: inline-block; float: left; overflow: hidden;"><b>Sample:&nbsp;&nbsp;</b></span>
+      <span id="sampleid" style="display: inline-block; float: left; width: 120px; overflow: auto; white-space: nowrap;">NA</span>
+      <span style="display: inline-block; float: left; overflow: hidden;">&nbsp;&nbsp;<b>Taxonomy:&nbsp;&nbsp;</b></span>
+      <span id="taxonomy" style="display: block; overflow: auto; white-space: nowrap;">NA</span>
     </div>
   </div>
 
@@ -425,7 +437,6 @@
     </div>
     <div class="panel-body">
       <p>Use mouse or -/= for zooming bacteria, shift+mouse for zooming samples, arrow keys to scroll up/down in heatmap.</p>
-      <p>For more analysis options, download <a href='https://github.com/amnona/calour' target='_blank'>Calour</a>.</p>
     </div>
   </div>
 </body>
