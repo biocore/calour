@@ -10,9 +10,7 @@ from logging import getLogger
 from io import BytesIO
 import urllib
 from pkg_resources import resource_filename
-
 import numpy as np
-
 from .transforming import log_n
 from .heatmap.heatmap import _transition_index
 
@@ -38,7 +36,7 @@ def _list_to_string(l):
         cstr += '"'
         cstr += str(cval)
         cstr += '",'
-    cstr = cstr[:-1]+']'
+    cstr = cstr[:-1] + ']'
     return cstr
 
 
@@ -79,7 +77,8 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
     import matplotlib.pyplot as plt
 
     if html_template is None:
-        html_template = resource_filename(__package__, 'export_html_template.html')
+        html_template = resource_filename(
+            __package__, 'export_html_template.html')
         logger.debug('using default template file %s' % html_template)
 
     logger.debug('export_html heatmap')
@@ -92,7 +91,8 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
     if transform is None:
         data = exp.get_data(sparse=False)
     else:
-        logger.debug('transform exp with %r with param %r' % (transform, kwargs))
+        logger.debug('transform exp with %r with param %r' %
+                     (transform, kwargs))
         data = transform(exp, inplace=False, **kwargs).data
 
     # step 2. plot heatmap.
@@ -101,7 +101,7 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap with 1 pixel per feature/sample, no axes/lines
     fig = plt.figure(frameon=False, dpi=300)
-    fig.set_size_inches(exp.shape[0]/300, exp.shape[1]/300)
+    fig.set_size_inches(exp.shape[0] / 300, exp.shape[1] / 300)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
@@ -113,16 +113,16 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
     # add parameters to html template
     with open(html_template) as fl:
         html_page = fl.read()
-    html_page = html_page.replace('// yticklabels go here', 'yticklabels=%s' %
+    html_page = html_page.replace('// yticklabels go here', 'var yticklabels = %s;' %
                                   _list_to_string(exp.feature_metadata[feature_field].values))
-    html_page = html_page.replace('// ids go here', 'ids=%s' %
+    html_page = html_page.replace('// ids go here', 'var ids = %s;' %
                                   _list_to_string(exp.feature_metadata.index.values))
-    html_page = html_page.replace('// samples go here', 'samples=%s' %
+    html_page = html_page.replace('// samples go here', 'var samples = %s;' %
                                   _list_to_string(exp.sample_metadata.index.values))
     if sample_field is not None:
-        html_page = html_page.replace('// field_name goes here', 'field_name = "%s"' %
+        html_page = html_page.replace('// field_name goes here', 'var field_name = "%s";' %
                                       sample_field)
-    html_page = html_page.replace('// title_text goes here', 'title_text="%s"' %
+    html_page = html_page.replace('// title_text goes here', 'var title_text = "%s";' %
                                   title)
 
     # add vertical lines between sample groups and add x tick labels
@@ -130,15 +130,15 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
         try:
             xticks = _transition_index(exp.sample_metadata[sample_field])
         except KeyError:
-            raise ValueError('Sample field %r not in sample metadata' %
+            raise ValueError('Sample field %r not in sample metadata.' %
                              sample_field)
         x_pos, x_val = zip(*xticks)
         x_pos = np.array([0.] + list(x_pos))
 
-        html_page = html_page.replace('// vlines go here', 'vlines=%s' %
+        html_page = html_page.replace('// vlines go here', 'var vlines = %s;' %
                                       _list_to_string(x_pos[1:-1]))
         xtick_pos = x_pos[:-1] + (x_pos[1:] - x_pos[:-1]) / 2
-        html_page = html_page.replace('// xtick_pos go here', 'xtick_pos=%s' %
+        html_page = html_page.replace('// xtick_pos go here', 'var xtick_pos = %s;' %
                                       _list_to_string(xtick_pos))
 
         xticklabels = [str(i) for i in x_val]
@@ -148,7 +148,7 @@ def export_html(exp, sample_field=None, feature_field=False, title=None,
             xticklabels = ['%s..%s' % (i[:mid], i[-mid:])
                            if len(i) > xticklabel_len else i
                            for i in xticklabels]
-        html_page = html_page.replace('// xtick_labels go here', 'xtick_labels=%s' %
+        html_page = html_page.replace('// xtick_labels go here', 'var xtick_labels = %s;' %
                                       _list_to_string(xticklabels))
 
     # embed the figure png into the html page
