@@ -347,7 +347,7 @@ class ApplicationWindow(QMainWindow):
         exp = self.gui.exp
         group1_seqs = self.gui.get_selected_seqs()
         allseqs = exp.feature_metadata.index.values
-        group2_seqs = list(set(allseqs) - set(group1_seqs))
+        group2_seqs = set(allseqs) - set(group1_seqs)
 
         for cdb in self.gui.databases:
             if not cdb.can_do_enrichment:
