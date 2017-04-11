@@ -127,7 +127,7 @@ def enrichment(exp, features, dbname, *kargs, **kwargs):
             description : the term (str)
     '''
     db = _get_database_class(dbname, exp=exp)
-    if not db.can_do_enrichment():
+    if not db.can_do_enrichment:
         raise ValueError('database %s does not support enrichment analysis' % dbname)
     return db.enrichment(exp, features, *kargs, **kwargs)
 

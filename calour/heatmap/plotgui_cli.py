@@ -16,6 +16,11 @@ class PlotGUI_CLI(PlotGUI):
     It uses ``matplotlib`` only to display the plot and prints info on the
     terminal screen.
     '''
+    def __init__(self, *kargs, **kwargs):
+        super().__init__(*kargs, **kwargs)
+        # create the figure to plot the heatmap into
+        self._set_figure(None, kwargs['tree_size'])
+
     def __call__(self):
         '''Run the GUI.'''
         super().__call__()

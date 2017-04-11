@@ -43,7 +43,7 @@ class PlotGUI_QT5(PlotGUI):
         self.app_window = ApplicationWindow(self)
         app.references.add(self.app_window)
         self.app_window.setWindowTitle("Calour")
-        self._set_figure(self.app_window.plotfigure)
+        self._set_figure(self.app_window.plotfigure, kwargs['tree_size'])
 
     def __call__(self):
         logger.debug('opening Qt5 window')

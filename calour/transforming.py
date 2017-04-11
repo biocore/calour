@@ -278,3 +278,28 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values,
                                               total=total, negate=True, inplace=inplace)
     return newexp
+
+
+def random_permute_data(exp, normalize=True):
+    '''Shuffle independently the reads of each feature
+
+    Creates a new experiment with no dependence between the features.
+
+    Parameters
+    ----------
+    normalize : bool (optional)
+        True (default) to normalize each sample after completing the feature shuffling.
+        False to not normalize
+
+    Returns
+    -------
+    ``Experiment``
+        With each feature shuffled independently
+    '''
+    newexp = exp.copy()
+    newexp.sparse = False
+    for cfeature in range(newexp.shape[1]):
+        np.random.shuffle(newexp.data[:, cfeature])
+    if normalize:
+        newexp.normalize(np.mean(exp.data.sum(axis=1)), inplace=True)
+    return newexp

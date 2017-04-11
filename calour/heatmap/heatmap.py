@@ -54,7 +54,7 @@ def _transition_index(l):
     yield i + 1, item[1]
 
 
-def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
+def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
     It still waits for the heatmap to be plotted and set up.
@@ -87,7 +87,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
     gui_module_name = 'calour.heatmap.' + gui.lower()
     gui_module = importlib.import_module(gui_module_name)
     GUIClass = getattr(gui_module, gui)
-    gui_obj = GUIClass(exp)
+    gui_obj = GUIClass(exp, tree_size=tree_size)
 
     # link gui with the databases requested
     for cdatabase in databases:
@@ -485,3 +485,202 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
     else:
         return newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
                            gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+
+
+def _plot_dendrogram(ax_dendrogram, table, edges):
+    """ Plots the actual dendrogram.
+    Parameters
+    ----------
+    ax_dendrogram : matplotlib axes object
+        Contains the matplotlib axes in which the dendrogram will be plotted.
+    table : pd.DataFrame
+        Contain sample/feature labels along with table of values.
+        Rows correspond to samples, and columns correspond to features.
+    edges : pd.DataFrame
+        (x,y) coordinates for edges in the heatmap.
+    """
+    offset = 0.5
+    for i in range(len(edges.index)):
+        row = edges.iloc[i]
+        ax_dendrogram.plot([row.x0, row.x1],
+                           [row.y0-offset, row.y1-offset], '-k')
+    ax_dendrogram.set_ylim([-offset, table.shape[0]-offset])
+    ax_dendrogram.set_yticks([])
+    ax_dendrogram.set_xticks([])
+
+
+def plot_tree(exp, tree, axes):
+    import matplotlib.pyplot as plt
+    from calour._dendrogram import SquareDendrogram
+    import pandas as pd
+
+    dendrogram_width = 20
+    # get edges from tree
+    t = SquareDendrogram.from_tree(tree)
+    pts = t.coords(width=dendrogram_width, height=exp.shape[1])
+    edges = pts[['child0', 'child1']]
+    edges = edges.dropna(subset=['child0', 'child1'])
+    edges = edges.unstack()
+    edges = pd.DataFrame({'src_node': edges.index.get_level_values(1),
+                          'dest_node': edges.values})
+    edges['x0'] = [pts.loc[n].x for n in edges.src_node]
+    edges['x1'] = [pts.loc[n].x for n in edges.dest_node]
+    edges['y0'] = [pts.loc[n].y for n in edges.src_node]
+    edges['y1'] = [pts.loc[n].y for n in edges.dest_node]
+
+    plt.rcParams['axes.facecolor'] = 'white'
+
+    _plot_dendrogram(axes, exp.get_data().transpose(), edges)
+    plt.show()
+
+
+def match_tips(exp, tree):
+    """ Returns the contingency table and tree with matched tips.
+    Sorts the columns of the contingency table to match the tips in
+    the tree.  The ordering of the tips is in post-traversal order.
+    If the tree is multi-furcating, then the tree is reduced to a
+    bifurcating tree by randomly inserting internal nodes.
+    The intersection of samples in the contingency table and the
+    tree will returned.
+    Parameters
+    ----------
+    table : pd.DataFrame
+        Contingency table where samples correspond to rows and
+        features correspond to columns.
+    tree : skbio.TreeNode
+        Tree object where the leafs correspond to the features.
+    Returns
+    -------
+    pd.DataFrame :
+        Subset of the original contingency table with the common features.
+    skbio.TreeNode :
+        Sub-tree with the common features.
+    Raises
+    ------
+    ValueError:
+        Raised if `table` and `tree` have incompatible sizes.
+    See Also
+    --------
+    skbio.TreeNode.bifurcate
+    skbio.TreeNode.tips
+    """
+    tips = [x.name for x in tree.tips()]
+    common_tips = list(set(tips) & set(exp.feature_metadata.index.values))
+    _tree = tree.shear(names=common_tips)
+
+    _tree.bifurcate()
+    _tree.prune()
+
+    sorted_features = [n.name for n in _tree.tips()]
+    newexp = exp.filter_ids(sorted_features, axis=1)
+    return newexp, _tree
+
+
+def plot_tree2(exp, tree, sample_color_bars=None, feature_color_bars=None,
+               gui='cli', databases=False, color_bar_label=True, tree_size=12, **kwargs):
+    '''Plot the interactive heatmap and its associated axes.
+
+    The heatmap is interactive and can be dynamically updated with
+    following key and mouse events:
+
+    +---------------------------+-----------------------------------+
+    |Event                      |Description                        |
+    +===========================+===================================+
+    |`+` or `⇧ →`               |zoom in on x axis                  |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`_` or `⇧ ←`               |zoom out on x axis                 |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`=` or `⇧ ↑`               |zoom in on y axis                  |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`-` or `⇧ ↓`               |zoom out on y axis                 |
+    |                           |                                   |
+    +---------------------------+-----------------------------------+
+    |`left mouse click`         |select the current row and column  |
+    +---------------------------+-----------------------------------+
+    |`⇧` and `left mouse click` |select all the rows between        |
+    |                           |previous selected and current rows |
+    +---------------------------+-----------------------------------+
+    |`.`                        |move the selection down by one row |
+    +---------------------------+-----------------------------------+
+    |`,`                        |move the selection up by one row   |
+    +---------------------------+-----------------------------------+
+    |`<`                        |move the selection left by one     |
+    |                           |column                             |
+    +---------------------------+-----------------------------------+
+    |`>`                        |move the selection right by one    |
+    |                           |column                             |
+    +---------------------------+-----------------------------------+
+    |`↑` or `=`                 |scroll the heatmap up on y axis    |
+    +---------------------------+-----------------------------------+
+    |`↓` or `-`                 |scroll the heatmap down on y axis  |
+    +---------------------------+-----------------------------------+
+    |`←` or `<`                 |scroll the heatmap left on x axis  |
+    +---------------------------+-----------------------------------+
+    |`→` or `>`                 |scroll the heatmap right on x axis |
+    +---------------------------+-----------------------------------+
+
+
+    .. _plot-ref:
+
+    Parameters
+    ----------
+    exp : ``Experiment``
+        the object to plot
+    sample_color_bars : list or str, optional
+        list of column names in the sample metadata. It plots a color bar
+        for each column. It doesn't plot color bars by default (``None``)
+    feature_color_bars : list or str, optional
+        list of column names in the feature metadata. It plots a color bar
+        for each column. It doesn't plot color bars by default (``None``)
+    color_bar_label : bool, optional
+        whether to show the label for the color bars
+    gui : str, optional
+        GUI to use
+    databases : Iterable of str or None or False (optional)
+        a list of databases to access or add annotation
+        False (default) to use the default field based on the experiment subclass
+        None to not use databases
+    kwargs : dict, optional
+        keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
+
+    Returns
+    -------
+    ``PlottingGUI``
+        Contains the figure of the output plot in .figure parameter
+    '''
+    # match the exp order to the tree
+    exp, tree = match_tips(exp, tree)
+    # set the databases if default requested (i.e. False)
+    if databases is False:
+        databases = exp.heatmap_databases
+    gui_obj = _create_plot_gui(exp, gui, databases, tree_size=tree_size)
+    exp.heatmap(axes=gui_obj.axes, **kwargs)
+    barwidth = 0.3
+    barspace = 0.05
+    label = color_bar_label
+    if sample_color_bars is not None:
+        sample_color_bars = _to_list(sample_color_bars)
+        position = 0
+        for s in sample_color_bars:
+            # convert to string and leave it as empty if it is None
+            values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
+            _ax_color_bar(
+                gui_obj.xax, values=values, width=barwidth, position=position, label=label, axis=0)
+            position += (barspace + barwidth)
+    if feature_color_bars is not None:
+        feature_color_bars = _to_list(feature_color_bars)
+        position = 0
+        for f in feature_color_bars:
+            values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
+            _ax_color_bar(
+                gui_obj.yax, values=values, width=barwidth, position=position, label=label, axis=1)
+            position += (barspace + barwidth)
+
+    plot_tree(exp, tree, gui_obj.tree_axes)
+    # set up the gui ready for interaction
+    gui_obj()
+
+    return gui_obj
