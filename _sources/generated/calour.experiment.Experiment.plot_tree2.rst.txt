@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.plot_tree2
+=======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.plot_tree2

@@ -93,6 +93,8 @@ calour\.experiment\.Experiment
          
          Experiment.log_n
          
+         Experiment.match_tips
+         
          Experiment.merge_identical
          
          Experiment.nlargest
@@ -108,6 +110,12 @@ calour\.experiment\.Experiment
          Experiment.plot_hist
          
          Experiment.plot_sort
+         
+         Experiment.plot_tree
+         
+         Experiment.plot_tree2
+         
+         Experiment.random_permute_data
          
          Experiment.read
          

@@ -101,6 +101,8 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.log_n
          
+         AmpliconExperiment.match_tips
+         
          AmpliconExperiment.merge_identical
          
          AmpliconExperiment.nlargest
@@ -116,6 +118,12 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          AmpliconExperiment.plot_hist
          
          AmpliconExperiment.plot_sort
+         
+         AmpliconExperiment.plot_tree
+         
+         AmpliconExperiment.plot_tree2
+         
+         AmpliconExperiment.random_permute_data
          
          AmpliconExperiment.read
          

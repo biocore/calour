@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
@@ -324,29 +324,41 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.log_n.html#calour.experiment.Experiment.log_n" title="calour.experiment.Experiment.log_n"><code class="xref py py-obj docutils literal"><span class="pre">log_n</span></code></a>(exp[,&nbsp;n,&nbsp;inplace])</td>
 <td>Log transform the data</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.merge_identical.html#calour.experiment.Experiment.merge_identical" title="calour.experiment.Experiment.merge_identical"><code class="xref py py-obj docutils literal"><span class="pre">merge_identical</span></code></a>(exp,&nbsp;field[,&nbsp;method,&nbsp;axis,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.match_tips.html#calour.experiment.Experiment.match_tips" title="calour.experiment.Experiment.match_tips"><code class="xref py py-obj docutils literal"><span class="pre">match_tips</span></code></a>(exp,&nbsp;tree)</td>
+<td>Returns the contingency table and tree with matched tips.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.merge_identical.html#calour.experiment.Experiment.merge_identical" title="calour.experiment.Experiment.merge_identical"><code class="xref py py-obj docutils literal"><span class="pre">merge_identical</span></code></a>(exp,&nbsp;field[,&nbsp;method,&nbsp;axis,&nbsp;...])</td>
 <td>Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.nlargest.html#calour.experiment.Experiment.nlargest" title="calour.experiment.Experiment.nlargest"><code class="xref py py-obj docutils literal"><span class="pre">nlargest</span></code></a>(n,&nbsp;iterable[,&nbsp;key])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.nlargest.html#calour.experiment.Experiment.nlargest" title="calour.experiment.Experiment.nlargest"><code class="xref py py-obj docutils literal"><span class="pre">nlargest</span></code></a>(n,&nbsp;iterable[,&nbsp;key])</td>
 <td>Find the n largest elements in a dataset.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.normalize.html#calour.experiment.Experiment.normalize" title="calour.experiment.Experiment.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.normalize.html#calour.experiment.Experiment.normalize" title="calour.experiment.Experiment.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
 <td>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.normalize_by_subset_features.html#calour.experiment.Experiment.normalize_by_subset_features" title="calour.experiment.Experiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.normalize_by_subset_features.html#calour.experiment.Experiment.normalize_by_subset_features" title="calour.experiment.Experiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
 <td>Normalize each sample by their total sums without a list of features</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.normalize_compositional.html#calour.experiment.Experiment.normalize_compositional" title="calour.experiment.Experiment.normalize_compositional"><code class="xref py py-obj docutils literal"><span class="pre">normalize_compositional</span></code></a>(exp[,&nbsp;min_frac,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.normalize_compositional.html#calour.experiment.Experiment.normalize_compositional" title="calour.experiment.Experiment.normalize_compositional"><code class="xref py py-obj docutils literal"><span class="pre">normalize_compositional</span></code></a>(exp[,&nbsp;min_frac,&nbsp;...])</td>
 <td>Normalize each sample by ignoring the features with mean&gt;=min_frac in all the experiment</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.plot.html#calour.experiment.Experiment.plot" title="calour.experiment.Experiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>(exp[,&nbsp;sample_color_bars,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.plot.html#calour.experiment.Experiment.plot" title="calour.experiment.Experiment.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>(exp[,&nbsp;sample_color_bars,&nbsp;...])</td>
 <td>Plot the interactive heatmap and its associated axes.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.plot_hist.html#calour.experiment.Experiment.plot_hist" title="calour.experiment.Experiment.plot_hist"><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code></a>(exp,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.plot_hist.html#calour.experiment.Experiment.plot_hist" title="calour.experiment.Experiment.plot_hist"><code class="xref py py-obj docutils literal"><span class="pre">plot_hist</span></code></a>(exp,&nbsp;**kwargs)</td>
 <td>Plot histogram of all the values in data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.plot_sort.html#calour.experiment.Experiment.plot_sort" title="calour.experiment.Experiment.plot_sort"><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code></a>(exp[,&nbsp;fields,&nbsp;sample_color_bars,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.plot_sort.html#calour.experiment.Experiment.plot_sort" title="calour.experiment.Experiment.plot_sort"><code class="xref py py-obj docutils literal"><span class="pre">plot_sort</span></code></a>(exp[,&nbsp;fields,&nbsp;sample_color_bars,&nbsp;...])</td>
 <td>Plot after sorting by sample field.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.plot_tree.html#calour.experiment.Experiment.plot_tree" title="calour.experiment.Experiment.plot_tree"><code class="xref py py-obj docutils literal"><span class="pre">plot_tree</span></code></a>(exp,&nbsp;tree,&nbsp;axes)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.plot_tree2.html#calour.experiment.Experiment.plot_tree2" title="calour.experiment.Experiment.plot_tree2"><code class="xref py py-obj docutils literal"><span class="pre">plot_tree2</span></code></a>(exp,&nbsp;tree[,&nbsp;sample_color_bars,&nbsp;...])</td>
+<td>Plot the interactive heatmap and its associated axes.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.random_permute_data.html#calour.experiment.Experiment.random_permute_data" title="calour.experiment.Experiment.random_permute_data"><code class="xref py py-obj docutils literal"><span class="pre">random_permute_data</span></code></a>(exp[,&nbsp;normalize])</td>
+<td>Shuffle independently the reads of each feature</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.read.html#calour.experiment.Experiment.read" title="calour.experiment.Experiment.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(data_file[,&nbsp;sample_metadata_file,&nbsp;...])</td>
 <td>Read the files for the experiment.</td>
@@ -421,7 +433,7 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
     </p>
     <p>
         &copy; Copyright 2014--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
     </p>
   </div>
 </footer>

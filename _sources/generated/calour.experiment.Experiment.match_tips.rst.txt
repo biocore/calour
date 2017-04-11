@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.match_tips
+=======================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.match_tips

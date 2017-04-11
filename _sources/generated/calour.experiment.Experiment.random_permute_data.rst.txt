@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.random_permute_data
+================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.random_permute_data
