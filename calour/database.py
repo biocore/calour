@@ -118,6 +118,7 @@ def enrichment(exp, features, dbname, *kargs, **kwargs):
         columns:
             feature : str the feature
             pval : the p-value for the enrichment (float)
+            odif : the effect size (float)
             observed : the number of observations of this term in group1 (int)
             expected : the expected (based on all features) number of observations of this term in group1 (float)
             frac_group1 : fraction of total terms in group 1 which are the specific term (float)
@@ -127,7 +128,7 @@ def enrichment(exp, features, dbname, *kargs, **kwargs):
             description : the term (str)
     '''
     db = _get_database_class(dbname, exp=exp)
-    if not db.can_do_enrichment():
+    if not db.can_do_enrichment:
         raise ValueError('database %s does not support enrichment analysis' % dbname)
     return db.enrichment(exp, features, *kargs, **kwargs)
 

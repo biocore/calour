@@ -152,10 +152,16 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
             newdat = cdata.sum(axis=axis)
         elif method == 'random':
             random_pos = np.random.randint(np.sum(pos))
-            newdat = cdata[random_pos]
+            if axis == 0:
+                newdat = cdata[random_pos, :]
+            else:
+                newdat = cdata[:, random_pos]
         merge_number.append(pos.sum())
         merge_ids.append(metadata.index.values[pos])
-        replace_pos = np.where(pos)[0][0]
+        if method == 'random':
+            replace_pos = np.where(pos)[0][random_pos]
+        else:
+            replace_pos = np.where(pos)[0][0]
         keep_pos.append(replace_pos)
         if axis == 0:
             newexp.data[replace_pos, :] = newdat

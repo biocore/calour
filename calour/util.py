@@ -29,6 +29,7 @@ from pkg_resources import resource_filename
 from collections import Iterable
 from numbers import Real
 
+import numpy as np
 import scipy
 
 
@@ -352,5 +353,5 @@ def _argsort(values):
     # convert all numbers to float otherwise int will be sorted different place
     values = [float(x) if isinstance(x, Real) else x for x in values]
     # make values ordered by type and sort inside each var type
-    values = [(str(type(x)), x) for x in values]
+    values = [(str(type(x)), x) if x is not np.nan else (str(type(x)), np.inf) for x in values]
     return sorted(range(len(values)), key=values.__getitem__)
