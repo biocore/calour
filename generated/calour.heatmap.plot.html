@@ -143,7 +143,7 @@
 <h1>calour.heatmap.plot<a class="headerlink" href="#calour-heatmap-plot" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.heatmap.plot">
-<code class="descclassname">calour.heatmap.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/heatmap/heatmap.py#L330"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.heatmap.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>tree=None</em>, <em>tree_size=8</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/heatmap/heatmap.py#L331"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the interactive heatmap and its associated axes.</p>
 <p>The heatmap is interactive and can be dynamically updated with
 following key and mouse events:</p>
@@ -236,6 +236,16 @@ for each column. It doesn&#8217;t plot color bars by default (<code class="docut
 <div><p>a list of databases to access or add annotation
 False (default) to use the default field based on the experiment subclass
 None to not use databases</p>
+</div></blockquote>
+<p><strong>tree</strong> : skbio.TreeNode or None (optional)</p>
+<blockquote>
+<div><p>None (default) to not plot a tree
+otherwise, plot the tree dendrogram on the left.
+NOTE: features are reordered according to the tree</p>
+</div></blockquote>
+<p><strong>tree_size</strong> : int (optional)</p>
+<blockquote>
+<div><p>The width of the tree relative to the main heatmap (12 is identical size)</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict, optional</p>
 <blockquote>

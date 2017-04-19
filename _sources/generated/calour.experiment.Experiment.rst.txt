@@ -103,9 +103,17 @@ calour\.experiment\.Experiment
          
          Experiment.plot
          
+         Experiment.plot_diff_abundance_enrichment
+         
+         Experiment.plot_enrichment
+         
          Experiment.plot_hist
          
          Experiment.plot_sort
+         
+         Experiment.plot_tree
+         
+         Experiment.random_permute_data
          
          Experiment.read
          

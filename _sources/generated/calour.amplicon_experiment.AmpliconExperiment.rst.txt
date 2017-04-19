@@ -111,9 +111,17 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.plot
          
+         AmpliconExperiment.plot_diff_abundance_enrichment
+         
+         AmpliconExperiment.plot_enrichment
+         
          AmpliconExperiment.plot_hist
          
          AmpliconExperiment.plot_sort
+         
+         AmpliconExperiment.plot_tree
+         
+         AmpliconExperiment.random_permute_data
          
          AmpliconExperiment.read
          
