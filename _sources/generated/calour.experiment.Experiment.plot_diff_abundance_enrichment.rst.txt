@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.plot_diff_abundance_enrichment
+===========================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.plot_diff_abundance_enrichment
