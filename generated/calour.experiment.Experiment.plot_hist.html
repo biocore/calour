@@ -141,7 +141,7 @@
 <h1>calour.experiment.Experiment.plot_hist<a class="headerlink" href="#calour-experiment-experiment-plot-hist" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.plot_hist">
-<code class="descclassname">Experiment.</code><code class="descname">plot_hist</code><span class="sig-paren">(</span><em>exp</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot_hist" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">plot_hist</code><span class="sig-paren">(</span><em>exp</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L55"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot_hist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot histogram of all the values in data.</p>
 <p>It flattens the 2-D array and plots histogram out of it. This
 gives a sense of value distribution. Useful to guess a reasonable
@@ -152,8 +152,14 @@ clim for heatmap.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exp</strong> : <code class="docutils literal"><span class="pre">Experiment</span></code></p>
 <p><strong>kwargs</strong> : dict</p>
-<blockquote class="last">
+<blockquote>
 <div><p>key word arguments passing to the matplotlib <code class="docutils literal"><span class="pre">hist</span></code> plotting function.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">tuple of 1-D int array, 1-D float array, <code class="docutils literal"><span class="pre">Figure</span></code></p>
+<blockquote class="last">
+<div><p>the count in each bin, the start coord of each bin, and hist figure</p>
 </div></blockquote>
 </td>
 </tr>
