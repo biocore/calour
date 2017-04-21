@@ -353,8 +353,17 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         raise ValueError('unkown data_file_type %s' % data_file_type)
     # load the sample metadata file
     if sample_metadata_file is not None:
+        sample_metadata = _read_table(sample_metadata_file, encoding=encoding)
+        smid = set(sample_metadata.index)
+        sdid = set(sid)
+        diff = smid - sdid
+        if diff:
+            logger.warning('the samples are dropped because they have metadata but do not have data: %r' % diff)
+        diff = sdid - smid
+        if diff:
+            logger.warning('the samples have data but do not have metadata: %r' % diff)
         # reorder the sample id to align with biom
-        sample_metadata = _read_table(sample_metadata_file, encoding=encoding).loc[sid, ]
+        sample_metadata = sample_metadata.loc[sid, ]
         exp_metadata['map_md5'] = get_file_md5(sample_metadata_file, encoding=encoding)
     else:
         sample_metadata = pd.DataFrame(index=sid)
@@ -364,7 +373,18 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # load the feature metadata file
     if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
-        feature_metadata = _read_table(feature_metadata_file, encoding=encoding).loc[oid, ]
+        feature_metadata = _read_table(feature_metadata_file, encoding=encoding)
+        fmid = set(feature_metadata.index)
+        fdid = set(oid)
+        diff = fmid - fdid
+        if diff:
+            logger.warning('the features are dropped because they have metadata but do not have data: %r' % diff)
+        diff = fdid - fmid
+        if diff:
+            logger.warning('the features have data but do not have metadata: %r' % diff)
+        # reorder the sample id to align with biom
+        feature_metadata = feature_metadata.loc[oid, ]
+
     else:
         feature_metadata = pd.DataFrame(index=oid)
         feature_metadata['id'] = oid

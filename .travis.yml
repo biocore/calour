@@ -29,6 +29,8 @@ before_install:
   # xvfb is required to test plot and gui for linux
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y xvfb; fi
 install:
+  - conda create --yes -n calour
+  - source activate calour
   - conda install --yes --file ci/conda_requirements.txt
   - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
@@ -36,6 +38,7 @@ before_script:
   - export DISPLAY=:99.0
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
+  # - export MPLBACKEND="agg"
   - WITH_COVERAGE=TRUE make all
 notifications:
   webhooks:
