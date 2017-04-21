@@ -26,8 +26,6 @@ from logging import getLogger
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-from statsmodels.sandbox.stats.multicomp import multipletests
 
 from .experiment import Experiment
 from .util import _to_list
@@ -73,7 +71,11 @@ def correlation(exp, field, method='spearman', nonzero=False, transform='rankdat
     newexp : calour.Experiment
         The experiment with only significant (FDR<=maxfval) correlated features, sorted according to correlation size
     '''
-    data = exp.get_data(copy=True, sparse=False).transpose()
+    # remove features not present in both groups
+    cexp = exp.filter_min_abundance(0, strict=True)
+
+    data = cexp.get_data(copy=True, sparse=False).transpose()
+
     labels = pd.to_numeric(exp.sample_metadata[field], errors='coerce').values
     # remove the nans
     nanpos = np.where(np.isnan(labels))[0]
@@ -93,7 +95,7 @@ def correlation(exp, field, method='spearman', nonzero=False, transform='rankdat
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s for field %s. Positive correlated features : %d. Negative correlated features : %d. total %d'
                 % (method, field, np.sum(odif[keep] > 0), np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
 @Experiment._record_sig
@@ -145,6 +147,9 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     else:
         cexp = exp
 
+    # remove features not present in both groups
+    cexp = cexp.filter_min_abundance(0, strict=True)
+
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels.
     labels = np.zeros(len(cexp.sample_metadata))
@@ -152,7 +157,7 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
 @Experiment._record_sig
@@ -182,7 +187,11 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
     logger.debug('diff_abundance_kw for field %s' % field)
-    data = exp.get_data(copy=True, sparse=False).transpose()
+
+    # remove features with 0 abundance
+    cexp = exp.filter_min_abundance(0, strict=True)
+
+    data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels. If correlation method, get the values, otherwise the group
     labels = np.zeros(len(exp.sample_metadata))
     for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
@@ -191,18 +200,19 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     print(keep)
     logger.info('Found %d significant features' % (np.sum(keep)))
-    return _new_experiment_from_pvals(exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
 
-@Experiment._record_sig
-def _new_experiment_from_pvals(exp, keep, odif, pvals):
+def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
     '''Combine the pvalues and effect size into a new experiment.
     Keep only the significant features, sort the features by the effect size
 
     Parameters
     ----------
+    cexp : ``Experiment``
+        The experiment used for the actual diff. abundance (filtered for relevant samples/non-zero features)
     exp : ``Experiment``
-        The experiment being analysed
+        The original experiment being analysed (with all samples/features)
     keep : np.array of bool
         One entry per exp feature. True for the features which are significant (following FDR correction)
     odif : np.array of float
@@ -219,7 +229,10 @@ def _new_experiment_from_pvals(exp, keep, odif, pvals):
     keep = np.where(keep)
     if len(keep[0]) == 0:
         logger.warn('no significant features found')
-    newexp = exp.reorder(keep[0], axis=1)
+    newexp = cexp.reorder(keep[0], axis=1)
+    if exp is not None:
+        # we want all samples (rather than the subset in cexp) so use the original exp
+        newexp = exp.filter_ids(newexp.feature_metadata.index.values)
     odif = odif[keep[0]]
     pvals = pvals[keep[0]]
     si = np.argsort(odif, kind='mergesort')
@@ -229,126 +242,3 @@ def _new_experiment_from_pvals(exp, keep, odif, pvals):
     newexp.feature_metadata['_calour_diff_abundance_effect'] = odif
     newexp.feature_metadata['_calour_diff_abundance_pval'] = pvals
     return newexp
-
-
-def get_term_features(seqs, sequence_annotations):
-    '''Get dict of number of appearances in each sequence keyed by term
-
-    Parameters
-    ----------
-    seqs : list of str
-        A list of DNA sequences
-    sequence_annotations : dict of (sequence, list of ontology terms)
-        from dbbact.get_seq_list_fast_annotations()
-
-    Returns
-    -------
-    seq_annotations : dict of (ontology_term : num per sequence)
-        number of times each ontology term appears in each sequence in seqs
-    '''
-    # get all terms
-    terms = set()
-    for ctermlist in sequence_annotations.values():
-        for cterm in ctermlist:
-            terms.add(cterm)
-
-    seq_annotations = {}
-    for cterm in terms:
-        seq_annotations[cterm] = np.zeros([len(seqs)])
-
-    num_seqs_no_annotations = 0
-    for idx, cseq in enumerate(seqs):
-        if cseq not in sequence_annotations:
-            num_seqs_no_annotations += 1
-            continue
-        for cterm in sequence_annotations[cseq]:
-            seq_annotations[cterm][idx] += 1
-    if num_seqs_no_annotations > 0:
-        logger.info('found %d sequences with no annotations out of %d' % (num_seqs_no_annotations, len(seqs)))
-    return seq_annotations
-
-
-def relative_enrichment(exp, features, feature_terms):
-    '''Get the list of enriched terms in features compared to all features in exp.
-
-    given uneven distribtion of number of terms per feature
-
-    Parameters
-    ----------
-    exp : calour.Experiment
-        The experiment to compare the features to
-    features : list of str
-        The features (from exp) to test for enrichmnt
-    feature_terms : dict of {feature: list of terms}
-        The terms associated with each feature in exp
-        feature (key) : str the feature (out of exp) to which the terms relate
-        feature_terms (value) : list of str or int the terms associated with this feature
-
-    Returns
-    -------
-    list of dict
-        info about significantly enriched terms. one item per term, keys are:
-        'pval' : the p-value for the enrichment (float)
-        'observed' : the number of observations of this term in group1 (int)
-        'expected' : the expected (based on all features) number of observations of this term in group1 (float)
-        'group1' : fraction of total terms in group 1 which are the specific term (float)
-        'group2' : fraction of total terms in group 2 which are the specific term (float)
-        'description' : the term (str)
-    '''
-    all_features = set(exp.feature_metadata.index.values)
-    bg_features = list(all_features.difference(features))
-    # get the number of features each term appears in the bg and fg feature lists
-    bg_terms = get_term_features(bg_features, feature_terms)
-    fg_terms = get_term_features(features, feature_terms)
-
-    for cterm in bg_terms.keys():
-        bg_terms[cterm] = np.sum(bg_terms[cterm])
-    for cterm in fg_terms.keys():
-        fg_terms[cterm] = np.sum(fg_terms[cterm])
-
-    total_bg_terms = np.sum(list(bg_terms.values()))
-    total_fg_terms = np.sum(list(fg_terms.values()))
-    total_terms = total_bg_terms + total_fg_terms
-
-    # calculate total count for each feature in both lists combined
-    all_terms = bg_terms.copy()
-    for cterm, ccount in fg_terms.items():
-        if cterm not in all_terms:
-            all_terms[cterm] = 0
-        all_terms[cterm] += fg_terms[cterm]
-
-    allp = []
-    pv = []
-    for cterm in all_terms.keys():
-        pval = all_terms[cterm] / total_terms
-        num1 = fg_terms.get(cterm, 0)
-        num2 = bg_terms.get(cterm, 0)
-        pval1 = 1 - stats.binom.cdf(num1, total_fg_terms, pval)
-        pval2 = 1 - stats.binom.cdf(num2, total_bg_terms, pval)
-        p = np.min([pval1, pval2])
-        # store the result
-        allp.append(p)
-        cpv = {}
-        cpv['pval'] = p
-        cpv['observed'] = fg_terms[cterm]
-        cpv['expected'] = total_fg_terms * pval
-        cpv['group1'] = num1 / total_fg_terms
-        cpv['group2'] = num2 / total_bg_terms
-        cpv['description'] = cterm
-        pv.append(cpv)
-
-    reject, _, _, _ = multipletests(allp, method='fdr_bh')
-    keep = np.where(reject)[0]
-    plist = []
-    rat = []
-    for cidx in keep:
-        plist.append(pv[cidx])
-        rat.append(np.abs(float(pv[cidx]['observed'] - pv[cidx]['expected'])) / np.mean([pv[cidx]['observed'], pv[cidx]['expected']]))
-    print('found %d' % len(keep))
-    si = np.argsort(rat)
-    si = si[::-1]
-    newplist = []
-    for idx, crat in enumerate(rat):
-        newplist.append(plist[si[idx]])
-
-    return(newplist)

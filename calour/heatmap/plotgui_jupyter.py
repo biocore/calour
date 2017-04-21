@@ -21,6 +21,8 @@ class PlotGUI_Jupyter(PlotGUI):
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
+        # create the figure to plot the heatmap into
+        self._set_figure(None, kwargs['tree_size'])
         if matplotlib.get_backend() != 'nbAgg':
             logger.warning('You need to set up jupyter notebook with `%matplotlib notebook`')
 

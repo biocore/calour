@@ -49,9 +49,9 @@ class PlotGUI(ABC):
     zoom_scale : the scaling factor for zooming
     scroll_offset : The amount of columns/rows to scroll when arrow key pressed
     databases : the databases to interact with
+    tree_size : int (>= 0). the width of the axes to plot a tree.
     '''
-    def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None):
-        import matplotlib.pyplot as plt
+    def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None, tree_size=0):
         # the Experiment being plotted
         self.exp = exp
         # how much zooming in on key press
@@ -69,18 +69,31 @@ class PlotGUI(ABC):
             self.databases = []
         # the default database used when annotating features
         self._annotation_db = None
-        # create the figure to plot the heatmap into
-        self._set_figure(plt.figure())
 
-    def _set_figure(self, figure):
-        self.figure = figure
-        gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
-        hm_ax = self.figure.add_subplot(gs[2])
-        self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
-        self.xax.axis('off')
-        self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
-        self.yax.axis('off')
-        self.axes = hm_ax
+    def _set_figure(self, figure=None, tree_size=0):
+        import matplotlib.pyplot as plt
+        if figure is None:
+            self.figure = plt.figure()
+        else:
+            self.figure = figure
+        if tree_size == 0:
+            gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
+            hm_ax = self.figure.add_subplot(gs[2])
+            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.xax.axis('off')
+            self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
+            self.yax.axis('off')
+            self.axes = hm_ax
+        else:
+            gs = GridSpec(2, 3, width_ratios=[12, 1, tree_size], height_ratios=[1, 12])
+            hm_ax = self.figure.add_subplot(gs[3])
+            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.xax.axis('off')
+            self.yax = self.figure.add_subplot(gs[4], sharey=hm_ax)
+            self.yax.axis('off')
+            self.axes = hm_ax
+            self.tree_axes = self.figure.add_subplot(gs[5], sharey=hm_ax)
+            self.tree_axes.axis('off')
 
     def save_figure(self, *args, **kwargs):
         '''Save the figure to file.
@@ -334,7 +347,7 @@ class PlotGUI(ABC):
         for cpos in samplepos:
             if cpos not in self.selected_samples:
                 self.selected_samples[cpos] = self.axes.axvline(
-                    x=cpos, color='white', linestyle='dotted')
+                    x=cpos, color='white', linestyle='dotted', alpha=0.5, linewidth=0.5)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
@@ -343,7 +356,7 @@ class PlotGUI(ABC):
         for cpos in featurepos:
             if cpos not in self.selected_features:
                 self.selected_features[cpos] = self.axes.axhline(
-                    y=cpos, color='white', linestyle='dotted')
+                    y=cpos, color='white', linestyle='dotted', alpha=0.5, linewidth=0.5)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:

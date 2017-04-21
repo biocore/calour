@@ -16,6 +16,7 @@ import numpy as np
 
 from ..transforming import log_n
 from ..database import _get_database_class
+from .._dendrogram import plot_tree
 
 from ..util import _to_list
 
@@ -54,7 +55,7 @@ def _transition_index(l):
     yield i + 1, item[1]
 
 
-def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
+def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
     It still waits for the heatmap to be plotted and set up.
@@ -87,7 +88,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
     gui_module_name = 'calour.heatmap.' + gui.lower()
     gui_module = importlib.import_module(gui_module_name)
     GUIClass = getattr(gui_module, gui)
-    gui_obj = GUIClass(exp)
+    gui_obj = GUIClass(exp, tree_size=tree_size)
 
     # link gui with the databases requested
     for cdatabase in databases:
@@ -328,7 +329,8 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
 
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
-         gui='cli', databases=False, color_bar_label=True, **kwargs):
+         gui='cli', databases=False, color_bar_label=True,
+         tree=None, tree_size=8, **kwargs):
     '''Plot the interactive heatmap and its associated axes.
 
     The heatmap is interactive and can be dynamically updated with
@@ -394,6 +396,12 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         a list of databases to access or add annotation
         False (default) to use the default field based on the experiment subclass
         None to not use databases
+    tree : skbio.TreeNode or None (optional)
+        None (default) to not plot a tree
+        otherwise, plot the tree dendrogram on the left.
+        NOTE: features are reordered according to the tree
+    tree_size : int (optional)
+        The width of the tree relative to the main heatmap (12 is identical size)
     kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
@@ -405,7 +413,14 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     # set the databases if default requested (i.e. False)
     if databases is False:
         databases = exp.heatmap_databases
-    gui_obj = _create_plot_gui(exp, gui, databases)
+
+    if tree is None:
+        gui_obj = _create_plot_gui(exp, gui, databases)
+    else:
+        gui_obj = _create_plot_gui(exp, gui, databases, tree_size=tree_size)
+        # match the exp order to the tree (reorders the features)
+        exp, tree = plot_tree(exp, tree, gui_obj.tree_axes)
+
     exp.heatmap(axes=gui_obj.axes, **kwargs)
     barwidth = 0.3
     barspace = 0.05

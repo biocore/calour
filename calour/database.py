@@ -53,7 +53,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term'):
+def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term', term_type=None):
     '''Add a field to the feature metadata, with most common term for each feature
 
     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
@@ -66,14 +66,16 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
         None (default) to use all terms
     field_name : str (optional)
         Name of feature_metadata field to store the annotatiosn.
-
+    term_type : str or None (optional)
+        type of the annotation summary to get from the database (db specific)
+        None to get default type
     Returns
     -------
     exp : Experiment
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
-    term_list = db.get_feature_terms(features, exp=exp)
+    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type)
     feature_terms = []
     for cfeature in features:
         term_count = defaultdict(int)
@@ -82,9 +84,8 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
             continue
         for cterm in term_list[cfeature]:
             if use_term_list is not None:
-                for clist_term in use_term_list:
-                    if clist_term in cterm:
-                        term_count[clist_term] += 1
+                if cterm in use_term_list:
+                    term_count[cterm] += 1
             else:
                 term_count[cterm] += 1
         if len(term_count) == 0:
@@ -92,13 +93,48 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
         else:
             max_term = max(term_count, key=term_count.get)
         feature_terms.append(max_term)
-        # feature_terms.append('%d:%s' % (term_count[max_term],max_term))
     exp.feature_metadata[field_name] = feature_terms
     return exp
 
 
+def enrichment(exp, features, dbname, *kargs, **kwargs):
+    '''Get the list of enriched annotation terms in features compared to all features in exp.
+
+    Uses the database specific enrichment analysis method.
+
+    Parameters
+    ----------
+    features : list of str
+        The features to test for enrichment (compared to all other features in exp)
+    dbname : str
+        the database to use for the annotation terms and enrichment analysis
+    *kargs, **kwargs
+        Additional database specific parameters
+
+    Returns
+    -------
+    pandas.DataFrame
+    with info about significantly enriched terms.
+        columns:
+            feature : str the feature
+            pval : the p-value for the enrichment (float)
+            odif : the effect size (float)
+            observed : the number of observations of this term in group1 (int)
+            expected : the expected (based on all features) number of observations of this term in group1 (float)
+            frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+            frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+            num_group1 : number of total terms in group 1 which are the specific term (float)
+            num_group2 : number of total terms in group 2 which are the specific term (float)
+            description : the term (str)
+    '''
+    db = _get_database_class(dbname, exp=exp)
+    if not db.can_do_enrichment:
+        raise ValueError('database %s does not support enrichment analysis' % dbname)
+    return db.enrichment(exp, features, *kargs, **kwargs)
+
+
 class Database(ABC):
-    def __init__(self, exp=None, database_name=None, methods=['get', 'annotate', 'feature_terms']):
+    def __init__(self, exp=None, database_name=None, methods=['get', 'annotate', 'enrichment']):
         '''Initialize the database interface
 
         Parameters
@@ -123,10 +159,10 @@ class Database(ABC):
         return 'annotate' in self._methods
 
     @property
-    def can_get_feature_terms(self):
+    def can_do_enrichment(self):
         '''True if the database supports getting a dict of terms per feature via the get_feature_terms() function
         '''
-        return 'feature_terms' in self._methods
+        return 'enrichment' in self._methods
 
     def get_seq_annotation_strings(self, sequence):
         '''Get nice string summaries of annotations for a given sequence
@@ -251,3 +287,30 @@ class Database(ABC):
         '''
         logger.debug('Generic function for get_feature_terms')
         return {}
+
+    def enrichment(self, exp, features, *kargs, **kwargs):
+        '''Get the list of enriched terms in features compared to all features in exp.
+
+        Parameters
+        ----------
+        exp : calour.Experiment
+            The experiment to compare the features to
+        features : list of str
+            The features (from exp) to test for enrichmnt
+        *kargs, **kwargs : additional dtabase specific parameters
+
+        Returns
+        -------
+        pandas.DataFrame with  info about significantly enriched terms.
+            columns:
+                feature : str
+                    the feature
+                pval : float
+                    the p-value for the enrichment
+                odif : float
+                    the effect size for the enrichment
+                term : str
+                    the enriched term
+        '''
+        logger.debug('Generic function for enrichment')
+        return None

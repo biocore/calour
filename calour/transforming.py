@@ -251,3 +251,55 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
         newexp = deepcopy(exp)
     newexp.data = total * data / use_reads[:, None]
     return newexp
+
+
+def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
+    '''Normalize each sample by ignoring the features with mean>=min_frac in all the experiment
+
+    This assumes that the majority of features have less than min_frac mean, and that the majority of features don't change
+    between samples in a constant direction
+
+    Parameters
+    ----------
+    min_frac : float (optional)
+        ignore features with mean (over all samples) >= min_frac.
+    total : int (optional)
+        The total abundance for the non-excluded features per sample
+    inplace : bool (optional)
+        False (default) to create a new experiment, True to normalize in place
+
+    Returns
+    -------
+    ``Experiment``
+        The normalized experiment. Note that all features are normalized (including the ones with mean>=min_frac)
+    '''
+    comp_features = exp.filter_mean(min_frac)
+    logger.info('ignoring %d features' % comp_features.shape[1])
+    newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values,
+                                              total=total, negate=True, inplace=inplace)
+    return newexp
+
+
+def random_permute_data(exp, normalize=True):
+    '''Shuffle independently the reads of each feature
+
+    Creates a new experiment with no dependence between the features.
+
+    Parameters
+    ----------
+    normalize : bool (optional)
+        True (default) to normalize each sample after completing the feature shuffling.
+        False to not normalize
+
+    Returns
+    -------
+    ``Experiment``
+        With each feature shuffled independently
+    '''
+    newexp = exp.copy()
+    newexp.sparse = False
+    for cfeature in range(newexp.shape[1]):
+        np.random.shuffle(newexp.data[:, cfeature])
+    if normalize:
+        newexp.normalize(np.mean(exp.data.sum(axis=1)), inplace=True)
+    return newexp
