@@ -289,7 +289,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
 
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True, data_file_type='biom', encoding=None,
+         description='', drop=False, sparse=True, data_file_type='biom', encoding=None,
          cls=Experiment, *, normalize):
     '''Read the files for the experiment.
 
@@ -307,6 +307,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         file path to the feature metadata.
     description : str
         description of the experiment
+    drop : boolean (optional)
+        True to drop the samples if there is no metadata for it.
     sparse : bool
         read the biom table into sparse or dense array
     file_type : str (optional)
@@ -351,6 +353,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         sid, oid, data, md = _read_qiime2(data_file)
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
+    sfilter = [True] * len(sid)
     # load the sample metadata file
     if sample_metadata_file is not None:
         sample_metadata = _read_table(sample_metadata_file, encoding=encoding)
@@ -359,9 +362,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         diff = smid - sdid
         if diff:
             logger.warning('the samples are dropped because they have metadata but do not have data: %r' % diff)
-        diff = sdid - smid
-        if diff:
-            logger.warning('the samples have data but do not have metadata: %r' % diff)
+        sdiff = (sdid - smid)
+        if sdiff:
+            logger.warning('the samples have data but do not have metadata: %r' % sdiff)
+            sfilter = [i not in sdiff for i in sid]
         # reorder the sample id to align with biom
         sample_metadata = sample_metadata.loc[sid, ]
         exp_metadata['map_md5'] = get_file_md5(sample_metadata_file, encoding=encoding)
@@ -379,12 +383,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         diff = fmid - fdid
         if diff:
             logger.warning('the features are dropped because they have metadata but do not have data: %r' % diff)
-        diff = fdid - fmid
-        if diff:
-            logger.warning('the features have data but do not have metadata: %r' % diff)
-        # reorder the sample id to align with biom
+        fdiff = fdid - fmid
+        if fdiff:
+            logger.warning('the features have data but do not have metadata: %r' % fdiff)
         feature_metadata = feature_metadata.loc[oid, ]
-
     else:
         feature_metadata = pd.DataFrame(index=oid)
         feature_metadata['id'] = oid
@@ -403,7 +405,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     exp = cls(data, sample_metadata, feature_metadata,
               exp_metadata=exp_metadata, description=description, sparse=sparse)
-
+    if drop is True:
+        exp = exp.reorder(sfilter, axis=0)
     if normalize is not None:
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
