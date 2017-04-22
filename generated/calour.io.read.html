@@ -143,7 +143,7 @@
 <h1>calour.io.read<a class="headerlink" href="#calour-io-read" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.io.read">
-<code class="descclassname">calour.io.</code><code class="descname">read</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=''</em>, <em>sparse=True</em>, <em>data_file_type='biom'</em>, <em>encoding=None</em>, <em>cls=&lt;class 'calour.experiment.Experiment'&gt;</em>, <em>*</em>, <em>normalize</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/io.py#L291"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.io.</code><code class="descname">read</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>feature_metadata_file=None</em>, <em>description=''</em>, <em>drop=False</em>, <em>sparse=True</em>, <em>data_file_type='biom'</em>, <em>encoding=None</em>, <em>cls=&lt;class 'calour.experiment.Experiment'&gt;</em>, <em>*</em>, <em>normalize</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/io.py#L291"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the files for the experiment.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -170,6 +170,10 @@ if not None, file path to the sample metadata (aka mapping file in QIIME).</p>
 <p><strong>description</strong> : str</p>
 <blockquote>
 <div><p>description of the experiment</p>
+</div></blockquote>
+<p><strong>drop</strong> : boolean (optional)</p>
+<blockquote>
+<div><p>True to drop the samples if there is no metadata for it.</p>
 </div></blockquote>
 <p><strong>sparse</strong> : bool</p>
 <blockquote>
