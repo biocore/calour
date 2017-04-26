@@ -159,9 +159,15 @@ if int, show at most the max_show maximal positive and negative terms
 if (int, int), show at most XXX maximal positive and YYY maximal negative terms</p>
 </div></blockquote>
 <p><strong>axes: matplotlib.Axis or None (optional)</strong></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The axis to which to plot the figure
 None (default) to create a new figure</p>
+</div></blockquote>
+<p><strong>ignore_exp</strong> : list None (optional)</p>
+<blockquote class="last">
+<div><p>list of experiment ids to ignore when doing the enrichment_analysis.
+Useful when you don&#8217;t want to get terms from your own experiment analysis.
+For dbbact it is a list of int</p>
 </div></blockquote>
 </td>
 </tr>
