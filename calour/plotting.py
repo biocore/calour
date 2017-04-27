@@ -107,7 +107,7 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, axes=None):
     return fig
 
 
-def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=40, axes=None):
+def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=40, axes=None, ignore_exp=None):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -122,6 +122,10 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     axes: matplotlib.Axis or None (optional)
         The axis to which to plot the figure
         None (default) to create a new figure
+    ignore_exp : list None (optional)
+        list of experiment ids to ignore when doing the enrichment_analysis.
+        Useful when you don't want to get terms from your own experiment analysis.
+        For dbbact it is a list of int
     '''
     import matplotlib.pyplot as plt
     if '_calour_diff_abundance_effect' not in exp.feature_metadata.columns:
@@ -132,7 +136,7 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     positive = exp.feature_metadata.index.values[positive.values]
 
     # get the enrichment
-    enriched = exp.enrichment(positive, 'dbbact', term_type=term_type)
+    enriched = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp)
 
     # and plot
     fig = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, axes=axes)

@@ -109,7 +109,8 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
 def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
-            axes=None, rect=None,  transform=log_n, **kwargs):
+            axes=None, rect=None,  transform=log_n,
+            show_legend_colorbar=False, **kwargs):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
@@ -135,8 +136,9 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     clim : tuple of (float, float) or None (optional)
         the min and max values for the heatmap or None to use all range. It uses the min
         and max values in the ``data`` array by default.
-    xticklabel_rot : float (optional)
+    xticklabel_rot : float or None (optional)
         The rotation angle for the x labels (if sample_field is supplied)
+        if None, will have rotation=0, horizontalalignment='center', otherwise horizontalalignment='right'
     xticklabel_len : int (optional) or None
         The maximal length for the x label strings (will be cut to
         this length if longer). Used to prevent long labels from
@@ -151,6 +153,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
+    show_legend_colorbar : bool (optional)
+        True to plot a legend color bar for the heatmap
 
     Returns
     -------
@@ -181,7 +185,9 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap
-    ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    if show_legend_colorbar:
+        _figure_color_bar(exp, image, fig, axes=None, log_scale=(transform == log_n))
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -209,7 +215,11 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabels = ['%s..%s' % (i[:mid], i[-mid:])
                            if len(i) > xticklabel_len else i
                            for i in xticklabels]
-        ax.set_xticklabels(xticklabels, rotation=xticklabel_rot, ha='right')
+        if xticklabel_rot is not None:
+            ha = 'right'
+        else:
+            ha = 'center'
+        ax.set_xticklabels(xticklabels, rotation=xticklabel_rot, horizontalalignment=ha)
     else:
         ax.get_xaxis().set_visible(False)
 
@@ -256,6 +266,38 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             return 'x=%1.2f, y=%1.2f' % (x, y)
     ax.format_coord = format_coord
     return fig
+
+
+def _figure_color_bar(exp, image, fig, axes, log_scale=True, num_ticks=8, aspect=100):
+    '''Plot the heatmap colorbar scale
+
+    Parameters
+    ----------
+    exp : ``Experiment``
+        The experiment for which the plot is made.
+        We use it to see whether the scale should be relative(normalized) or absolute
+    fig : matplotlib.Figure
+        The figure to plot the colorbar in
+    axes : matplotlib.Axis
+        The axis to plot into
+    log_scale : bool (optional)
+        True (default) to plot log scale colorbar
+        False to plot linear scale
+    num_ticks : int (optional)
+        number of ticks to put on the colorbar
+    '''
+    clim = image.get_clim()
+    ticks = np.linspace(clim[0], clim[1], num_ticks)
+    ticks = [eval("%.0e" % (x)) for x in ticks]
+    cb = fig.colorbar(image, ax=axes, ticks=ticks, aspect=aspect)
+    if log_scale:
+        tick_labels = np.power(2, ticks)
+    else:
+        tick_labels = ticks
+    if exp.exp_metadata.get('normalized'):
+        tick_labels = 100 * np.array(tick_labels) / exp.exp_metadata['normalized']
+        tick_labels = ['%%%s' % x for x in tick_labels]
+    cb.ax.set_yticklabels(tick_labels)
 
 
 def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=True):

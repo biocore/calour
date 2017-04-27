@@ -350,8 +350,18 @@ def _argsort(values):
         the positions of the sorted values
 
     '''
-    # convert all numbers to float otherwise int will be sorted different place
-    values = [float(x) if isinstance(x, Real) else x for x in values]
-    # make values ordered by type and sort inside each var type
-    values = [(str(type(x)), x) if x is not np.nan else (str(type(x)), np.inf) for x in values]
-    return sorted(range(len(values)), key=values.__getitem__)
+    pairs = []
+    for cval in values:
+        if isinstance(cval, Real):
+            if np.isnan(cval):
+                cval = np.inf
+            else:
+                cval = float(cval)
+        pairs.append((str(type(cval)), cval))
+
+    # # convert all numbers to float otherwise int will be sorted different place
+    # values = [float(x) if isinstance(x, Real) else x for x in values]
+    # # make values ordered by type and sort inside each var type
+    # values = [(str(type(x)), x) if not np.isnan(x) else (str(type(x)), np.inf) for x in values]
+    # return sorted(range(len(values)), key=values.__getitem__)
+    return sorted(range(len(pairs)), key=pairs.__getitem__)

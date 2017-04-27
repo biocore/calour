@@ -65,6 +65,8 @@ def normalize(exp, total=10000, axis=0, inplace=False):
     if not inplace:
         exp = deepcopy(exp)
     exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
+    # store the normalization depth into the experiment metadata
+    exp.exp_metadata['normalized'] = total
     return exp
 
 
@@ -250,6 +252,8 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
     else:
         newexp = deepcopy(exp)
     newexp.data = total * data / use_reads[:, None]
+    # store the normalization depth into the experiment metadata
+    newexp.exp_metadata['normalized'] = total
     return newexp
 
 
