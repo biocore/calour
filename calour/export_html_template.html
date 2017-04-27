@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <style>
+    .axis path {
+      display: none;
+    }
+    .pixel {
+      /* image-rendering: pixelated; */
+      padding: 0px;
+      margin: 0px;
+      border: 0px;
+        image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+        image-rendering: -moz-crisp-edges;          /* Firefox                        */
+        image-rendering: -o-crisp-edges;            /* Opera                          */
+        image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+        image-rendering: pixelated;                 /* Chrome */
+        image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+        -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+    }
+    .axis line {
+      stroke-opacity: 0.3;
+      shape-rendering: crispEdges;
+    }
+    .line {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 2px;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function() {
+
+      var yticklabels = ['NA'];
+      var ids = ['NA'];
+      var samples = ['NA'];
+      var vlines = [];
+      var xtick_pos = [];
+      var xtick_labels = [];
+      var field_name = '';
+      var title_text = 'Experiment';
+
+      //**********************************************************
+      // following variables are set by the external python program
+      // DO NOT DELETE/CHANGE
+      // yticklabels go here
+      // ids go here
+      // samples go here
+      // vlines go here
+      // xtick_pos go here
+      // xtick_labels go here
+      // field_name goes here
+      // title_text goes here
+      //***********************************************************
+
+      var yaxiswidth = 100;
+      var xaxisheight = 20;
+
+      // fix for safari image smoothing interpolation - we want it pixelated!
+      var ctx = document.getElementById('canvas').getContext('2d');
+      ctx.webkitImageSmoothingEnabled = false;
+
+      // set the title
+      $('#field_name').html(field_name);
+      $('#title_text').html(title_text);
+
+      var svg = d3.select('svg');
+
+      var width = $('#div-heatmap').width();
+      var height = $('#div-heatmap').height();
+
+      // available display for the heatmap (without axes)
+      var hwidth = width - yaxiswidth;
+      var hheight = height - xaxisheight;
+
+      svg.attr('width', width)
+          .attr('height', height);
+
+      svg.on('click', onclick);
+
+      var xScale = d3.scaleLinear()
+          .domain([0, width])
+          .range([0, width]);
+
+      var yScale = d3.scaleLinear()
+          .domain([0, ids.length])
+          .range([0.5, ids.length + 0.5]);
+
+      var heatmapregion = svg
+          .append('svg')
+          .attr('width', width - yaxiswidth + 'px')
+          .attr('height', height - xaxisheight + 'px')
+          .attr('x', yaxiswidth)
+          .attr('y', 0);
+
+      var heatmap = heatmapregion.append('g')
+          .append('image')
+          .attr('class', 'pixel')
+          .attr('width', samples.length)
+          .attr('height', ids.length)
+          .attr('xlink:xlink:href', 'data:image/png;base64, **image_goes_here**')
+          // .attr('xlink:href', 'out.png');
+
+      var xyratio = get_xyratio();
+
+      var xAxis = d3.axisBottom(xScale)
+          .tickValues(xtick_pos)
+          .tickFormat(function(d, i) {return xtick_labels[i];});
+
+      function customTickFunction(d) {
+        var dom = yAxis.scale().domain();
+        if ((dom[1] - dom[0]) < 50) {
+          return Math.round(dom[1] - dom[0]);
+        }
+        return 50;
+      }
+
+      var yAxis = d3.axisLeft(yScale)
+          .ticks(50)
+          .tickFormat(function(d) {
+            try {
+              var taxa = yticklabels[Math.round(d)].replace(/;+$/, '').split(';');
+              var label = taxa.pop();
+              if (label[0] != label[0].toUpperCase() && taxa.length > 0) {
+                label = taxa.pop() + ' ' + label;
+              }
+            }
+            catch(err) {
+              label=''
+            }
+            return label;
+          });
+      yAxis.ticks(customTickFunction());
+
+      var gX = svg.append('g')
+          .attr('class', 'axis axis--x')
+          .attr('transform', 'translate(' + yaxiswidth + ',' + (hheight) + ')')
+          .call(xAxis);
+
+      console.log(gX)
+
+      var gY = svg.append('g')
+          .attr('class', 'axis axis--y')
+          .attr('transform', 'translate(' + yaxiswidth + ',0)')
+          .call(yAxis);
+
+      // The per sample-type vlines
+      var vline_lines = heatmapregion.append('g');
+      for (idx=0;idx<vlines.length; idx++) {
+        vline_lines.append('line')
+            .attr('id', 'vline')
+            .attr('class', 'vLine')
+            .style('stroke', 'white')
+            // .style('stroke-dasharray', '1,1')
+            .style('stroke-opacity', 1)
+            .style('stroke-width', 6 * xyratio)
+            .attr('x1', vlines[idx]).attr('y1', 0)
+            .attr('x2', vlines[idx]).attr('y2', ids.length);
+      }
+
+      // The cursor crosshair
+      var focus = heatmapregion.append('g');
+
+      var xline = focus.append('line')
+          .attr('id', 'focusLineX')
+          .attr('class', 'focusLine')
+          .style('stroke', 'white')
+          // .style('stroke-dasharray', '1,1')
+          .style('stroke-opacity', 0.5)
+          .style('stroke-width', 1);
+
+      focus.append('line')
+          .attr('id', 'focusLineY')
+          .attr('class', 'focusLine')
+          .style('stroke', 'white')
+          .style("stroke-opacity", 0.5)
+          // .style('stroke-dasharray', '1,1')
+          .style('stroke-width', 1 * xyratio);
+
+      d3.select('#reset')
+          .on('click', resetted);
+
+      d3.select('#zoomplus')
+          .on('click', zoomY);
+
+      d3.select('#zoomminus')
+          .on('click', unzoomY);
+
+      d3.select('#movedown')
+          .on('click', moveDown);
+
+      d3.select('#moveup')
+          .on('click', moveUp);
+
+      var initial_scale_factor = hwidth / samples.length;
+
+      var shiftdown = 0;
+      var shift_zoom_tx, shift_zoom_k, zoom_k, zoom_ty;
+      d3.select('body').on('keydown', onkeydown);
+      d3.select('body').on('keyup', onkey);
+
+      var zoom = d3.zoom()
+          .scaleExtent([initial_scale_factor, 10000])
+          .translateExtent([[0, 0], [width / initial_scale_factor, 100000000]])
+          .on('zoom', zoomed);
+
+      heatmapregion.call(zoom);
+
+      // and initial zoom to have full screen
+      resetted();
+
+      function onkeydown() {
+        if (d3.event.key == '-') {
+          unzoomY();
+        };
+        if (d3.event.key == '=') {
+          zoomY();
+        };
+        if (d3.event.key == 'ArrowDown') {
+          moveDown();
+        };
+        if (d3.event.key == 'ArrowUp') {
+          moveUp();
+        };
+        // and now process the shift
+        onkey();
+      }
+
+      function onkey() {
+        shiftdown = d3.event.shiftKey;
+        if (shiftdown) {
+          xyratio = xyratio * zoom_k / shift_zoom_k;
+          zoom_k = shift_zoom_k;
+          shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
+          heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
+          zoom.translateBy(heatmapregion, 0, 0);
+        } else {
+          xyratio = xyratio * zoom_k / shift_zoom_k;
+          zoom_ty = zoom_ty / shift_zoom_k;
+          heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
+          zoom.translateBy(heatmapregion, 0, 0);
+        }
+        // zoom.scaleExtent([initial_scale_factor*xyratio, 1000]);
+        // heatmapregion.call(zoom);
+      }
+
+      function zoomed() {
+        tt = d3.event.transform
+        if (shiftdown != 0) {
+          newt = 'translate(' + tt.x + ',' + zoom_ty + ') scale(' + tt.k + ',' + zoom_k * xyratio + ')';
+          shift_zoom_tx = tt.x;
+          shift_zoom_k = tt.k;
+          gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
+          vline_lines.selectAll('#vline').style('stroke-width', 3 / tt.k);
+          focus.selectAll('#focusLineY').style('stroke-width', 2 / tt.k);
+        };
+        if (shiftdown != 1) {
+          newt = 'translate(' + shift_zoom_tx + ',' + tt.y + ') scale(' + shift_zoom_k + ',' + tt.k * xyratio + ')';
+          zoom_k = tt.k;
+          zoom_ty = tt.y;
+          ytransform = d3.zoomIdentity.translate(tt.x, tt.y).scale(tt.k * xyratio);
+          gY.call(yAxis.scale(ytransform.rescaleY(yScale)).ticks(customTickFunction()));
+          focus.selectAll('#focusLineX').style('stroke-width', 2 / (xyratio * tt.k));
+        };
+        console.log(newt);
+        heatmap.attr('transform', newt);
+        vline_lines.attr('transform', newt);
+        focus.attr('transform', newt);
+      }
+
+      function reset_coords() {
+        xyratio = get_xyratio();
+        shift_zoom_tx = 0;
+        shift_zoom_k = initial_scale_factor;
+        zoom_ty = 0;
+        zoom_k = initial_scale_factor;
+      }
+
+      function resetted() {
+        console.log('reset');
+        reset_coords();
+        old_shiftdown = shiftdown;
+        shiftdown = 2;
+        heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(initial_scale_factor));
+        shiftdown = old_shiftdown;
+        // The nice transition didn't work with the shift up/down
+        // heatmapregion.transition()
+        //     .duration(750)
+        //     .call(zoom.transform, d3.zoomIdentity.scale(initial_scale_factor));
+      }
+
+      function zoomY() {
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.y = 0;
+        // the topmost feature showing in the screen
+        screen_start = yAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        xyratio = xyratio * 2;
+        zoom.translateBy(heatmapregion, 0, 0);
+        newpos = yAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.y = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
+      function unzoomY() {
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.y = 0;
+        // the topmost feature showing in the screen
+        screen_start = yAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        xyratio = xyratio / 2;
+        zoom.translateBy(heatmapregion, 0, 0);
+        newpos = yAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.y = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
+      function moveDown() {
+        // xyratio = xyratio / 2;
+        // zoom.translateBy(svg, 0, 0);
+        screen_start = yAxis.scale().invert(0);
+        screen_end = yAxis.scale().invert(height - xaxisheight);
+        zoom.translateBy(heatmapregion, 0, (screen_start - screen_end) * xyratio);
+      }
+
+      function moveUp() {
+        // xyratio = xyratio / 2;
+        // zoom.translateBy(svg, 0, 0);
+        screen_start = yAxis.scale().invert(0);
+        screen_end = yAxis.scale().invert(height - xaxisheight);
+        zoom.translateBy(heatmapregion, 0, (screen_end - screen_start) * xyratio);
+      }
+
+      function onclick() {
+        console.log('click');
+
+        var pos = d3.mouse(heatmap.node());
+        var cx = Math.round(xScale.invert(pos[0])), cy = Math.round(yScale.invert(pos[1]));
+        var posx = xScale.invert(pos[0]), posy = yScale.invert(pos[1]);
+
+        focus.select('#focusLineY')
+            .attr('x1', Math.round(posx + 0.5) - 0.5).attr('y1', 0)
+            .attr('x2', Math.round(posx + 0.5) - 0.5).attr('y2', ids.length);
+        focus.select('#focusLineX')
+            .attr('x1', 0).attr('y1', Math.round(posy) + 0.5)
+            .attr('x2', samples.length).attr('y2', Math.round(posy) + 0.5);
+
+        var cid = ids[cy];
+        var csamp = samples[cx];
+        var ctax = yticklabels[cy].split(';').map(function(e) {
+          return '<a href="https://en.wikipedia.org/wiki/' + e + '" target="_blank">' + e + '</a>'
+        }).join('; ');
+        $('#taxonomy').html(ctax);
+        $('#sampleid').html(csamp);
+        // Get dbBact annotations for selection
+        $.ajax({
+          url: 'http://dbbact.org/REST-API/sequences/get_string_annotations',
+          type: 'POST',
+          data: JSON.stringify({'sequence': cid}),
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          success: function(data) {
+              if (data.annotations.length == 0) {
+                atext = 'No annotations found for sequence'
+              }
+              else {
+                var atext = '';
+                var clink = 'http://dbbact.org/sequence_annotations/' + cid;
+                var ctext = '<p><a href="' + clink + '" target="_blank">dbBact Summary</a></p>';
+                atext += ctext;
+                for (i = 0; i < data.annotations.length; i++) {
+                    clink = 'http://dbbact.org/annotation_info/' + data.annotations[i].annotationid.toString();
+                    ctext = '<a href="' + clink + '" target="_blank">' + data.annotations[i].annotation_string + '</a><br>';
+                    atext += ctext;
+                }
+              }
+              $('#p-annotation').html(atext);
+          }
+        });
+      }
+
+      function get_xyratio() {
+        return (hheight / ids.length) * (samples.length / hwidth);
+      }
+
+      $(window).on('resize', function(){
+        $('body').height('calc(100vh - 50px)');
+      });
+    });
+  </script>
+</head>
+<body style="height: calc(100vh - 50px); min-height: 600px; min-width: 1080px;">
+  <div>&nbsp;</div>
+  <div id="div-annotation" class="panel panel-default" style="float: right; margin: 10px; width: 360px; height: auto; white-space: nowrap;">
+    <!--Here goes the annotations!-->
+    <div class="panel-heading">
+      <b>dbBact annotations</b>
+    </div>
+    <div class="panel-body" style="overflow: auto;">
+      <p id="p-annotation">Click on heatmap to see annotations</p>
+    </div>
+    <div class="panel-footer">
+      For more analysis options, download <a href='https://github.com/amnona/calour' target='_blank'>Calour</a>.
+    </div>
+  </div>
+
+  <div class="panel panel-default" style="margin: 10px; width: auto; height: 100%; overflow: hidden;">
+    <div id="div-title" class="panel-heading">
+      <b><span id="title_text">Experiment</span></b>
+      (sorted by field: <b><span id='field_name'> NA </span></b>)
+      <span style="float: right;">
+        <button id="reset" class="btn btn-default btn-xs">Reset</button>
+        <button id="zoomplus" class="btn btn-default btn-xs">+</button>
+        <button id="zoomminus" class="btn btn-default btn-xs">-</button>
+        <button id="moveup" class="btn btn-default btn-xs">&uarr;</button>
+        <button id="movedown" class="btn btn-default btn-xs">&darr;</button>
+        <button id="btn-help" class="btn btn-default btn-xs" onclick="$('#div-help').toggle();">Help</button>
+      </span>
+    </div>
+    <div id="div-heatmap" class="panel-body" style="height: calc(100% - 80px);">
+      <svg id="heatmap" style="width: 100%; height: 100%;)"></svg>
+    </div>
+    <div id="div-selection" class="panel-footer">
+      <!--Here goes the selection!-->
+      <span style="display: inline-block; float: left; overflow: hidden;"><b>Sample:&nbsp;&nbsp;</b></span>
+      <span id="sampleid" style="display: inline-block; float: left; width: 120px; overflow: auto; white-space: nowrap;">NA</span>
+      <span style="display: inline-block; float: left; overflow: hidden;">&nbsp;&nbsp;<b>Taxonomy:&nbsp;&nbsp;</b></span>
+      <span id="taxonomy" style="display: block; overflow: auto; white-space: nowrap;">NA</span>
+    </div>
+  </div>
+
+  <div id="div-help" class="panel panel-info" style="display: none; position: fixed; left: 50%; width: 400px; margin-left: -200px; top: 200px; box-shadow: 10px 10px 5px rgba(0,0,0,0.5);">
+    <div class="panel-heading">
+    	Help
+    	<span style="float: right;"><button class="btn btn-default btn-xs" onclick="$('#div-help').hide();">&times;</button></span>
+    </div>
+    <div class="panel-body">
+      <p>Use mouse or -/= for zooming bacteria, shift+mouse for zooming samples, arrow keys to scroll up/down in heatmap.</p>
+    </div>
+  </div>
+</body>
+</html>
