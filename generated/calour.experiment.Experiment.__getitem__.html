@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>calour.filtering.filter_prevalence &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>calour.experiment.Experiment.__getitem__ &#8212; calour 0.1.0.dev0 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,8 +33,6 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="calour.filtering.filter_min_abundance" href="calour.filtering.filter_min_abundance.html" />
-    <link rel="prev" title="calour.filtering.filter_mean" href="calour.filtering.filter_mean.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -84,11 +82,11 @@
      href="../index.html">Site <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><ul class="current">
+      aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
@@ -109,7 +107,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">calour.filtering.filter_prevalence</a></li>
+<li><a class="reference internal" href="#">calour.experiment.Experiment.__getitem__</a></li>
 </ul>
 </ul>
 </li>
@@ -139,28 +137,26 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="calour-filtering-filter-prevalence">
-<h1>calour.filtering.filter_prevalence<a class="headerlink" href="#calour-filtering-filter-prevalence" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="calour.filtering.filter_prevalence">
-<code class="descclassname">calour.filtering.</code><code class="descname">filter_prevalence</code><span class="sig-paren">(</span><em>exp</em>, <em>fraction=0.5</em>, <em>cutoff=0.0001</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L218"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.filter_prevalence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter features keeping only ones present in at least fraction fraction of the samples.
-This is a convenience function wrapping filter_by_data()</p>
+  <div class="section" id="calour-experiment-experiment-getitem">
+<h1>calour.experiment.Experiment.__getitem__<a class="headerlink" href="#calour-experiment-experiment-getitem" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="calour.experiment.Experiment.__getitem__">
+<code class="descclassname">Experiment.</code><code class="descname">__getitem__</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L55"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the abundance at (sampleid, featureid)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fraction</strong> : float (optional)</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pos</strong> : tuple of (str, str)</p>
 <blockquote>
-<div><p>Keep features present at least in fraction of samples</p>
-</div></blockquote>
-<p><strong>cutoff</strong> : float (optional)</p>
-<blockquote>
-<div><p>The minimal fraction of reads for the otu to be called present in a sample</p>
+<div><p>the SampleID, FeatureID to look for</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Experiment</span></code> with only features present in at least fraction of samples</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">float</p>
+<blockquote class="last">
+<div><p>The abundance of featureID in SampleID</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>

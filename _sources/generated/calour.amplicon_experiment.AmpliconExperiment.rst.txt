@@ -19,6 +19,8 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.__format__
          
+         AmpliconExperiment.__getitem__
+         
          
          AmpliconExperiment.__ne__
          

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.__getitem__
+========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.__getitem__

@@ -19,6 +19,8 @@ calour\.experiment\.Experiment
          
          Experiment.__format__
          
+         Experiment.__getitem__
+         
          
          Experiment.__ne__
          
