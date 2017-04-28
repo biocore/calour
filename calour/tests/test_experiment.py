@@ -215,6 +215,15 @@ class ExperimentTests(Tests):
         res = exp.to_pandas()
         pdt.assert_frame_equal(res, df)
 
+    def test_getitem(self):
+        self.assertEqual(self.test1['S5', 'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG'], 5)
+        self.assertEqual(self.test1['S4', 'TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGGGTGCGTAGGCGGCCTGTTAAGTAAGTGGTTAAATTGTTGGGCTCAACCCAATCCGGCCACTTAAACTGGCAGGCTAGAGTATTGGAGAGGCAAGTGGAATTCCATGT'], 0)
+        with self.assertRaises(ValueError):
+            self.test1['Pita', 'TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGGGTGCGTAGGCGGCCTGTTAAGTAAGTGGTTAAATTGTTGGGCTCAACCCAATCCGGCCACTTAAACTGGCAGGCTAGAGTATTGGAGAGGCAAGTGGAATTCCATGT']
+        with self.assertRaises(ValueError):
+            self.test1['S5', 'Pita']
+        with self.assertRaises(ValueError):
+            self.test1['S5']
 
 if __name__ == "__main__":
     main()

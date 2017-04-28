@@ -28,6 +28,7 @@ import configparser
 from pkg_resources import resource_filename
 from collections import Iterable
 from numbers import Real
+import os
 
 import numpy as np
 import scipy
@@ -188,7 +189,8 @@ def get_data_md5(data):
 
 def get_config_file():
     '''Get the calour config file location
-    located in calour/config.calour.txt
+    If the environment CALOUR_CONFIG_FILE is set, take the config file from it
+    otherwise return CALOUR_PACKAGE_LOCATION/calour/config.calour.txt
 
     Parameters
     ----------
@@ -198,7 +200,11 @@ def get_config_file():
     config_file_name : str
         the full path to the calour config file
     '''
-    config_file_name = resource_filename(__package__, 'calour.config')
+    if 'CALOUR_CONFIG_FILE' in os.environ:
+        config_file_name = os.environ['CALOUR_CONFIG_FILE']
+        logger.debug('Using calour config file %s from CALOUR_CONFIG_FILE variable' % config_file_name)
+    else:
+        config_file_name = resource_filename(__package__, 'calour.config')
     return config_file_name
 
 

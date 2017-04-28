@@ -33,8 +33,11 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
     class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
     module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
     if class_name is not None and module_name is not None:
-        # import the database module
-        db_module = importlib.import_module(module_name)
+        try:
+            # import the database module
+            db_module = importlib.import_module(module_name)
+        except:
+            raise ValueError('Database interface %s not installed. Did you do pip install for it?' % module_name)
         # get the class
         DBClass = getattr(db_module, class_name)
         cdb = DBClass(exp)
