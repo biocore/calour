@@ -575,5 +575,8 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
         # md has to be a dict of dict, so it needs to be converted from
         # a DataFrame instead of Series
         md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
+        # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
+        for k, v in md.items():
+            v[add_metadata] = v[add_metadata].split(';')
         table.add_metadata(md, axis='observation')
     return table
