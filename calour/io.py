@@ -582,7 +582,7 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
         # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
         if to_list:
             for k, v in md.items():
-                if isinstance(v[add_metadata], str):
-                    v[add_metadata] = v[add_metadata].split(';')
+                # if isinstance(v[add_metadata], str):
+                v[add_metadata] = v[add_metadata].split(';')
         table.add_metadata(md, axis='observation')
     return table
