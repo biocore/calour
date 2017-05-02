@@ -152,7 +152,7 @@ class IOTests(Tests):
         d = mkdtemp()
         f = join(d, 'test1.save.biom')
         # test the json biom format
-        exp.save_biom(f, fmt='json')
+        exp.save_biom(f, fmt='hdf5')
         newexp = ca.read(f, self.test1_samp, normalize=None)
         assert_experiment_equal(newexp, exp)
         # test the txt biom format

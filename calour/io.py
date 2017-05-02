@@ -489,14 +489,16 @@ def save_biom(exp, f, fmt='hdf5', add_metadata='taxonomy'):
 
     '''
     logger.debug('save biom table to file %s format %s' % (f, fmt))
-    tab = _create_biom_table_from_exp(exp, add_metadata)
     if fmt == 'hdf5':
+        tab = _create_biom_table_from_exp(exp, add_metadata, to_list=True)
         with biom.util.biom_open(f, 'w') as f:
             tab.to_hdf5(f, "calour")
     elif fmt == 'json':
+        tab = _create_biom_table_from_exp(exp, add_metadata)
         with open(f, 'w') as f:
             tab.to_json("calour", f)
     elif fmt == 'txt':
+        tab = _create_biom_table_from_exp(exp, add_metadata)
         if add_metadata:
             logger.warning('.txt format does not support taxonomy information in save. Saving without taxonomy.')
         s = tab.to_tsv()
@@ -552,7 +554,7 @@ def save_fasta(exp, f, seqs=None):
     logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs)-num_skipped, num_skipped))
 
 
-def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
+def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     '''Create a biom table from an experiment
 
     Parameters
@@ -561,6 +563,8 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
     add_metadata : str or None (optional)
         add metadata column from ``Experiment.feature_metadata`` to biom table.
         Don't add if it is ``None``.
+    to_list: bool (optional)
+        True to convert the metadata field to list (for hdf5)
 
     Returns
     -------
@@ -576,7 +580,9 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
         # a DataFrame instead of Series
         md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
         # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
-        for k, v in md.items():
-            v[add_metadata] = v[add_metadata].split(';')
+        if to_list:
+            for k, v in md.items():
+                if isinstance(v[add_metadata, str]):
+                    v[add_metadata] = v[add_metadata].split(';')
         table.add_metadata(md, axis='observation')
     return table
