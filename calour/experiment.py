@@ -157,17 +157,15 @@ class Experiment:
         Parameters
         ----------
         pos : tuple of (str, str)
-            the SampleID, FeatureID to look for
+            the SampleID, FeatureID
 
         Returns
         -------
         float
-            The abundance of featureID in SampleID
+            The abundance of feature ID in sample ID
         '''
-        if not isinstance(pos, tuple):
-            raise ValueError('Must supply sampleID, featureID')
-        if len(pos) != 2:
-            raise ValueError('Must supply sampleID, featureID')
+        if not isinstance(pos, tuple) or len(pos) != 2:
+            raise ValueError('Must supply sample ID, feature ID')
         sample = pos[0]
         feature = pos[1]
         if sample not in self.sample_metadata.index:
