@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>calour.sorting.cluster_data &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>calour.transforming.normalize_compositional &#8212; calour 0.1.0.dev0 documentation</title>
     
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,8 +33,8 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="calour.sorting.cluster_features" href="calour.sorting.cluster_features.html" />
-    <link rel="prev" title="calour.sorting.sort_ids" href="calour.sorting.sort_ids.html" />
+    <link rel="next" title="calour.transforming.scale" href="calour.transforming.scale.html" />
+    <link rel="prev" title="calour.transforming.normalize_by_subset_features" href="calour.transforming.normalize_by_subset_features.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -89,8 +89,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
@@ -109,7 +109,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">calour.sorting.cluster_data</a></li>
+<li><a class="reference internal" href="#">calour.transforming.normalize_compositional</a></li>
 </ul>
 </ul>
 </li>
@@ -139,47 +139,35 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="calour-sorting-cluster-data">
-<h1>calour.sorting.cluster_data<a class="headerlink" href="#calour-sorting-cluster-data" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="calour-transforming-normalize-compositional">
+<h1>calour.transforming.normalize_compositional<a class="headerlink" href="#calour-transforming-normalize-compositional" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="calour.sorting.cluster_data">
-<code class="descclassname">calour.sorting.</code><code class="descname">cluster_data</code><span class="sig-paren">(</span><em>exp</em>, <em>transform=None</em>, <em>axis=1</em>, <em>metric='euclidean'</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L218"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.sorting.cluster_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cluster the samples/features.</p>
-<p>Reorder the features/samples so that ones with similar behavior (pattern
-across samples/features) are close to each other</p>
+<dt id="calour.transforming.normalize_compositional">
+<code class="descclassname">calour.transforming.</code><code class="descname">normalize_compositional</code><span class="sig-paren">(</span><em>exp</em>, <em>min_frac=0.05</em>, <em>total=10000</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/transforming.py#L262"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.transforming.normalize_compositional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize each sample by ignoring the features with mean&gt;=min_frac in all the experiment</p>
+<p>This assumes that the majority of features have less than min_frac mean, and that the majority of features don&#8217;t change
+between samples in a constant direction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>aixs</strong> : 0, 1, &#8216;s&#8217;, or &#8216;f&#8217; (optional)</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>min_frac</strong> : float (optional)</p>
 <blockquote>
-<div><p>&#8216;f&#8217; or 1 (default) means clustering features; &#8216;s&#8217; or 0 means clustering samples</p>
+<div><p>ignore features with mean (over all samples) &gt;= min_frac.</p>
 </div></blockquote>
-<p><strong>transform</strong> : Callable</p>
+<p><strong>total</strong> : int (optional)</p>
 <blockquote>
-<div><p>a callable transform on a 2-d matrix. Input and output of transform are <code class="docutils literal"><span class="pre">Experiment</span></code>.
-The transform function can modify <code class="docutils literal"><span class="pre">Experiment.data</span></code> (it is a copy).
-It should not change the dimension of <code class="docutils literal"><span class="pre">data</span></code> in <code class="docutils literal"><span class="pre">Experiment</span></code>.</p>
-</div></blockquote>
-<p><strong>metric</strong> : str or callable</p>
-<blockquote>
-<div><p>the clustering metric to use. It should be able to be passed to
-<code class="docutils literal"><span class="pre">scipy.spatial.distance.pdist</span></code>.</p>
+<div><p>The total abundance for the non-excluded features per sample</p>
 </div></blockquote>
 <p><strong>inplace</strong> : bool (optional)</p>
 <blockquote>
-<div><p>False (default) to create a copy.
-True to Replace data in exp.</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote>
-<div><p>additional keyword parameters passed to <code class="docutils literal"><span class="pre">transform</span></code>.</p>
+<div><p>False (default) to create a new experiment, True to normalize in place</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>exp</strong> : Experiment</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">Experiment</span></code></p>
 <blockquote class="last">
-<div><p>With samples/features clustered (reordered)</p>
+<div><p>The normalized experiment. Note that all features are normalized (including the ones with mean&gt;=min_frac)</p>
 </div></blockquote>
 </td>
 </tr>

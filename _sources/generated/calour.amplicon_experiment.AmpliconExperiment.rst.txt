@@ -155,6 +155,8 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.sort_centroid
          
+         AmpliconExperiment.sort_ids
+         
          AmpliconExperiment.sort_samples
          
          AmpliconExperiment.sort_taxonomy

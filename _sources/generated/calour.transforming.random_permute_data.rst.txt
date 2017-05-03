@@ -1,0 +1,6 @@
+calour\.transforming\.random\_permute\_data
+===========================================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: random_permute_data

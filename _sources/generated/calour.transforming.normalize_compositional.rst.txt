@@ -1,0 +1,6 @@
+calour\.transforming\.normalize\_compositional
+==============================================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: normalize_compositional

@@ -1,0 +1,6 @@
+calour\.sorting\.sort\_ids
+==========================
+
+.. currentmodule:: calour.sorting
+
+.. autofunction:: sort_ids

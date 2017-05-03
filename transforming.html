@@ -158,8 +158,14 @@
 <tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.normalize_by_subset_features.html#calour.transforming.normalize_by_subset_features" title="calour.transforming.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
 <td>Normalize each sample by their total sums without a list of features</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.scale.html#calour.transforming.scale" title="calour.transforming.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.normalize_compositional.html#calour.transforming.normalize_compositional" title="calour.transforming.normalize_compositional"><code class="xref py py-obj docutils literal"><span class="pre">normalize_compositional</span></code></a>(exp[,&nbsp;min_frac,&nbsp;...])</td>
+<td>Normalize each sample by ignoring the features with mean&gt;=min_frac in all the experiment</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.scale.html#calour.transforming.scale" title="calour.transforming.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Standardize a dataset along an axis</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.random_permute_data.html#calour.transforming.random_permute_data" title="calour.transforming.random_permute_data"><code class="xref py py-obj docutils literal"><span class="pre">random_permute_data</span></code></a>(exp[,&nbsp;normalize])</td>
+<td>Shuffle independently the reads of each feature</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.binarize.html#calour.transforming.binarize" title="calour.transforming.binarize"><code class="xref py py-obj docutils literal"><span class="pre">binarize</span></code></a>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
 <td>Binarize the data with a threshold.</td>

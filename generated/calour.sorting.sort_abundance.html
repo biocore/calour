@@ -33,7 +33,7 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="calour.sorting.cluster_data" href="calour.sorting.cluster_data.html" />
+    <link rel="next" title="calour.sorting.sort_ids" href="calour.sorting.sort_ids.html" />
     <link rel="prev" title="calour.sorting.sort_samples" href="calour.sorting.sort_samples.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -143,7 +143,7 @@
 <h1>calour.sorting.sort_abundance<a class="headerlink" href="#calour-sorting-sort-abundance" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.sorting.sort_abundance">
-<code class="descclassname">calour.sorting.</code><code class="descname">sort_abundance</code><span class="sig-paren">(</span><em>exp</em>, <em>subset=None</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L218"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.sorting.sort_abundance" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.sorting.</code><code class="descname">sort_abundance</code><span class="sig-paren">(</span><em>exp</em>, <em>subset=None</em>, <em>inplace=False</em>, <em>invert=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/experiment.py#L218"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.sorting.sort_abundance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sort features based on their abundance in a subset of the samples.</p>
 <p>This is a convenience wrapper for sort_by_data()</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -159,6 +159,10 @@ the dict values (a list). sorting is only on samples matching this list</p>
 <p><strong>inplace</strong> : bool (optional)</p>
 <blockquote>
 <div><p>False (default) to create a copy of the experiment, True to filter inplace</p>
+</div></blockquote>
+<p><strong>invert</strong> : bool (optional)</p>
+<blockquote>
+<div><p>True to invert the order of the sort</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
 <blockquote>

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.sort_ids
+=====================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.sort_ids
