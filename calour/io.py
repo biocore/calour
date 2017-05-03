@@ -444,7 +444,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
     if 'taxonomy' in exp.feature_metadata.columns:
-        exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp)
+        exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp, remove_underscore=False)
     else:
         exp.feature_metadata['taxonomy'] = 'NA'
 

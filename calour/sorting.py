@@ -13,6 +13,7 @@ Functions
    sort_by_metadata
    sort_samples
    sort_abundance
+   sort_ids
    cluster_data
    cluster_features
 '''
@@ -200,7 +201,7 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwargs):
+def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, invert=False, **kwargs):
     '''Sort features based on their mean frequency.
 
     Sort the 2-d array by sample (axis=0) or feature (axis=0). ``key``
@@ -223,6 +224,8 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
         mean.
     inplace : bool (optional)
         False (default) to create a copy. True to modify in place.
+    invert : bool (optional)
+        True to invert the order of the sort
     kwargs : dict
         key word parameters passed to ``key``
 
@@ -258,6 +261,8 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, **kwar
     else:
         sort_pos = np.argsort(np.apply_along_axis(key, 1 - axis, data_subset, **kwargs))
 
+    if invert:
+        sort_pos = sort_pos[::-1]
     exp = exp.reorder(sort_pos, axis=axis, inplace=inplace)
 
     return exp
@@ -314,7 +319,7 @@ def sort_samples(exp, field, **kwargs):
 
 
 @Experiment._record_sig
-def sort_abundance(exp, subset=None, inplace=False, **kwargs):
+def sort_abundance(exp, subset=None, inplace=False, invert=False, **kwargs):
     '''Sort features based on their abundance in a subset of the samples.
 
     This is a convenience wrapper for sort_by_data()
@@ -327,6 +332,8 @@ def sort_abundance(exp, subset=None, inplace=False, **kwargs):
         the dict values (a list). sorting is only on samples matching this list
     inplace : bool (optional)
         False (default) to create a copy of the experiment, True to filter inplace
+    invert : bool (optional)
+        True to invert the order of the sort
     kwargs : dict
         keyword arguments passing to ``sort_by_data``.
 
@@ -344,4 +351,41 @@ def sort_abundance(exp, subset=None, inplace=False, **kwargs):
             select = np.logical_and(subset, exp.sample_metadata[k].isin(v).values)
         # convert boolean mask to index because sparse matrix can't be sliced with bools
         select = np.where(select)[0]
-    return exp.sort_by_data(axis=1, subset=select, inplace=inplace, **kwargs)
+    return exp.sort_by_data(axis=1, subset=select, inplace=inplace, invert=invert, **kwargs)
+
+
+@Experiment._record_sig
+def sort_ids(exp, ids, axis=1, inplace=False):
+    '''Sort the features/samples by first using ids in the ids list and then the others
+
+    Parameters
+    ----------
+    ids : list of str
+        The ids to put first in the new experiment
+    axis : 0, 1, 's', or 'f'
+        sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
+        in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
+    inplace : bool (optional)
+        False (default) to create a copy of the experiment, True to filter inplace
+
+    Returns
+    -------
+    ``Experiment``
+        with features/samples first according to the ids list and then the rest
+    '''
+    if axis == 0:
+        index = exp.sample_metadata.index
+    else:
+        index = exp.feature_metadata.index
+    tot_ids = 0
+    okpos = []
+    for cid in ids:
+        tot_ids += 1
+        if cid in index:
+            pos = index.get_loc(cid)
+            okpos.append(pos)
+    logger.debug('list contained %d sequences. Found %d sequences in experiment' % (tot_ids, len(okpos)))
+    otherpos = np.setdiff1d(np.arange(len(index)), okpos, assume_unique=True)
+    okpos.extend(list(otherpos))
+    newexp = exp.reorder(okpos, axis=axis, inplace=inplace)
+    return newexp
