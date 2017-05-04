@@ -142,7 +142,8 @@
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.sort_ids">
 <code class="descclassname">AmpliconExperiment.</code><code class="descname">sort_ids</code><span class="sig-paren">(</span><em>exp</em>, <em>ids</em>, <em>axis=1</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L56"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.sort_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sort the features/samples by first using ids in the ids list and then the others</p>
+<dd><p>Sort the features or samples by the given ids.</p>
+<p>If ids are not cover the all the features (samples), the rest will be unsorted and appended.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

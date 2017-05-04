@@ -402,10 +402,10 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.scale.html#calour.amplicon_experiment.AmpliconExperiment.scale" title="calour.amplicon_experiment.AmpliconExperiment.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Standardize a dataset along an axis</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_abundance.html#calour.amplicon_experiment.AmpliconExperiment.sort_abundance" title="calour.amplicon_experiment.AmpliconExperiment.sort_abundance"><code class="xref py py-obj docutils literal"><span class="pre">sort_abundance</span></code></a>(exp[,&nbsp;subset,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_abundance.html#calour.amplicon_experiment.AmpliconExperiment.sort_abundance" title="calour.amplicon_experiment.AmpliconExperiment.sort_abundance"><code class="xref py py-obj docutils literal"><span class="pre">sort_abundance</span></code></a>(exp[,&nbsp;subset,&nbsp;inplace,&nbsp;reverse])</td>
 <td>Sort features based on their abundance in a subset of the samples.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_data.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_data" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_data"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_data</span></code></a>(exp[,&nbsp;axis,&nbsp;subset,&nbsp;key,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_data.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_data" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_data"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_data</span></code></a>(exp[,&nbsp;axis,&nbsp;subset,&nbsp;key,&nbsp;...])</td>
 <td>Sort features based on their mean frequency.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata"><code class="xref py py-obj docutils literal"><span class="pre">sort_by_metadata</span></code></a>(exp,&nbsp;field[,&nbsp;axis,&nbsp;inplace])</td>
@@ -414,11 +414,17 @@ or <a class="reference external" href="https://docs.scipy.org/doc/numpy/referenc
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_centroid.html#calour.amplicon_experiment.AmpliconExperiment.sort_centroid" title="calour.amplicon_experiment.AmpliconExperiment.sort_centroid"><code class="xref py py-obj docutils literal"><span class="pre">sort_centroid</span></code></a>(exp[,&nbsp;transform,&nbsp;inplace])</td>
 <td>Sort the features based on the center of mass</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_samples.html#calour.amplicon_experiment.AmpliconExperiment.sort_samples" title="calour.amplicon_experiment.AmpliconExperiment.sort_samples"><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code></a>(exp,&nbsp;field,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_ids.html#calour.amplicon_experiment.AmpliconExperiment.sort_ids" title="calour.amplicon_experiment.AmpliconExperiment.sort_ids"><code class="xref py py-obj docutils literal"><span class="pre">sort_ids</span></code></a>(exp,&nbsp;ids[,&nbsp;axis,&nbsp;inplace])</td>
+<td>Sort the features or samples by the given ids.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_samples.html#calour.amplicon_experiment.AmpliconExperiment.sort_samples" title="calour.amplicon_experiment.AmpliconExperiment.sort_samples"><code class="xref py py-obj docutils literal"><span class="pre">sort_samples</span></code></a>(exp,&nbsp;field,&nbsp;**kwargs)</td>
 <td>Sort samples by field</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy"><code class="xref py py-obj docutils literal"><span class="pre">sort_taxonomy</span></code></a>(exp[,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.sort_taxonomy"><code class="xref py py-obj docutils literal"><span class="pre">sort_taxonomy</span></code></a>(exp[,&nbsp;inplace])</td>
 <td>Sort the features based on the taxonomy</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.split_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.split_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.split_taxonomy"><code class="xref py py-obj docutils literal"><span class="pre">split_taxonomy</span></code></a>([sep])</td>
+<td>Split taxonomy column into individual column per level.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.to_pandas.html#calour.amplicon_experiment.AmpliconExperiment.to_pandas" title="calour.amplicon_experiment.AmpliconExperiment.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
 <td>Get a pandas dataframe of the abundances Samples are rows, features are columns.</td>

@@ -147,6 +147,8 @@ calour\.experiment\.Experiment
          
          Experiment.sort_centroid
          
+         Experiment.sort_ids
+         
          Experiment.sort_samples
          
          Experiment.to_pandas
