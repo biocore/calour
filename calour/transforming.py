@@ -11,7 +11,9 @@ Functions
 
    normalize
    normalize_by_subset_features
+   normalize_compositional
    scale
+   random_permute_data
    binarize
    log_n
    transform

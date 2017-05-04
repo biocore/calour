@@ -243,3 +243,6 @@ class AmpliconExperiment(Experiment):
         newexp.merge_identical('_calour_tax_group', method='sum', axis=1, inplace=True)
         newexp.feature_metadata['taxonomy'] = newexp.feature_metadata['_calour_tax_group']
         return newexp
+
+    def split_taxonomy(self, sep=';'):
+        '''Split taxonomy column into individual column per level.'''
