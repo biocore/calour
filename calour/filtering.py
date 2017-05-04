@@ -87,7 +87,7 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
         elif len(i_indice) == num_keep:
             indices.append(i_indice)
         else:
-            indices.append(np.random.choice(i_indice, num_keep))
+            indices.append(np.random.choice(i_indice, num_keep, replace=False))
     if num_skipped > 0:
         logger.info('%d values had < %d items and were skipped' % (num_skipped, num_keep))
     # if nothing left, raise error
