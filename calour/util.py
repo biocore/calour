@@ -70,15 +70,16 @@ def _convert_axis_name(func):
     return inner
 
 
-def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=False):
-    '''Get a nice taxonomy string
+def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
+    '''Get a nice taxonomy string.
+
     Convert the taxonomy list stored (from biom.read_table) to a single string per feature
 
     Parameters
     ----------
     exp : Experiment
         with the taxonomy entry in the feature_metadata
-    separator : str (optional)
+    sep : str (optional)
         the output separator to use between the taxonomic levels
     remove_underscore : bool (optional)
         True (default) to remove the 'g__' entries and missing values
@@ -102,7 +103,7 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
         return list(exp.feature_metadata['taxonomy'].values)
 
     if not remove_underscore:
-        taxonomy = [separator.join(x) for x in exp.feature_metadata['taxonomy']]
+        taxonomy = [sep.join(x) for x in exp.feature_metadata['taxonomy']]
     else:
         taxonomy = []
         for ctax in exp.feature_metadata['taxonomy']:
@@ -112,7 +113,7 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
                 if len(clevel) > 3:
                     if clevel[1:3] == '__':
                         clevel = clevel[3:]
-                    taxstr += clevel + separator
+                    taxstr += clevel + sep
             if len(taxstr) == 0:
                 taxstr = 'na'
             taxonomy.append(taxstr)

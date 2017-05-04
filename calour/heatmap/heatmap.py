@@ -110,7 +110,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
             axes=None, rect=None,  transform=log_n,
-            show_legend_colorbar=False, **kwargs):
+            show_legend=False, **kwargs):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
@@ -153,7 +153,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
-    show_legend_colorbar : bool (optional)
+    show_legend : bool (optional)
         True to plot a legend color bar for the heatmap
 
     Returns
@@ -186,7 +186,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
-    if show_legend_colorbar:
+    if show_legend:
         _figure_color_bar(exp, image, fig, axes=None, log_scale=(transform == log_n))
     # set the initial zoom window if supplied
     if rect is not None:
@@ -205,7 +205,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         # samples position - 0.5 before and go to 0.5 after
         x_pos -= 0.5
         for pos in x_pos[1:-1]:
-            ax.axvline(x=pos, color='white')
+            ax.axvline(x=pos, color='white', linewidth=1)
         # set tick/label at the middle of each sample group
         ax.set_xticks(x_pos[:-1] + (x_pos[1:] - x_pos[:-1]) / 2)
         xticklabels = [str(i) for i in x_val]
