@@ -311,7 +311,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         True to drop the samples if there is no metadata for it.
     sparse : bool
         read the biom table into sparse or dense array
-    file_type : str (optional)
+    data_file_type : str (optional)
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
