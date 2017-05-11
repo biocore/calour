@@ -289,7 +289,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
 
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True, data_file_type='biom', encoding=None,
+         description='', drop=False, sparse=True, data_file_type='biom', encoding=None,
          cls=Experiment, *, normalize):
     '''Read the files for the experiment.
 
@@ -307,9 +307,11 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         file path to the feature metadata.
     description : str
         description of the experiment
+    drop : boolean (optional)
+        True to drop the samples if there is no metadata for it.
     sparse : bool
         read the biom table into sparse or dense array
-    file_type : str (optional)
+    data_file_type : str (optional)
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
@@ -351,10 +353,21 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         sid, oid, data, md = _read_qiime2(data_file)
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
+    sfilter = [True] * len(sid)
     # load the sample metadata file
     if sample_metadata_file is not None:
+        sample_metadata = _read_table(sample_metadata_file, encoding=encoding)
+        smid = set(sample_metadata.index)
+        sdid = set(sid)
+        diff = smid - sdid
+        if diff:
+            logger.warning('the samples are dropped because they have metadata but do not have data: %r' % diff)
+        sdiff = (sdid - smid)
+        if sdiff:
+            logger.warning('the samples have data but do not have metadata: %r' % sdiff)
+            sfilter = [i not in sdiff for i in sid]
         # reorder the sample id to align with biom
-        sample_metadata = _read_table(sample_metadata_file, encoding=encoding).loc[sid, ]
+        sample_metadata = sample_metadata.loc[sid, ]
         exp_metadata['map_md5'] = get_file_md5(sample_metadata_file, encoding=encoding)
     else:
         sample_metadata = pd.DataFrame(index=sid)
@@ -364,7 +377,16 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # load the feature metadata file
     if feature_metadata_file is not None:
         # reorder the feature id to align with that from biom table
-        feature_metadata = _read_table(feature_metadata_file, encoding=encoding).loc[oid, ]
+        feature_metadata = _read_table(feature_metadata_file, encoding=encoding)
+        fmid = set(feature_metadata.index)
+        fdid = set(oid)
+        diff = fmid - fdid
+        if diff:
+            logger.warning('the features are dropped because they have metadata but do not have data: %r' % diff)
+        fdiff = fdid - fmid
+        if fdiff:
+            logger.warning('the features have data but do not have metadata: %r' % fdiff)
+        feature_metadata = feature_metadata.loc[oid, ]
     else:
         feature_metadata = pd.DataFrame(index=oid)
         feature_metadata['id'] = oid
@@ -383,7 +405,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     exp = cls(data, sample_metadata, feature_metadata,
               exp_metadata=exp_metadata, description=description, sparse=sparse)
-
+    if drop is True:
+        exp = exp.reorder(sfilter, axis=0)
     if normalize is not None:
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
@@ -421,7 +444,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
     if 'taxonomy' in exp.feature_metadata.columns:
-        exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp)
+        exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp, remove_underscore=False)
     else:
         exp.feature_metadata['taxonomy'] = 'NA'
 
@@ -466,14 +489,16 @@ def save_biom(exp, f, fmt='hdf5', add_metadata='taxonomy'):
 
     '''
     logger.debug('save biom table to file %s format %s' % (f, fmt))
-    tab = _create_biom_table_from_exp(exp, add_metadata)
     if fmt == 'hdf5':
+        tab = _create_biom_table_from_exp(exp, add_metadata, to_list=True)
         with biom.util.biom_open(f, 'w') as f:
             tab.to_hdf5(f, "calour")
     elif fmt == 'json':
+        tab = _create_biom_table_from_exp(exp, add_metadata)
         with open(f, 'w') as f:
             tab.to_json("calour", f)
     elif fmt == 'txt':
+        tab = _create_biom_table_from_exp(exp, add_metadata)
         if add_metadata:
             logger.warning('.txt format does not support taxonomy information in save. Saving without taxonomy.')
         s = tab.to_tsv()
@@ -529,7 +554,7 @@ def save_fasta(exp, f, seqs=None):
     logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs)-num_skipped, num_skipped))
 
 
-def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
+def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     '''Create a biom table from an experiment
 
     Parameters
@@ -538,6 +563,8 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
     add_metadata : str or None (optional)
         add metadata column from ``Experiment.feature_metadata`` to biom table.
         Don't add if it is ``None``.
+    to_list: bool (optional)
+        True to convert the metadata field to list (for hdf5)
 
     Returns
     -------
@@ -552,5 +579,10 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy'):
         # md has to be a dict of dict, so it needs to be converted from
         # a DataFrame instead of Series
         md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
+        # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
+        if to_list:
+            for k, v in md.items():
+                # if isinstance(v[add_metadata], str):
+                v[add_metadata] = v[add_metadata].split(';')
         table.add_metadata(md, axis='observation')
     return table

@@ -21,6 +21,8 @@ class PlotGUI_Jupyter(PlotGUI):
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
+        # create the figure to plot the heatmap into
+        self._set_figure(None, kwargs['tree_size'])
         if matplotlib.get_backend() != 'nbAgg':
             logger.warning('You need to set up jupyter notebook with `%matplotlib notebook`')
 
@@ -117,7 +119,7 @@ class PlotGUI_Jupyter(PlotGUI):
         display(self.figure)
 
     def _print_axes_lim(self, button):
-        ax = self.figure.gca()
+        ax = self.axes
         ylim_lower, ylim_upper = ax.get_ylim()
         xlim_lower, xlim_upper = ax.get_xlim()
         print([xlim_lower, xlim_upper, ylim_lower, ylim_upper])

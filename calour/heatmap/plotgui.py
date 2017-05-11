@@ -39,7 +39,10 @@ class PlotGUI(ABC):
         >0 : scroll than constant number of columns/rows per keypress
     figure : ``matplotlib.figure.Figure``
         The figure where the heatmap and other axes will be plotted into.
-    axes : the matplotlib axes from ``figure`` to plot heatmap into.
+    axes : the matplotlib axis from ``figure`` of the heatmap.
+    xax : the matplotlib axis of the sample colorbar
+    yax : the matplotlib axis of the feature colorbar
+    tree_axes : the matplotlib axis of the dendrogram
     databases : list
         the databases to interact with
 
@@ -49,9 +52,9 @@ class PlotGUI(ABC):
     zoom_scale : the scaling factor for zooming
     scroll_offset : The amount of columns/rows to scroll when arrow key pressed
     databases : the databases to interact with
+    tree_size : int (>= 0). the width of the axes to plot a tree.
     '''
-    def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None):
-        import matplotlib.pyplot as plt
+    def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None, tree_size=0):
         # the Experiment being plotted
         self.exp = exp
         # how much zooming in on key press
@@ -69,18 +72,33 @@ class PlotGUI(ABC):
             self.databases = []
         # the default database used when annotating features
         self._annotation_db = None
-        # create the figure to plot the heatmap into
-        self._set_figure(plt.figure())
 
-    def _set_figure(self, figure):
-        self.figure = figure
-        gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
-        hm_ax = self.figure.add_subplot(gs[2])
-        self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
-        self.xax.axis('off')
-        self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
-        self.yax.axis('off')
-        self.axes = hm_ax
+    def _set_figure(self, figure=None, tree_size=0):
+        import matplotlib.pyplot as plt
+        if figure is None:
+            self.figure = plt.figure()
+        else:
+            self.figure = figure
+        if tree_size == 0:
+            gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
+            hm_ax = self.figure.add_subplot(gs[2])
+            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.xax.axis('off')
+            self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
+            self.yax.axis('off')
+            self.axes = hm_ax
+            self.gridspec = gs
+        else:
+            gs = GridSpec(2, 3, width_ratios=[12, 1, tree_size], height_ratios=[1, 12])
+            hm_ax = self.figure.add_subplot(gs[3])
+            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.xax.axis('off')
+            self.yax = self.figure.add_subplot(gs[4], sharey=hm_ax)
+            self.yax.axis('off')
+            self.axes = hm_ax
+            self.tree_axes = self.figure.add_subplot(gs[5], sharey=hm_ax)
+            self.tree_axes.axis('off')
+            self.gridspec = gs
 
     def save_figure(self, *args, **kwargs):
         '''Save the figure to file.
@@ -90,11 +108,11 @@ class PlotGUI(ABC):
         args, kwargs: tuple, dict
             arguments passing to ``matplotlib.Figure.savefig`` function.
         '''
-        try:
-            # create color bar for the heatmap before saving
-            self.figure.colorbar(self.axes.images[0])
-        except IndexError:
-            logger.warning('no heatmap are plotted')
+        # try:
+        #     # create color bar for the heatmap before saving
+        #     self.figure.colorbar(self.axes.images[0])
+        # except IndexError:
+        #     logger.warning('no heatmap are plotted')
         self.figure.savefig(*args, **kwargs)
 
     def get_selection_info(self):
@@ -160,6 +178,9 @@ class PlotGUI(ABC):
         '''Run the GUI.'''
         self.connect_functions()
         self.figure.tight_layout()
+        # the following line does not work since makes the colorbars far away so commented
+        # self.gridspec.tight_layout(self.figure, pad=1, h_pad=0, w_pad=0)
+
         # squeeze color bars close to the heatmap
         self.figure.subplots_adjust(hspace=0.01, wspace=0.01)
 
@@ -334,7 +355,7 @@ class PlotGUI(ABC):
         for cpos in samplepos:
             if cpos not in self.selected_samples:
                 self.selected_samples[cpos] = self.axes.axvline(
-                    x=cpos, color='white', linestyle='dotted')
+                    x=cpos, color='white', linestyle='dotted', alpha=0.5, linewidth=0.5)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
@@ -343,7 +364,7 @@ class PlotGUI(ABC):
         for cpos in featurepos:
             if cpos not in self.selected_features:
                 self.selected_features[cpos] = self.axes.axhline(
-                    y=cpos, color='white', linestyle='dotted')
+                    y=cpos, color='white', linestyle='dotted', alpha=0.5, linewidth=0.5)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:

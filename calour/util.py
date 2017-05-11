@@ -28,7 +28,9 @@ import configparser
 from pkg_resources import resource_filename
 from collections import Iterable
 from numbers import Real
+import os
 
+import numpy as np
 import scipy
 
 
@@ -68,15 +70,16 @@ def _convert_axis_name(func):
     return inner
 
 
-def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=False):
-    '''Get a nice taxonomy string
+def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
+    '''Get a nice taxonomy string.
+
     Convert the taxonomy list stored (from biom.read_table) to a single string per feature
 
     Parameters
     ----------
     exp : Experiment
         with the taxonomy entry in the feature_metadata
-    separator : str (optional)
+    sep : str (optional)
         the output separator to use between the taxonomic levels
     remove_underscore : bool (optional)
         True (default) to remove the 'g__' entries and missing values
@@ -100,7 +103,7 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
         return list(exp.feature_metadata['taxonomy'].values)
 
     if not remove_underscore:
-        taxonomy = [separator.join(x) for x in exp.feature_metadata['taxonomy']]
+        taxonomy = [sep.join(x) for x in exp.feature_metadata['taxonomy']]
     else:
         taxonomy = []
         for ctax in exp.feature_metadata['taxonomy']:
@@ -110,7 +113,7 @@ def _get_taxonomy_string(exp, separator=';', remove_underscore=True, to_lower=Fa
                 if len(clevel) > 3:
                     if clevel[1:3] == '__':
                         clevel = clevel[3:]
-                    taxstr += clevel + separator
+                    taxstr += clevel + sep
             if len(taxstr) == 0:
                 taxstr = 'na'
             taxonomy.append(taxstr)
@@ -187,7 +190,8 @@ def get_data_md5(data):
 
 def get_config_file():
     '''Get the calour config file location
-    located in calour/config.calour.txt
+    If the environment CALOUR_CONFIG_FILE is set, take the config file from it
+    otherwise return CALOUR_PACKAGE_LOCATION/calour/config.calour.txt
 
     Parameters
     ----------
@@ -197,7 +201,11 @@ def get_config_file():
     config_file_name : str
         the full path to the calour config file
     '''
-    config_file_name = resource_filename(__package__, 'calour.config')
+    if 'CALOUR_CONFIG_FILE' in os.environ:
+        config_file_name = os.environ['CALOUR_CONFIG_FILE']
+        logger.debug('Using calour config file %s from CALOUR_CONFIG_FILE variable' % config_file_name)
+    else:
+        config_file_name = resource_filename(__package__, 'calour.config')
     return config_file_name
 
 
@@ -349,8 +357,18 @@ def _argsort(values):
         the positions of the sorted values
 
     '''
-    # convert all numbers to float otherwise int will be sorted different place
-    values = [float(x) if isinstance(x, Real) else x for x in values]
-    # make values ordered by type and sort inside each var type
-    values = [(str(type(x)), x) for x in values]
-    return sorted(range(len(values)), key=values.__getitem__)
+    pairs = []
+    for cval in values:
+        if isinstance(cval, Real):
+            if np.isnan(cval):
+                cval = np.inf
+            else:
+                cval = float(cval)
+        pairs.append((str(type(cval)), cval))
+
+    # # convert all numbers to float otherwise int will be sorted different place
+    # values = [float(x) if isinstance(x, Real) else x for x in values]
+    # # make values ordered by type and sort inside each var type
+    # values = [(str(type(x)), x) if not np.isnan(x) else (str(type(x)), np.inf) for x in values]
+    # return sorted(range(len(values)), key=values.__getitem__)
+    return sorted(range(len(pairs)), key=pairs.__getitem__)

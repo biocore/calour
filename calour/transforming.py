@@ -11,7 +11,9 @@ Functions
 
    normalize
    normalize_by_subset_features
+   normalize_compositional
    scale
+   random_permute_data
    binarize
    log_n
    transform
@@ -66,6 +68,8 @@ def normalize(exp, total=10000, axis=0, inplace=False):
     if not inplace:
         exp = deepcopy(exp)
     exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
+    # store the normalization depth into the experiment metadata
+    exp.exp_metadata['normalized'] = total
     return exp
 
 
@@ -251,6 +255,8 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
     else:
         newexp = deepcopy(exp)
     newexp.data = total * data / use_reads[:, None]
+    # store the normalization depth into the experiment metadata
+    newexp.exp_metadata['normalized'] = total
     return newexp
 
 
@@ -278,6 +284,31 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     logger.info('ignoring %d features' % comp_features.shape[1])
     newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values,
                                               total=total, negate=True, inplace=inplace)
+    return newexp
+
+
+def random_permute_data(exp, normalize=True):
+    '''Shuffle independently the reads of each feature
+
+    Creates a new experiment with no dependence between the features.
+
+    Parameters
+    ----------
+    normalize : bool (optional)
+        True (default) to normalize each sample after completing the feature shuffling.
+        False to not normalize
+
+    Returns
+    -------
+    ``Experiment``
+        With each feature shuffled independently
+    '''
+    newexp = exp.copy()
+    newexp.sparse = False
+    for cfeature in range(newexp.shape[1]):
+        np.random.shuffle(newexp.data[:, cfeature])
+    if normalize:
+        newexp.normalize(np.mean(exp.data.sum(axis=1)), inplace=True)
     return newexp
 
 

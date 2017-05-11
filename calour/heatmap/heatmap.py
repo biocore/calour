@@ -16,6 +16,7 @@ import numpy as np
 
 from ..transforming import log_n
 from ..database import _get_database_class
+from .._dendrogram import plot_tree
 
 from ..util import _to_list
 
@@ -54,7 +55,7 @@ def _transition_index(l):
     yield i + 1, item[1]
 
 
-def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
+def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
     It still waits for the heatmap to be plotted and set up.
@@ -87,7 +88,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
     gui_module_name = 'calour.heatmap.' + gui.lower()
     gui_module = importlib.import_module(gui_module_name)
     GUIClass = getattr(gui_module, gui)
-    gui_obj = GUIClass(exp)
+    gui_obj = GUIClass(exp, tree_size=tree_size)
 
     # link gui with the databases requested
     for cdatabase in databases:
@@ -108,7 +109,8 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',)):
 def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
-            axes=None, rect=None,  transform=log_n, **kwargs):
+            axes=None, rect=None,  transform=log_n,
+            show_legend=False, **kwargs):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
@@ -134,8 +136,9 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     clim : tuple of (float, float) or None (optional)
         the min and max values for the heatmap or None to use all range. It uses the min
         and max values in the ``data`` array by default.
-    xticklabel_rot : float (optional)
+    xticklabel_rot : float or None (optional)
         The rotation angle for the x labels (if sample_field is supplied)
+        if None, will have rotation=0, horizontalalignment='center', otherwise horizontalalignment='right'
     xticklabel_len : int (optional) or None
         The maximal length for the x label strings (will be cut to
         this length if longer). Used to prevent long labels from
@@ -150,6 +153,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
+    show_legend : bool (optional)
+        True to plot a legend color bar for the heatmap
 
     Returns
     -------
@@ -180,7 +185,9 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
     # plot the heatmap
-    ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    if show_legend:
+        _figure_color_bar(exp, image, fig, axes=None, log_scale=(transform == log_n))
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -198,7 +205,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         # samples position - 0.5 before and go to 0.5 after
         x_pos -= 0.5
         for pos in x_pos[1:-1]:
-            ax.axvline(x=pos, color='white')
+            ax.axvline(x=pos, color='white', linewidth=1)
         # set tick/label at the middle of each sample group
         ax.set_xticks(x_pos[:-1] + (x_pos[1:] - x_pos[:-1]) / 2)
         xticklabels = [str(i) for i in x_val]
@@ -208,7 +215,11 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabels = ['%s..%s' % (i[:mid], i[-mid:])
                            if len(i) > xticklabel_len else i
                            for i in xticklabels]
-        ax.set_xticklabels(xticklabels, rotation=xticklabel_rot, ha='right')
+        if xticklabel_rot is not None:
+            ha = 'right'
+        else:
+            ha = 'center'
+        ax.set_xticklabels(xticklabels, rotation=xticklabel_rot, horizontalalignment=ha)
     else:
         ax.get_xaxis().set_visible(False)
 
@@ -255,6 +266,38 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             return 'x=%1.2f, y=%1.2f' % (x, y)
     ax.format_coord = format_coord
     return fig
+
+
+def _figure_color_bar(exp, image, fig, axes, log_scale=True, num_ticks=8, aspect=100):
+    '''Plot the heatmap colorbar scale
+
+    Parameters
+    ----------
+    exp : ``Experiment``
+        The experiment for which the plot is made.
+        We use it to see whether the scale should be relative(normalized) or absolute
+    fig : matplotlib.Figure
+        The figure to plot the colorbar in
+    axes : matplotlib.Axis
+        The axis to plot into
+    log_scale : bool (optional)
+        True (default) to plot log scale colorbar
+        False to plot linear scale
+    num_ticks : int (optional)
+        number of ticks to put on the colorbar
+    '''
+    clim = image.get_clim()
+    ticks = np.linspace(clim[0], clim[1], num_ticks)
+    ticks = [eval("%.0e" % (x)) for x in ticks]
+    cb = fig.colorbar(image, ax=axes, ticks=ticks, aspect=aspect)
+    if log_scale:
+        tick_labels = np.power(2, ticks)
+    else:
+        tick_labels = ticks
+    if exp.exp_metadata.get('normalized'):
+        tick_labels = 100 * np.array(tick_labels) / exp.exp_metadata['normalized']
+        tick_labels = ['%%%s' % x for x in tick_labels]
+    cb.ax.set_yticklabels(tick_labels)
 
 
 def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=True):
@@ -328,7 +371,8 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
 
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
-         gui='cli', databases=False, color_bar_label=True, **kwargs):
+         gui='cli', databases=False, color_bar_label=True,
+         tree=None, tree_size=8, **kwargs):
     '''Plot the interactive heatmap and its associated axes.
 
     The heatmap is interactive and can be dynamically updated with
@@ -394,6 +438,12 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         a list of databases to access or add annotation
         False (default) to use the default field based on the experiment subclass
         None to not use databases
+    tree : skbio.TreeNode or None (optional)
+        None (default) to not plot a tree
+        otherwise, plot the tree dendrogram on the left.
+        NOTE: features are reordered according to the tree
+    tree_size : int (optional)
+        The width of the tree relative to the main heatmap (12 is identical size)
     kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
@@ -405,7 +455,14 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     # set the databases if default requested (i.e. False)
     if databases is False:
         databases = exp.heatmap_databases
-    gui_obj = _create_plot_gui(exp, gui, databases)
+
+    if tree is None:
+        gui_obj = _create_plot_gui(exp, gui, databases)
+    else:
+        gui_obj = _create_plot_gui(exp, gui, databases, tree_size=tree_size)
+        # match the exp order to the tree (reorders the features)
+        exp, tree = plot_tree(exp, tree, gui_obj.tree_axes)
+
     exp.heatmap(axes=gui_obj.axes, **kwargs)
     barwidth = 0.3
     barspace = 0.05

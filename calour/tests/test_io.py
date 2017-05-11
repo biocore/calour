@@ -148,16 +148,16 @@ class IOTests(Tests):
     def test_save_biom(self):
         # NOTE: Currently not testing the save biom hdf with taxonomy
         # as there is a bug there!
-        exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)
+        exp = ca.read_amplicon(self.test1_biom, self.test1_samp, normalize=None, filter_reads=None)
         d = mkdtemp()
         f = join(d, 'test1.save.biom')
         # test the json biom format
-        exp.save_biom(f, fmt='json')
-        newexp = ca.read(f, self.test1_samp, normalize=None)
+        exp.save_biom(f, fmt='hdf5')
+        newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, filter_reads=None)
         assert_experiment_equal(newexp, exp)
         # test the txt biom format
         exp.save_biom(f, fmt='txt')
-        newexp = ca.read(f, self.test1_samp, normalize=None)
+        newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, filter_reads=None)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         # test the hdf5 biom format with no taxonomy
         exp.save_biom(f, add_metadata=None)

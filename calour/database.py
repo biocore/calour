@@ -33,8 +33,11 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
     class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
     module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
     if class_name is not None and module_name is not None:
-        # import the database module
-        db_module = importlib.import_module(module_name)
+        try:
+            # import the database module
+            db_module = importlib.import_module(module_name)
+        except:
+            raise ValueError('Database interface %s not installed. Did you do pip install for it?' % module_name)
         # get the class
         DBClass = getattr(db_module, class_name)
         cdb = DBClass(exp)
@@ -53,7 +56,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term', term_type=None):
+def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
     '''Add a field to the feature metadata, with most common term for each feature
 
     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
@@ -69,13 +72,15 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
     term_type : str or None (optional)
         type of the annotation summary to get from the database (db specific)
         None to get default type
+    ignore_exp : list of int or None (optional)
+        list of experiments to ignore when adding the terms
     Returns
     -------
     exp : Experiment
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
-    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type)
+    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
     feature_terms = []
     for cfeature in features:
         term_count = defaultdict(int)
@@ -118,6 +123,7 @@ def enrichment(exp, features, dbname, *kargs, **kwargs):
         columns:
             feature : str the feature
             pval : the p-value for the enrichment (float)
+            odif : the effect size (float)
             observed : the number of observations of this term in group1 (int)
             expected : the expected (based on all features) number of observations of this term in group1 (float)
             frac_group1 : fraction of total terms in group 1 which are the specific term (float)
@@ -127,7 +133,7 @@ def enrichment(exp, features, dbname, *kargs, **kwargs):
             description : the term (str)
     '''
     db = _get_database_class(dbname, exp=exp)
-    if not db.can_do_enrichment():
+    if not db.can_do_enrichment:
         raise ValueError('database %s does not support enrichment analysis' % dbname)
     return db.enrichment(exp, features, *kargs, **kwargs)
 

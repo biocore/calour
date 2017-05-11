@@ -151,6 +151,31 @@ class Experiment:
     def __ne__(self, other):
         return not (self == other)
 
+    def __getitem__(self, pos):
+        '''Get the abundance at (sampleid, featureid)
+
+        Parameters
+        ----------
+        pos : tuple of (str, str)
+            the SampleID, FeatureID
+
+        Returns
+        -------
+        float
+            The abundance of feature ID in sample ID
+        '''
+        if not isinstance(pos, tuple) or len(pos) != 2:
+            raise ValueError('Must supply sample ID, feature ID')
+        sample = pos[0]
+        feature = pos[1]
+        if sample not in self.sample_metadata.index:
+            raise ValueError('SampleID %s not in experiment samples' % sample)
+        if feature not in self.feature_metadata.index:
+            raise ValueError('FeatureID %s not in experiment features' % feature)
+        sample_pos = self.sample_metadata.index.get_loc(sample)
+        feature_pos = self.feature_metadata.index.get_loc(feature)
+        return self.data[sample_pos, feature_pos]
+
     def copy(self):
         '''Copy the object.
 
