@@ -355,7 +355,7 @@ class PlotGUI(ABC):
         for cpos in samplepos:
             if cpos not in self.selected_samples:
                 self.selected_samples[cpos] = self.axes.axvline(
-                    x=cpos, color='white', linestyle='dotted', alpha=0.5, linewidth=0.5)
+                    x=cpos, color='white', linestyle='dotted', alpha=0.7, linewidth=0.7)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
@@ -364,7 +364,7 @@ class PlotGUI(ABC):
         for cpos in featurepos:
             if cpos not in self.selected_features:
                 self.selected_features[cpos] = self.axes.axhline(
-                    y=cpos, color='white', linestyle='dotted', alpha=0.5, linewidth=0.5)
+                    y=cpos, color='white', linestyle='dotted', alpha=0.7, linewidth=0.7)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:

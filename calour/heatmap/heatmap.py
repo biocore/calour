@@ -181,6 +181,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         fig, ax = axes.get_figure(), axes
 
     # step 2. plot heatmap.
+    if title is not None:
+        ax.set_title(title)
     # init the default colormap
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
