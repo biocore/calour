@@ -338,12 +338,10 @@ def center_log(exp, delta=1, method=None, inplace=False):
     logger.debug('clr transforming the data, min. threshold=%f' % delta)
     if not inplace:
         exp = deepcopy(exp)
-
     if exp.sparse:
         exp.sparse = False
     if method is None:
         method = lambda x : x + delta
-
     exp.data = clr(centralize(method(exp.data)))
     return exp
 
