@@ -341,7 +341,7 @@ def center_log(exp, delta=1, method=None, inplace=False):
     if exp.sparse:
         exp.sparse = False
     if method is None:
-        method = lambda x : x + delta
+        def method(x): x + delta
+
     exp.data = clr(centralize(method(exp.data)))
     return exp
-
