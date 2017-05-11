@@ -15,6 +15,7 @@ Functions
    binarize
    log_n
    transform
+   center_log
 '''
 
 # ----------------------------------------------------------------------------
@@ -33,7 +34,7 @@ import numpy as np
 from sklearn import preprocessing
 
 from .experiment import Experiment
-
+from skbio.stats.composition import clr, centralize
 
 logger = getLogger(__name__)
 
@@ -278,3 +279,41 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values,
                                               total=total, negate=True, inplace=inplace)
     return newexp
+
+
+@Experiment._record_sig
+def center_log(exp, delta=1, method=None, inplace=False):
+    """ Performs a clr transform to normalize each sample.
+
+    Parameters
+    ----------
+    delta : numeric, optional
+        cap the tiny values and then clr transform the data.
+    method : str, optional
+        An optional function to specify how the pseudocount method should be
+        handled.
+    inplace : bool, optional
+
+     Returns
+    -------
+    ``Experiment``
+        The normalized experiment. Note that all features are clr normalized.
+
+    See Also
+    --------
+    skbio.stats.composition.clr
+    skbio.stats.composition.centralize
+    """
+    logger.debug('clr transforming the data, min. threshold=%f' % n)
+    if not inplace:
+        exp = deepcopy(exp)
+
+    if exp.sparse:
+        exp.sparse = False
+    if method is None:
+        method = lambda x : x + delta
+
+    exp.data[exp.data < n] = n
+    exp.data = clr(centralize(method(exp.data)))
+    return exp
+

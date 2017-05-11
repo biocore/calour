@@ -15,6 +15,7 @@ from sklearn import preprocessing
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
 from calour.transforming import log_n, scale
+from skbio.stats.composition import clr, centralize
 
 
 class TestTransforming(Tests):
@@ -74,6 +75,24 @@ class TestTransforming(Tests):
              [10., 20., 7., 14., 3., 100., 846., 700.],
              [10., 20., 8., 13., 1., 100., 849., 800.],
              [10., 20., 9., 12., 7., 100., 842., 900.]])
+        assert_experiment_equal(obs, self.test2)
+        self.assertIsNot(obs, self.test2)
+
+        obs = self.test2.log_n(inplace=True)
+        self.assertIs(obs, self.test2)
+
+    def test_center_log(self):
+        obs = self.test2.center_log()
+        self.test2.data = clr(centralize(
+            [[10., 20., 1., 20., 5., 100., 844., 100.],
+             [10., 20., 2., 19., 1., 100., 849., 200.],
+             [10., 20., 3., 18., 5., 100., 844., 300.],
+             [10., 20., 4., 17., 1., 100., 849., 400.],
+             [10., 20., 5., 16., 4., 100., 845., 500.],
+             [10., 20., 6., 15., 1., 100., 849., 600.],
+             [10., 20., 7., 14., 3., 100., 846., 700.],
+             [10., 20., 8., 13., 1., 100., 849., 800.],
+             [10., 20., 9., 12., 7., 100., 842., 900.]]))
         assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
