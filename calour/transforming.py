@@ -335,7 +335,7 @@ def center_log(exp, delta=1, method=None, inplace=False):
     skbio.stats.composition.clr
     skbio.stats.composition.centralize
     """
-    logger.debug('clr transforming the data, min. threshold=%f' % n)
+    logger.debug('clr transforming the data, min. threshold=%f' % delta)
     if not inplace:
         exp = deepcopy(exp)
 
@@ -344,7 +344,6 @@ def center_log(exp, delta=1, method=None, inplace=False):
     if method is None:
         method = lambda x : x + delta
 
-    exp.data[exp.data < n] = n
     exp.data = clr(centralize(method(exp.data)))
     return exp
 
