@@ -374,7 +374,7 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=False, color_bar_label=True,
-         tree=None, tree_size=8, **kwargs):
+         tree=None, tree_size=8, title=None, **kwargs):
     '''Plot the interactive heatmap and its associated axes.
 
     The heatmap is interactive and can be dynamically updated with
@@ -446,6 +446,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         NOTE: features are reordered according to the tree
     tree_size : int (optional)
         The width of the tree relative to the main heatmap (12 is identical size)
+    title : str (optional)
+        The title of the figure.
     kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
@@ -464,6 +466,9 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         gui_obj = _create_plot_gui(exp, gui, databases, tree_size=tree_size)
         # match the exp order to the tree (reorders the features)
         exp, tree = plot_tree(exp, tree, gui_obj.tree_axes)
+
+    if title is not None:
+        gui_obj.figure.suptitle(title)
 
     exp.heatmap(axes=gui_obj.axes, **kwargs)
     barwidth = 0.3
@@ -493,7 +498,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
 
 
 def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
-              gui='cli', databases=False, color_bar_label=True, **kwargs):
+              gui='cli', databases=False, color_bar_label=True, title=None, **kwargs):
     '''Plot after sorting by sample field.
 
     This is a convenience wrapper for plot().
@@ -522,6 +527,8 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
         a list of databases to access or add annotation
         False (default) to use the default field based on the experiment subclass
         None to not use databases
+    title : str (optional)
+        The title of the figure.
     kwargs : dict, optional
         keyword arguments passing to :ref:`plot<plot-ref>` function.
 
@@ -540,7 +547,7 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
         plot_field = None
     if 'sample_field' in kwargs:
         return newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                           gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+                           gui=gui, databases=databases, color_bar_label=color_bar_label, title=title, **kwargs)
     else:
         return newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                           gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+                           gui=gui, databases=databases, color_bar_label=color_bar_label, title=title, **kwargs)
