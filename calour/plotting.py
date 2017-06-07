@@ -20,7 +20,13 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
+from logging import getLogger
 import numpy as np
+from .util import _transition_index, _to_list
+from .heatmap.heatmap import _ax_color_bar
+
+
+logger = getLogger(__name__)
 
 
 def plot_hist(exp, ax=None, **kwargs):
@@ -74,9 +80,8 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    ax: matplotlib.Axis or None (optional)
-        The axis to which to plot the figure
-        None (default) to create a new figure
+    ax: matplotlib Axes or None (optional)
+        The axes to which to plot the figure. None (default) to create a new figure
 
     Returns
     -------
@@ -176,7 +181,7 @@ def plot_shareness(exp, group=None, frac_steps=None, ax=None):
 
 
 
-def plot_taxonomy_bar(exp, fields=None, level='genus', title=None, ax=None):
+def plot_stacked_bar(exp, field=None, sample_color_bars=None, color_bar_label=True, title=None, figsize=(12, 12)):
     '''Plot the number of shared features against the number of samples included.
 
     To see if there is a core feature set shared across most of the samples
@@ -188,37 +193,56 @@ def plot_taxonomy_bar(exp, fields=None, level='genus', title=None, ax=None):
 
     Returns
     -------
-    ax : matplotlib Axes
-        The Axes object containing the plot.
+    fig : matplotlib Figure
+        The Figure object containing the plot.
     '''
-    if fields is not None:
-        newexp = exp.copy()
-        fields = _to_list(fields)
-        for cfield in fields:
-            newexp.sort_samples(cfield, inplace=True)
-        plot_field = cfield
+    from matplotlib.gridspec import GridSpec
+    from matplotlib import pyplot as plt
 
-    if ax is None:
-        from matplotlib import pyplot as plt
-        fig, ax = plt.subplots()
+    if exp.sparse:
+        data = exp.data.T.toarray()
     else:
-        fig = ax.figure
+        data = exp.data.T
+    fig = plt.figure(figsize=figsize)
+    gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[3, 12])
+    bar = fig.add_subplot(gs[2])
 
-    exp = exp.collapse_taxonomy(level=level)
-    data = np.array(exp.data.T)
     bottom = np.vstack((np.zeros((data.shape[1],), dtype=data.dtype),
                         np.cumsum(data, axis=0)[:-1]))
     ind = range(data.shape[1])
     rects = []
     for dat, bot in zip(data, bottom):
-        rect = ax.bar(ind, dat, bottom=bot)
+        rect = bar.barh(ind, dat, left=bot, height=0.9)
         rects.append(rect[0])
-    ax.set_xticks(ind)
-    ax.set_xticklabels(exp.sample_metadata.index, rotation='vertical')
-    ax.set_ylabel('abundance')
-    ax.set_xlabel('sample')
+    bar.set_yticks(ind)
+    bar.set_yticklabels(exp.sample_metadata.index)
+    bar.set_ylabel('sample')
+    bar.set_xlabel('abundance')
+    bar.spines['top'].set_visible(False)
+    bar.spines['right'].set_visible(False)
+    bar.spines['left'].set_visible(False)
+
+    lax = fig.add_subplot(gs[0])
+    lax.axis('off')
+    lax.legend(rects, exp.feature_metadata[field], loc="center", labelspacing=0.25, fontsize='small')
+
+    xax = fig.add_subplot(gs[3], sharey=bar)
+    xax.axis('off')
+    barwidth = 0.3
+    barspace = 0.05
+    if sample_color_bars is not None:
+        sample_color_bars = _to_list(sample_color_bars)
+        position = 0
+        for s in sample_color_bars:
+            # convert to string and leave it as empty if it is None
+            values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
+            _ax_color_bar(
+                xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=1)
+            position += (barspace + barwidth)
+
     if title is not None:
-        ax.set_title(title)
-    ax.legend(rects, exp.feature_metadata['taxonomy'], bbox_to_anchor=(1.04,1), loc="upper right")
+        fig.suptitle(title)
+
     fig.tight_layout()
+    fig.subplots_adjust(hspace=0.01, wspace=0.01)
     return fig
