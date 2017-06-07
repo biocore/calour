@@ -6,15 +6,14 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from unittest import main, TestCase
+from unittest import main
 
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal
 
-from calour import Experiment, AmpliconExperiment
+from calour import Experiment
 from calour._testing import Tests
-import calour as ca
 
 
 class PlotTests(Tests):

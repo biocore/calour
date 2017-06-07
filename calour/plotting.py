@@ -25,7 +25,7 @@ Functions
 
 from logging import getLogger
 import numpy as np
-from .util import _transition_index, _to_list
+from .util import _to_list
 from .heatmap.heatmap import _ax_color_bar
 
 
@@ -179,7 +179,6 @@ def plot_shareness(exp, group=None, frac_steps=None, ax=None):
         fig = ax.figure
 
     return fig
-
 
 
 def plot_stacked_bar(exp, xtick=False, sample_color_bars=None, color_bar_label=True, title=None,

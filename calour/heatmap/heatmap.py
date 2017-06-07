@@ -331,7 +331,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
                 cy = ry + rect.get_height()/2.0
                 # add the text in the color bars
                 ax.annotate(value, (cx, cy), color='w', weight='bold',
-                              fontsize=7, ha='center', va='center', rotation=rotation)
+                            fontsize=7, ha='center', va='center', rotation=rotation)
         prev = i
     # ax.legend(
     #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
