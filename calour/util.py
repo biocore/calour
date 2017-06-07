@@ -37,6 +37,38 @@ import scipy
 logger = getLogger(__name__)
 
 
+def _transition_index(l):
+    '''Return the transition index and current value of the list.
+
+    Examples
+    -------
+    >>> l = ['a', 'a', 'b']
+    >>> list(_transition_index(l))
+    [(2, 'a'), (3, 'b')]
+    >>> l = ['a', 'a', 'b', 1, 2, None, None]
+    >>> list(_transition_index(l))
+    [(2, 'a'), (3, 'b'), (4, 1), (5, 2), (7, None)]
+
+    Parameters
+    ----------
+    l : Iterable of arbitrary objects
+
+    Yields
+    ------
+    tuple of (int, arbitrary)
+        the transition index, the item value
+    '''
+    it = enumerate(l)
+    i, item = next(it)
+    item = str(type(item)), item
+    for i, current in it:
+        current = str(type(current)), current
+        if item != current:
+            yield i, item[1]
+            item = current
+    yield i + 1, item[1]
+
+
 def _convert_axis_name(func):
     '''Convert str value of axis to 0/1.
 
