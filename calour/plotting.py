@@ -23,7 +23,7 @@ Functions
 import numpy as np
 
 
-def plot_hist(exp, **kwargs):
+def plot_hist(exp, ax=None, **kwargs):
     '''Plot histogram of all the values in data.
 
     It flattens the 2-D array and plots histogram out of it. This
@@ -33,6 +33,8 @@ def plot_hist(exp, **kwargs):
     Parameters
     ----------
     exp : ``Experiment``
+    ax : matplotlib Axes, optional
+        Axes object to draw the plot onto, otherwise uses the current Axes.
     kwargs : dict
         key word arguments passing to the matplotlib ``hist`` plotting function.
 
@@ -41,8 +43,12 @@ def plot_hist(exp, **kwargs):
     tuple of 1-D int array, 1-D float array, ``Figure``
         the count in each bin, the start coord of each bin, and hist figure
     '''
-    from matplotlib import pyplot as plt
-    fig, ax = plt.subplots()
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
+
     data = exp.get_data(sparse=False, copy=True)
     counts, bins, patches = ax.hist(data.flatten(), **kwargs)
     # note the count number on top of the histogram bars
@@ -54,7 +60,7 @@ def plot_hist(exp, **kwargs):
     return counts, bins, fig
 
 
-def plot_enrichment(exp, enriched, max_show=10, max_len=40, axes=None):
+def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -68,7 +74,7 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, axes=None):
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    axes: matplotlib.Axis or None (optional)
+    ax: matplotlib.Axis or None (optional)
         The axis to which to plot the figure
         None (default) to create a new figure
 
@@ -77,12 +83,11 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, axes=None):
     matplotlib.Figure
         handle to the figure created
     '''
-    from matplotlib import pyplot as plt
-
-    if axes is None:
-        fig, axes = plt.subplots()
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
     else:
-        fig = axes.figure
+        fig = ax.figure
 
     if max_show is None:
         max_show = [np.inf, np.inf]
@@ -93,8 +98,8 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, axes=None):
     positive = np.min([np.sum(enriched['odif'].values > 0), max_show[0]])
     negative = np.min([np.sum(enriched['odif'].values < 0), max_show[1]])
 
-    axes.barh(np.arange(negative)+positive, enriched['odif'].values[-negative:])
-    axes.barh(np.arange(positive), enriched['odif'].values[:positive])
+    ax.barh(np.arange(negative)+positive, enriched['odif'].values[-negative:])
+    ax.barh(np.arange(positive), enriched['odif'].values[:positive])
     use = np.zeros(len(enriched), dtype=bool)
     use[:positive] = True
     use[-negative:] = True
@@ -102,12 +107,12 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, axes=None):
     ticks = [x.split('(')[0] for x in ticks]
     ticks = ['LOWER IN '+x[1:] if x[0] == '-' else x for x in ticks]
     ticks = [x[:max_len] for x in ticks]
-    plt.yticks(np.arange(negative+positive), ticks)
-    plt.xlabel('effect size (positive is higher in group1')
+    ax.set_yticks(np.arange(negative+positive), ticks)
+    ax.set_xlabel('effect size (positive is higher in group1')
     return fig
 
 
-def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=40, axes=None, ignore_exp=None):
+def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -119,7 +124,7 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    axes: matplotlib.Axis or None (optional)
+    ax: matplotlib.Axis or None (optional)
         The axis to which to plot the figure
         None (default) to create a new figure
     ignore_exp : list None (optional)
@@ -127,7 +132,6 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
         Useful when you don't want to get terms from your own experiment analysis.
         For dbbact it is a list of int
     '''
-    import matplotlib.pyplot as plt
     if '_calour_diff_abundance_effect' not in exp.feature_metadata.columns:
         raise ValueError('Experiment does not seem to be the results of differential_abundance().')
 
@@ -139,7 +143,82 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     enriched = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp)
 
     # and plot
-    fig = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, axes=axes)
-    plt.tight_layout()
+    fig = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
+    fig.tight_layout()
     fig.show()
     return fig, enriched
+
+
+def plot_shareness(exp, group=None, frac_steps=None, ax=None):
+    '''Plot the number of shared features against the number of samples included.
+
+    To see if there is a core feature set shared across most of the samples
+
+    Parameters
+    ----------
+    ax : matplotlib Axes, optional
+        Axes object to draw the plot onto, otherwise uses the current Axes.
+
+    Returns
+    -------
+    ax : matplotlib Axes
+        The Axes object containing the plot.
+    '''
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
+
+
+
+    return fig
+
+
+
+def plot_taxonomy_bar(exp, fields=None, level='genus', title=None, ax=None):
+    '''Plot the number of shared features against the number of samples included.
+
+    To see if there is a core feature set shared across most of the samples
+
+    Parameters
+    ----------
+    ax : matplotlib Axes, optional
+        Axes object to draw the plot onto, otherwise uses the current Axes.
+
+    Returns
+    -------
+    ax : matplotlib Axes
+        The Axes object containing the plot.
+    '''
+    if fields is not None:
+        newexp = exp.copy()
+        fields = _to_list(fields)
+        for cfield in fields:
+            newexp.sort_samples(cfield, inplace=True)
+        plot_field = cfield
+
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
+
+    exp = exp.collapse_taxonomy(level=level)
+    data = np.array(exp.data.T)
+    bottom = np.vstack((np.zeros((data.shape[1],), dtype=data.dtype),
+                        np.cumsum(data, axis=0)[:-1]))
+    ind = range(data.shape[1])
+    rects = []
+    for dat, bot in zip(data, bottom):
+        rect = ax.bar(ind, dat, bottom=bot)
+        rects.append(rect[0])
+    ax.set_xticks(ind)
+    ax.set_xticklabels(exp.sample_metadata.index, rotation='vertical')
+    ax.set_ylabel('abundance')
+    ax.set_xlabel('sample')
+    if title is not None:
+        ax.set_title(title)
+    ax.legend(rects, exp.feature_metadata['taxonomy'], bbox_to_anchor=(1.04,1), loc="upper right")
+    fig.tight_layout()
+    return fig
