@@ -10,6 +10,9 @@ Functions
    :toctree: generated
 
    plot_hist
+   plot_enrichment
+   plot_diff_abundance_enrichment
+   plot_stacked_bar
 '''
 
 # ----------------------------------------------------------------------------
@@ -175,23 +178,34 @@ def plot_shareness(exp, group=None, frac_steps=None, ax=None):
     else:
         fig = ax.figure
 
-
-
     return fig
 
 
 
-def plot_stacked_bar(exp, xtick=False, field=None, sample_color_bars=None, color_bar_label=True, title=None,
-                     figsize=(12, 8), legend_size='small'):
-    '''Plot the number of shared features against the number of samples included.
-
-    To see if there is a core feature set shared across most of the samples
+def plot_stacked_bar(exp, xtick=False, sample_color_bars=None, color_bar_label=True, title=None,
+                     figsize=(12, 8), legend_size='small', legend_field=None):
+    '''Plot the stacked bar for feature abundances.
 
     Parameters
     ----------
-    xtick: str, False, or None
-        how to draw ticks and tick labels on x axis. str: use a field in sample metadata; None: use sample IDs;
+    xtick : str, False, or None
+        how to draw ticks and tick labels on x axis.
+        str: use a column name in sample metadata;
+        None: use sample IDs;
         False: do not draw ticks.
+    legend_field : str, or None
+        a column name in feature metadata. the values in the column will be used as the legend labels
+    sample_color_bars : list, optional
+        list of column names in the sample metadata. It plots a color bar
+        for each unique column to indicate sample group. It doesn't plot color bars by default (``None``)
+    color_bar_label : bool
+        whether to show the label on the color bars
+    title : str
+        figure title
+    figsize : tuple of numeric
+        figure size passed to ``figsize`` in ``plt.figure``
+    legend_size : str or int
+        passed to ``fontsize`` in ``ax.legend()``
 
     Returns
     -------
@@ -201,15 +215,15 @@ def plot_stacked_bar(exp, xtick=False, field=None, sample_color_bars=None, color
     from matplotlib.gridspec import GridSpec
     from matplotlib import pyplot as plt
 
-    fig = plt.figure(figsize=figsize)
-    gs = GridSpec(2, 2, width_ratios=[12, 6], height_ratios=[1, 12])
-    bar = fig.add_subplot(gs[2])
-
     if exp.sparse:
         data = exp.data.T.toarray()
     else:
         data = exp.data.T
 
+    fig = plt.figure(figsize=figsize)
+    gs = GridSpec(2, 2, width_ratios=[12, 6], height_ratios=[1, 12])
+
+    bar = fig.add_subplot(gs[2])
     bottom = np.vstack((np.zeros((data.shape[1],), dtype=data.dtype),
                         np.cumsum(data, axis=0)[:-1]))
     ind = range(data.shape[1])
@@ -247,10 +261,10 @@ def plot_stacked_bar(exp, xtick=False, field=None, sample_color_bars=None, color
                 xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
             position += (barspace + barwidth)
 
-    if isinstance(legend_size, str) or legend_size > 0:
+    if legend_field is not None:
         lax = fig.add_subplot(gs[3])
         lax.axis('off')
-        lax.legend(rects, exp.feature_metadata[field], loc="center left", fontsize=legend_size)
+        lax.legend(rects, exp.feature_metadata[legend_field], loc="center left", fontsize=legend_size)
 
     if title is not None:
         fig.suptitle(title)
