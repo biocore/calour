@@ -261,23 +261,21 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     if mz_rt_sep is None:
         # autodetect the mz/rt separator
         tmp = exp.feature_metadata['id'].iloc[0].split('_')
-        if len(tmp) > 1:
+        if len(tmp) == 2:
             logger.debug('Autodetcted "_" as mz/rt separator')
             mz_rt_sep = '_'
         else:
-            tmp = exp.feature_metadata['id'].iloc[0].split(' ')
-            if len(tmp) > 1:
+            tmp = exp.feature_metadata['id'].iloc[0].split()
+            if len(tmp) == 2:
                 logger.debug('Autodetcted " " as mz/rt separator')
-                mz_rt_sep = ' '
+                mz_rt_sep = None
             else:
                 raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
 
-    mzdata = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
-    mzdata = mzdata[[0, 1]]
     # mzdata = mzdata.astype(float)
-    mzdata.columns = ['MZ', 'RT']
-    exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
-
+    exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
+    exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].str.strip()
+    exp.feature_metadata['RT'] = exp.feature_metadata['RT'].str.strip()
     if gnps_file:
         # load the gnps table
         gnps_data = pd.read_table(gnps_file, sep='\t')

@@ -81,8 +81,8 @@ class IOTests(Tests):
         # test we get the MZ and RT correct
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
-        self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
-        self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
+        self.assertEqual(exp.feature_metadata['MZ'].iloc[1], '118.0869')
+        self.assertEqual(exp.feature_metadata['RT'].iloc[1], '23.9214')
         # test normalizing
         exp = ca.read_open_ms(self.openms_csv, normalize=10000)
         assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
@@ -95,8 +95,8 @@ class IOTests(Tests):
         # test we get the MZ and RT correct
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
-        self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
-        self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
+        self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], '118.0869')
+        self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], '23.9214')
 
     def test_read_qiim2(self):
         # problem with travis and qiime2 install - skipping
