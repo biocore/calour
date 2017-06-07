@@ -181,15 +181,17 @@ def plot_shareness(exp, group=None, frac_steps=None, ax=None):
 
 
 
-def plot_stacked_bar(exp, field=None, sample_color_bars=None, color_bar_label=True, title=None, figsize=(12, 12)):
+def plot_stacked_bar(exp, xtick=False, field=None, sample_color_bars=None, color_bar_label=True, title=None,
+                     figsize=(12, 8), legend_size='small'):
     '''Plot the number of shared features against the number of samples included.
 
     To see if there is a core feature set shared across most of the samples
 
     Parameters
     ----------
-    ax : matplotlib Axes, optional
-        Axes object to draw the plot onto, otherwise uses the current Axes.
+    xtick: str, False, or None
+        how to draw ticks and tick labels on x axis. str: use a field in sample metadata; None: use sample IDs;
+        False: do not draw ticks.
 
     Returns
     -------
@@ -199,34 +201,39 @@ def plot_stacked_bar(exp, field=None, sample_color_bars=None, color_bar_label=Tr
     from matplotlib.gridspec import GridSpec
     from matplotlib import pyplot as plt
 
+    fig = plt.figure(figsize=figsize)
+    gs = GridSpec(2, 2, width_ratios=[12, 6], height_ratios=[1, 12])
+    bar = fig.add_subplot(gs[2])
+
     if exp.sparse:
         data = exp.data.T.toarray()
     else:
         data = exp.data.T
-    fig = plt.figure(figsize=figsize)
-    gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[3, 12])
-    bar = fig.add_subplot(gs[2])
 
     bottom = np.vstack((np.zeros((data.shape[1],), dtype=data.dtype),
                         np.cumsum(data, axis=0)[:-1]))
     ind = range(data.shape[1])
     rects = []
     for dat, bot in zip(data, bottom):
-        rect = bar.barh(ind, dat, left=bot, height=0.9)
+        rect = bar.bar(ind, dat, bottom=bot, width=0.95)
         rects.append(rect[0])
-    bar.set_yticks(ind)
-    bar.set_yticklabels(exp.sample_metadata.index)
-    bar.set_ylabel('sample')
-    bar.set_xlabel('abundance')
+    if xtick is None:
+        bar.set_xticks(ind)
+        bar.set_xticklabels(exp.sample_metadata.index, rotation='vertical')
+    elif xtick is False:
+        # don't draw tick and tick label on x axis
+        bar.tick_params(labelbottom='off', bottom='off')
+    else:
+        bar.set_xticks(ind)
+        bar.set_xticklabels(exp.sample_metadata[xtick], rotation='vertical')
+
+    bar.set_xlabel('sample')
+    bar.set_ylabel('abundance')
     bar.spines['top'].set_visible(False)
     bar.spines['right'].set_visible(False)
-    bar.spines['left'].set_visible(False)
+    bar.spines['bottom'].set_visible(False)
 
-    lax = fig.add_subplot(gs[0])
-    lax.axis('off')
-    lax.legend(rects, exp.feature_metadata[field], loc="center", labelspacing=0.25, fontsize='small')
-
-    xax = fig.add_subplot(gs[3], sharey=bar)
+    xax = fig.add_subplot(gs[0], sharex=bar)
     xax.axis('off')
     barwidth = 0.3
     barspace = 0.05
@@ -237,8 +244,13 @@ def plot_stacked_bar(exp, field=None, sample_color_bars=None, color_bar_label=Tr
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
-                xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=1)
+                xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
             position += (barspace + barwidth)
+
+    if isinstance(legend_size, str) or legend_size > 0:
+        lax = fig.add_subplot(gs[3])
+        lax.axis('off')
+        lax.legend(rects, exp.feature_metadata[field], loc="center left", fontsize=legend_size)
 
     if title is not None:
         fig.suptitle(title)
