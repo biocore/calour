@@ -272,8 +272,8 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
             else:
                 raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
 
-    # mzdata = mzdata.astype(float)
     exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
+    # trim the whitespaces
     exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].str.strip()
     exp.feature_metadata['RT'] = exp.feature_metadata['RT'].str.strip()
     if gnps_file:

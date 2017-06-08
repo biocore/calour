@@ -14,7 +14,6 @@ import matplotlib as mpl
 import matplotlib.patches as mpatches
 import numpy as np
 
-from ..transforming import log_n
 from ..database import _get_database_class
 from .._dendrogram import plot_tree
 from ..util import _to_list, _transition_index
@@ -77,7 +76,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
 def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
-            ax=None, rect=None,  transform=log_n,
+            ax=None, rect=None,  norm=mpl.colors.LogNorm(),
             show_legend=False, **kwargs):
     '''Plot a heatmap for the experiment.
 
@@ -132,16 +131,12 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     logger.debug('plot heatmap')
     # import pyplot is less polite. do it locally
     import matplotlib.pyplot as plt
+
     # get the default feature field if not specified (i.e. False)
     if feature_field is False:
         feature_field = exp.heatmap_feature_field
     numrows, numcols = exp.shape
-    # step 1. transform data
-    if transform is None:
-        data = exp.get_data(sparse=False)
-    else:
-        logger.debug('transform exp with %r with param %r' % (transform, kwargs))
-        data = transform(exp, inplace=False, **kwargs).data
+    data = exp.get_data(sparse=False)
 
     if ax is None:
         fig, ax = plt.subplots()
@@ -154,10 +149,21 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     # init the default colormap
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
+    if isinstance(cmap, str):
+        cmap = plt.get_cmap(cmap)
+    # this set cells of zero value.
+    cmap.set_bad('black')
     # plot the heatmap
-    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', norm=norm, cmap=cmap, clim=clim)
+    # plot legend of color scale
     if show_legend:
-        _imshow_legend(exp, image, fig, ax=None, log_scale=(transform == log_n))
+        legend = fig.colorbar(
+            image,
+            aspect=100,
+            # convert tick label to percentage
+            format=mpl.ticker.FuncFormatter(
+                lambda tick_val, tick_pos: tick_val * 100 / exp.exp_metadata.get('normalized')))
+        legend.ax.tick_params(labelsize=5)
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -236,38 +242,6 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             return 'x=%1.2f, y=%1.2f' % (x, y)
     ax.format_coord = format_coord
     return fig
-
-
-def _imshow_legend(exp, image, fig, ax, log_scale=True, num_ticks=8, aspect=100):
-    '''Plot the heatmap colorbar scale
-
-    Parameters
-    ----------
-    exp : ``Experiment``
-        The experiment for which the plot is made.
-        We use it to see whether the scale should be relative(normalized) or absolute
-    fig : matplotlib.Figure
-        The figure to plot the colorbar in
-    ax : matplotlib Axes
-        The axes to plot into
-    log_scale : bool (optional)
-        True (default) to plot log scale colorbar
-        False to plot linear scale
-    num_ticks : int (optional)
-        number of ticks to put on the colorbar
-    '''
-    clim = image.get_clim()
-    ticks = np.linspace(clim[0], clim[1], num_ticks)
-    ticks = [eval("%.0e" % (x)) for x in ticks]
-    cb = fig.colorbar(image, ax=ax, ticks=ticks, aspect=aspect)
-    if log_scale:
-        tick_labels = np.power(2, ticks)
-    else:
-        tick_labels = ticks
-    if exp.exp_metadata.get('normalized'):
-        tick_labels = 100 * np.array(tick_labels) / exp.exp_metadata['normalized']
-        tick_labels = ['%%%s' % x for x in tick_labels]
-    cb.ax.set_yticklabels(tick_labels)
 
 
 def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True):
