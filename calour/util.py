@@ -37,6 +37,35 @@ import scipy
 logger = getLogger(__name__)
 
 
+def compute_prevalence(abundance):
+    '''Return the prevalence at each abundance cutoffs.
+
+    Each sample that has the OTU above the cutoff (exclusive) will
+    be counted.
+
+    Parameters
+    ----------
+    abundance : iterable of numeric
+        The abundance of a species across samples.
+
+    Examples
+    --------
+    >>> abund = [0, 0, 1, 2, 4, 1]
+    >>> x, y = compute_prevalence(abund)
+    >>> x
+    array([0, 1, 2, 4])
+    >>> y
+    array([ 0.66666667,  0.33333333,  0.16666667,  0.        ])
+
+    '''
+    # unique values are sorted
+    cutoffs, counts = np.unique(abundance, return_counts=True)
+    cum_counts = np.cumsum(counts)
+    prevalences = 1 - cum_counts / counts.sum()
+    # print(cutoffs, prevalences)
+    return cutoffs, prevalences
+
+
 def _transition_index(l):
     '''Return the transition index and current value of the list.
 

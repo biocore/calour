@@ -26,7 +26,7 @@ Functions
 
 from logging import getLogger
 import numpy as np
-from .util import _to_list
+from .util import _to_list, compute_prevalence
 from .heatmap.heatmap import _ax_color_bar
 
 
@@ -161,7 +161,13 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
 def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
     '''Plot the number of shared features against the number of samples subsampled.
 
-    To see if there is a core feature set shared across most of the samples
+    To see if there is a core feature set shared across most of the samples.
+
+    As an example of this type of plot, please see Fig 2C in Muegge,
+    B. D. et al. Diet drives convergence in gut microbiome functions
+    across mammalian phylogeny and within humans. Science 332, 970–974
+    (2011).
+
 
     Parameters
     ----------
@@ -180,6 +186,7 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
     -------
     ax : matplotlib Axes
         The Axes object containing the plot.
+
     '''
     if ax is None:
         from matplotlib import pyplot as plt
@@ -207,7 +214,7 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
         ax.legend()
     ax.set_xlabel('sample number')
     ax.set_ylabel('shared features (%)')
-    return fig
+    return ax
 
 
 def _compute_frac_nonzero(data, step, steps):
@@ -231,6 +238,70 @@ def _compute_frac_nonzero(data, step, steps):
     return steps, shared
 
 
+def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, ax=None):
+    '''Plot abundance against prevalence.
+
+    Prevalence/abundance curve is a chart used to visualize the
+    prevalence of OTUs. For each OTU, a curve was constructed
+    measuring the percentage of a population that carries the OTU
+    above a given abundance (normalized over the total abundance of
+    the OTU). A steep curve indicates this OTU is shared prevalently
+    among the population. If many OTUs show in steep curves, it
+    indicates the population has a core set of microbes.
+
+    Y-axis: prevalence of the OTU that above the abundance threshold.
+
+    X-axis: abundance threshold.
+
+    As an example of this type of plot, please see Fig 1D in Clemente,
+    J. C. et al. The microbiome of uncontacted Amerindians. Science
+    Advances 1, e1500183 (2015).
+
+    .. warning:: This function is still less tested.
+
+    Parameters
+    ----------
+    field : str
+        sample metadata field to group samples
+    log : bool
+        whether to plot abundance in log scale
+    min_abund : numeric
+        the min abundance. features with mean abundance
+        less than min_abund in the each sample group will be not considered
+    ax : matplotlib Axes, optional
+        Axes object to draw the plot onto, otherwise uses the current Axes.
+
+    '''
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
+
+    for uniq in exp.sample_metadata[field].unique():
+        data = exp.filter_samples(
+            field, uniq).filter_by_data(
+                'mean_abundance', cutoff=min_abund, axis=1).data
+        flag = True
+        # this implementation is for both dense and sparse arrays
+        for column in range(data.shape[1]):
+            feature = data[:, column].data
+            x, y = compute_prevalence(feature)
+            if flag:
+                line, = ax.plot(x, y, alpha=0.5, label=uniq)
+                flag = False
+            else:
+                ax.plot(x, y, alpha=0.5, color=line.get_color())
+
+    ax.set_ylabel('prevalence')
+    if log is True:
+        ax.set_xscale("log", nonposx='mask')
+        ax.set_xlabel('log(abundance)')
+    else:
+        ax.set_xlabel('abundance')
+    # ax.invert_xaxis()
+    ax.legend()
+    return ax
 
 
 def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=None,
