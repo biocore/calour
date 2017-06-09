@@ -120,6 +120,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
+    norm : matplotlib colors Normalize or ``None``
+        passed to ``norm`` parameter of ``plt.imshow``. Default is log scale.
     show_legend : bool (optional)
         True to plot a legend color bar for the heatmap
 
@@ -307,10 +309,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
                 ax.annotate(value, (cx, cy), color='w', weight='bold',
                             fontsize=7, ha='center', va='center', rotation=rotation)
         prev = i
-    # ax.legend(
-    #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
-    #     bbox_to_anchor=(0, 1.2),
-    #     ncol=len(col))
+
     return ax
 
 

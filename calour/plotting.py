@@ -191,8 +191,6 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
     if ax is None:
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots()
-    else:
-        fig = ax.figure
 
     if field is None:
         for i in range(iterations):
@@ -275,8 +273,6 @@ def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, ax=None):
     if ax is None:
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots()
-    else:
-        fig = ax.figure
 
     for uniq in exp.sample_metadata[field].unique():
         data = exp.filter_samples(
