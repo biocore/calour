@@ -13,6 +13,7 @@ Functions
    plot_enrichment
    plot_diff_abundance_enrichment
    plot_stacked_bar
+   plot_shareness
 '''
 
 # ----------------------------------------------------------------------------
@@ -157,13 +158,21 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     return fig, enriched
 
 
-def plot_shareness(exp, group=None, frac_steps=None, ax=None):
+def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
     '''Plot the number of shared features against the number of samples included.
 
     To see if there is a core feature set shared across most of the samples
 
     Parameters
     ----------
+    field : str
+        sample metadata field to group samples
+    step : int
+        step size to compute the shareness
+    steps : iterable of ints
+        steps to compute the shareness. If it is specified, it overrides ``step``.
+    iterations : int
+        repeat the compute multiple times and plot all the iterations
     ax : matplotlib Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
 
@@ -178,11 +187,51 @@ def plot_shareness(exp, group=None, frac_steps=None, ax=None):
     else:
         fig = ax.figure
 
+    if field is None:
+        for i in range(iterations):
+            x, y = _compute_frac_nonzero(exp.data, step, steps)
+            if i == 0:
+                line, = ax.plot(x, y * 100, alpha=0.5)
+            else:
+                # use the same color as the first iteration
+                ax.plot(x, y * 100, alpha=0.5, color=line.get_color())
+    else:
+        for uniq in exp.sample_metadata[field].unique():
+            data = exp.filter_samples(field, uniq).data
+            for i in range(iterations):
+                x, y = _compute_frac_nonzero(data, step, steps)
+                if i == 0:
+                    line, = ax.plot(x, y * 100, label=uniq, alpha=0.5)
+                else:
+                    ax.plot(x, y * 100, alpha=0.5, color=line.get_color())
+        ax.legend()
+    ax.set_xlabel('sample number')
+    ax.set_ylabel('shared features (%)')
     return fig
 
 
-def plot_stacked_bar(exp, xtick=False, sample_color_bars=None, color_bar_label=True, title=None,
-                     figsize=(12, 8), legend_size='small', legend_field=None):
+def _compute_frac_nonzero(data, step, steps):
+    '''iteratively compute the fraction of non-zeros in each column after subsampling rows.'''
+    n, features = data.shape
+    if steps is None:
+        steps = [i for i in range(2, n, step)]
+    else:
+        # filter out the illegal large valus
+        steps = [i for i in steps if i < n]
+    shared = []
+    for i in steps:
+        x = data[np.random.choice(n, int(i), replace=False), :] > 0
+        # the count of samples that have the given feature
+        counts = x.sum(axis=0).A1
+        frac = np.sum(counts == i)
+        shared.append(frac)
+
+    shared = np.array(shared) / features
+    return steps, shared
+
+
+def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=None,
+                     figsize=(12, 8), legend_size='small', legend_field=None, xtick=False):
     '''Plot the stacked bar for feature abundances.
 
     Parameters
@@ -192,8 +241,6 @@ def plot_stacked_bar(exp, xtick=False, sample_color_bars=None, color_bar_label=T
         str: use a column name in sample metadata;
         None: use sample IDs;
         False: do not draw ticks.
-    legend_field : str, or None
-        a column name in feature metadata. the values in the column will be used as the legend labels
     sample_color_bars : list, optional
         list of column names in the sample metadata. It plots a color bar
         for each unique column to indicate sample group. It doesn't plot color bars by default (``None``)
@@ -205,6 +252,8 @@ def plot_stacked_bar(exp, xtick=False, sample_color_bars=None, color_bar_label=T
         figure size passed to ``figsize`` in ``plt.figure``
     legend_size : str or int
         passed to ``fontsize`` in ``ax.legend()``
+    legend_field : str, or None
+        a column name in feature metadata. the values in the column will be used as the legend labels
 
     Returns
     -------
