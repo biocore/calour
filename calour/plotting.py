@@ -14,6 +14,7 @@ Functions
    plot_diff_abundance_enrichment
    plot_stacked_bar
    plot_shareness
+   plot_abund_prevalence
 '''
 
 # ----------------------------------------------------------------------------
@@ -158,7 +159,7 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     return fig, enriched
 
 
-def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
+def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
     '''Plot the number of shared features against the number of samples subsampled.
 
     To see if there is a core feature set shared across most of the samples.
@@ -196,19 +197,19 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
         for i in range(iterations):
             x, y = _compute_frac_nonzero(exp.data, step, steps)
             if i == 0:
-                line, = ax.plot(x, y * 100, alpha=0.5)
+                line, = ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth)
             else:
                 # use the same color as the first iteration
-                ax.plot(x, y * 100, alpha=0.5, color=line.get_color())
+                ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth, color=line.get_color())
     else:
         for uniq in exp.sample_metadata[field].unique():
             data = exp.filter_samples(field, uniq).data
             for i in range(iterations):
                 x, y = _compute_frac_nonzero(data, step, steps)
                 if i == 0:
-                    line, = ax.plot(x, y * 100, label=uniq, alpha=0.5)
+                    line, = ax.plot(x, y * 100, label=uniq, alpha=alpha, linewidth=linewidth)
                 else:
-                    ax.plot(x, y * 100, alpha=0.5, color=line.get_color())
+                    ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth, color=line.get_color())
         ax.legend()
     ax.set_xlabel('sample number')
     ax.set_ylabel('shared features (%)')
@@ -236,7 +237,7 @@ def _compute_frac_nonzero(data, step, steps):
     return steps, shared
 
 
-def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, ax=None):
+def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, alpha=0.5, linewidth=0.7, ax=None):
     '''Plot abundance against prevalence.
 
     Prevalence/abundance curve is a chart used to visualize the
@@ -284,10 +285,10 @@ def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, ax=None):
             feature = data[:, column].data
             x, y = compute_prevalence(feature)
             if flag:
-                line, = ax.plot(x, y, alpha=0.5, label=uniq)
+                line, = ax.plot(x, y, alpha=0.5, label=uniq, alpha=alpha, linewidth=linewidth)
                 flag = False
             else:
-                ax.plot(x, y, alpha=0.5, color=line.get_color())
+                ax.plot(x, y, alpha=0.5, color=line.get_color(), alpha=alpha, linewidth=linewidth)
 
     ax.set_ylabel('prevalence')
     if log is True:
