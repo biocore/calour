@@ -12,14 +12,15 @@ import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal
 
-from calour import Experiment
+import calour as ca
 from calour._testing import Tests
+from calour.util import compute_prevalence
 
 
 class PlotTests(Tests):
     def test_plot_hist(self):
         data = np.array([[0, 1], [2, 3]])
-        exp = Experiment(data,
+        exp = ca.Experiment(data,
                          pd.DataFrame({'A': ['ab', 'cd'], 'B': ['ef', 'gh']}))
         counts, bins, fig = exp.plot_hist(bins=4)
         assert_array_almost_equal(counts, np.array([1] * 4))
@@ -29,7 +30,7 @@ class PlotTests(Tests):
         self.assertEqual([i.get_text() for i in ax.texts], ['1'] * 4)
 
     def test_plot_stacked_bar(self):
-        exp = Experiment(np.array([[0, 1], [2, 3]]),
+        exp = ca.Experiment(np.array([[0, 1], [2, 3]]),
                          pd.DataFrame({'A': ['ab', 'cd'], 'B': ['ef', 'gh']},
                                       index=['s1', 's2']),
                          pd.DataFrame({'genus': ['bacillus', 'listeria']}))
@@ -57,6 +58,28 @@ class PlotTests(Tests):
             self.assertAlmostEqual(w, width)
             self.assertAlmostEqual(y, ys[i])
             self.assertAlmostEqual(h, heights[i])
+
+    def test_plot_abund_prevalence(self):
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=100)
+        self.test1.sparse = False
+        ax = self.test1.filter_samples('group', ['1', '2']).plot_abund_prevalence('group', min_abund=50)
+        grp1 = self.test1.filter_samples('group', '1')
+        grp2 = self.test1.filter_samples('group', '2')
+        lines = ax.get_lines()
+        self.assertEqual(len(lines), 2)
+        # only one feature for each group
+        mean_abund = grp1.data.sum(axis=0) / grp1.data.shape[0]
+        self.assertEqual(np.sum(mean_abund > 50), 1)
+        f = grp1.data[:, mean_abund > 50]
+        x, y = compute_prevalence(f)
+        assert_array_almost_equal(np.array([[i,j] for i, j in zip(x, y)]),
+                                  lines[0].get_xydata())
+        mean_abund = grp2.data.sum(axis=0) / grp2.data.shape[0]
+        self.assertEqual(np.sum(mean_abund > 50), 1)
+        f = grp2.data[:, mean_abund > 50]
+        x, y = compute_prevalence(f)
+        assert_array_almost_equal(np.array([[i,j] for i, j in zip(x, y)]),
+                                  lines[1].get_xydata())
 
 
 if __name__ == '__main__':

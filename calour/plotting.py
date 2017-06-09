@@ -216,12 +216,12 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
 
 
 def _compute_frac_nonzero(data, step, steps):
-    '''iteratively compute the fraction of non-zeros in each column after subsampling rows.'''
+    '''iteratively compute the fraction of non-zeros in each column after subsampling rows. '''
     n, features = data.shape
     if steps is None:
-        steps = reversed([i for i in range(2, n, step)])
+        steps = [i for i in range(2, n, step)][::-1]
     else:
-        # filter out the illegal large valus
+        # filter out the illegal large values
         steps = sorted([i for i in steps if i < n], reverse=True)
     shared = []
     for i in steps:
