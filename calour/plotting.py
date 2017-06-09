@@ -159,7 +159,7 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
 
 
 def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, ax=None):
-    '''Plot the number of shared features against the number of samples included.
+    '''Plot the number of shared features against the number of samples subsampled.
 
     To see if there is a core feature set shared across most of the samples
 
@@ -214,20 +214,23 @@ def _compute_frac_nonzero(data, step, steps):
     '''iteratively compute the fraction of non-zeros in each column after subsampling rows.'''
     n, features = data.shape
     if steps is None:
-        steps = [i for i in range(2, n, step)]
+        steps = reversed([i for i in range(2, n, step)])
     else:
         # filter out the illegal large valus
-        steps = [i for i in steps if i < n]
+        steps = sorted([i for i in steps if i < n], reverse=True)
     shared = []
     for i in steps:
-        x = data[np.random.choice(n, int(i), replace=False), :] > 0
+        data = data[np.random.choice(n, int(i), replace=False), :]
+        x = data > 0
         # the count of samples that have the given feature
         counts = x.sum(axis=0).A1
         frac = np.sum(counts == i)
         shared.append(frac)
-
+        n = data.shape[0]
     shared = np.array(shared) / features
     return steps, shared
+
+
 
 
 def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=None,
