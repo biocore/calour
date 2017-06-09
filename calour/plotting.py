@@ -204,13 +204,18 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, alpha=0.5
     else:
         for uniq in exp.sample_metadata[field].unique():
             data = exp.filter_samples(field, uniq).data
+            ys = []
             for i in range(iterations):
                 x, y = _compute_frac_nonzero(data, step, steps)
+                ys.append(y)
                 if i == 0:
-                    line, = ax.plot(x, y * 100, label=uniq, alpha=alpha, linewidth=linewidth)
+                    line, = ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth)
                 else:
                     ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth, color=line.get_color())
+            y_ave = np.array(ys).mean(axis=0)
+            ax.plot(x, y_ave * 100, linewidth=linewidth * 2, label=uniq, color=line.get_color())
         ax.legend()
+    ax.set_xscale('log')
     ax.set_xlabel('sample number')
     ax.set_ylabel('shared features (%)')
     return ax
@@ -229,7 +234,7 @@ def _compute_frac_nonzero(data, step, steps):
         data = data[np.random.choice(n, int(i), replace=False), :]
         x = data > 0
         # the count of samples that have the given feature
-        counts = x.sum(axis=0).A1
+        counts = x.sum(axis=0).data
         frac = np.sum(counts == i)
         shared.append(frac)
         n = data.shape[0]
@@ -285,10 +290,10 @@ def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, alpha=0.5, linew
             feature = data[:, column].data
             x, y = compute_prevalence(feature)
             if flag:
-                line, = ax.plot(x, y, alpha=0.5, label=uniq, alpha=alpha, linewidth=linewidth)
+                line, = ax.plot(x, y, label=uniq, alpha=alpha, linewidth=linewidth)
                 flag = False
             else:
-                ax.plot(x, y, alpha=0.5, color=line.get_color(), alpha=alpha, linewidth=linewidth)
+                ax.plot(x, y, color=line.get_color(), alpha=alpha, linewidth=linewidth)
 
     ax.set_ylabel('prevalence')
     if log is True:

@@ -19,9 +19,8 @@ from calour.util import compute_prevalence
 
 class PlotTests(Tests):
     def test_plot_hist(self):
-        data = np.array([[0, 1], [2, 3]])
-        exp = ca.Experiment(data,
-                         pd.DataFrame({'A': ['ab', 'cd'], 'B': ['ef', 'gh']}))
+        exp = ca.Experiment(np.array([[0, 1], [2, 3]]),
+                            pd.DataFrame({'A': ['ab', 'cd'], 'B': ['ef', 'gh']}))
         counts, bins, fig = exp.plot_hist(bins=4)
         assert_array_almost_equal(counts, np.array([1] * 4))
         assert_array_almost_equal(bins, np.array([0., 0.75, 1.5, 2.25, 3.]))
@@ -31,9 +30,9 @@ class PlotTests(Tests):
 
     def test_plot_stacked_bar(self):
         exp = ca.Experiment(np.array([[0, 1], [2, 3]]),
-                         pd.DataFrame({'A': ['ab', 'cd'], 'B': ['ef', 'gh']},
-                                      index=['s1', 's2']),
-                         pd.DataFrame({'genus': ['bacillus', 'listeria']}))
+                            pd.DataFrame({'A': ['ab', 'cd'], 'B': ['ef', 'gh']},
+                                         index=['s1', 's2']),
+                            pd.DataFrame({'genus': ['bacillus', 'listeria']}))
         # bar width used in plot_staked_bar
         width = 0.95
         fig = exp.plot_stacked_bar(sample_color_bars='A', legend_field='genus', xtick=None)
@@ -66,20 +65,31 @@ class PlotTests(Tests):
         grp1 = self.test1.filter_samples('group', '1')
         grp2 = self.test1.filter_samples('group', '2')
         lines = ax.get_lines()
+        # only 2 features passed min_abund
         self.assertEqual(len(lines), 2)
         # only one feature for each group
         mean_abund = grp1.data.sum(axis=0) / grp1.data.shape[0]
         self.assertEqual(np.sum(mean_abund > 50), 1)
         f = grp1.data[:, mean_abund > 50]
         x, y = compute_prevalence(f)
-        assert_array_almost_equal(np.array([[i,j] for i, j in zip(x, y)]),
+        assert_array_almost_equal(np.array([[i, j] for i, j in zip(x, y)]),
                                   lines[0].get_xydata())
         mean_abund = grp2.data.sum(axis=0) / grp2.data.shape[0]
         self.assertEqual(np.sum(mean_abund > 50), 1)
         f = grp2.data[:, mean_abund > 50]
         x, y = compute_prevalence(f)
-        assert_array_almost_equal(np.array([[i,j] for i, j in zip(x, y)]),
+        assert_array_almost_equal(np.array([[i, j] for i, j in zip(x, y)]),
                                   lines[1].get_xydata())
+
+    def test_plot_shareness(self):
+        np.random.seed(12345)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=100)
+        self.test1.sparse = False
+        ax = self.test1.filter_samples(
+            'group', ['1', '2']).plot_shareness(
+                field='group', steps=(2, 10), iterations=2)
+        lines = ax.get_lines()
+        self.assertEqual(len(lines), 6)
 
 
 if __name__ == '__main__':
