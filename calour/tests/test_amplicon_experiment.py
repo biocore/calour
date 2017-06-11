@@ -113,6 +113,61 @@ class ExperimentTests(Tests):
         # and all samples are there
         npt.assert_equal(res.shape[0], self.test1.shape[0])
 
+    def test_split_taxonomy(self):
+        self.test1.split_taxonomy(sep='; ')
+        k = ['k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'k__Bacteria',
+             'Unknown',
+             'bad_bacteria']
+        self.assertListEqual(k, self.test1.feature_metadata['kingdom'].tolist())
+        p = ['p__Bacteroidetes',
+             'p__Tenericutes',
+             'p__Proteobacteria',
+             'p__Proteobacteria',
+             'p__Firmicutes',
+             'p__Bacteroidetes',
+             'p__Actinobacteria',
+             'p__Firmicutes',
+             'p__Firmicutes',
+             'p__Firmicutes',
+             None,
+             None]
+        self.assertListEqual(p, self.test1.feature_metadata['phylum'].tolist())
+        s = ['s__',
+             's__',
+             's__lividum',
+             's__paradoxus',
+             's__',
+             's__',
+             's__',
+             's__',
+             's__moorei',
+             None,
+             None,
+             None]
+        self.assertListEqual(s, self.test1.feature_metadata['species'].tolist())
+        g = ['g__Prevotella',
+             'g__Mycoplasma',
+             'g__Janthinobacterium',
+             'g__Variovorax',
+             'g__Veillonella',
+             'g__Capnocytophaga',
+             'g__Actinomyces',
+             'g__',
+             'g__Bulleidia',
+             None,
+             None,
+             None]
+        self.assertListEqual(g, self.test1.feature_metadata['genus'].tolist())
+
 
 if __name__ == "__main__":
     main()

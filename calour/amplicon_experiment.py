@@ -244,5 +244,18 @@ class AmpliconExperiment(Experiment):
         newexp.feature_metadata['taxonomy'] = newexp.feature_metadata['_calour_tax_group']
         return newexp
 
-    def split_taxonomy(self, sep=';'):
-        '''Split taxonomy column into individual column per level.'''
+    def split_taxonomy(self, field='taxonomy', sep=';',
+                       names=['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']):
+        '''Split taxonomy column into individual column per level.
+
+        Assume the taxonomy string is in QIIME style:
+        "k__Bacteria;p__Firmicutes;c__Bacilli;o__Bacillales;f__Staphylococcaceae;g__Staphylococcus;s__"
+
+        Parameters
+        ----------
+        sep : str
+            the separator between taxa levels
+        names : list
+            the column names for the new columns split from ``field``
+        '''
+        self.feature_metadata[names] = self.feature_metadata[field].str.split(sep, expand=True)
