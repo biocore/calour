@@ -105,11 +105,16 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
         max_show = [max_show, max_show]
 
     enriched = enriched.sort_values('odif')
+    evals = enriched['odif'].values
     positive = np.min([np.sum(enriched['odif'].values > 0), max_show[0]])
     negative = np.min([np.sum(enriched['odif'].values < 0), max_show[1]])
-
-    ax.barh(np.arange(negative)+positive, enriched['odif'].values[-negative:])
-    ax.barh(np.arange(positive), enriched['odif'].values[:positive])
+    if negative + positive == 0:
+        print('No significantly enriched categories found')
+        return fig
+    if positive > 0:
+        ax.barh(np.arange(positive) + negative, evals[-positive:])
+    if negative > 0:
+        ax.barh(np.arange(negative), evals[:negative])
     use = np.zeros(len(enriched), dtype=bool)
     use[:positive] = True
     use[-negative:] = True
@@ -117,7 +122,8 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
     ticks = [x.split('(')[0] for x in ticks]
     ticks = ['LOWER IN '+x[1:] if x[0] == '-' else x for x in ticks]
     ticks = [x[:max_len] for x in ticks]
-    ax.set_yticks(np.arange(negative+positive), ticks)
+    ax.set_yticks(np.arange(negative+positive))
+    ax.set_yticklabels(ticks)
     ax.set_xlabel('effect size (positive is higher in group1')
     return fig
 
@@ -156,6 +162,7 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     fig = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
     fig.tight_layout()
     fig.show()
+    enriched = enriched.sort_values('odif')
     return fig, enriched
 
 
