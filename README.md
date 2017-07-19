@@ -1,8 +1,8 @@
 CALOUR
 ======
 
-[![Build Status](https://travis-ci.org/amnona/calour.png?branch=master)](https://travis-ci.org/amnona/calour)
-[![Coverage Status](https://coveralls.io/repos/github/amnona/calour/badge.svg?branch=master)](https://coveralls.io/github/amnona/calour?branch=master)
+[![Build Status](https://travis-ci.org/biocore/calour.png?branch=master)](https://travis-ci.org/biocore/calour)
+[![Coverage Status](https://coveralls.io/repos/github/biocore/calour/badge.svg?branch=master)](https://coveralls.io/github/biocore/calour?branch=master)
 
 exploratory and interactive microbiome analysis based on heatmaps
 
@@ -25,7 +25,7 @@ conda install -c biocore biom-format scikit-bio
 
 Install calour:
 ```
-pip install git+git://github.com/amnona/calour.git
+pip install git+git://github.com/biocore/calour.git
 ```
 
 Install the [dbBact](http://www.dbbact.org) calour interface:
@@ -49,7 +49,7 @@ Using calour
 Calour can be used from within an ipython session / jupyter notebook or as a standalone GUI (EZCalour).
 
 Sample jupyter notebooks are located in:
-[https://github.com/amnona/calour/blob/master/notebooks](https://github.com/amnona/calour/blob/master/notebooks)
+[https://github.com/biocore/calour/blob/master/notebooks](https://github.com/biocore/calour/blob/master/notebooks)
 
 Full Documentation is located in:
 [http://biocore.github.io/calour/](http://biocore.github.io/calour/)
