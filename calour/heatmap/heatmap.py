@@ -156,7 +156,14 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     # this set cells of zero value.
     cmap.set_bad('black')
     # plot the heatmap
-    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', norm=norm, cmap=cmap, clim=clim)
+    vmin = vmax = None
+    if clim is not None:
+        vmin, vmax = clim
+        # logNorm requires positive values. set it to default None if vmin is zero
+        if vmin == 0:
+            vmin = None
+    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest',
+                      norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)
     # plot legend of color scale
     if show_legend:
         legend = fig.colorbar(
