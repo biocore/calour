@@ -35,7 +35,7 @@ class PlotTests(Tests):
                             pd.DataFrame({'genus': ['bacillus', 'listeria']}))
         # bar width used in plot_staked_bar
         width = 0.95
-        fig = exp.plot_stacked_bar(sample_color_bars='A', legend_field='genus', xtick=None)
+        fig = exp.plot_stacked_bar(sample_color_bars='A', field='genus', xtick=None)
         self.assertEqual(len(fig.axes), 3)
         # test bar ax
         ax = fig.axes[0]

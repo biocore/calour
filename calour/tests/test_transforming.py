@@ -9,7 +9,8 @@
 from unittest import main
 
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+import pandas as pd
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn import preprocessing
 
 import calour as ca
@@ -134,6 +135,30 @@ class TestTransforming(Tests):
         good_features = list(set(range(exp.data.shape[1])).difference(set(bad_features)))
         assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)
         self.assertTrue(np.all(newexp.data[:, bad_features] > exp.data[:, bad_features]))
+
+    def test_subsample_count(self):
+        exp = ca.Experiment(data=np.array([[1, 2, 3], [4, 5, 6]]),
+                            sample_metadata=pd.DataFrame([['a', 'b', 'c'], ['d', 'e', 'f']]),
+                            sparse=False)
+        n = 6
+        obs = exp.subsample_count(n)
+        assert_array_equal(obs.data.sum(axis=1), np.array([n, n]))
+        self.assertTrue(np.all(obs.data <= n))
+
+        n = 7
+        obs = exp.subsample_count(n)
+        # the 1st row dropped
+        assert_array_equal(obs.data.sum(axis=1), np.array([n]))
+        self.assertIsNot(obs, exp)
+
+        obs = exp.subsample_count(n, inplace=True)
+        assert_array_equal(obs.data.sum(axis=1), np.array([n]))
+        self.assertTrue(np.all(obs.data <= n))
+        self.assertIs(obs, exp)
+
+        n = 10000
+        obs = exp.subsample_count(n)
+        assert_array_equal(obs.data.sum(axis=1), np.array([]))
 
 
 if __name__ == '__main__':
