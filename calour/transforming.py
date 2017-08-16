@@ -2,6 +2,8 @@
 transforming (:mod:`calour.transforming`)
 =========================================
 
+.. warning:: Some of the functions require dense matrix and thus will change the sparse matrix to dense matrix.
+
 .. currentmodule:: calour.transforming
 
 Functions
@@ -18,6 +20,7 @@ Functions
    log_n
    transform
    center_log
+   subsample_count
 '''
 
 # ----------------------------------------------------------------------------
@@ -37,6 +40,7 @@ from sklearn import preprocessing
 
 from .experiment import Experiment
 from skbio.stats.composition import clr, centralize
+from skbio.stats import subsample_counts
 
 logger = getLogger(__name__)
 
@@ -320,12 +324,13 @@ def center_log(exp, delta=1, method=None, inplace=False):
     ----------
     delta : numeric, optional
         cap the tiny values and then clr transform the data.
-    method : str, optional
+    method : callable, optional
         An optional function to specify how the pseudocount method should be
         handled.
     inplace : bool, optional
+        False (default) to create a new experiment, True to normalize in place
 
-     Returns
+    Returns
     -------
     ``Experiment``
         The normalized experiment. Note that all features are clr normalized.
@@ -345,3 +350,54 @@ def center_log(exp, delta=1, method=None, inplace=False):
 
     exp.data = clr(centralize(method(exp.data)))
     return exp
+
+
+@Experiment._record_sig
+def subsample_count(exp, total, replace=False, inplace=False):
+    """Randomly subsample each sample to the same number of counts.
+
+    .. warning:: This function will change the data matrix in
+    ``Experiment`` object from sparse to dense. The input
+    ``Experiment`` object should not have been normalized by total sum
+    and its data should be discrete count. The samples that have few
+    total count than ``total`` will be dropped.
+
+    Parameters
+    ----------
+    total : int, optional
+        cap the tiny values and then clr transform the data.
+    replace : bool, optional
+        If True, subsample with replacement. If False (the default), subsample without replacement
+    inplace : bool, optional
+        False (default) to create a new experiment, True to do it in place
+
+    Returns
+    -------
+    ``Experiment``
+        The subsampled experiment.
+
+    See Also
+    --------
+    skbio.stats.subsample_counts
+
+    """
+    if inplace:
+        newexp = exp
+    else:
+        newexp = deepcopy(exp)
+    if newexp.sparse:
+        newexp.sparse = False
+    # subsample_counts() require int as input;
+    # check if it is normalized: if so, raise error
+    if exp.exp_metadata.get('normalized'):
+        raise ValueError('Your ``Experiment`` object is normalized: subsample operates on integer raw data, not on normalized data.')
+    newexp.data = newexp.data.astype(int)
+    drops = []
+    for row in range(newexp.data.shape[0]):
+        try:
+            newexp.data[row, :] = subsample_counts(newexp.data[row, :], n=total, replace=replace)
+        except ValueError:
+            # if the row sum is smaller than total in case replace is True, this row should be dropped
+            drops.append(row)
+    newexp.reorder([i not in drops for i in range(newexp.data.shape[0])], inplace=True)
+    return newexp

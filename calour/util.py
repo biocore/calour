@@ -37,6 +37,67 @@ import scipy
 logger = getLogger(__name__)
 
 
+def compute_prevalence(abundance):
+    '''Return the prevalence at each abundance cutoffs.
+
+    Each sample that has the OTU above the cutoff (exclusive) will
+    be counted.
+
+    Parameters
+    ----------
+    abundance : iterable of numeric
+        The abundance of a species across samples.
+
+    Examples
+    --------
+    >>> abund = [0, 0, 1, 2, 4, 1]
+    >>> x, y = compute_prevalence(abund)
+    >>> x
+    array([0, 1, 2, 4])
+    >>> y
+    array([ 0.66666667,  0.33333333,  0.16666667,  0.        ])
+
+    '''
+    # unique values are sorted
+    cutoffs, counts = np.unique(abundance, return_counts=True)
+    cum_counts = np.cumsum(counts)
+    prevalences = 1 - cum_counts / counts.sum()
+    # print(cutoffs, prevalences)
+    return cutoffs, prevalences
+
+
+def _transition_index(l):
+    '''Return the transition index and current value of the list.
+
+    Examples
+    -------
+    >>> l = ['a', 'a', 'b']
+    >>> list(_transition_index(l))
+    [(2, 'a'), (3, 'b')]
+    >>> l = ['a', 'a', 'b', 1, 2, None, None]
+    >>> list(_transition_index(l))
+    [(2, 'a'), (3, 'b'), (4, 1), (5, 2), (7, None)]
+
+    Parameters
+    ----------
+    l : Iterable of arbitrary objects
+
+    Yields
+    ------
+    tuple of (int, arbitrary)
+        the transition index, the item value
+    '''
+    it = enumerate(l)
+    i, item = next(it)
+    item = str(type(item)), item
+    for i, current in it:
+        current = str(type(current)), current
+        if item != current:
+            yield i, item[1]
+            item = current
+    yield i + 1, item[1]
+
+
 def _convert_axis_name(func):
     '''Convert str value of axis to 0/1.
 

@@ -214,7 +214,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     Parameters
     ----------
     data_file : str
-        name of the OpenMS bucket table CSV file
+        name of the OpenMS bucket table CSV file.
     sample_metadata_file : str or None (optional)
         None (default) to not load metadata per sample
         str to specify name of sample mapping file (tsv)
@@ -261,23 +261,21 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     if mz_rt_sep is None:
         # autodetect the mz/rt separator
         tmp = exp.feature_metadata['id'].iloc[0].split('_')
-        if len(tmp) > 1:
+        if len(tmp) == 2:
             logger.debug('Autodetcted "_" as mz/rt separator')
             mz_rt_sep = '_'
         else:
-            tmp = exp.feature_metadata['id'].iloc[0].split(' ')
-            if len(tmp) > 1:
+            tmp = exp.feature_metadata['id'].iloc[0].split()
+            if len(tmp) == 2:
                 logger.debug('Autodetcted " " as mz/rt separator')
-                mz_rt_sep = ' '
+                mz_rt_sep = None
             else:
                 raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
 
-    mzdata = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
-    mzdata = mzdata[[0, 1]]
-    mzdata = mzdata.astype(float)
-    mzdata.columns = ['MZ', 'RT']
-    exp.feature_metadata = pd.concat([exp.feature_metadata, mzdata], axis='columns')
-
+    exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
+    # trim the whitespaces
+    exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].str.strip()
+    exp.feature_metadata['RT'] = exp.feature_metadata['RT'].str.strip()
     if gnps_file:
         # load the gnps table
         gnps_data = pd.read_table(gnps_file, sep='\t')
@@ -314,6 +312,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     data_file_type : str (optional)
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
+        'tsv': a tab-separated table with (samples in column and feature in row)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
         'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
@@ -351,8 +350,14 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         sid, oid, data = _read_open_ms(data_file, rows_are_samples=True)
     elif data_file_type == 'qiime2':
         sid, oid, data, md = _read_qiime2(data_file)
+    elif data_file_type == 'tsv':
+        df = pd.read_table(data_file, sep='\t', index_col=0)
+        sid = df.columns.tolist()
+        oid = df.index.tolist()
+        data = df.as_matrix().T
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
+
     sfilter = [True] * len(sid)
     # load the sample metadata file
     if sample_metadata_file is not None:

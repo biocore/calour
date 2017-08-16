@@ -14,45 +14,12 @@ import matplotlib as mpl
 import matplotlib.patches as mpatches
 import numpy as np
 
-from ..transforming import log_n
 from ..database import _get_database_class
 from .._dendrogram import plot_tree
+from ..util import _to_list, _transition_index
 
-from ..util import _to_list
 
 logger = getLogger(__name__)
-
-
-def _transition_index(l):
-    '''Return the transition index and current value of the list.
-
-    Examples
-    -------
-    >>> l = ['a', 'a', 'b']
-    >>> list(_transition_index(l))
-    [(2, 'a'), (3, 'b')]
-    >>> l = ['a', 'a', 'b', 1, 2, None, None]
-    >>> list(_transition_index(l))
-    [(2, 'a'), (3, 'b'), (4, 1), (5, 2), (7, None)]
-
-    Parameters
-    ----------
-    l : Iterable of arbitrary objects
-
-    Yields
-    ------
-    tuple of (int, arbitrary)
-        the transition index, the item value
-    '''
-    it = enumerate(l)
-    i, item = next(it)
-    item = str(type(item)), item
-    for i, current in it:
-        current = str(type(current)), current
-        if item != current:
-            yield i, item[1]
-            item = current
-    yield i + 1, item[1]
 
 
 def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
@@ -109,7 +76,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
 def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
-            axes=None, rect=None,  transform=log_n,
+            ax=None, rect=None,  norm=mpl.colors.LogNorm(),
             show_legend=False, **kwargs):
     '''Plot a heatmap for the experiment.
 
@@ -147,12 +114,14 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         None (default) to use mpl default color map. str to use colormap named str.
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
-    axes : matplotlib ``AxesSubplot`` object or None (optional)
+    ax : matplotlib Axes object or None (optional)
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot heatmap into the axes
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
+    norm : matplotlib colors Normalize or ``None``
+        passed to ``norm`` parameter of ``plt.imshow``. Default is log scale.
     show_legend : bool (optional)
         True to plot a legend color bar for the heatmap
 
@@ -164,30 +133,46 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     logger.debug('plot heatmap')
     # import pyplot is less polite. do it locally
     import matplotlib.pyplot as plt
+
     # get the default feature field if not specified (i.e. False)
     if feature_field is False:
         feature_field = exp.heatmap_feature_field
     numrows, numcols = exp.shape
-    # step 1. transform data
-    if transform is None:
-        data = exp.get_data(sparse=False)
-    else:
-        logger.debug('transform exp with %r with param %r' % (transform, kwargs))
-        data = transform(exp, inplace=False, **kwargs).data
+    data = exp.get_data(sparse=False)
 
-    if axes is None:
+    if ax is None:
         fig, ax = plt.subplots()
     else:
-        fig, ax = axes.get_figure(), axes
+        fig = ax.get_figure()
 
     # step 2. plot heatmap.
+    if title is not None:
+        ax.set_title(title)
     # init the default colormap
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
+    if isinstance(cmap, str):
+        cmap = plt.get_cmap(cmap)
+    # this set cells of zero value.
+    cmap.set_bad('black')
     # plot the heatmap
-    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest', cmap=cmap, clim=clim)
+    vmin = vmax = None
+    if clim is not None:
+        vmin, vmax = clim
+        # logNorm requires positive values. set it to default None if vmin is zero
+        if vmin == 0:
+            vmin = None
+    image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest',
+                      norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)
+    # plot legend of color scale
     if show_legend:
-        _figure_color_bar(exp, image, fig, axes=None, log_scale=(transform == log_n))
+        legend = fig.colorbar(
+            image,
+            aspect=100,
+            # convert tick label to percentage
+            format=mpl.ticker.FuncFormatter(
+                lambda tick_val, tick_pos: tick_val * 100 / exp.exp_metadata.get('normalized')))
+        legend.ax.tick_params(labelsize=5)
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -268,44 +253,12 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     return fig
 
 
-def _figure_color_bar(exp, image, fig, axes, log_scale=True, num_ticks=8, aspect=100):
-    '''Plot the heatmap colorbar scale
-
-    Parameters
-    ----------
-    exp : ``Experiment``
-        The experiment for which the plot is made.
-        We use it to see whether the scale should be relative(normalized) or absolute
-    fig : matplotlib.Figure
-        The figure to plot the colorbar in
-    axes : matplotlib.Axis
-        The axis to plot into
-    log_scale : bool (optional)
-        True (default) to plot log scale colorbar
-        False to plot linear scale
-    num_ticks : int (optional)
-        number of ticks to put on the colorbar
-    '''
-    clim = image.get_clim()
-    ticks = np.linspace(clim[0], clim[1], num_ticks)
-    ticks = [eval("%.0e" % (x)) for x in ticks]
-    cb = fig.colorbar(image, ax=axes, ticks=ticks, aspect=aspect)
-    if log_scale:
-        tick_labels = np.power(2, ticks)
-    else:
-        tick_labels = ticks
-    if exp.exp_metadata.get('normalized'):
-        tick_labels = 100 * np.array(tick_labels) / exp.exp_metadata['normalized']
-        tick_labels = ['%%%s' % x for x in tick_labels]
-    cb.ax.set_yticklabels(tick_labels)
-
-
-def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=True):
+def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True):
     '''plot color bars along x or y axis
 
     Parameters
     ----------
-    axes : ``matplotlib`` axes
+    ax : ``matplotlib`` axes
         the axes to plot the color bars in.
     values : list/tuple
         the values informing the colors on the bar
@@ -354,25 +307,22 @@ def _ax_color_bar(axes, values, width, position=0, colors=None, axis=0, label=Tr
                 edgecolor="none",  # No border
                 facecolor=col[value],
                 label=value)
-            axes.add_patch(rect)
+            ax.add_patch(rect)
             if label is True:
                 rx, ry = rect.get_xy()
                 cx = rx + rect.get_width()/2.0
                 cy = ry + rect.get_height()/2.0
                 # add the text in the color bars
-                axes.annotate(value, (cx, cy), color='w', weight='bold',
-                              fontsize=7, ha='center', va='center', rotation=rotation)
+                ax.annotate(value, (cx, cy), color='w', weight='bold',
+                            fontsize=7, ha='center', va='center', rotation=rotation)
         prev = i
-    # axes.legend(
-    #     handles=[mpatches.Rectangle((0, 0), 0, 0, facecolor=col[k], label=k) for k in col],
-    #     bbox_to_anchor=(0, 1.2),
-    #     ncol=len(col))
-    return axes
+
+    return ax
 
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=False, color_bar_label=True,
-         tree=None, tree_size=8, **kwargs):
+         tree=None, tree_size=8, title=None, **kwargs):
     '''Plot the interactive heatmap and its associated axes.
 
     The heatmap is interactive and can be dynamically updated with
@@ -444,6 +394,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         NOTE: features are reordered according to the tree
     tree_size : int (optional)
         The width of the tree relative to the main heatmap (12 is identical size)
+    title : str (optional)
+        The title of the figure.
     kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
@@ -463,10 +415,13 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         # match the exp order to the tree (reorders the features)
         exp, tree = plot_tree(exp, tree, gui_obj.tree_axes)
 
-    exp.heatmap(axes=gui_obj.axes, **kwargs)
+    if title is not None:
+        gui_obj.figure.suptitle(title)
+
+    exp.heatmap(ax=gui_obj.axes, **kwargs)
     barwidth = 0.3
     barspace = 0.05
-    label = color_bar_label
+
     if sample_color_bars is not None:
         sample_color_bars = _to_list(sample_color_bars)
         position = 0
@@ -474,7 +429,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
-                gui_obj.xax, values=values, width=barwidth, position=position, label=label, axis=0)
+                gui_obj.xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
             position += (barspace + barwidth)
     if feature_color_bars is not None:
         feature_color_bars = _to_list(feature_color_bars)
@@ -482,7 +437,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         for f in feature_color_bars:
             values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
             _ax_color_bar(
-                gui_obj.yax, values=values, width=barwidth, position=position, label=label, axis=1)
+                gui_obj.yax, values=values, width=barwidth, position=position, label=color_bar_label, axis=1)
             position += (barspace + barwidth)
     # set up the gui ready for interaction
     gui_obj()
@@ -491,7 +446,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
 
 
 def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
-              gui='cli', databases=False, color_bar_label=True, **kwargs):
+              gui='cli', databases=False, color_bar_label=True, title=None, **kwargs):
     '''Plot after sorting by sample field.
 
     This is a convenience wrapper for plot().
@@ -520,6 +475,8 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
         a list of databases to access or add annotation
         False (default) to use the default field based on the experiment subclass
         None to not use databases
+    title : str (optional)
+        The title of the figure.
     kwargs : dict, optional
         keyword arguments passing to :ref:`plot<plot-ref>` function.
 
@@ -538,7 +495,7 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
         plot_field = None
     if 'sample_field' in kwargs:
         return newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                           gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+                           gui=gui, databases=databases, color_bar_label=color_bar_label, title=title, **kwargs)
     else:
         return newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                           gui=gui, databases=databases, color_bar_label=color_bar_label, **kwargs)
+                           gui=gui, databases=databases, color_bar_label=color_bar_label, title=title, **kwargs)
