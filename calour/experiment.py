@@ -322,7 +322,8 @@ class Experiment:
             exp.sample_metadata = exp.sample_metadata.iloc[new_order, :]
         else:
             exp.data = exp.data[:, new_order]
-            exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
+            if exp.feature_metadata is not None:
+                exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
         return exp
 
     def to_pandas(self, sample_field=None, feature_field=None, sparse=None):
