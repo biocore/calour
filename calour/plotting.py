@@ -26,7 +26,10 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from itertools import cycle
+
 import numpy as np
+
 from .util import _to_list, compute_prevalence
 from .heatmap.heatmap import _ax_color_bar
 
@@ -313,17 +316,14 @@ def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, alpha=0.5, linew
     return ax
 
 
-def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=None,
-                     figsize=(12, 8), legend_size='small', legend_field=None, xtick=False):
+def plot_stacked_bar(exp, field=None, sample_color_bars=None, color_bar_label=True, title=None,
+                     figsize=(12, 8), legend_size='small', xtick=False, cmap='Paired'):
     '''Plot the stacked bar for feature abundances.
 
     Parameters
     ----------
-    xtick : str, False, or None
-        how to draw ticks and tick labels on x axis.
-        str: use a column name in sample metadata;
-        None: use sample IDs;
-        False: do not draw ticks.
+    field : str, or None
+        a column name in feature metadata. the values in the column will be used as the legend labels
     sample_color_bars : list, optional
         list of column names in the sample metadata. It plots a color bar
         for each unique column to indicate sample group. It doesn't plot color bars by default (``None``)
@@ -335,8 +335,13 @@ def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=No
         figure size passed to ``figsize`` in ``plt.figure``
     legend_size : str or int
         passed to ``fontsize`` in ``ax.legend()``
-    legend_field : str, or None
-        a column name in feature metadata. the values in the column will be used as the legend labels
+    xtick : str, False, or None
+        how to draw ticks and tick labels on x axis.
+        str: use a column name in sample metadata;
+        None: use sample IDs;
+        False: do not draw ticks.
+    cmap : string
+        matplotlib qualitative colormap
 
     Returns
     -------
@@ -351,6 +356,9 @@ def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=No
     else:
         data = exp.data.T
 
+    cmap = plt.get_cmap(cmap)
+    colors = cycle(cmap.colors)
+
     fig = plt.figure(figsize=figsize)
     gs = GridSpec(2, 2, width_ratios=[12, 6], height_ratios=[1, 12])
 
@@ -359,8 +367,8 @@ def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=No
                         np.cumsum(data, axis=0)[:-1]))
     ind = range(data.shape[1])
     rects = []
-    for dat, bot in zip(data, bottom):
-        rect = bar.bar(ind, dat, bottom=bot, width=0.95)
+    for dat, bot, col in zip(data, bottom, colors):
+        rect = bar.bar(ind, dat, bottom=bot, width=0.95, color=col)
         rects.append(rect[0])
     if xtick is None:
         bar.set_xticks(ind)
@@ -392,10 +400,10 @@ def plot_stacked_bar(exp, sample_color_bars=None, color_bar_label=True, title=No
                 xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
             position += (barspace + barwidth)
 
-    if legend_field is not None:
+    if field is not None:
         lax = fig.add_subplot(gs[3])
         lax.axis('off')
-        lax.legend(rects, exp.feature_metadata[legend_field], loc="center left", fontsize=legend_size)
+        lax.legend(rects, exp.feature_metadata[field], loc="center left", fontsize=legend_size)
 
     if title is not None:
         fig.suptitle(title)

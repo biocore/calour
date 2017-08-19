@@ -166,13 +166,21 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
                       norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)
     # plot legend of color scale
     if show_legend:
+        # make the colorbar wider
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+        from matplotlib.ticker import MaxNLocator
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
         legend = fig.colorbar(
             image,
-            aspect=100,
+            cax=cax,
+            label='percentage',
             # convert tick label to percentage
             format=mpl.ticker.FuncFormatter(
                 lambda tick_val, tick_pos: tick_val * 100 / exp.exp_metadata.get('normalized')))
-        legend.ax.tick_params(labelsize=5)
+        # specify tick label font size
+        legend.ax.tick_params(labelsize=9)
+        legend.ax.yaxis.set_major_locator(MaxNLocator(4))
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
