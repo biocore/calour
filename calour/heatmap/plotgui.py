@@ -19,6 +19,24 @@ logger = getLogger(__name__)
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
+    The grid of axes looks like this:
+
+    +------------------------------------+---+----------------+
+    |        sample color bar            |   |            |   |
+    |------------------------------------+---+------------+---|
+    |                                    | f |            |   |
+    |                                    | e |            | l |
+    |                                    | a |            | e |
+    |                                    | t |    tree    | g |
+    |           HEATMAP                  | u | (optional  | e |
+    |                                    | r |  column)   | n |
+    |                                    | e |            | d |
+    |                                    |   |            |   |
+    |                                    | b |            |   |
+    |                                    | a |            |   |
+    |                                    | r |            |   |
+    +------------------------------------+---+------------+---+
+
     Attributes
     ----------
     exp : ``Experiment``
@@ -52,7 +70,8 @@ class PlotGUI(ABC):
     zoom_scale : the scaling factor for zooming
     scroll_offset : The amount of columns/rows to scroll when arrow key pressed
     databases : the databases to interact with
-    tree_size : int (>= 0). the width of the axes to plot a tree.
+    tree_size : int (>= 0). the width of the axes to plot a tree. 7 is a good value to start.
+
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None, tree_size=0):
         # the Experiment being plotted
@@ -80,24 +99,26 @@ class PlotGUI(ABC):
         else:
             self.figure = figure
         if tree_size == 0:
-            gs = GridSpec(2, 2, width_ratios=[12, 1], height_ratios=[1, 12])
-            hm_ax = self.figure.add_subplot(gs[2])
-            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
-            self.xax.axis('off')
-            self.yax = self.figure.add_subplot(gs[3], sharey=hm_ax)
-            self.yax.axis('off')
-            self.axes = hm_ax
-            self.gridspec = gs
-        else:
-            gs = GridSpec(2, 3, width_ratios=[12, 1, tree_size], height_ratios=[1, 12])
+            gs = GridSpec(2, 3, width_ratios=[12, 1, 0.5], height_ratios=[1, 12])
             hm_ax = self.figure.add_subplot(gs[3])
             self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
             self.xax.axis('off')
             self.yax = self.figure.add_subplot(gs[4], sharey=hm_ax)
             self.yax.axis('off')
             self.axes = hm_ax
-            self.tree_axes = self.figure.add_subplot(gs[5], sharey=hm_ax)
+            self.legend = self.figure.add_subplot(gs[5])
+            self.gridspec = gs
+        else:
+            gs = GridSpec(2, 4, width_ratios=[12, 1, tree_size, 0.5], height_ratios=[1, 12])
+            hm_ax = self.figure.add_subplot(gs[4])
+            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.xax.axis('off')
+            self.yax = self.figure.add_subplot(gs[5], sharey=hm_ax)
+            self.yax.axis('off')
+            self.axes = hm_ax
+            self.tree_axes = self.figure.add_subplot(gs[6], sharey=hm_ax)
             self.tree_axes.axis('off')
+            self.legend = self.figure.add_subplot(gs[7])
             self.gridspec = gs
 
     def save_figure(self, *args, **kwargs):
