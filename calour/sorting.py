@@ -134,7 +134,7 @@ def cluster_data(exp, transform=None, axis=1, metric='euclidean', inplace=False,
 
 
 @Experiment._record_sig
-def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
+def cluster_features(exp, min_abundance=0, inplace=False, **kwargs):
     '''Cluster features.
 
     Cluster is done after filtering of minimal abundance, log
@@ -143,7 +143,7 @@ def cluster_features(exp, min_abundance=10, inplace=False, **kwargs):
     Parameters
     ----------
     min_abundance : Number, optional
-        filter away features less than ``min_abundance`` (10 by default).
+        filter away features less than ``min_abundance``. Default to 0.
     kwargs : dict
         keyword arguments passing to ``cluster_data``
 
