@@ -86,7 +86,6 @@ class PlotTests(Tests):
         np.random.seed(12345)
         self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=100)
         self.test1.sparse = False
-        print(self.test1.shape)
         ax = self.test1.filter_samples(
             'group', ['1', '2']).plot_shareness(
                 field='group', steps=(2, 12), iterations=2)
