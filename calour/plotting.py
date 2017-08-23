@@ -221,7 +221,7 @@ def plot_shareness(exp, field=None, steps=None, iterations=10, alpha=0.5, linewi
         for uniq in exp.sample_metadata[field].unique():
             data = exp.filter_samples(field, uniq).data
             # this subset may have number of samples smaller than some value in steps
-            steps_i = [i for i in steps if i <= exp.shape[0]]
+            steps_i = [i for i in steps if i <= data.shape[0]]
             plot_lines(data, steps_i, uniq)
         ax.legend()
     # because the shareness drops quickly, we plot it in log scale
