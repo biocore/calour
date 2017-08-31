@@ -65,13 +65,14 @@ def correlation(exp, field, method='spearman', nonzero=False, transform='rankdat
         the desired FDR control level
     numperm : int
         number of permutations to perform
+    fdr_method : str
+        method to compute FDR. Allowed method include "", ""
 
     Returns
     -------
     newexp : calour.Experiment
-        The experiment with only significant (FDR<=maxfval) correlated features, sorted according to correlation size
+        The experiment with only significant (FDR<=maxfval) correlated features, sorted according to correlation coefficient
     '''
-    # remove features not present in both groups
     cexp = exp.filter_min_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
@@ -112,7 +113,7 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
         The field to test by
     val1: str or list of str
         The values for the first group.
-    val1: str or list of str or None (optional)
+    val2: str or list of str or None (optional)
         None (default) to compare to all other samples (not in val1)
     method : str or function
         the method to use for the t-statistic test. options:
@@ -198,7 +199,7 @@ def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1,
         labels[exp.sample_metadata[field].values == clabel] = idx
     logger.debug('Found %d unique sample labels' % (idx+1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
-    print(keep)
+
     logger.info('Found %d significant features' % (np.sum(keep)))
     return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
 
