@@ -70,9 +70,10 @@ class TestAnalysis(Tests):
         np.random.seed(2017)
         # test using non zero spearman correlation
         dd = self.test1.correlation('id', method='spearman', nonzero=True)
-        expected_ids = [0, 1, 2, 3, 4, 7, 10]
-        self.assertEqual(len(dd.feature_metadata), 7)
+        expected_ids = [1, 2, 4, 5, 7, 10]
+        self.assertEqual(len(dd.feature_metadata), 6)
         for cid in expected_ids:
+            print('%d: %s' % (cid,self.test1.feature_metadata.index[cid]))
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
 
     def test_correlation_pearson(self):
