@@ -36,7 +36,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def correlation(exp, field, method='spearman', nonzero=False, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def correlation(exp, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''Find features with correlation to a numeric metadata field
     With permutation based p-values and multiple hypothesis correction
 
