@@ -81,6 +81,7 @@ class TestAnalysis(Tests):
         # test using pearson correlation
         dd = self.test1.correlation('id', method='pearson')
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
+        print('len pearson %d' % len(dd.feature_metadata))
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
