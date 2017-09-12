@@ -30,7 +30,6 @@ class TestAnalysis(Tests):
         # test using defulat values
         dd = diff_abundance(self.test1, 'group', val1='1', val2='2')
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
-        print(self.test1.feature_metadata.index.values)
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
@@ -40,14 +39,12 @@ class TestAnalysis(Tests):
         # we get 1 less since now we also include badsample sample (not in the mapping file, so gets na)
         self.assertEqual(len(dd.feature_metadata), 6)
         for cid in expected_ids:
-            print(self.test1.feature_metadata.index[cid])
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
         # test using no val 2 using only group 2
         dd = diff_abundance(self.test1, 'group', val1='2')
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
-            print(self.test1.feature_metadata.index[cid])
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
 
     def test_diff_abundance_alpha0(self):
@@ -101,7 +98,6 @@ class TestAnalysis(Tests):
         # test on real complex dataset (timeseries)
         # after rank transforming the reads, should get
         dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson', transform='rankdata')
-        print(len(dd.feature_metadata))
         self.assertTrue(np.abs(101 - len(dd.feature_metadata)) < 5)
         goodseq = 'TACGGAGGATGCGAGCGTTATTCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGGCTATTAAGTCAGGGGTGAAAGGTTTCAGCTTAACTGAGAAATTGCCTTTGATACTGGTAGTCTTGAATATCTGTGAAGTTCTTGGAATGTGTAG'
         self.assertIn(goodseq, dd.feature_metadata.index)
@@ -116,7 +112,6 @@ class TestAnalysis(Tests):
         np.random.seed(2017)
         # test on real complex dataset (timeseries) with spearman correlation
         dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='spearman')
-        print(len(dd.feature_metadata))
         self.assertTrue(np.abs(51 - len(dd.feature_metadata)) < 5)
 
     def test_diff_abundance_kw(self):
