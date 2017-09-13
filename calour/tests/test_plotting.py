@@ -15,6 +15,7 @@ from numpy.testing import assert_array_almost_equal
 import calour as ca
 from calour._testing import Tests
 from calour.util import compute_prevalence
+from calour.plotting import _compute_frac_nonzero
 
 
 class PlotTests(Tests):
@@ -87,9 +88,20 @@ class PlotTests(Tests):
         self.test1.sparse = False
         ax = self.test1.filter_samples(
             'group', ['1', '2']).plot_shareness(
-                field='group', steps=(2, 10), iterations=2)
+                field='group', steps=(2, 12), iterations=2)
         lines = ax.get_lines()
         self.assertEqual(len(lines), 6)
+
+    def test_compute_frac_nonzero(self):
+        data = np.array([[4, 5, 0, 3, 5, 1, 4, 3],
+                         [0, 2, 1, 0, 5, 3, 1, 5],
+                         [4, 0, 4, 3, 0, 2, 0, 5],
+                         [2, 4, 0, 4, 2, 0, 1, 0],
+                         [3, 3, 5, 3, 1, 0, 0, 1]])
+        np.random.seed(1)
+        steps, frac = _compute_frac_nonzero(data, [5, 3, 2])
+        self.assertListEqual(steps, [5, 3, 2])
+        assert_array_almost_equal(frac, np.array([0, 0.25, 4/7]))
 
 
 if __name__ == '__main__':

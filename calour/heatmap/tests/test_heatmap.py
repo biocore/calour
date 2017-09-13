@@ -34,11 +34,10 @@ class PlotTests(Tests):
             self.assertEqual(fid, self.test1.feature_metadata.index[col])
 
     def test_heatmap(self):
-        fig = self.test1.heatmap(sample_field='group',
-                                 feature_field='ph',
-                                 yticklabels_max=None,
-                                 transform=None)
-        ax = fig.gca()
+        ax = self.test1.heatmap(sample_field='group',
+                                feature_field='ph',
+                                yticklabels_max=None,
+                                transform=None)
         obs_images = ax.images
         # test only one heatmap exists
         self.assertEqual(len(obs_images), 1)
