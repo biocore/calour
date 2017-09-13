@@ -420,7 +420,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
 
 def read_amplicon(data_file, sample_metadata_file=None,
-                  *, filter_reads, normalize, **kwargs):
+                  *, min_reads, normalize, **kwargs):
     '''Load an amplicon experiment.
 
     Fix taxonomy, normalize reads, and filter low abundance
@@ -431,8 +431,8 @@ def read_amplicon(data_file, sample_metadata_file=None,
     ----------
     sample_metadata_file : None or str (optional)
         None (default) to just use samplenames (no additional metadata).
-    filter_reads : int or None
-        int (default) to remove all samples with less than ``filter_reads``.
+    min_reads : int or None
+        int (default) to remove all samples with less than ``min_reads``.
         ``None`` to not filter
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
@@ -453,10 +453,10 @@ def read_amplicon(data_file, sample_metadata_file=None,
     else:
         exp.feature_metadata['taxonomy'] = 'NA'
 
-    if filter_reads is not None:
-        exp.filter_by_data('sum_abundance', cutoff=filter_reads, inplace=True)
+    if min_reads is not None:
+        exp.filter_by_data('sum_abundance', cutoff=min_reads, inplace=True)
     if normalize is not None:
-        exp.normalize(total=normalize, inplace=True)
+        exp.normalize(total=normalize, axis='s', inplace=True)
 
     return exp
 

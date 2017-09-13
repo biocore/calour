@@ -23,7 +23,7 @@ class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
         self.test1 = ca.read_amplicon(self.test1_biom, self.test1_samp,
-                                      filter_reads=1000, normalize=10000)
+                                      min_reads=1000, normalize=10000)
 
     def test_filter_taxonomy(self):
         # default - substring and keep matching

@@ -77,7 +77,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
             ax=None, rect=None,  norm=mpl.colors.LogNorm(),
-            show_legend=False, **kwargs):
+            cax=None, **kwargs):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple or an interactive heatmap for the experiment. Plot features in row
@@ -122,12 +122,12 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         [x_min, x_max, y_min, y_max] to set initial zoom window
     norm : matplotlib colors Normalize or ``None``
         passed to ``norm`` parameter of ``plt.imshow``. Default is log scale.
-    show_legend : bool (optional)
-        True to plot a legend color bar for the heatmap
+    cax : None or matplotlib Axes object (optional)
+        plot a legend colorbar for the heatmap in the cax or not
 
     Returns
     -------
-    ``matplotlib.figure.Figure``
+    matplotlib Axes of the heatmap
 
     '''
     logger.debug('plot heatmap')
@@ -165,22 +165,13 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest',
                       norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)
     # plot legend of color scale
-    if show_legend:
+    if cax is not None:
         # make the colorbar wider
-        from mpl_toolkits.axes_grid1 import make_axes_locatable
-        from matplotlib.ticker import MaxNLocator
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="5%", pad=0.05)
-        legend = fig.colorbar(
-            image,
-            cax=cax,
-            label='percentage',
-            # convert tick label to percentage
-            format=mpl.ticker.FuncFormatter(
-                lambda tick_val, tick_pos: tick_val * 100 / exp.exp_metadata.get('normalized')))
+        legend = fig.colorbar(image, cax=cax)
+        # cax.set_title('percentage', fontdict={'fontsize': 'small'})
         # specify tick label font size
         legend.ax.tick_params(labelsize=9)
-        legend.ax.yaxis.set_major_locator(MaxNLocator(4))
+        # legend.ax.yaxis.set_major_locator(MaxNLocator(4))
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim((rect[0], rect[1]))
@@ -258,7 +249,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         else:
             return 'x=%1.2f, y=%1.2f' % (x, y)
     ax.format_coord = format_coord
-    return fig
+    return ax
 
 
 def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True):
@@ -426,7 +417,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     if title is not None:
         gui_obj.figure.suptitle(title)
 
-    exp.heatmap(ax=gui_obj.axes, **kwargs)
+    exp.heatmap(ax=gui_obj.axes, cax=gui_obj.legend, **kwargs)
     barwidth = 0.3
     barspace = 0.05
 

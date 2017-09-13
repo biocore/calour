@@ -22,7 +22,7 @@ class TestAnalysis(Tests):
         self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
         # load the complex experiment as sparse with normalizing and removing low read samples
         self.complex = ca.read_amplicon(self.timeseries_biom, self.timeseries_samp,
-                                        filter_reads=1000, normalize=10000)
+                                        min_reads=1000, normalize=10000)
 
     def test_diff_abundance(self):
         # set the seed as we are testing random permutations
@@ -112,6 +112,7 @@ class TestAnalysis(Tests):
         np.random.seed(2017)
         # test on real complex dataset (timeseries) with spearman correlation
         dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='spearman')
+        print(len(dd.feature_metadata))
         self.assertTrue(np.abs(51 - len(dd.feature_metadata)) < 5)
 
     def test_diff_abundance_kw(self):
