@@ -105,6 +105,8 @@ class TestAnalysis(Tests):
         self.assertIn(goodseq, dd.feature_metadata.index)
         # with no transform, we get less
         dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson')
+        print(len(dd.feature_metadata))
+        print(dd.feature_metadata)
         self.assertTrue(np.abs(26 - len(dd.feature_metadata)) < 5)
 
     def test_correlation_complex_spearman(self):
