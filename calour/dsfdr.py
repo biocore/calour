@@ -277,6 +277,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             label_nonzero = label_nonzero - np.mean(label_nonzero)
             tstat[i] = np.dot(sample_nonzero, label_nonzero)
             t[i] = np.abs(tstat[i])
+            tstat[i] = tstat[i] / (np.std(sample_nonzero) * np.std(label_nonzero) * len(sample_nonzero))
 
             permlabels = np.zeros([len(label_nonzero), numperm])
             for cperm in range(numperm):
