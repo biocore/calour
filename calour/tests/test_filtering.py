@@ -214,7 +214,7 @@ class FilteringTests(Tests):
     def test_filter_sample_categories(self):
         test = self.test1.filter_ids(['badsample'], axis=0, negate=True)
         # does not filter anything
-        assert_experiment_equal(test.filter_sample_categories('group', 9), test1)
+        assert_experiment_equal(test.filter_sample_categories('group', 9), test)
         # filter group of 2
         assert_experiment_equal(test.filter_sample_categories('group', 10),
                                 test.filter_samples('group', '1'))
