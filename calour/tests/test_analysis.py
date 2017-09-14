@@ -106,9 +106,6 @@ class TestAnalysis(Tests):
         # with no transform
         np.random.seed(2017)
         dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson')
-        # print(len(dd.feature_metadata))
-        # print(dd.feature_metadata)
-        # self.assertTrue(np.abs(26 - len(dd.feature_metadata)) < 5)
         self.assertEqual(len(dd.feature_metadata), 0)
 
     def test_correlation_complex_spearman(self):
