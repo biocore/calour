@@ -232,7 +232,8 @@ class ExperimentTests(Tests):
         # 1st sample
         npt.assert_array_equal(self.test1['S1', :], self.test1.data.toarray()[0, :])
         # 2nd feature
-        npt.assert_array_equal(self.test1[:, 'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT'], self.test1.data.toarray()[:, 1])
+        npt.assert_array_equal(self.test1[:, 'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT'],
+                               self.test1.data.toarray()[:, 1])
 
 
 if __name__ == "__main__":
