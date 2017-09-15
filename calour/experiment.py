@@ -165,16 +165,29 @@ class Experiment:
             The abundance of feature ID in sample ID
         '''
         if not isinstance(pos, tuple) or len(pos) != 2:
-            raise ValueError('Must supply sample ID, feature ID')
+            raise SyntaxError('Must supply sample ID, feature ID')
+
         sample = pos[0]
         feature = pos[1]
-        if sample not in self.sample_metadata.index:
-            raise ValueError('SampleID %s not in experiment samples' % sample)
-        if feature not in self.feature_metadata.index:
-            raise ValueError('FeatureID %s not in experiment features' % feature)
-        sample_pos = self.sample_metadata.index.get_loc(sample)
-        feature_pos = self.feature_metadata.index.get_loc(feature)
-        return self.data[sample_pos, feature_pos]
+        if isinstance(sample, slice):
+            sample_pos = sample
+        else:
+            try:
+                sample_pos = self.sample_metadata.index.get_loc(sample)
+            except KeyError:
+                raise KeyError('SampleID %s not in experiment samples' % sample)
+        if isinstance(feature, slice):
+            feature_pos = feature
+        else:
+            try:
+                feature_pos = self.feature_metadata.index.get_loc(feature)
+            except KeyError:
+                raise KeyError('FeatureID %s not in experiment features' % feature)
+        if self.sparse:
+            dat = self.get_data(sparse=False)
+        else:
+            dat = self.get_data()
+        return dat[sample_pos, feature_pos]
 
     def copy(self):
         '''Copy the object.
@@ -220,12 +233,14 @@ class Experiment:
             exp = args[0]
             log = exp._log
             try:
+                logger.debug('Run func {}'.format(fn))
                 new_exp = func(*args, **kwargs)
                 if exp._log is True:
                     param = ['%r' % i for i in args[1:]] + ['%s=%r' % (k, v) for k, v in kwargs.items()]
                     param = ', '.join(param)
                     new_exp._call_history.append('{0}({1})'.format(fn, param))
                     exp._log = False
+                    logger.debug('Current object: {}'.format(new_exp))
             finally:
                 # set log status back
                 exp._log = log
@@ -275,7 +290,7 @@ class Experiment:
 
     @property
     def shape(self):
-        return self.get_data().shape
+        return self.data.shape
 
     def reorder(self, new_order, axis=0, inplace=False):
         '''Reorder according to indices in the new order.

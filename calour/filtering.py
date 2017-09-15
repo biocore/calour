@@ -16,6 +16,7 @@ Functions
    filter_mean
    filter_prevalence
    filter_min_abundance
+   filter_sample_categories
 '''
 
 # ----------------------------------------------------------------------------
@@ -97,6 +98,44 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
 
 
 @Experiment._record_sig
+def filter_sample_categories(exp, field, min_samples=5, inplace=False):
+    '''Filter sample categories that have too few samples.
+
+    This is useful to get rid of categories with few samples for
+    supervised classification training.  It also drops the samples
+    that don't have any value in the field.
+
+    Examples
+    --------
+
+    Parameters
+    ----------
+    field : str
+        The name of the column in samples metadata table. This column
+        should has categorical values
+    min_samples : int (optional)
+        Filter away the samples with a value in the given column if its sample count is
+        less than min_samples.
+    inplace : bool (optional)
+        False (default) to create a copy of the experiment, True to filter inplace
+
+    Returns
+    -------
+    ``Experiment``
+        filtered so contains only features/samples present in exp and in ids
+
+    '''
+    exp = exp.reorder(exp.sample_metadata[field].notnull(), inplace=inplace)
+    unique, counts = np.unique(exp.sample_metadata[field].values, return_counts=True)
+    drop_values = [i for i, j in zip(unique, counts) if j < min_samples]
+    if drop_values:
+        logger.debug('Drop samples with {0} values in column {1}'.format(drop_values, field))
+        return exp.filter_samples(field, drop_values, negate=True, inplace=inplace)
+    else:
+        return exp
+
+
+@Experiment._record_sig
 def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
 
@@ -120,8 +159,6 @@ def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
     ``Experiment``
         the filtered object
     '''
-    logger.debug('filter_by_metadata')
-
     if axis == 0:
         x = exp.sample_metadata
     elif axis == 1:
@@ -324,7 +361,7 @@ def _unique_cut(x, unique=0.05):
 
 
 def _freq_ratio(x, ratio=2):
-    '''the ratio of the most common value to the second most common value
+    '''the ratio of the counts of the most common value to the second most common value
 
     Return True if the ratio is not greater than "ratio".
 
@@ -425,7 +462,6 @@ def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
     ``Experiment``
         filtered so contains only features/samples present in exp and in ids
     '''
-    logger.debug('filter_ids')
     okpos = []
     tot_ids = 0
     if axis == 0:

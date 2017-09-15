@@ -218,12 +218,22 @@ class ExperimentTests(Tests):
     def test_getitem(self):
         self.assertEqual(self.test1['S5', 'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG'], 5)
         self.assertEqual(self.test1['S4', 'TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGGGTGCGTAGGCGGCCTGTTAAGTAAGTGGTTAAATTGTTGGGCTCAACCCAATCCGGCCACTTAAACTGGCAGGCTAGAGTATTGGAGAGGCAAGTGGAATTCCATGT'], 0)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.test1['Pita', 'TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGGGTGCGTAGGCGGCCTGTTAAGTAAGTGGTTAAATTGTTGGGCTCAACCCAATCCGGCCACTTAAACTGGCAGGCTAGAGTATTGGAGAGGCAAGTGGAATTCCATGT']
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.test1['S5', 'Pita']
-        with self.assertRaises(ValueError):
+        with self.assertRaises(SyntaxError):
             self.test1['S5']
+
+    def test_shape(self):
+        self.assertEqual(self.test1.shape, (21, 12))
+
+    def test_getitem_slice(self):
+        # 1st sample
+        npt.assert_array_equal(self.test1['S1', :], self.test1.data.toarray()[0, :])
+        # 2nd feature
+        npt.assert_array_equal(self.test1[:, 'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT'],
+                               self.test1.data.toarray()[:, 1])
 
 
 if __name__ == "__main__":
