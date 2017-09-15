@@ -238,6 +238,24 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         labels = labels - np.mean(labels)
         tstat = np.dot(data, labels)
         t = np.abs(tstat)
+
+        # calculate the normalized test statistic
+        stdval = np.std(data, axis=1).reshape([data.shape[0], 1])
+        # to fix problem with 0 std divide by zero (since we permute it's ok)
+        # note we don't remove from mutiple hypothesis - could be done better
+        stdval[stdval == 0] = 1
+        tdata = data / np.repeat(stdval, data.shape[1], axis=1)
+        meanval = np.mean(tdata, axis=1).reshape([tdata.shape[0], 1])
+        tdata = tdata - np.repeat(meanval, tdata.shape[1], axis=1)
+        meanval = np.mean(data, axis=1).reshape([data.shape[0], 1])
+        tdata = tdata - np.repeat(meanval, tdata.shape[1], axis=1)
+
+        tlabels = labels / np.std(labels)
+        # fix for n since we multiply without normalizing for n
+        tlabels = tlabels / len(tlabels)
+        tlabels = tlabels - np.mean(tlabels)
+        tstat = np.dot(tdata, tlabels)
+
         permlabels = np.zeros([len(labels), numperm])
         for cperm in range(numperm):
             rlabels = np.random.permutation(labels)
@@ -259,6 +277,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             label_nonzero = label_nonzero - np.mean(label_nonzero)
             tstat[i] = np.dot(sample_nonzero, label_nonzero)
             t[i] = np.abs(tstat[i])
+            tstat[i] = tstat[i] / (np.std(sample_nonzero) * np.std(label_nonzero) * len(sample_nonzero))
 
             permlabels = np.zeros([len(label_nonzero), numperm])
             for cperm in range(numperm):
