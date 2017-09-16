@@ -1,6 +1,4 @@
 from logging import getLogger
-import ipywidgets
-from IPython.display import display, clear_output
 
 import matplotlib
 
@@ -20,6 +18,12 @@ class PlotGUI_Jupyter(PlotGUI):
     ----------
     '''
     def __init__(self, *kargs, **kwargs):
+        try:
+            # import here to make them an optional dependencies
+            import ipywidgets
+            from IPython.display import display, clear_output
+        except ImportError:
+            raise ValueError('%r. You need to install ipywidgets and IPython to use GUI of Jupyter' % e)
         super().__init__(*kargs, **kwargs)
         # create the figure to plot the heatmap into
         self._set_figure(None, kwargs['tree_size'])
