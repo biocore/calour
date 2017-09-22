@@ -252,8 +252,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     ax.format_coord = format_coord
     return fig
 
-
-def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True):
+def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True,
+                  **label_kwargs):
     '''plot color bars along x or y axis
 
     Parameters
@@ -274,11 +274,20 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
         plot the color bar horizontally or vertically
     label : bool, optional
         whether to label the color bars with text
+    **label_kwargs: dict
+        keyword arguments to pass in for annotating labels
 
     Returns
     -------
     ``matplotlib`` axes
     '''
+
+    default_kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 7,
+                      'ha': 'center', 'va':'center'}
+    for k, v in default_kwargs:
+        if k not in in label_kwargs:
+            label_kwargs[k] =v
+
     uniques = np.unique(values)
     if colors is None:
         cmap = mpl.cm.get_cmap('Dark2')
@@ -310,11 +319,13 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
             ax.add_patch(rect)
             if label is True:
                 rx, ry = rect.get_xy()
-                cx = rx + rect.get_width()/2.0
-                cy = ry + rect.get_height()/2.0
+                cx = rx + rect.get_width() / 2.0
+                cy = ry + rect.get_height() / 2.0
+
                 # add the text in the color bars
-                ax.annotate(value, (cx, cy), color='w', weight='bold',
-                            fontsize=7, ha='center', va='center', rotation=rotation)
+                ax.annotate(value, (cx, cy), rotation=rotation,
+                            **label_kwargs)
+
         prev = i
 
     return ax
@@ -322,7 +333,9 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=False, color_bar_label=True,
-         tree=None, tree_size=8, title=None, **kwargs):
+         tree=None, tree_size=8, title=None, barwidth = 0.3
+         barspace = 0.05, **kwargs):
+
     '''Plot the interactive heatmap and its associated axes.
 
     The heatmap is interactive and can be dynamically updated with
@@ -396,6 +409,10 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         The width of the tree relative to the main heatmap (12 is identical size)
     title : str (optional)
         The title of the figure.
+    barwidth : float
+        The width of the bars
+    barspace : float
+        The spacing between the bars.
     kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
@@ -419,8 +436,6 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         gui_obj.figure.suptitle(title)
 
     exp.heatmap(ax=gui_obj.axes, **kwargs)
-    barwidth = 0.3
-    barspace = 0.05
 
     if sample_color_bars is not None:
         sample_color_bars = _to_list(sample_color_bars)
@@ -429,7 +444,9 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
-                gui_obj.xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
+                gui_obj.xax, values=values, width=barwidth, position=position,
+                label=color_bar_label, axis=0)
+
             position += (barspace + barwidth)
     if feature_color_bars is not None:
         feature_color_bars = _to_list(feature_color_bars)
