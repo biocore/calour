@@ -108,11 +108,16 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
         max_show = [max_show, max_show]
 
     enriched = enriched.sort_values('odif')
+    evals = enriched['odif'].values
     positive = np.min([np.sum(enriched['odif'].values > 0), max_show[0]])
     negative = np.min([np.sum(enriched['odif'].values < 0), max_show[1]])
-
-    ax.barh(np.arange(negative)+positive, enriched['odif'].values[-negative:])
-    ax.barh(np.arange(positive), enriched['odif'].values[:positive])
+    if negative + positive == 0:
+        print('No significantly enriched categories found')
+        return fig
+    if positive > 0:
+        ax.barh(np.arange(positive) + negative, evals[-positive:])
+    if negative > 0:
+        ax.barh(np.arange(negative), evals[:negative])
     use = np.zeros(len(enriched), dtype=bool)
     use[:positive] = True
     use[-negative:] = True
@@ -120,7 +125,8 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
     ticks = [x.split('(')[0] for x in ticks]
     ticks = ['LOWER IN '+x[1:] if x[0] == '-' else x for x in ticks]
     ticks = [x[:max_len] for x in ticks]
-    ax.set_yticks(np.arange(negative+positive), ticks)
+    ax.set_yticks(np.arange(negative+positive))
+    ax.set_yticklabels(ticks)
     ax.set_xlabel('effect size (positive is higher in group1')
     return fig
 
@@ -159,10 +165,11 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     fig = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
     fig.tight_layout()
     fig.show()
+    enriched = enriched.sort_values('odif')
     return fig, enriched
 
 
-def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
+def plot_shareness(exp, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
     '''Plot the number of shared features against the number of samples subsampled.
 
     To see if there is a core feature set shared across most of the samples.
@@ -177,12 +184,14 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, alpha=0.5
     ----------
     field : str
         sample metadata field to group samples
-    step : int
-        step size to compute the shareness
-    steps : iterable of ints
-        steps to compute the shareness. If it is specified, it overrides ``step``.
+    steps : iterable of int
+        the sizes of subsamples to compute the shareness.
     iterations : int
-        repeat the compute multiple times and plot all the iterations
+        repeat the subsampling multiple times and plot all the iterations
+    alpha : float
+        the transparency (1 is most opaque and 0 is most transparent) to plot for each iteration.
+    linewidth : float
+        the linewidth of the plotting lines for each iteration
     ax : matplotlib Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
 
@@ -196,52 +205,67 @@ def plot_shareness(exp, field=None, step=3, steps=None, iterations=10, alpha=0.5
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots()
 
-    if field is None:
+    # filter out the illegal large values
+    steps = sorted([i for i in steps if i <= exp.shape[0]], reverse=True)
+    logger.debug('steps are filtered and sorted to %r' % steps)
+
+    def plot_lines(data, steps, label):
+        y_sum = np.zeros(len(steps))
         for i in range(iterations):
-            x, y = _compute_frac_nonzero(exp.data, step, steps)
+            x, y = _compute_frac_nonzero(data, steps)
+            y_sum += y
             if i == 0:
-                line, = ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth)
+                line, = ax.plot(x, y, alpha=alpha, linewidth=linewidth)
             else:
-                # use the same color as the first iteration
-                ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth, color=line.get_color())
+                ax.plot(x, y, alpha=alpha, linewidth=linewidth, color=line.get_color())
+        y_ave = y_sum / iterations
+        # plot average of the iterations
+        ax.plot(x, y_ave, linewidth=linewidth * 3, label=label, color=line.get_color())
+
+    if field is None:
+        plot_lines(exp.data, steps, label='all samples')
     else:
         for uniq in exp.sample_metadata[field].unique():
             data = exp.filter_samples(field, uniq).data
-            ys = []
-            for i in range(iterations):
-                x, y = _compute_frac_nonzero(data, step, steps)
-                ys.append(y)
-                if i == 0:
-                    line, = ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth)
-                else:
-                    ax.plot(x, y * 100, alpha=alpha, linewidth=linewidth, color=line.get_color())
-            y_ave = np.array(ys).mean(axis=0)
-            ax.plot(x, y_ave * 100, linewidth=linewidth * 2, label=uniq, color=line.get_color())
+            # this subset may have number of samples smaller than some value in steps
+            steps_i = [i for i in steps if i <= data.shape[0]]
+            plot_lines(data, steps_i, uniq)
         ax.legend()
+    # because the shareness drops quickly, we plot it in log scale
     ax.set_xscale('log')
     ax.set_xlabel('sample number')
-    ax.set_ylabel('shared features (%)')
+    ax.set_ylabel('fraction of shared features')
     return ax
 
 
-def _compute_frac_nonzero(data, step, steps):
-    '''iteratively compute the fraction of non-zeros in each column after subsampling rows. '''
-    n, features = data.shape
-    if steps is None:
-        steps = [i for i in range(2, n, step)][::-1]
-    else:
-        # filter out the illegal large values
-        steps = sorted([i for i in steps if i < n], reverse=True)
+def _compute_frac_nonzero(data, steps):
+    '''iteratively compute the fraction of non-zeros in each column after subsampling rows.
+
+    Parameters
+    ----------
+    data : 2-d array of numeric
+        sample in row and feature in column
+    steps : iterable of int
+        the sizes of subsamples
+
+    Return
+    ------
+    tuple of 2 lists
+        steps and fractions
+    '''
+    n_samples, n_features = data.shape
+
     shared = []
     for i in steps:
-        data = data[np.random.choice(n, int(i), replace=False), :]
+        data = data[np.random.choice(n_samples, i, replace=False), :]
         x = data > 0
         # the count of samples that have the given feature
-        counts = x.sum(axis=0).data
-        frac = np.sum(counts == i)
-        shared.append(frac)
-        n = data.shape[0]
-    shared = np.array(shared) / features
+        counts = x.sum(axis=0)
+        all_presence = np.sum(counts == i)
+        all_absence = np.sum(counts == 0)
+        # important: remove the features that are all zeros across the subset of samples
+        shared.append(all_presence / (n_features - all_absence))
+        n_samples = data.shape[0]
     return steps, shared
 
 

@@ -143,6 +143,11 @@ class ApplicationWindow(QMainWindow):
         self.main_widget = QWidget(self)
 
         scroll_box_width = 800
+
+        # the height of the feature/label boxes (too small makes the horizontal scroll bar
+        # cover the text)
+        label_box_height = 35
+
         # set the GUI widgets
         # the user side on the right
         userside = QVBoxLayout()
@@ -152,7 +157,8 @@ class ApplicationWindow(QMainWindow):
         self.w_sfield_val = QLabel(text='NA')
         self.w_sfield_val.setTextInteractionFlags(Qt.TextSelectableByMouse)
         scroll = QScrollArea()
-        scroll.setFixedHeight(18)
+        scroll.setFixedHeight(label_box_height)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.w_sfield_val.setMinimumWidth(scroll_box_width)
         scroll.setWidget(self.w_sfield_val)
         lbox.addWidget(self.w_sfield)
@@ -167,7 +173,7 @@ class ApplicationWindow(QMainWindow):
         self.w_ffield_val = QLabel(text='NA')
         self.w_ffield_val.setTextInteractionFlags(Qt.TextSelectableByMouse)
         scroll = QScrollArea()
-        scroll.setFixedHeight(18)
+        scroll.setFixedHeight(label_box_height)
         self.w_ffield_val.setMinimumWidth(scroll_box_width)
         scroll.setWidget(self.w_ffield_val)
         lbox.addWidget(self.w_ffield)
@@ -180,7 +186,7 @@ class ApplicationWindow(QMainWindow):
         lbox = QHBoxLayout()
         label = QLabel(text='Sample ID:')
         scroll = QScrollArea()
-        scroll.setFixedHeight(18)
+        scroll.setFixedHeight(label_box_height)
         self.w_sid = QLabel(text='?')
         self.w_sid.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.w_sid.setMinimumWidth(scroll_box_width)
@@ -192,7 +198,7 @@ class ApplicationWindow(QMainWindow):
         lbox = QHBoxLayout()
         label = QLabel(text='Feature ID:')
         scroll = QScrollArea()
-        scroll.setFixedHeight(18)
+        scroll.setFixedHeight(label_box_height)
         self.w_fid = QLabel(text='?')
         self.w_fid.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.w_fid.setMinimumWidth(scroll_box_width)

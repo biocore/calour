@@ -1,7 +1,7 @@
 from logging import getLogger
+
 import ipywidgets
 from IPython.display import display, clear_output
-
 import matplotlib
 
 from .plotgui import PlotGUI

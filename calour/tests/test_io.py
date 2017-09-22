@@ -118,7 +118,7 @@ class IOTests(Tests):
 
     def test_read_amplicon(self):
         # test loading a taxonomy biom table and filtering/normalizing
-        exp = ca.read_amplicon(self.test1_biom, filter_reads=1000, normalize=10000)
+        exp = ca.read_amplicon(self.test1_biom, min_reads=1000, normalize=10000)
         exp2 = ca.read(self.test1_biom, normalize=None)
         exp2.filter_by_data('sum_abundance', cutoff=1000, inplace=True)
         exp2.normalize(inplace=True)
@@ -148,16 +148,16 @@ class IOTests(Tests):
     def test_save_biom(self):
         # NOTE: Currently not testing the save biom hdf with taxonomy
         # as there is a bug there!
-        exp = ca.read_amplicon(self.test1_biom, self.test1_samp, normalize=None, filter_reads=None)
+        exp = ca.read_amplicon(self.test1_biom, self.test1_samp, normalize=None, min_reads=None)
         d = mkdtemp()
         f = join(d, 'test1.save.biom')
         # test the json biom format
         exp.save_biom(f, fmt='hdf5')
-        newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, filter_reads=None)
+        newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, min_reads=None)
         assert_experiment_equal(newexp, exp)
         # test the txt biom format
         exp.save_biom(f, fmt='txt')
-        newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, filter_reads=None)
+        newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, min_reads=None)
         assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         # test the hdf5 biom format with no taxonomy
         exp.save_biom(f, add_metadata=None)
