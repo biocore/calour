@@ -284,8 +284,8 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
     default_kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 7,
                       'ha': 'center', 'va':'center'}
-    for k, v in default_kwargs:
-        if k not in in label_kwargs:
+    for k, v in default_kwargs.items():
+        if k not in label_kwargs.keys():
             label_kwargs[k] =v
 
     uniques = np.unique(values)
@@ -333,8 +333,8 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=False, color_bar_label=True,
-         tree=None, tree_size=8, title=None, barwidth = 0.3
-         barspace = 0.05, **kwargs):
+         tree=None, tree_size=8, title=None, barwidth = 0.3,
+         barspace = 0.05, label_kwargs={}, **kwargs):
 
     '''Plot the interactive heatmap and its associated axes.
 
@@ -413,7 +413,10 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         The width of the bars
     barspace : float
         The spacing between the bars.
-    kwargs : dict, optional
+    **label_kwargs : dict, optional
+        keyword arguments passing to :ref:`_ax_color_bar` function
+        to modify the labels.
+    **kwargs : dict, optional
         keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
 
     Returns
@@ -445,7 +448,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
                 gui_obj.xax, values=values, width=barwidth, position=position,
-                label=color_bar_label, axis=0)
+                label=color_bar_label, axis=0,
+                **label_kwargs)
 
             position += (barspace + barwidth)
     if feature_color_bars is not None:
@@ -454,7 +458,8 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         for f in feature_color_bars:
             values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
             _ax_color_bar(
-                gui_obj.yax, values=values, width=barwidth, position=position, label=color_bar_label, axis=1)
+                gui_obj.yax, values=values, width=barwidth, position=position, label=color_bar_label, axis=1,
+                **label_kwargs)
             position += (barspace + barwidth)
     # set up the gui ready for interaction
     gui_obj()
