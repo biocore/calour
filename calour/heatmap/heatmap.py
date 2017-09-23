@@ -437,7 +437,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     if title is not None:
         gui_obj.figure.suptitle(title)
 
-    exp.heatmap(ax=gui_obj.axes, **kwargs)
+    exp.heatmap(ax=gui_obj.axes, cax=gui_obj.legend, **kwargs)
 
     if sample_color_bars is not None:
         sample_color_bars = _to_list(sample_color_bars)
