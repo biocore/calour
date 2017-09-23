@@ -252,7 +252,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     return ax
 
 def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True,
-                  **label_kwargs):
+                  highlight_colors=None, **label_kwargs):
     '''plot color bars along x or y axis
 
     Parameters
@@ -265,7 +265,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
         the width of the color bar
     position : float, optional
         the position of the color bar (its left bottom corner)
-    colors : list of colors, optional
+    colors : dict or pd.Series, optional
         the colors for each unique value in the ``values`` list.
         if it is ``None``, it will use ``Dark2`` discrete color map
         in a cycling way.
@@ -291,7 +291,10 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
     if colors is None:
         cmap = mpl.cm.get_cmap('Dark2')
         colors = cmap.colors
-    col = dict(zip(uniques, itertools.cycle(colors)))
+        col = dict(zip(uniques, itertools.cycle(colors)))
+    else:
+        col = colors
+
     prev = 0
     offset = 0.5
     for i, value in _transition_index(values):
@@ -332,8 +335,11 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=False, color_bar_label=True,
-         tree=None, tree_size=8, title=None, barwidth = 0.3,
-         barspace = 0.05, label_kwargs={}, **kwargs):
+         tree=None, tree_size=8, title=None,
+         barwidth = 0.3, barspace = 0.05,
+         sample_highlight_colors=None,
+         feature_highlight_colors=None,
+         label_kwargs={}, **kwargs):
 
     '''Plot the interactive heatmap and its associated axes.
 
@@ -412,6 +418,10 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         The width of the bars
     barspace : float
         The spacing between the bars.
+    sample_highlight_colors : pd.Series or dict
+        The colors of the sample categories indicated on the sample axis
+    feature_highlight_colors : pd.Series or dict
+        The colors of the feature categories indicated on the feature axis
     **label_kwargs : dict, optional
         keyword arguments passing to :ref:`_ax_color_bar` function
         to modify the labels.
@@ -447,6 +457,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
                 gui_obj.xax, values=values, width=barwidth, position=position,
+                colors=sample_highlight_colors,
                 label=color_bar_label, axis=0,
                 **label_kwargs)
 
@@ -457,7 +468,9 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         for f in feature_color_bars:
             values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
             _ax_color_bar(
-                gui_obj.yax, values=values, width=barwidth, position=position, label=color_bar_label, axis=1,
+                gui_obj.yax, values=values, width=barwidth, position=position,
+                colors=feature_highlight_colors,
+                label=color_bar_label, axis=1,
                 **label_kwargs)
             position += (barspace + barwidth)
     # set up the gui ready for interaction
