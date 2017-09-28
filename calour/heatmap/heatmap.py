@@ -124,7 +124,8 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         passed to ``norm`` parameter of ``plt.imshow``. Default is log scale.
     cax : None or matplotlib Axes object (optional)
         plot a legend colorbar for the heatmap in the cax or not
-
+    figsize : tuple of int, optional
+        Specifies the height and the width of the figure
     Returns
     -------
     matplotlib Axes of the heatmap
@@ -251,6 +252,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     ax.format_coord = format_coord
     return ax
 
+
 def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True,
                   highlight_colors=None, **label_kwargs):
     '''plot color bars along x or y axis
@@ -282,10 +284,10 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
     '''
 
     default_kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 7,
-                      'ha': 'center', 'va':'center'}
+                      'ha': 'center', 'va': 'center'}
     for k, v in default_kwargs.items():
         if k not in label_kwargs.keys():
-            label_kwargs[k] =v
+            label_kwargs[k] = v
 
     uniques = np.unique(values)
     if colors is None:
@@ -336,7 +338,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 def plot(exp, sample_color_bars=None, feature_color_bars=None,
          gui='cli', databases=False, color_bar_label=True,
          tree=None, tree_size=8, title=None,
-         barwidth = 0.3, barspace = 0.05,
+         barwidth=0.3, barspace=0.05,
          sample_highlight_colors=None,
          feature_highlight_colors=None,
          label_kwargs={}, **kwargs):
