@@ -284,7 +284,8 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
     default_kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 7,
                       'ha': 'center', 'va': 'center'}
-    label_kwargs = default_kwargs(label_kwargs)
+    default_kwargs.update(label_kwargs)
+    label_kwargs =  default_kwargs
 
     uniques = np.unique(values)
     if colors is None:
