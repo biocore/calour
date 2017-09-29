@@ -227,7 +227,7 @@ def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, revers
     reverse : bool (optional)
         True to reverse the order of the sort
     kwargs : dict
-        key word parameters passed to ``key``
+        keyword parameters passed to ``key``
 
     Returns
     -------

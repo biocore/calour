@@ -35,18 +35,9 @@ class ExperimentTests(Tests):
 
         # test with list of values and negate
         exp = self.test1.filter_taxonomy(['Firmicutes', 'proteobacteria'], negate=True)
-        self.assertEqual(exp.shape[1], 6)
-        # should not have this sequence
-        self.assertNotIn(self.test1.feature_metadata.index[4], exp.feature_metadata.index)
         # should have all these sequences
-        okseqs = ['TACGTATGTCACAAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTGGATTAAGCGTGTTGTGAAATGTAGACGCTCAACGTCTGAATCGCAGCGCGAACTGGTTCACTTGAGTATGCACAACGTAGGCGGAATTCGTCG',
-                  'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT',
-                  'TACGGAGGATGCGAGCGTTATCTGGAATCATTGGGTTTAAAGGGTCCGTAGGCGGGTTGATAAGTCAGAGGTGAAAGCGCTTAGCTCAACTAAGCAACTGCCTTTGAAACTGTCAGTCTTGAATGATTGTGAAGTAGTTGGAATGTGTAG',
-                  'TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
-                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG',
-                  'ACGT']
-        for cseq in okseqs:
-            self.assertIn(cseq, exp.feature_metadata.index)
+        fids = ['AA', 'AT', 'TT', 'TG', 'GG', 'badfeature']
+        self.assertListEqual(fids, exp.feature_metadata.index.tolist())
 
     def test_filter_fasta(self):
         # test keeping the sequences from fasta
@@ -64,7 +55,7 @@ class ExperimentTests(Tests):
         # and is not inplace
         self.assertIsNot(exp, self.test1)
 
-    def test_filter_fasta_inverse(self):
+    def test_filter_fasta_negate(self):
         # test removing sequences from fasta and inplace
         orig_exp = deepcopy(self.test1)
         exp = self.test1.filter_fasta(self.seqs1_fasta, negate=True, inplace=True)
@@ -84,8 +75,12 @@ class ExperimentTests(Tests):
 
     def test_sort_taxonomy(self):
         obs = self.test1.sort_taxonomy()
-        expected_taxonomy = pd.Series.from_csv(join(self.test_data_dir, 'test1.sorted.taxonomy.csv'))
-        pdt.assert_series_equal(obs.feature_metadata['taxonomy'], expected_taxonomy, check_names=False)
+        self.assertListEqual(
+            ['GG', 'badfeature', 'TG', 'AA', 'TT', 'GT', 'TA', 'TC', 'GA', 'AC', 'AG', 'AT'],
+            obs.feature_metadata.index.tolist())
+        self.assertListEqual(self.test1.sample_metadata.index.tolist(),
+                             obs.sample_metadata.index.tolist())
+
 
     def test_filter_orig_reads(self):
         obs = self.test1.filter_orig_reads(2900)
@@ -96,7 +91,8 @@ class ExperimentTests(Tests):
 
     def test_collapse_taxonomy_kingdom(self):
         res = self.test1.collapse_taxonomy(level=0)
-        self.assertCountEqual(res.feature_metadata['taxonomy'].values, ['k__Bacteria', 'Unknown', 'bad_bacteria'])
+        self.assertListEqual(res.feature_metadata['taxonomy'].tolist(),
+                             ['k__Bacteria', 'Unknown', 'bad_bacteria'])
         # test we did't lose any reads when grouping
         npt.assert_array_almost_equal(res.get_data(sparse=False).sum(axis=1), self.test1.get_data(sparse=False).sum(axis=1))
         # and all samples are there

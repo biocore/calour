@@ -58,7 +58,7 @@ def _read_biom(fp, transpose=True):
     -------
     sid : list of str
         the sample ids
-    oid : list of str
+    fid : list of str
         the feature ids
     data : numpy array (2d) of float
         the table
@@ -68,8 +68,8 @@ def _read_biom(fp, transpose=True):
     logger.debug('loading biom table %s' % fp)
     table = biom.load_table(fp)
     sid = table.ids(axis='sample')
-    oid = table.ids(axis='observation')
-    logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
+    fid = table.ids(axis='observation')
+    logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
     data = table.matrix_data
     feature_md = _get_md_from_biom(table)
 
@@ -77,7 +77,7 @@ def _read_biom(fp, transpose=True):
         logger.debug('transposing table')
         data = data.transpose()
 
-    return sid, oid, data, feature_md
+    return sid, fid, data, feature_md
 
 
 def _read_qiime2(fp, transpose=True):
@@ -96,7 +96,7 @@ def _read_qiime2(fp, transpose=True):
     -------
     sid : list of str
         the sample ids
-    oid : list of str
+    fid : list of str
         the feature ids
     data : numpy array (2d) of float
         the table
@@ -110,8 +110,8 @@ def _read_qiime2(fp, transpose=True):
     table = q2table.view(biom.Table)
 
     sid = table.ids(axis='sample')
-    oid = table.ids(axis='observation')
-    logger.info('loaded %d samples, %d observations' % (len(sid), len(oid)))
+    fid = table.ids(axis='observation')
+    logger.info('loaded %d samples, %d observations' % (len(sid), len(fid)))
     data = table.matrix_data
     feature_md = _get_md_from_biom(table)
 
@@ -119,7 +119,7 @@ def _read_qiime2(fp, transpose=True):
         logger.debug('transposing table')
         data = data.transpose()
 
-    return sid, oid, data, feature_md
+    return sid, fid, data, feature_md
 
 
 def _get_md_from_biom(table):
@@ -158,7 +158,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
     -------
     sid : list of str
         the sample ids
-    oid : list of str
+    fid : list of str
         the feature ids
     data : numpy array (2d) of float
         the table
@@ -172,39 +172,14 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
     table.set_index(table.columns[0], drop=True, inplace=True)
     if rows_are_samples:
         table = table.transpose()
-    logger.info('loaded %d observations, %d  samples' % table.shape)
+    logger.info('loaded %d samples, %d features' % table.shape)
     sid = table.columns
-    oid = table.index
+    fid = table.index
     data = table.values.astype(float)
     if transpose:
         logger.debug('transposing table')
         data = data.transpose()
-    return sid, oid, data
-
-
-def _read_table(fp, encoding=None):
-    '''Read tab-delimited table file.
-
-    It is used to read sample metadata (mapping) file and feature
-    metadata file
-
-    Parameters
-    ----------
-    fp : str
-        the file path to read
-    encoding : str or None (optional)
-        None (default) to use pandas default encoder, str to specify
-        encoder name (see pandas.read_table() documentation)
-
-    Returns
-    -------
-    pandas.DataFrame with index set to first column (as str)
-    '''
-    # read the 1st column as str
-    table = pd.read_table(fp, sep='\t', encoding=encoding, dtype={0: str})
-    # table.fillna('na', inplace=True)
-    table.set_index(table.columns[0], drop=False, inplace=True)
-    return table
+    return sid, fid, data
 
 
 def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
@@ -286,8 +261,31 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     return exp
 
 
+def _read_metadata(ids, f, kwargs):
+    # load the sample metadata file
+    if f is not None:
+        if kwargs is None:
+            # use first column as sample ID
+            kwargs = {'index_col': 0}
+
+        metadata = pd.read_table(f, **kwargs)
+        mid, ids2 = set(metadata.index), set(ids)
+        diff = mid - ids2
+        if diff:
+            logger.warning('These have metadata but do not have data - dropped: %r' % diff)
+        diff = ids2 - mid
+        if diff:
+            logger.warning('These have data but do not have metadata: %r' % diff)
+        # reorder the id in metadata to align with biom
+        metadata = metadata.loc[ids, ]
+    else:
+        metadata = pd.DataFrame(index=ids)
+    return metadata
+
+
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', drop=False, sparse=True, data_file_type='biom', encoding=None,
+         description='', sparse=True, data_file_type='biom',
+         sample_metadata_kwargs=None, feature_metadata_kwargs=None,
          cls=Experiment, *, normalize):
     '''Read the files for the experiment.
 
@@ -299,14 +297,12 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     data_file : str
         file path to the biom table.
     sample_metadata_file : None or str (optional)
-        None (default) to just use samplenames (no additional metadata).
+        None (default) to just use sample names (no additional metadata).
         if not None, file path to the sample metadata (aka mapping file in QIIME).
-    feature_metadata_file : str
+    feature_metadata_file : None or str (optional)
         file path to the feature metadata.
     description : str
         description of the experiment
-    drop : boolean (optional)
-        True to drop the samples if there is no metadata for it.
     sparse : bool
         read the biom table into sparse or dense array
     data_file_type : str (optional)
@@ -316,25 +312,24 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
         'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
-    encoding : str or None (optional)
-        encoder for the metadata files. None (default) to use
-        pandas default encoder, str to specify encoder name (see
-        pandas.read_table() documentation)
+    sample_metadata_kwargs, feature_metadata_kwargs : dict or None (optional)
+        keyword arguments passing to :function:`pandas.read_table` when reading sample metadata
+        or feature metadata
     cls : ``class``, optional
         what class object to read the data into (``Experiment`` by default)
     normalize : int or None
-        normalize each sample to the specified reads. ``None`` to not normalize
+        normalize each sample to the specified read count. ``None`` to not normalize
 
     Returns
     -------
-    data : np.array or scipy.sprase.csr
+    data : :class:`np.array` or :class:`scipy.sprase.csr`
         The experiment count data (each row is a sample, each column is a feature)
     sample_metadata : :class:`pandas.DataFrame`
         Metadata for the samples
-    feature_metadata : pandas.DataFrame
+    feature_metadata : :class:`pandas.DataFrame`
         Metadata for the features
     exp_metadata : dict
-        information about the experiment (including 'map_md5', 'data_md5')
+        information about the experiment (including `map_md5`, `data_md5`)
     description : str
         name of the experiment
     '''
@@ -342,76 +337,43 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         data_file, sample_metadata_file, feature_metadata_file))
     exp_metadata = {'map_md5': ''}
     # load the data table
+    fmd = None
     if data_file_type == 'biom':
-        sid, oid, data, md = _read_biom(data_file)
+        sid, fid, data, fmd = _read_biom(data_file)
     elif data_file_type == 'openms':
-        sid, oid, data = _read_open_ms(data_file, rows_are_samples=False)
+        sid, fid, data = _read_open_ms(data_file, rows_are_samples=False)
     elif data_file_type == 'openms_transpose':
-        sid, oid, data = _read_open_ms(data_file, rows_are_samples=True)
+        sid, fid, data = _read_open_ms(data_file, rows_are_samples=True)
     elif data_file_type == 'qiime2':
-        sid, oid, data, md = _read_qiime2(data_file)
+        sid, fid, data, fmd = _read_qiime2(data_file)
     elif data_file_type == 'tsv':
         df = pd.read_table(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
-        oid = df.index.tolist()
+        fid = df.index.tolist()
         data = df.as_matrix().T
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
 
-    sfilter = [True] * len(sid)
-    # load the sample metadata file
-    if sample_metadata_file is not None:
-        sample_metadata = _read_table(sample_metadata_file, encoding=encoding)
-        smid = set(sample_metadata.index)
-        sdid = set(sid)
-        diff = smid - sdid
-        if diff:
-            logger.warning('the samples are dropped because they have metadata but do not have data: %r' % diff)
-        sdiff = (sdid - smid)
-        if sdiff:
-            logger.warning('the samples have data but do not have metadata: %r' % sdiff)
-            sfilter = [i not in sdiff for i in sid]
-        # reorder the sample id to align with biom
-        sample_metadata = sample_metadata.loc[sid, ]
-        exp_metadata['map_md5'] = get_file_md5(sample_metadata_file, encoding=encoding)
-    else:
-        sample_metadata = pd.DataFrame(index=sid)
-        # duplicate the index to a column so we can select it
-        sample_metadata['id'] = sid
+    sample_metadata = _read_metadata(sid, sample_metadata_file, sample_metadata_kwargs)
+    feature_metadata = _read_metadata(fid, feature_metadata_file, feature_metadata_kwargs)
 
-    # load the feature metadata file
-    if feature_metadata_file is not None:
-        # reorder the feature id to align with that from biom table
-        feature_metadata = _read_table(feature_metadata_file, encoding=encoding)
-        fmid = set(feature_metadata.index)
-        fdid = set(oid)
-        diff = fmid - fdid
-        if diff:
-            logger.warning('the features are dropped because they have metadata but do not have data: %r' % diff)
-        fdiff = fdid - fmid
-        if fdiff:
-            logger.warning('the features have data but do not have metadata: %r' % fdiff)
-        feature_metadata = feature_metadata.loc[oid, ]
-    else:
-        feature_metadata = pd.DataFrame(index=oid)
-        feature_metadata['id'] = oid
-    if data_file_type == 'biom' and md is not None:
-        # combine it with the metadata
-        feature_metadata = pd.concat([feature_metadata, md], axis=1)
+    if fmd is not None:
+        # combine it with the feature metadata
+        feature_metadata = pd.concat([feature_metadata, fmd], axis=1)
 
     # init the experiment metadata details
     exp_metadata['data_file'] = data_file
     exp_metadata['sample_metadata_file'] = sample_metadata_file
+    exp_metadata['sample_metadata_md5'] = get_file_md5(sample_metadata_file)
     exp_metadata['feature_metadata_file'] = feature_metadata_file
-    exp_metadata['data_md5'] = get_data_md5(data)
+    exp_metadata['feature_metadata_md5'] = get_file_md5(feature_metadata_file)
 
     if description == '':
         description = os.path.basename(data_file)
 
     exp = cls(data, sample_metadata, feature_metadata,
               exp_metadata=exp_metadata, description=description, sparse=sparse)
-    if drop is True:
-        exp = exp.reorder(sfilter, axis=0)
+
     if normalize is not None:
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
@@ -446,7 +408,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
                normalize=None, **kwargs)
 
-    exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
+    # exp.feature_metadata.index = exp.feature_metadata.index.str.upper()
 
     if 'taxonomy' in exp.feature_metadata.columns:
         exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp, remove_underscore=False)

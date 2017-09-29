@@ -39,7 +39,7 @@ class IOTests(Tests):
 
     def test_get_file_md5(self):
         md5 = util.get_file_md5(self.test1_samp)
-        self.assertEqual(md5, 'c109f0e9cb6cd24ae820ea9c4bf84931')
+        self.assertEqual(md5, '848da38fdda24906e59856f6f7aece40')
 
     def test_get_data_md5(self):
         exp = deepcopy(self.test1)
