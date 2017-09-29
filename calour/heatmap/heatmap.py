@@ -266,7 +266,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
         the width of the color bar
     position : float, optional
         the position of the color bar (its left bottom corner)
-    colors : dict or pd.Series, optional
+    colors : dict, optional
         the colors for each unique value in the ``values`` list.
         if it is ``None``, it will use ``Dark2`` discrete color map
         in a cycling way.
@@ -418,9 +418,9 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         The width of the bars
     barspace : float
         The spacing between the bars.
-    sample_highlight_colors : pd.Series or dict
+    sample_highlight_colors : dict
         The colors of the sample categories indicated on the sample axis
-    feature_highlight_colors : pd.Series or dict
+    feature_highlight_colors : dict
         The colors of the feature categories indicated on the feature axis
     **label_kwargs : dict, optional
         keyword arguments passing to :ref:`_ax_color_bar` function
