@@ -8,12 +8,10 @@
 
 from unittest import main
 from copy import deepcopy
-from os.path import join
 
 import pandas.util.testing as pdt
 import numpy as np
 import numpy.testing as npt
-import pandas as pd
 
 from calour._testing import Tests
 import calour as ca
@@ -80,7 +78,6 @@ class ExperimentTests(Tests):
             obs.feature_metadata.index.tolist())
         self.assertListEqual(self.test1.sample_metadata.index.tolist(),
                              obs.sample_metadata.index.tolist())
-
 
     def test_filter_orig_reads(self):
         obs = self.test1.filter_orig_reads(2900)
