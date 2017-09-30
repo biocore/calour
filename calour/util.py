@@ -359,17 +359,7 @@ def set_log_level(level):
 
 
 def _to_list(x):
-    '''if x is non iterable or string, convert to iterable
-
-    Parameters
-    ----------
-    x : Iterable of any type
-
-    Returns
-    -------
-    iterable
-        With the same values as x
-    '''
+    '''if x is non iterable or string, convert to iterable '''
     if isinstance(x, str):
         return [x]
     if isinstance(x, Iterable):

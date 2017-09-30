@@ -262,12 +262,14 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
 
 def _read_metadata(ids, f, kwargs):
-    # load the sample metadata file
+    # load the sample/feature metadata file
     if f is not None:
+        default = {'index_col': 0}
         if kwargs is None:
             # use first column as sample ID
-            kwargs = {'index_col': 0}
-
+            kwargs = default
+        else:
+            kwargs.update(default)
         metadata = pd.read_table(f, **kwargs)
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
