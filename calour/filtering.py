@@ -428,13 +428,13 @@ def filter_min_abundance(exp, min_abundance, **kwargs):
 
 
 @Experiment._record_sig
-def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
+def filter_prevalence(exp, fraction, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
     This is a convenience function wrapping filter_by_data()
 
     Parameters
     ----------
-    fraction : float (optional)
+    fraction : float
         Keep features present at least in fraction of samples
     cutoff : float (optional)
         The minimal fraction of reads for the otu to be called present in a sample

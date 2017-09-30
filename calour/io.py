@@ -262,6 +262,21 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
 
 def _read_metadata(ids, f, kwargs):
+    '''read metadata table
+
+    Parameters
+    ----------
+    ids : list like of str
+        ids from data table
+    f : str
+        file path of metadata
+    kwargs : dict
+        keyword argument passed to ``pandas.read_table``
+
+    Returns
+    -------
+    ``pandas.DataFrame`` of metadata
+    '''
     # load the sample/feature metadata file
     if f is not None:
         default = {'index_col': 0}
@@ -316,7 +331,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None (optional)
         keyword arguments passing to :function:`pandas.read_table` when reading sample metadata
-        or feature metadata
+        or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
+        {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
+        as int and parse the file as latin-8 instead of utf-8.
     cls : ``class``, optional
         what class object to read the data into (``Experiment`` by default)
     normalize : int or None
@@ -324,16 +341,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     Returns
     -------
-    data : :class:`np.array` or :class:`scipy.sprase.csr`
-        The experiment count data (each row is a sample, each column is a feature)
-    sample_metadata : :class:`pandas.DataFrame`
-        Metadata for the samples
-    feature_metadata : :class:`pandas.DataFrame`
-        Metadata for the features
-    exp_metadata : dict
-        information about the experiment (including `map_md5`, `data_md5`)
-    description : str
-        name of the experiment
+    ``Experiment``
+        the new object created
+
     '''
     logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
