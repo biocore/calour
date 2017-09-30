@@ -8,6 +8,7 @@
 
 from unittest import main
 import numpy as np
+import pandas as pd
 from numpy.testing import assert_array_almost_equal
 
 from matplotlib import pyplot as plt
@@ -62,13 +63,15 @@ class PlotTests(Tests):
 
     def test_ax_color_bar(self):
         fig, ax = plt.subplots()
-        colors = [(1.0, 0.0, 0.0, 1), (0.0, 0.5, 0.0, 1)]
+        colors = pd.Series({'a': (1.0, 0.0, 0.0, 1),
+                            'b': (0.0, 0.5, 0.0, 1)})
         axes = _ax_color_bar(ax, ['a', 'a', 'b'], 0.3, 0, colors)
         self.assertIs(ax, axes)
+
         # test face color rectangle in the bar
         self.assertListEqual(
             [i.get_facecolor() for i in axes.patches],
-            colors)
+            list(colors.values))
         # test the position rectangle in the bar
         self.assertListEqual(
             [i.get_xy() for i in axes.patches],
