@@ -8,6 +8,7 @@
 
 from unittest import TestCase
 from os.path import join, dirname, abspath
+import logging
 
 import pandas.util.testing as pdt
 import numpy.testing as npt
@@ -17,6 +18,9 @@ import calour as ca
 
 class Tests(TestCase):
     def setUp(self):
+        # disable logging
+        logging.disable(logging.CRITICAL)
+
         test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
         self.test_data_dir = test_data_dir
         # a simple artificial biom table

@@ -146,7 +146,9 @@ def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
     select : list, tuple, or Callable
         select what to keep based on the value in the specified field.
         if it is a callable, it accepts a 1d array and return a
-        boolean array of the same length.
+        boolean array of the same length; if it is a list-like object,
+        keep the samples with the values in the ``field`` column included
+        in the ``select``.
     axis : 0, 1, 's', or 'f', optional
         the field is on samples (0 or 's') or features (1 or 'f') metadata
     negate : bool, optional
@@ -326,7 +328,7 @@ def _mean_abundance(data, axis, cutoff=0.01, strict=False):
     return res
 
 
-def _prevalence(x, cutoff=1/10000, fraction=0.5):
+def _prevalence(x, cutoff=1/10000, fraction=0.1):
     '''Check the prevalence of values above the cutoff.
 
     present (abundance >= cutoff) in at least "fraction" of samples
@@ -381,7 +383,25 @@ def _freq_ratio(x, ratio=2):
 
 @Experiment._record_sig
 def filter_samples(exp, field, values, negate=False, inplace=False):
-    '''Shortcut for filtering samples.'''
+    '''Shortcut for filtering samples.
+
+    Parameters
+    ----------
+    field : str
+        the column name of the sample metadata tables
+    values :
+        keep the samples with the values included in the ``select``
+    negate : bool, optional
+        discard instead of keep the samples if set to ``True``
+    inplace : bool, optional
+        return the filtering on the original ``Experiment`` object or a copied one.
+
+    Returns
+    -------
+    ``Experiment``
+        the filtered object
+
+    '''
     values = _to_list(values)
     return filter_by_metadata(exp, field=field, select=values,
                               negate=negate, inplace=inplace)
@@ -396,19 +416,25 @@ def filter_min_abundance(exp, min_abundance, **kwargs):
     ----------
     min_abundance : numeric
         The minimal total abundance for each feature over all samples
+
+    Returns
+    -------
+    ``Experiment``
+        the filtered object
+
     '''
     newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=min_abundance, **kwargs)
     return newexp
 
 
 @Experiment._record_sig
-def filter_prevalence(exp, fraction=0.5, cutoff=1/10000, **kwargs):
+def filter_prevalence(exp, fraction, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
     This is a convenience function wrapping filter_by_data()
 
     Parameters
     ----------
-    fraction : float (optional)
+    fraction : float
         Keep features present at least in fraction of samples
     cutoff : float (optional)
         The minimal fraction of reads for the otu to be called present in a sample

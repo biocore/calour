@@ -64,7 +64,7 @@ class ExperimentTests(Tests):
         self.assertEqual(obs, (1, True))
 
     def test_reorder_samples(self):
-        # keep only samples 5 and 4
+        # keep only samples S6 and S5
         new = self.test1.reorder([5, 4], axis=0)
 
         self.assertEqual(new.data.shape[0], 2)
@@ -75,23 +75,19 @@ class ExperimentTests(Tests):
         self.assertEqual(new.sample_metadata['id'][1], 5)
 
         # test data are correct
-        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCA'
-                'GGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTG'
-                'CATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
-        seqpos = new.feature_metadata.index.get_loc(sseq)
-        self.assertEqual(new.data[0, seqpos], 6)
-        self.assertEqual(new.data[1, seqpos], 5)
+        fid = 'GG'
+        fpos = new.feature_metadata.index.get_loc(fid)
+        self.assertEqual(new.data[0, fpos], 600)
+        self.assertEqual(new.data[1, fpos], 500)
 
-    def test_reorder_inplace_features(self):
+    def test_reorder_features_inplace(self):
         # test inplace reordering of features
-        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCA'
-                'GGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTG'
-                'CATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
-        self.test1.reorder([2, 0], axis=1, inplace=True)
-        seqpos = self.test1.feature_metadata.index.get_loc(sseq)
-        self.assertEqual(seqpos, 0)
-        self.assertEqual(self.test1.data[0, seqpos], 1)
-        self.assertEqual(self.test1.data[1, seqpos], 2)
+        new = self.test1.reorder([2, 0], axis=1, inplace=True)
+        fid = 'AG'
+        fpos = self.test1.feature_metadata.index.get_loc(fid)
+        self.assertIs(new, self.test1)
+        self.assertEqual(new.data[0, fpos], 1)
+        self.assertEqual(new.data[1, fpos], 2)
 
     def test_reorder_round_trip(self):
         # test double permuting of a bigger data set
@@ -216,10 +212,10 @@ class ExperimentTests(Tests):
         pdt.assert_frame_equal(res, df)
 
     def test_getitem(self):
-        self.assertEqual(self.test1['S5', 'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG'], 5)
-        self.assertEqual(self.test1['S4', 'TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGGGTGCGTAGGCGGCCTGTTAAGTAAGTGGTTAAATTGTTGGGCTCAACCCAATCCGGCCACTTAAACTGGCAGGCTAGAGTATTGGAGAGGCAAGTGGAATTCCATGT'], 0)
+        self.assertEqual(self.test1['S5', 'AG'], 5)
+        self.assertEqual(self.test1['S4', 'AC'], 0)
         with self.assertRaises(KeyError):
-            self.test1['Pita', 'TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGGGTGCGTAGGCGGCCTGTTAAGTAAGTGGTTAAATTGTTGGGCTCAACCCAATCCGGCCACTTAAACTGGCAGGCTAGAGTATTGGAGAGGCAAGTGGAATTCCATGT']
+            self.test1['Pita', 'AG']
         with self.assertRaises(KeyError):
             self.test1['S5', 'Pita']
         with self.assertRaises(SyntaxError):
@@ -232,7 +228,7 @@ class ExperimentTests(Tests):
         # 1st sample
         npt.assert_array_equal(self.test1['S1', :], self.test1.data.toarray()[0, :])
         # 2nd feature
-        npt.assert_array_equal(self.test1[:, 'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT'],
+        npt.assert_array_equal(self.test1[:, 'AT'],
                                self.test1.data.toarray()[:, 1])
 
 

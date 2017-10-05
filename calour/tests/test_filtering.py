@@ -8,7 +8,7 @@
 
 from unittest import main
 
-from skbio.util import get_data_path
+from numpy.testing import assert_array_equal
 
 from calour._testing import Tests, assert_experiment_equal
 import calour as ca
@@ -73,8 +73,7 @@ class FilteringTests(Tests):
             obs = test2.filter_by_metadata(
                 'ori.order', lambda l: [7 > i > 3 for i in l], inplace=inplace)
             self.assertEqual(obs.shape, (3, 8))
-            self.assertEqual(obs.sample_metadata.index.tolist(),
-                             ['S5', 'S6', 'S7'])
+            self.assertEqual(obs.sample_metadata.index.tolist(), ['S5', 'S6', 'S7'])
             if inplace:
                 self.assertIs(obs, test2)
             else:
@@ -89,20 +88,11 @@ class FilteringTests(Tests):
 
     def test_filter_by_metadata_feature(self):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
-            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
-                            sparse=sparse, normalize=None)
+            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse, normalize=None)
             # only filter samples with id bewtween 3 and 7.
-            obs = test2.filter_by_metadata(
-                'oxygen', ['anaerobic'], axis=1, inplace=inplace)
+            obs = test2.filter_by_metadata('oxygen', ['anaerobic'], axis=1, inplace=inplace)
             self.assertEqual(obs.shape, (9, 2))
-            self.assertEqual(
-                obs.feature_metadata.index.tolist(),
-                ['TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTA'
-                 'GGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGC'
-                 'CTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
-                 'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTA'
-                 'GGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTG'
-                 'CAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG'])
+            self.assertListEqual(obs.feature_metadata.index.tolist(), ['TG', 'TC'])
             if inplace:
                 self.assertIs(obs, test2)
             else:
@@ -119,18 +109,14 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_sample(self):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
-            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
-                            sparse=sparse, normalize=None)
+            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse, normalize=None)
             # filter out samples with abundance < 1200. only the last sample is filtered out.
-            obs = test2.filter_by_data(
-                'sum_abundance', axis=0, inplace=inplace, cutoff=1200)
+            obs = test2.filter_by_data('sum_abundance', axis=0, inplace=inplace, cutoff=1200)
             self.assertEqual(obs.shape, (8, 8))
-            exp = ca.read(*[get_data_path(i) for i in [
-                'test2.biom.filter.sample',
-                'test2.sample',
-                'test2.feature']],
-                          normalize=None)
-            assert_experiment_equal(obs, exp)
+            self.assertNotIn('S9', obs.sample_metadata)
+            for sid in obs.sample_metadata.index:
+                assert_array_equal(obs[sid, :], self.test2[sid, :])
+
             if inplace:
                 self.assertIs(obs, test2)
             else:
@@ -148,16 +134,12 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_feature(self):
         # one feature is filtered out when cutoff is set to 25
-        for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
-            obs = self.test2.filter_by_data(
-                'sum_abundance', axis=1, inplace=inplace, cutoff=25)
+        for inplace in [True, False]:
+            obs = self.test2.filter_by_data('sum_abundance', axis=1, inplace=inplace, cutoff=25)
             self.assertEqual(obs.shape, (9, 7))
-            exp = ca.read(*[get_data_path(i) for i in [
-                'test2.biom.filter.feature',
-                'test2.sample',
-                'test2.feature']],
-                          normalize=None)
-            assert_experiment_equal(obs, exp)
+            self.assertNotIn('TA', obs.feature_metadata)
+            for fid in obs.feature_metadata.index:
+                assert_array_equal(obs[:, fid], self.test2[:, fid])
             if inplace:
                 self.assertIs(obs, self.test2)
             else:
@@ -166,42 +148,29 @@ class FilteringTests(Tests):
     def test_filter_min_abundance(self):
         exp = self.test1.filter_min_abundance(17008)
         self.assertEqual(exp.shape[1], 2)
-        okseqs = ['TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
-                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG']
-        self.assertCountEqual(exp.feature_metadata.index, okseqs)
+        fids = ['TC', 'GG']
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
 
     def test_filter_prevalence(self):
-        # default value is 0.5 - keep only features present at least in 0.5 the samples
-        exp = self.test1.filter_prevalence()
-        okseqs = ['TACGTATGTCACAAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTGGATTAAGCGTGTTGTGAAATGTAGACGCTCAACGTCTGAATCGCAGCGCGAACTGGTTCACTTGAGTATGCACAACGTAGGCGGAATTCGTCG',
-                  'TACATAGGTCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGCGTTCGTAGGCTGTTTATTAAGTCTGGAGTCAAATCCCAGGGCTCAACCCTGGCTCGCTTTGGATACTGGTAAACTAGAGTTAGATAGAGGTAAGCAGAATTCCATGT',
-                  'TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCAGGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTGCATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG',
-                  'TACGTAGGTGGCAAGCTTTGTCCTTCCTTATTTGGCGTAAAGCGCGCGCAGGCGGCCTATCCAGTCTGTCTTAAAAGTTCGGGGCTCAACCCCGTGATGGGATGGAAACTAGTAGGCTAGAGTATCGGAGAGGAAAGCGGAATTCCTAGT',
-                  'TACGGAGGATGCGAGCGTTATCTGGAATCATTGGGTTTAAAGGGTCCGTAGGCGGGTTGATAAGTCAGAGGTGAAAGCGCTTAGCTCAACTAAGCAACTGCCTTTGAAACTGTCAGTCTTGAATGATTGTGAAGTAGTTGGAATGTGTAG',
-                  'TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
-                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
-                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG']
-        self.assertCountEqual(exp.feature_metadata.index, okseqs)
+        # keep only features present at least in 0.5 the samples
+        exp = self.test1.filter_prevalence(fraction=0.5)
+        fids = ['AA', 'AT', 'AG', 'TA', 'TT', 'TG', 'TC', 'GG']
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
         self.assertEqual(exp.shape[1], 8)
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
     def test_filter_mean(self):
         # default is 0.01 - keep features with mean abundance >= 1%
         exp = self.test1.filter_mean()
-        okseqs = ['TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
-                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
-                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG']
-        self.assertCountEqual(exp.feature_metadata.index, okseqs)
+        fids = ['TG', 'TC', 'GG']
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
         self.assertEqual(exp.shape[1], 3)
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
     def test_filter_ids_default(self):
-        okseqs = ['TACGTAGGGCGCGAGCGTTGTCCGGAATTATTGGGCGTAAAGGGCTTGTAGGCGGTTGGTCGCGTCTGCCGTGAAATTCTCTGGCTTAACTGGAGGCGTGCGGTGGGTACGGGCTGACTTGAGTGCGGTAGGGGAGACTGGAACTCCTGG',
-                  'TACGTAGGGCGCGAGCGTTATCCGGAATTATTGGGCGTAAAGAGTGCGTAGGTGGCATCTTAAGCGCAGGGTTTAAGGCAATGGCTCAACCATTGTTCGCCTTGCGAACTGGGGTGCTTGAGTGCAGGAGGGGAAAGTGGAATTCCTAGT',
-                  'AAAAAAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGATTAAGTCAGCTGCGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGTTGTCTTGAGTGCACGCAGGGATGTTGGAATTCATGG',
-                  'pita']
-        exp = self.test1.filter_ids(okseqs)
-        self.assertEqual(list(exp.feature_metadata.index.values), okseqs[:-1])
+        fids = ['GG', 'AA', 'TT', 'pita']
+        exp = self.test1.filter_ids(fids)
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids[:-1])
         self.assertIsNot(exp, self.test1)
 
     def test_filter_ids_samples_inplace_negate(self):

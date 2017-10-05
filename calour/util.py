@@ -184,12 +184,12 @@ def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     return taxonomy
 
 
-def get_file_md5(filename, encoding='utf-8'):
+def get_file_md5(f, encoding='utf-8'):
     '''get the md5 of the text file.
 
     Parameters
     ----------
-    filename : str
+    f : str
         name of the file to calculate md5 on
     encoding : str or None (optional)
         encoding of the text file (see python str.encode() ). None to use 'utf-8'
@@ -197,21 +197,18 @@ def get_file_md5(filename, encoding='utf-8'):
     Returns
     -------
     flmd5: str
-        the md5 of the file filename
+        the md5 of the file f
     '''
-    logger.debug('getting file md5 for file %s' % filename)
-    if encoding is None:
-        encoding = 'utf-8'
-    with open(filename, 'r', encoding=encoding) as fl:
+    logger.debug('getting file md5 for file %s' % f)
+    if f is None:
+        return None
+    with open(f, 'rb') as fl:
         flmd5 = hashlib.md5()
-        for cline in fl:
-            try:
-                flmd5.update(cline.encode('utf-8'))
-            except:
-                logger.warn('map md5 cannot be calculated - utf problems?')
-                return ''
+        chunk_size = 4096
+        for chunk in iter(lambda: fl.read(chunk_size), b""):
+            flmd5.update(chunk)
         flmd5 = flmd5.hexdigest()
-        logger.debug('md5 is %s' % flmd5)
+        logger.debug('md5 of %s: %s' % (f, flmd5))
         return flmd5
 
 
@@ -227,23 +224,14 @@ def get_data_md5(data):
     Returns
     -------
     datmd5 : str
-        the md5 of the data (row by row)
+        the md5 of the data
     '''
     logger.debug('caculating data md5')
-    datmd5 = hashlib.md5()
     if scipy.sparse.issparse(data):
-        issparse = True
-    else:
-        issparse = False
-    for crow in range(data.shape[0]):
-        if issparse:
-            # if sparse need to convert to numpy array
-            cdat = data[crow, :].toarray()[0]
-        else:
-            cdat = data[crow, :]
-        # convert to string of raw data since hashlib.md5 does not take numpy array as input
-        datmd5.update(cdat.tostring())
-
+        # if sparse need to convert to numpy array
+        data = data.toarray()
+    # convert to string of raw data since hashlib.md5 does not take numpy array as input
+    datmd5 = hashlib.md5(data.tobytes())
     datmd5 = datmd5.hexdigest()
     logger.debug('data md5 is: %s' % datmd5)
     return datmd5
@@ -251,11 +239,9 @@ def get_data_md5(data):
 
 def get_config_file():
     '''Get the calour config file location
-    If the environment CALOUR_CONFIG_FILE is set, take the config file from it
-    otherwise return CALOUR_PACKAGE_LOCATION/calour/config.calour.txt
 
-    Parameters
-    ----------
+    If the environment CALOUR_CONFIG_FILE is set, take the config file from it
+    otherwise return CALOUR_PACKAGE_LOCATION/calour/calour.config
 
     Returns
     -------
@@ -373,17 +359,7 @@ def set_log_level(level):
 
 
 def _to_list(x):
-    '''if x is non iterable or string, convert to iterable [x]
-
-    Parameters
-    ----------
-    x : any type (can be iterable)
-
-    Returns
-    -------
-    iterable
-        With the same values as x
-    '''
+    '''if x is non iterable or string, convert to iterable '''
     if isinstance(x, str):
         return [x]
     if isinstance(x, Iterable):
@@ -399,13 +375,13 @@ def _argsort(values):
 
     Examples
     --------
-    >>> l = [10, 'b', 2.5, 'a']
+    >>> l = [10, 'b', np.nan, 2.5, 'a']
     >>> idx = _argsort(l)
     >>> idx
-    [2, 0, 3, 1]
+    [3, 0, 2, 4, 1]
     >>> l_sorted = [l[i] for i in idx]
     >>> l_sorted
-    [2.5, 10, 'a', 'b']
+    [2.5, 10, nan, 'a', 'b']
 
     Parameters
     ----------

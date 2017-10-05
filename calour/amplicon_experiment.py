@@ -134,7 +134,8 @@ class AmpliconExperiment(Experiment):
         filename : str
             the fasta filename containing the sequences to use for filtering
         negate : bool (optional)
-            False (default) to keep only sequences matching the fasta file, True to remove sequences in the fasta file.
+            False (default) to keep only sequences matching the fasta file;
+            True to remove sequences in the fasta file.
         inplace : bool (optional)
             False (default) to create a copy of the experiment, True to filter inplace
 
@@ -170,12 +171,13 @@ class AmpliconExperiment(Experiment):
         inplace : bool (optional)
             False (default) to create a copy
             True to Replace data in exp
+
         Returns
         -------
         exp : Experiment
             sorted by taxonomy
         '''
-        logger.debug('sorting by taxonomies')
+        logger.debug('sort features by taxonomies')
         taxonomy = _get_taxonomy_string(exp, remove_underscore=True)
         sort_pos = np.argsort(taxonomy, kind='mergesort')
         exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
