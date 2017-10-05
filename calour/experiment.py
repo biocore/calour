@@ -126,8 +126,16 @@ class Experiment:
 
     def __repr__(self):
         '''Return a string representation of this object.'''
-        return 'Experiment %s with %d samples, %d features' % (
-            self.description, self.data.shape[0], self.data.shape[1])
+        if self.description:
+            l1 = 'Experiment %s' % self.description
+        else:
+            l1 = 'Experiment'
+        l2 = '-' * len(l1)
+        lines = [l1, l2,
+                 'data dimension: %d samples, %d features' % self.data.shape,
+                 'sample IDs: %r' % self.sample_metadata.index,
+                 'feature IDs: %r' % self.feature_metadata.index]
+        return '\n'.join(lines)
 
     def __eq__(self, other):
         '''Check equality.
@@ -427,7 +435,7 @@ class Experiment:
 
 
 def add_functions(cls,
-                  modules=['.io', '.sorting', '.filtering', '.analysis',
+                  modules=['.io', '.sorting', '.filtering', '.analysis', '.training',
                            '.transforming', '.heatmap.heatmap', '.plotting',
                            '.manipulation', '.database']):
     '''Dynamically add functions to the class as methods.
