@@ -72,14 +72,18 @@ def onehot_encode_features(exp, fields, sparse=None, inplace=False):
         converted to one-hot numeric code and then concatenated to the
         data table
     sparse : bool or ``None`` (optional)
-        use sparse or dense data matrix
-    inplace :
+        use sparse or dense data matrix. When it is ``None``, it will follow
+        the same sparsity of the current data table in the ``Experiment`` object
+    inplace : bool
         change the ``Experiment`` object in place or return a copy of changed.
 
     Returns
     -------
     ``Experiment``
 
+    See Also
+    --------
+    :class:`sklearn.preprocessing.OneHotEncoder`
     '''
     if inplace:
         new = exp
