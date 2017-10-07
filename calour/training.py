@@ -24,6 +24,9 @@ import numpy as np
 from .experiment import Experiment
 
 
+logger = getLogger(__name__)
+
+
 @Experiment._record_sig
 def onehot_encode_features(exp, fields, sparse=None, inplace=False):
     '''Add covariates from sample metadata to the data table as features for machine learning.
@@ -85,11 +88,11 @@ def onehot_encode_features(exp, fields, sparse=None, inplace=False):
     --------
     :class:`sklearn.preprocessing.OneHotEncoder`
     '''
+    logger.debug('Add the sample metadata {} as features'.format(fields))
     if inplace:
         new = exp
     else:
         new = exp.copy()
-    data = new.data
     md = new.sample_metadata[fields]
     if sparse is None:
         sparse = new.sparse
@@ -102,4 +105,3 @@ def onehot_encode_features(exp, fields, sparse=None, inplace=False):
     # the order in the concatenation should be consistent with the data table
     new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata])
     return new
-

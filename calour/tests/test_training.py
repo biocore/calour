@@ -7,16 +7,10 @@
 # ----------------------------------------------------------------------------
 
 from unittest import main
-from copy import deepcopy
-from os.path import basename, join
-from tempfile import mkdtemp
-import shutil
 
 from numpy.testing import assert_array_equal
 
 import calour as ca
-from calour import util
-
 from calour._testing import Tests
 
 
@@ -44,5 +38,3 @@ class TTests(Tests):
 
 if __name__ == "__main__":
     main()
-
-
