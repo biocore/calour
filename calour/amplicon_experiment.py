@@ -5,7 +5,7 @@ amplicon experiment (:mod:`calour.amplicon_experiment`)
 .. currentmodule:: calour.amplicon_experiment
 
 Classes
-^^^^^^^^
+^^^^^^^
 .. autosummary::
    :toctree: generated
 

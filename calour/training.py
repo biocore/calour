@@ -1,16 +1,17 @@
 '''
-filtering (:mod:`calour.filtering`)
-===================================
+machine learning (:mod:`calour.training`)
+=========================================
 
-.. currentmodule:: calour.filtering
+.. currentmodule:: calour.training
+
+This module contains the functions related to machine learning.
 
 Functions
 ^^^^^^^^^
 .. autosummary::
    :toctree: generated
 
-   filter_by_data
-   filter_training
+   onehot_encode_features
 '''
 
 
@@ -82,7 +83,7 @@ def onehot_encode_features(exp, fields, sparse=None, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
 
     See Also
     --------
