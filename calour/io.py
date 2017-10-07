@@ -162,7 +162,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : pandas DataFram
+    feature_md : :class:`pandas.DataFrame`
         the feature metadata (if availble in table)
     '''
     logger.debug('loading OpenMS bucket table %s' % fp)
@@ -217,7 +217,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     Returns
     -------
-    exp : ``Experiment``
+    :class:`.Experiment`
     '''
     logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     if rows_are_samples:
@@ -344,7 +344,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the new object created
 
     '''
@@ -409,14 +409,14 @@ def read_amplicon(data_file, sample_metadata_file=None,
     sample_metadata_file : None or str (optional)
         None (default) to just use samplenames (no additional metadata).
     min_reads : int or None
-        int (default) to remove all samples with less than ``min_reads``.
+        int to remove all samples with less than ``min_reads``.
         ``None`` to not filter
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
-    ``AmpliconExperiment``
+    :class:`.AmpliconExperiment`
         after removing low read sampls and normalizing
     '''
     # don't do normalize before the possible filtering
@@ -513,7 +513,7 @@ def save_fasta(exp, f, seqs=None):
         None (default) to save all sequences in exp, or list of sequences to only save these sequences.
         Note: sequences not in exp will not be saved
     '''
-    logger.debug('save_fasta to file %s' % f)
+    logger.debug('Save seq to fasta file %s' % f)
     if seqs is None:
         logger.debug('no sequences supplied - saving all sequences')
         seqs = exp.feature_metadata.index.values

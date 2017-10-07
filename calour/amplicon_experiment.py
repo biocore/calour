@@ -33,7 +33,9 @@ logger = getLogger(__name__)
 
 
 class AmpliconExperiment(Experiment):
-    '''This class contains the data for a experiment or a meta experiment.
+    '''This class stores amplicon data and associated metadata.
+
+    This is a child class of :class:`.Experiment`
 
     Parameters
     ----------
@@ -68,9 +70,6 @@ class AmpliconExperiment(Experiment):
     description : str
         name of the experiment
 
-    See Also
-    --------
-    Experiment
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

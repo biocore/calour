@@ -59,7 +59,7 @@ class Experiment:
         The metadata on the features
     description : str
         name of experiment
-    sparse : :class:`bool`
+    sparse : ``bool``
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
 
