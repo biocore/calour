@@ -37,16 +37,17 @@ from collections import defaultdict
 
 import numpy as np
 from sklearn import preprocessing
-
-from .experiment import Experiment
 from skbio.stats.composition import clr, centralize
 from skbio.stats import subsample_counts
+
+from .experiment import Experiment
+
 
 logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def normalize(exp, total=10000, axis=0, inplace=False):
+def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total
 
     Parameters
@@ -78,7 +79,7 @@ def normalize(exp, total=10000, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def rescale(exp, total=10000, axis=0, inplace=False):
+def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
     '''Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.
 
     This function rescales by multiplying ALL entries in exp.data by same number.
@@ -109,7 +110,7 @@ def rescale(exp, total=10000, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def scale(exp, axis=0, inplace=False):
+def scale(exp: Experiment, axis=0, inplace=False):
     '''Standardize a dataset along an axis
 
     .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
@@ -133,7 +134,7 @@ def scale(exp, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def binarize(exp, threshold=1, inplace=False):
+def binarize(exp: Experiment, threshold=1, inplace=False):
     '''Binarize the data with a threshold.
 
     It calls scikit-learn to do the real work.
@@ -156,7 +157,7 @@ def binarize(exp, threshold=1, inplace=False):
 
 
 @Experiment._record_sig
-def log_n(exp, n=1, inplace=False):
+def log_n(exp: Experiment, n=1, inplace=False):
     '''Log transform the data
 
     Parameters
@@ -183,7 +184,7 @@ def log_n(exp, n=1, inplace=False):
 
 
 @Experiment._record_sig
-def transform(exp, steps=[], inplace=False, **kwargs):
+def transform(exp: Experiment, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.
 
     Parameters
@@ -197,7 +198,7 @@ def transform(exp, steps=[], inplace=False, **kwargs):
     kwargs : dict
         keyword arguments to pass to each transformers. The key should
         be in the form of "<transformer_name>__<param_name>". For
-        example, "transform(exp, steps=[log_n], log_n__n=3)" will set
+        example, "transform(exp: Experiment, steps=[log_n], log_n__n=3)" will set
         "n" of function "log_n" to 3
 
     Returns
@@ -221,7 +222,7 @@ def transform(exp, steps=[], inplace=False, **kwargs):
 
 
 @Experiment._record_sig
-def normalize_by_subset_features(exp, features, total=10000, negate=True, inplace=False):
+def normalize_by_subset_features(exp: Experiment, features, total=10000, negate=True, inplace=False):
     '''Normalize each sample by their total sums without a list of features
 
     Normalizes all features (including in the exclude list) by the
@@ -264,7 +265,7 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
     return newexp
 
 
-def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
+def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace=False):
     '''Normalize each sample by ignoring the features with mean>=min_frac in all the experiment
 
     This assumes that the majority of features have less than min_frac mean, and that the majority of features don't change
@@ -291,7 +292,7 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     return newexp
 
 
-def random_permute_data(exp, normalize=True):
+def random_permute_data(exp: Experiment, normalize=True):
     '''Shuffle independently the reads of each feature
 
     Creates a new experiment with no dependence between the features.
@@ -317,7 +318,7 @@ def random_permute_data(exp, normalize=True):
 
 
 @Experiment._record_sig
-def center_log(exp, delta=1, method=None, inplace=False):
+def center_log(exp: Experiment, delta=1, method=None, inplace=False):
     """ Performs a clr transform to normalize each sample.
 
     Parameters
@@ -353,7 +354,7 @@ def center_log(exp, delta=1, method=None, inplace=False):
 
 
 @Experiment._record_sig
-def subsample_count(exp, total, replace=False, inplace=False):
+def subsample_count(exp: Experiment, total, replace=False, inplace=False):
     """Randomly subsample each sample to the same number of counts.
 
     .. warning:: This function will change the data matrix in

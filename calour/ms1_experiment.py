@@ -97,7 +97,7 @@ class MS1Experiment(Experiment):
         logger.debug('Added terms')
 
     @Experiment._record_sig
-    def sort_mz(exp, inplace=False):
+    def sort_mz(exp: Experiment, inplace=False):
         '''Sort the features based on the taxonomy
 
         Sort features based on the taxonomy (alphabetical)

@@ -14,6 +14,7 @@ import matplotlib as mpl
 import matplotlib.patches as mpatches
 import numpy as np
 
+from .. import Experiment
 from ..database import _get_database_class
 from .._dendrogram import plot_tree
 from ..util import _to_list, _transition_index
@@ -73,7 +74,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     return gui_obj
 
 
-def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
+def heatmap(exp: Experiment, sample_field=None, feature_field=False, yticklabels_max=100,
             xticklabel_rot=45, xticklabel_len=10, yticklabel_len=15,
             title=None, clim=None, cmap=None,
             ax=None, rect=None,  norm=mpl.colors.LogNorm(),
@@ -86,7 +87,6 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     .. note:: By default it log transforms the abundance values and then plot heatmap.
        The original object is not modified.
 
-    .. _heatmap-ref:
 
     Parameters
     ----------
@@ -130,7 +130,7 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
     matplotlib Axes of the heatmap
 
     '''
-    logger.debug('plot heatmap')
+    logger.debug('Plot heatmap')
     # import pyplot is less polite. do it locally
     import matplotlib.pyplot as plt
 
@@ -386,8 +386,6 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     +---------------------------+-----------------------------------+
 
 
-    .. _plot-ref:
-
     Parameters
     ----------
     exp : ``Experiment``
@@ -422,11 +420,11 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         The colors of the sample categories indicated on the sample axis
     feature_highlight_colors : dict
         The colors of the feature categories indicated on the feature axis
-    **label_kwargs : dict, optional
-        keyword arguments passing to :ref:`_ax_color_bar` function
+    label_kwargs : dict, optional
+        keyword arguments passing to :func:`_ax_color_bar` function
         to modify the labels.
-    **kwargs : dict, optional
-        keyword arguments passing to :ref:`heatmap<heatmap-ref>` function.
+    kwargs : dict, optional
+        keyword arguments passing to :func:`heatmap` function.
 
     Returns
     -------
@@ -512,7 +510,7 @@ def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
     title : str (optional)
         The title of the figure.
     kwargs : dict, optional
-        keyword arguments passing to :ref:`plot<plot-ref>` function.
+        keyword arguments passing to :func:`plot` function.
 
     Returns
     -------

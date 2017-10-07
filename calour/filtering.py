@@ -41,7 +41,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def downsample(exp, field, axis=0, num_keep=None, inplace=False):
+def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
     '''Downsample the data set.
 
     This down samples all the samples/features to have the same number of
@@ -98,7 +98,7 @@ def downsample(exp, field, axis=0, num_keep=None, inplace=False):
 
 
 @Experiment._record_sig
-def filter_sample_categories(exp, field, min_samples=5, inplace=False):
+def filter_sample_categories(exp: Experiment, field, min_samples=5, inplace=False):
     '''Filter sample categories that have too few samples.
 
     This is useful to get rid of categories with few samples for
@@ -136,7 +136,7 @@ def filter_sample_categories(exp, field, min_samples=5, inplace=False):
 
 
 @Experiment._record_sig
-def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
+def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inplace=False):
     '''Filter samples or features by metadata.
 
     Parameters
@@ -179,7 +179,7 @@ def filter_by_metadata(exp, field, select, axis=0, negate=False, inplace=False):
 
 
 @Experiment._record_sig
-def filter_by_data(exp, predicate, axis=0, negate=False, inplace=False, **kwargs):
+def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
 
     Parameters
@@ -382,7 +382,7 @@ def _freq_ratio(x, ratio=2):
 
 
 @Experiment._record_sig
-def filter_samples(exp, field, values, negate=False, inplace=False):
+def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
     '''Shortcut for filtering samples.
 
     Parameters
@@ -408,7 +408,7 @@ def filter_samples(exp, field, values, negate=False, inplace=False):
 
 
 @Experiment._record_sig
-def filter_min_abundance(exp, min_abundance, **kwargs):
+def filter_min_abundance(exp: Experiment, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
     This is a convenience function wrapping filter_by_data()
 
@@ -428,7 +428,7 @@ def filter_min_abundance(exp, min_abundance, **kwargs):
 
 
 @Experiment._record_sig
-def filter_prevalence(exp, fraction, cutoff=1/10000, **kwargs):
+def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
     This is a convenience function wrapping filter_by_data()
 
@@ -448,7 +448,7 @@ def filter_prevalence(exp, fraction, cutoff=1/10000, **kwargs):
 
 
 @Experiment._record_sig
-def filter_mean(exp, cutoff=0.01, **kwargs):
+def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
 
     In order to keep features with mean abundance of 1%, use ``filter_mean(cutoff=0.01)``
@@ -469,7 +469,7 @@ def filter_mean(exp, cutoff=0.01, **kwargs):
 
 
 @Experiment._record_sig
-def filter_ids(exp, ids, axis=1, negate=False, inplace=False):
+def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
     '''Filter samples or features based on a list index values
 
     Parameters

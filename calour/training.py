@@ -29,7 +29,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def onehot_encode_features(exp, fields, sparse=None, inplace=False):
+def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
     '''Add covariates from sample metadata to the data table as features for machine learning.
 
     This will convert the columns of categorical strings using one-hot encoding scheme and add them

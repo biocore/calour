@@ -36,7 +36,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def correlation(exp, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''Find features with correlation to a numeric metadata field
     With permutation based p-values and multiple hypothesis correction
 
@@ -100,7 +100,7 @@ def correlation(exp, field, method='spearman', nonzero=False, transform=None, nu
 
 
 @Experiment._record_sig
-def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''
     test the differential expression between 2 groups (val1 and val2 in field field)
     using permutation based fdr (dsfdr)
@@ -162,7 +162,7 @@ def diff_abundance(exp, field, val1, val2=None, method='meandiff', transform='ra
 
 
 @Experiment._record_sig
-def diff_abundance_kw(exp, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''Test the differential expression between multiple sample groups using the Kruskal Wallis test.
     uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.
 

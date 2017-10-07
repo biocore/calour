@@ -235,7 +235,7 @@ class Experiment:
     def _record_sig(func):
         '''Record the function calls to history.
 
-        Note this require the function decorated to return an
+        Note this requires the function decorated to return an
         ``Experiment`` object.
         '''
         fn = func.__qualname__
@@ -459,4 +459,9 @@ def add_functions(cls,
         for fn, f in functions:
             # skip private functions
             if not fn.startswith('_'):
-                setattr(cls, fn, f)
+                params = inspect.signature(f).parameters
+                if params:
+                    # if the func accepts parameters
+                    first = next(iter(params.values()))
+                    if first.annotation is cls:
+                        setattr(cls, fn, f)

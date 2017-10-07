@@ -438,7 +438,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     return exp
 
 
-def save(exp, prefix, fmt='hdf5'):
+def save(exp: Experiment, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
 
     Parameters
@@ -449,11 +449,11 @@ def save(exp, prefix, fmt='hdf5'):
         format for the data table. could be 'hdf5', 'txt', or 'json'.
     '''
     exp.save_biom('%s.biom' % prefix, fmt=fmt)
-    exp.save_sample_metadata('%s_sample.txt' % prefix)
-    exp.save_feature_metadata('%s_feature.txt' % prefix)
+    exp.save_metadata('%s_sample.txt' % prefix, axis=0)
+    exp.save_metadata('%s_feature.txt' % prefix, axis=1)
 
 
-def save_biom(exp, f, fmt='hdf5', add_metadata='taxonomy'):
+def save_biom(exp: Experiment, f, fmt='hdf5', add_metadata='taxonomy'):
     '''Save experiment to biom format
 
     Parameters
@@ -491,18 +491,30 @@ def save_biom(exp, f, fmt='hdf5', add_metadata='taxonomy'):
     logger.debug('biom table saved to file %s' % f)
 
 
-def save_sample_metadata(exp, f):
-    '''Save sample metadata to file. '''
-    exp.sample_metadata.to_csv(f, sep='\t')
+def save_metadata(exp: Experiment, f, axis=0, **kwargs):
+    '''Save sample/feature metadata to file.
+
+    Parameters
+    ----------
+    exp : :class:`.Experiment`
+    f : str
+        file path to save to
+    axis : 0 ('s') or 1 ('f')
+        0 or 's' to save sample metadata; 1 or 'f' to save feature metadata
+    kwargs : dict
+        keyword arguments passing to :func:`pandas.DataFrame.to_csv`
+    '''
+    if axis == 0:
+        exp.sample_metadata.to_csv(f, sep='\t', **kwargs)
+    elif axis == 1:
+        exp.feature_metadata.to_csv(f, sep='\t', **kwargs)
+    else:
+        raise ValueError('Unknown axis: %r' % axis)
 
 
-def save_feature_metadata(exp, f):
-    '''Save feature metadata to file. '''
-    exp.feature_metadata.to_csv(f, sep='\t')
-
-
-def save_fasta(exp, f, seqs=None):
+def save_fasta(exp: Experiment, f, seqs=None):
     '''Save a list of sequences to fasta.
+
     Use taxonomy information if available, otherwise just use sequence as header.
 
     Parameters

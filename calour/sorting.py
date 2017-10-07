@@ -40,7 +40,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def sort_centroid(exp, transform=log_n, inplace=False, **kwargs):
+def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
 
     Assumes exp samples are sorted by some continuous field, and sort
@@ -86,7 +86,7 @@ def sort_centroid(exp, transform=log_n, inplace=False, **kwargs):
 
 
 @Experiment._record_sig
-def cluster_data(exp, transform=None, axis=1, metric='euclidean', inplace=False, **kwargs):
+def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', inplace=False, **kwargs):
     '''Cluster the samples/features.
 
     Reorder the features/samples so that ones with similar behavior (pattern
@@ -134,7 +134,7 @@ def cluster_data(exp, transform=None, axis=1, metric='euclidean', inplace=False,
 
 
 @Experiment._record_sig
-def cluster_features(exp, min_abundance=0, inplace=False, **kwargs):
+def cluster_features(exp: Experiment, min_abundance=0, inplace=False, **kwargs):
     '''Cluster features.
 
     Cluster is done after filtering of minimal abundance, log
@@ -171,7 +171,7 @@ def cluster_features(exp, min_abundance=0, inplace=False, **kwargs):
 
 
 @Experiment._record_sig
-def sort_by_metadata(exp, field, axis=0, inplace=False):
+def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
     '''Sort samples or features based on metadata values in the field.
 
     Parameters
@@ -201,7 +201,7 @@ def sort_by_metadata(exp, field, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def sort_by_data(exp, axis=0, subset=None, key='log_mean', inplace=False, reverse=False, **kwargs):
+def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=False, reverse=False, **kwargs):
     '''Sort features based on their mean frequency.
 
     Sort the 2-d array by sample (axis=0) or feature (axis=0). ``key``
@@ -301,7 +301,7 @@ def _prevalence(x, cutoff=0):
 
 
 @Experiment._record_sig
-def sort_samples(exp, field, **kwargs):
+def sort_samples(exp: Experiment, field, **kwargs):
     '''Sort samples by field
     A convenience function for sort_by_metadata
 
@@ -319,7 +319,7 @@ def sort_samples(exp, field, **kwargs):
 
 
 @Experiment._record_sig
-def sort_abundance(exp, subset=None, inplace=False, reverse=False, **kwargs):
+def sort_abundance(exp: Experiment, subset=None, inplace=False, reverse=False, **kwargs):
     '''Sort features based on their abundance in a subset of the samples.
 
     This is a convenience wrapper for sort_by_data()
@@ -355,7 +355,7 @@ def sort_abundance(exp, subset=None, inplace=False, reverse=False, **kwargs):
 
 
 @Experiment._record_sig
-def sort_ids(exp, ids, axis=1, inplace=False):
+def sort_ids(exp: Experiment, ids, axis=1, inplace=False):
     '''Sort the features or samples by the given ids.
 
     If ids are not cover the all the features (samples), the rest will be unsorted and appended.

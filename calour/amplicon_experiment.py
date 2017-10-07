@@ -81,7 +81,7 @@ class AmpliconExperiment(Experiment):
         return 'AmpliconExperiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
-    def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
+    def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
 
         if substring=True, look for partial match instead of identity.
@@ -125,7 +125,7 @@ class AmpliconExperiment(Experiment):
         logger.warn('%s remaining' % np.sum(select))
         return exp.reorder(select, axis=1, inplace=inplace)
 
-    def filter_fasta(exp, filename, negate=False, inplace=False):
+    def filter_fasta(exp: Experiment, filename, negate=False, inplace=False):
         '''Filter features from experiment based on fasta file
 
         Parameters
@@ -160,7 +160,7 @@ class AmpliconExperiment(Experiment):
         return newexp
 
     @Experiment._record_sig
-    def sort_taxonomy(exp, inplace=False):
+    def sort_taxonomy(exp: Experiment, inplace=False):
         '''Sort the features based on the taxonomy
 
         Sort features based on the taxonomy (alphabetical)
@@ -207,7 +207,7 @@ class AmpliconExperiment(Experiment):
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
         return newexp
 
-    def collapse_taxonomy(exp, level='genus', inplace=False):
+    def collapse_taxonomy(exp: Experiment, level='genus', inplace=False):
         '''Collapse all features sharing the same taxonomy up to level into a single feature
 
         Sums abundances of all features sharing the same taxonomy up to level.

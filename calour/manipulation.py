@@ -32,7 +32,7 @@ from .experiment import Experiment
 logger = getLogger(__name__)
 
 
-def join_fields(exp, field1, field2, newname=None, axis=0, sep='_', inplace=True):
+def join_fields(exp: Experiment, field1, field2, newname=None, axis=0, sep='_', inplace=True):
     '''Join two sample metadata fields into a single new field
 
     Parameters
@@ -91,7 +91,7 @@ def join_fields(exp, field1, field2, newname=None, axis=0, sep='_', inplace=True
 
 
 @Experiment._record_sig
-def merge_identical(exp, field, method='mean', axis=0, inplace=False):
+def merge_identical(exp: Experiment, field, method='mean', axis=0, inplace=False):
     '''Merge all samples/features (for axis =0 / 1 respectively) that have the same value in field
     Methods for merge (value for each observation) are:
     'mean' : the mean of all samples/features
@@ -177,7 +177,7 @@ def merge_identical(exp, field, method='mean', axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def join_experiments(exp, other, orig_field_name='orig_exp', prefixes=None):
+def join_experiments(exp: Experiment, other, orig_field_name='orig_exp', prefixes=None):
     '''Join two Experiment objects into one.
 
     Parameters

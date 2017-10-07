@@ -30,6 +30,7 @@ from itertools import cycle
 
 import numpy as np
 
+from . import Experiment
 from .util import _to_list, compute_prevalence
 from .heatmap.heatmap import _ax_color_bar
 
@@ -37,7 +38,7 @@ from .heatmap.heatmap import _ax_color_bar
 logger = getLogger(__name__)
 
 
-def plot_hist(exp, ax=None, **kwargs):
+def plot_hist(exp: Experiment, ax=None, **kwargs):
     '''Plot histogram of all the values in data.
 
     It flattens the 2-D array and plots histogram out of it. This
@@ -72,7 +73,7 @@ def plot_hist(exp, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -126,7 +127,7 @@ def plot_enrichment(exp, enriched, max_show=10, max_len=40, ax=None):
     return ax
 
 
-def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None):
+def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -166,7 +167,7 @@ def plot_diff_abundance_enrichment(exp, term_type='term', max_show=10, max_len=4
     return ax2, enriched
 
 
-def plot_shareness(exp, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
+def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
     '''Plot the number of shared features against the number of samples subsampled.
 
     To see if there is a core feature set shared across most of the samples.
@@ -266,7 +267,7 @@ def _compute_frac_nonzero(data, steps):
     return steps, shared
 
 
-def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, alpha=0.5, linewidth=0.7, ax=None):
+def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alpha=0.5, linewidth=0.7, ax=None):
     '''Plot abundance against prevalence.
 
     Prevalence/abundance curve is a chart used to visualize the
@@ -330,7 +331,7 @@ def plot_abund_prevalence(exp, field, log=True, min_abund=0.01, alpha=0.5, linew
     return ax
 
 
-def plot_stacked_bar(exp, field=None, sample_color_bars=None, color_bar_label=True, title=None,
+def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_bar_label=True, title=None,
                      figsize=(12, 8), legend_size='small', xtick=False, cmap='Paired'):
     '''Plot the stacked bar for feature abundances.
 
