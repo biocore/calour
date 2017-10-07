@@ -26,7 +26,7 @@ from .experiment import Experiment
 
 @Experiment._record_sig
 def onehot_encode_features(exp, fields, sparse=None, inplace=False):
-    '''Add covariates from sample metadata to the data table as features for supervised learning.
+    '''Add covariates from sample metadata to the data table as features for machine learning.
 
     This will convert the columns of categorical strings using one-hot encoding scheme and add them
     into the data table as new features.
@@ -99,6 +99,7 @@ def onehot_encode_features(exp, fields, sparse=None, inplace=False):
         new.data = hstack((encoded, new.data))
     else:
         new.data = np.concatenate([encoded, new.data], axis=1)
+    # the order in the concatenation should be consistent with the data table
     new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata])
     return new
 

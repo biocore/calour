@@ -286,6 +286,9 @@ def _read_metadata(ids, f, kwargs):
         else:
             kwargs.update(default)
         metadata = pd.read_table(f, **kwargs)
+        if metadata.index.dtype.char not in {'S', 'O'}:
+            # if the index is not string or object, convert it to str
+            metadata.index = metadata.index.astype(str)
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
         if diff:
