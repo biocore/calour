@@ -376,7 +376,7 @@ class Experiment:
 
         Returns
         -------
-        ``pandas.Dataframe`` or ``pandas.SparseDataframe``
+        :class:`pandas.Dataframe` or :class:`pandas.SparseDataFrame`
         '''
         if sample_field is None:
             ind = self.sample_metadata.index

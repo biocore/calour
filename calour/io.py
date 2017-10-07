@@ -127,7 +127,7 @@ def _get_md_from_biom(table):
 
     Return
     ------
-    ``pandas.DataFrame`` or ``None``
+    :class:`pandas.DataFrame` or ``None``
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
@@ -271,11 +271,11 @@ def _read_metadata(ids, f, kwargs):
     f : str
         file path of metadata
     kwargs : dict
-        keyword argument passed to ``pandas.read_table``
+        keyword argument passed to :func:`pandas.read_table`
 
     Returns
     -------
-    ``pandas.DataFrame`` of metadata
+    :class:`pandas.DataFrame` of metadata
     '''
     # load the sample/feature metadata file
     if f is not None:
@@ -333,7 +333,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None (optional)
-        keyword arguments passing to :function:`pandas.read_table` when reading sample metadata
+        keyword arguments passing to :func:`pandas.read_table` when reading sample metadata
         or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
         as int and parse the file as latin-8 instead of utf-8.
@@ -401,7 +401,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     '''Load an amplicon experiment.
 
     Fix taxonomy, normalize reads, and filter low abundance
-    samples. This wraps ``read()``.  Also convert feature metadata
+    samples. This wraps :func:`read`.  Also convert feature metadata
     index (sequences) to upper case
 
     Parameters

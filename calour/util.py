@@ -352,7 +352,8 @@ def set_log_level(level):
     ----------
     level : int or str
         10 for debug, 20 for info, 30 for warn, etc.
-        It is passing to ``logger.setLevel``.
+        It is passing to :func:`logging.Logger.setLevel`
+
     '''
     clog = getLogger('calour')
     clog.setLevel(level)

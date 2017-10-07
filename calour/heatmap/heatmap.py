@@ -114,15 +114,15 @@ def heatmap(exp, sample_field=None, feature_field=False, yticklabels_max=100,
         None (default) to use mpl default color map. str to use colormap named str.
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
-    ax : matplotlib Axes object or None (optional)
+    ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot heatmap into the axes
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
     norm : matplotlib colors Normalize or ``None``
-        passed to ``norm`` parameter of ``plt.imshow``. Default is log scale.
-    cax : None or matplotlib Axes object (optional)
+        passed to ``norm`` parameter of :func:`matplotlib.pyplot.imshow`. Default is log scale.
+    cax : None (default) or :class:`matplotlib.axes.Axes`, optional
         plot a legend colorbar for the heatmap in the cax or not
 
     Returns
@@ -258,7 +258,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
     Parameters
     ----------
-    ax : ``matplotlib`` axes
+    ax : :class:`matplotlib.axes.Axes`
         the axes to plot the color bars in.
     values : list/tuple
         the values informing the colors on the bar
@@ -279,7 +279,7 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
     Returns
     -------
-    ``matplotlib`` axes
+    :class:`matplotlib.axes.Axes`
     '''
 
     default_kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 7,
@@ -442,12 +442,12 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     else:
         gui_obj = _create_plot_gui(exp, gui, databases, tree_size=tree_size)
         # match the exp order to the tree (reorders the features)
-        exp, tree = plot_tree(exp, tree, gui_obj.tree_axes)
+        exp, tree = plot_tree(exp, tree, gui_obj.ax_tre)
 
     if title is not None:
         gui_obj.figure.suptitle(title)
 
-    exp.heatmap(ax=gui_obj.axes, cax=gui_obj.legend, **kwargs)
+    exp.heatmap(ax=gui_obj.ax_hm, cax=gui_obj.ax_legend, **kwargs)
 
     if sample_color_bars is not None:
         sample_color_bars = _to_list(sample_color_bars)
@@ -456,7 +456,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
             _ax_color_bar(
-                gui_obj.xax, values=values, width=barwidth, position=position,
+                gui_obj.ax_sbar, values=values, width=barwidth, position=position,
                 colors=sample_highlight_colors,
                 label=color_bar_label, axis=0,
                 **label_kwargs)
@@ -468,7 +468,7 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         for f in feature_color_bars:
             values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
             _ax_color_bar(
-                gui_obj.yax, values=values, width=barwidth, position=position,
+                gui_obj.ax_fbar, values=values, width=barwidth, position=position,
                 colors=feature_highlight_colors,
                 label=color_bar_label, axis=1,
                 **label_kwargs)

@@ -119,7 +119,7 @@ class PlotGUI_Jupyter(PlotGUI):
         display(self.figure)
 
     def _print_axes_lim(self, button):
-        ax = self.axes
+        ax = self.ax_hm
         ylim_lower, ylim_upper = ax.get_ylim()
         xlim_lower, xlim_upper = ax.get_xlim()
         print([xlim_lower, xlim_upper, ylim_lower, ylim_upper])
