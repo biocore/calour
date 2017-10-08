@@ -14,8 +14,7 @@ Functions
    read_open_ms
    save
    save_biom
-   save_sample_metadata
-   save_feature_metadata
+   save_metadata
 '''
 
 

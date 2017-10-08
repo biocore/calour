@@ -358,10 +358,10 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
     """Randomly subsample each sample to the same number of counts.
 
     .. warning:: This function will change the data matrix in
-    ``Experiment`` object from sparse to dense. The input
-    ``Experiment`` object should not have been normalized by total sum
-    and its data should be discrete count. The samples that have few
-    total count than ``total`` will be dropped.
+       ``Experiment`` object from sparse to dense. The input
+       ``Experiment`` object should not have been normalized by total sum
+       and its data should be discrete count. The samples that have few
+       total count than ``total`` will be dropped.
 
     Parameters
     ----------
@@ -374,12 +374,12 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`Experiment`
         The subsampled experiment.
 
     See Also
     --------
-    skbio.stats.subsample_counts
+    :func:`skbio.stats.subsample_counts`
 
     """
     if inplace:
