@@ -173,7 +173,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        exp : Experiment
+        :class:`.Experiment`
             sorted by taxonomy
         '''
         logger.debug('sort features by taxonomies')

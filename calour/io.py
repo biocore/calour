@@ -495,7 +495,6 @@ def save_metadata(exp: Experiment, f, axis=0, **kwargs):
 
     Parameters
     ----------
-    exp : :class:`.Experiment`
     f : str
         file path to save to
     axis : 0 ('s') or 1 ('f')

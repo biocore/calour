@@ -388,8 +388,6 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
 
     Parameters
     ----------
-    exp : ``Experiment``
-        the object to plot
     sample_color_bars : list or str, optional
         list of column names in the sample metadata. It plots a color bar
         for each column. It doesn't plot color bars by default (``None``)

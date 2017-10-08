@@ -47,11 +47,10 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
 
     Parameters
     ----------
-    exp : ``Experiment``
     ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
         Axes object to draw the plot onto; otherwise uses the current Axes.
     kwargs : dict
-        key word arguments passing to the matplotlib ``hist`` plotting function.
+        key word arguments passing to the :func:`matplotlib.pyplot.hist` plotting function.
 
     Returns
     -------
@@ -78,7 +77,6 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
 
     Parameters
     ----------
-    exp : ``Experiment``
     enriched : pandas.DataFrame
         The enriched terms ( from exp.enrichment() )
         must contain columns 'term', 'odif'
@@ -132,8 +130,6 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     Parameters
     ----------
-    exp : ``Experiment``
-        output of differential_abundance()
     max_show: int or (int, int) or None (optional)
         The maximal number of terms to show
         if None, show all terms

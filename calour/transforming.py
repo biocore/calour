@@ -52,7 +52,6 @@ def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
 
     Parameters
     ----------
-    exp : Experiment
     total : float
         the sum (along axis) to normalize to
     axis : 0, 1, 's', or 'f', optional
@@ -86,7 +85,6 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
 
     Parameters
     ----------
-    exp : Experiment
     total : float
         the mean sum (along axis) to normalize to
     axis : 0, 1, 's', or 'f', optional

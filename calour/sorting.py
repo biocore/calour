@@ -64,7 +64,7 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
 
     Returns
     -------
-    exp : Experiment
+    :class:`.Experiment`
         features sorted by center of mass
 
     '''
@@ -111,7 +111,7 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
 
     Returns
     -------
-    exp : Experiment
+    :class:`.Experiment`
         With samples/features clustered (reordered)
 
     '''
