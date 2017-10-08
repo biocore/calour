@@ -10,7 +10,6 @@ Functions
    :toctree: generated
 
    plot
-   plot_sort
    heatmap
 '''
 
@@ -23,7 +22,7 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from .heatmap import heatmap, plot, plot_sort
+from .heatmap import heatmap, plot
 
 
-__all__ = ['heatmap', 'plot', 'plot_sort']
+__all__ = ['heatmap', 'plot']

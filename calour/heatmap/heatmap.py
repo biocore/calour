@@ -120,14 +120,14 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=False, yticklabels
     rect : tuple of (int, int, int, int) or None (optional)
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
-    norm : matplotlib colors Normalize or ``None``
+    norm : :class:`matplotlib.colors.Normalize` or ``None``
         passed to ``norm`` parameter of :func:`matplotlib.pyplot.imshow`. Default is log scale.
     cax : None (default) or :class:`matplotlib.axes.Axes`, optional
         plot a legend colorbar for the heatmap in the cax or not
 
     Returns
     -------
-    matplotlib Axes of the heatmap
+    :class:`matplotlib.axes.Axes` of the heatmap
 
     '''
     logger.debug('Plot heatmap')
@@ -251,16 +251,27 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=False, yticklabels
     ax.format_coord = format_coord
     return ax
 
+def _ax_bars(ax, valuess, colorss=None, widths=0.3, spaces=0.05, labels=True, labels_kwargs=None, axis=0):
+    position = 0
+    for values, colors, width, space, label, label_kwargs in zip(
+            valuess,
+            itertools.cycle(_to_list(colorss)),
+            itertools.cycle(_to_list(widths)),
+            itertools.cycle(_to_list(spaces)),
+            itertools.cycle(_to_list(labels)),
+            itertools.cycle(_to_list(labels_kwargs))):
+        _ax_bar(ax, values, colors, width, position, label, label_kwargs, axis=axis)
+        position += (width + space)
+    return ax
 
-def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True,
-                  highlight_colors=None, **label_kwargs):
-    '''plot color bars along x or y axis
+def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kwargs=None, axis=0):
+    '''Plot color bars along x or y axis
 
     Parameters
     ----------
     ax : :class:`matplotlib.axes.Axes`
         the axes to plot the color bars in.
-    values : list/tuple
+    values : Iterable
         the values informing the colors on the bar
     width : float
         the width of the color bar
@@ -270,23 +281,23 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
         the colors for each unique value in the ``values`` list.
         if it is ``None``, it will use ``Dark2`` discrete color map
         in a cycling way.
-    horizontal : bool, optional
-        plot the color bar horizontally or vertically
     label : bool, optional
         whether to label the color bars with text
-    **label_kwargs: dict
-        keyword arguments to pass in for annotating labels
+    label_kwargs: dict
+        keyword arguments to pass in for :func:`matplotlib.axes.Axes.annotate`
 
     Returns
     -------
     :class:`matplotlib.axes.Axes`
     '''
+    if label_kwargs is None:
+        label_kwargs = {}
+    kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 6,
+              'ha': 'center', 'va': 'center'}
+    kwargs.update(label_kwargs)
 
-    default_kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 7,
-                      'ha': 'center', 'va': 'center'}
-    default_kwargs.update(label_kwargs)
-    label_kwargs = default_kwargs
-
+    # convert to string and leave it as empty if it is None
+    values = ['' if i in {None, np.nan} else str(i) for i in values]
     uniques = np.unique(values)
     if colors is None:
         cmap = mpl.cm.get_cmap('Dark2')
@@ -326,20 +337,17 @@ def _ax_color_bar(ax, values, width, position=0, colors=None, axis=0, label=True
 
                 # add the text in the color bars
                 ax.annotate(value, (cx, cy), rotation=rotation,
-                            **label_kwargs)
+                            **kwargs)
 
         prev = i
 
     return ax
 
 
-def plot(exp, sample_color_bars=None, feature_color_bars=None,
-         gui='cli', databases=False, color_bar_label=True,
-         tree=None, tree_size=8, title=None,
-         barwidth=0.3, barspace=0.05,
-         sample_highlight_colors=None,
-         feature_highlight_colors=None,
-         label_kwargs={}, **kwargs):
+def plot(exp: Experiment, title=None,
+         barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
+         bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
+         gui='cli', databases=False, tree=None, tree_size=8, **heatmap_kwargs):
 
     '''Plot the interactive heatmap and its associated axes.
 
@@ -388,14 +396,6 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
 
     Parameters
     ----------
-    sample_color_bars : list or str, optional
-        list of column names in the sample metadata. It plots a color bar
-        for each column. It doesn't plot color bars by default (``None``)
-    feature_color_bars : list or str, optional
-        list of column names in the feature metadata. It plots a color bar
-        for each column. It doesn't plot color bars by default (``None``)
-    color_bar_label : bool, optional
-        whether to show the label for the color bars
     gui : str, optional
         GUI to use
     databases : Iterable of str or None or False (optional)
@@ -410,24 +410,25 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
         The width of the tree relative to the main heatmap (12 is identical size)
     title : str (optional)
         The title of the figure.
-    barwidth : float
+    barx_fields, bary_fields : str or list of str, optional
+        column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
+        for each column. It doesn't plot color bars by default (``None``)
+    barx_width, bary_width : float, optional
         The width of the bars
-    barspace : float
-        The spacing between the bars.
-    sample_highlight_colors : dict
-        The colors of the sample categories indicated on the sample axis
-    feature_highlight_colors : dict
-        The colors of the feature categories indicated on the feature axis
-    label_kwargs : dict, optional
-        keyword arguments passing to :func:`_ax_color_bar` function
-        to modify the labels.
-    kwargs : dict, optional
+    barx_colors, bary_colors : dict, :class:`matplotlib.colors.ListedColormap`, optional
+        The colors for each unique values in the column of sample metadata / feature metadata
+    barx_label, bary_label : bool, optional
+        whether to show the labels on the bars.
+    barx_label_kwargs, bary_label_kwargs : dict, optional
+        keyword arguments passing to :meth:`matplotlib.axes.Axes.annotate` for labels on the bars
+    heatmap_kwargs : dict, optional
         keyword arguments passing to :func:`heatmap` function.
 
     Returns
     -------
     ``PlottingGUI``
-        Contains the figure of the output plot in .figure parameter
+        This object contains the figure of the plot as ``.figure`` attribute
+
     '''
     # set the databases if default requested (i.e. False)
     if databases is False:
@@ -443,89 +444,27 @@ def plot(exp, sample_color_bars=None, feature_color_bars=None,
     if title is not None:
         gui_obj.figure.suptitle(title)
 
-    exp.heatmap(ax=gui_obj.ax_hm, cax=gui_obj.ax_legend, **kwargs)
+    exp.heatmap(ax=gui_obj.ax_hm, cax=gui_obj.ax_legend, **heatmap_kwargs)
 
-    if sample_color_bars is not None:
-        sample_color_bars = _to_list(sample_color_bars)
-        position = 0
-        for s in sample_color_bars:
-            # convert to string and leave it as empty if it is None
-            values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
-            _ax_color_bar(
-                gui_obj.ax_sbar, values=values, width=barwidth, position=position,
-                colors=sample_highlight_colors,
-                label=color_bar_label, axis=0,
-                **label_kwargs)
+    if barx_fields is not None:
+        _ax_bars(gui_obj.ax_sbar,
+                 valuess=(exp.sample_metadata[column] for column in _to_list(barx_fields)),
+                 colorss=barx_colors,
+                 widths=barx_width,
+                 labels=barx_label,
+                 labels_kwargs=barx_label_kwargs,
+                 axis=0)
 
-            position += (barspace + barwidth)
-    if feature_color_bars is not None:
-        feature_color_bars = _to_list(feature_color_bars)
-        position = 0
-        for f in feature_color_bars:
-            values = ['' if i is None else str(i) for i in exp.feature_metadata[f]]
-            _ax_color_bar(
-                gui_obj.ax_fbar, values=values, width=barwidth, position=position,
-                colors=feature_highlight_colors,
-                label=color_bar_label, axis=1,
-                **label_kwargs)
-            position += (barspace + barwidth)
+    if bary_fields is not None:
+        _ax_bars(gui_obj.ax_fbar,
+                 valuess=(exp.feature_metadata[column] for column in _to_list(bary_fields)),
+                 colorss=bary_colors,
+                 widths=bary_width,
+                 labels=bary_label,
+                 labels_kwargs=bary_label_kwargs,
+                 axis=1)
+
     # set up the gui ready for interaction
     gui_obj()
 
     return gui_obj
-
-
-def plot_sort(exp, fields=None, sample_color_bars=None, feature_color_bars=None,
-              gui='cli', databases=False, color_bar_label=True, title=None, **kwargs):
-    '''Plot after sorting by sample field.
-
-    This is a convenience wrapper for plot().
-
-    .. note:: Sorting occurs on a copy, the original ``Experiment`` object is not modified.
-
-    Parameters
-    ----------
-    fields : str, list, or None, optional
-        The fields to sort samples by before plotting
-    sample_color_bars : list, optional
-        list of column names in the sample metadata. It plots a color bar
-        for each column. It doesn't plot color bars by default (``None``)
-    feature_color_bars : list, optional
-        list of column names in the feature metadata. It plots a color bar
-        for each column. It doesn't plot color bars by default (``None``)
-    color_bar_label : bool, optional
-        whether to show the label for the color bars
-    gui : str, optional
-        GUI to use:
-        'cli' : simple command line gui
-        'jupyter' : jupyter notebook interactive gui
-        'qt5' : qt5 based interactive gui
-        None : no interactivity - just a matplotlib figure
-    databases : Iterable of str or None or False (optional)
-        a list of databases to access or add annotation
-        False (default) to use the default field based on the experiment subclass
-        None to not use databases
-    title : str (optional)
-        The title of the figure.
-    kwargs : dict, optional
-        keyword arguments passing to :func:`plot` function.
-
-    Returns
-    -------
-    PlotGUI
-    '''
-    if fields is not None:
-        newexp = exp.copy()
-        fields = _to_list(fields)
-        for cfield in fields:
-            newexp.sort_samples(cfield, inplace=True)
-        plot_field = cfield
-    else:
-        newexp = exp
-        plot_field = None
-    if 'sample_field' in kwargs:
-        return newexp.plot(sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                           gui=gui, databases=databases, color_bar_label=color_bar_label, title=title, **kwargs)
-    else:
-        return newexp.plot(sample_field=plot_field, sample_color_bars=sample_color_bars, feature_color_bars=feature_color_bars,
-                           gui=gui, databases=databases, color_bar_label=color_bar_label, title=title, **kwargs)

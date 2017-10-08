@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 
 import calour as ca
 from calour._testing import Tests
-from calour.heatmap.heatmap import _ax_color_bar, _create_plot_gui
+from calour.heatmap.heatmap import _ax_bar, _create_plot_gui
 
 
 class PlotTests(Tests):
@@ -61,11 +61,11 @@ class PlotTests(Tests):
         self.assertListEqual(obs_yticklabels,
                              self.test1.feature_metadata['ph'].astype(str).tolist())
 
-    def test_ax_color_bar(self):
+    def test_ax_bar(self):
         fig, ax = plt.subplots()
         colors = pd.Series({'a': (1.0, 0.0, 0.0, 1),
                             'b': (0.0, 0.5, 0.0, 1)})
-        axes = _ax_color_bar(ax, ['a', 'a', 'b'], 0.3, 0, colors)
+        axes = _ax_bar(ax, ['a', 'a', 'b'], colors, 0.3, 0)
         self.assertIs(ax, axes)
 
         # test face color rectangle in the bar

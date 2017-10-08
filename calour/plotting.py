@@ -32,7 +32,7 @@ import numpy as np
 
 from . import Experiment
 from .util import _to_list, compute_prevalence
-from .heatmap.heatmap import _ax_color_bar
+from .heatmap.heatmap import _ax_bar
 
 
 logger = getLogger(__name__)
@@ -407,7 +407,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
         for s in sample_color_bars:
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
-            _ax_color_bar(
+            _ax_bar(
                 xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
             position += (barspace + barwidth)
 
