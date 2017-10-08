@@ -40,25 +40,35 @@ upon the ``Experiment`` object.
 
 For example:
 
+   >>> from calour import Experiment
    >>> exp = Experiment(np.array([[1,2], [3, 4]]), sparse=False,
    ...                  sample_metadata=pd.DataFrame({'category': ['A', 'B'],
    ...                                                'ph': [6.6, 7.7]},
    ...                                               index=['s1', 's2']),
    ...                  feature_metadata=pd.DataFrame({'motile': ['y', 'n']}, index=['otu1', 'otu2']))
-   >>> new1 = exp.filter_samples('motile', 'y')
+
+Let's filter samples:
+
+   >>> new1 = exp.filter_samples('category', 'A')
    >>> new1
    Experiment
    ----------
    data dimension: 1 samples, 2 features
    sample IDs: Index(['s1'], dtype='object')
    feature IDs: Index(['otu1', 'otu2'], dtype='object')
-   >>> new2 = filter_samples(exp, 'motile', 'y')
+
+Equivalently, we can filter in this way:
+
+   >>> from calour.filtering import filter_samples
+   >>> new2 = filter_samples(exp, 'category', 'A')
    >>> new2
    Experiment
    ----------
    data dimension: 1 samples, 2 features
    sample IDs: Index(['s1'], dtype='object')
    feature IDs: Index(['otu1', 'otu2'], dtype='object')
+   >>> new1 == new2
+   True
 
 
 Indices and tables
