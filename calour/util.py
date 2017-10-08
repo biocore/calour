@@ -30,7 +30,7 @@ import configparser
 from types import FunctionType
 from functools import wraps, update_wrapper
 from importlib import import_module
-from collections import Iterable
+from collections import Sequence
 from logging import getLogger
 from numbers import Real
 from pkg_resources import resource_filename
@@ -368,7 +368,7 @@ def _to_list(x):
     '''if x is non iterable or string, convert to iterable '''
     if isinstance(x, str):
         return [x]
-    if isinstance(x, Iterable):
+    if isinstance(x, Sequence):
         return x
     return [x]
 
@@ -440,7 +440,8 @@ def register_functions(cls, modules=None):
         The module names where the functions are defined. ``None`` means all public
         modules in `calour`.
     '''
-    p = re.compile(r"(\n +Parameters\n +-+ *\n)")
+    # pattern to recognize the Parameters section
+    p = re.compile(r"(\n +Parameters\n +-+ *)")
     if modules is None:
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
@@ -461,9 +462,8 @@ def register_functions(cls, modules=None):
                         # function but not that of the registered
                         # version
                         setattr(cls, fn, _clone_function(f))
-                        updated = ('    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
+                        updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
                                    '\\1'
-                                   '    exp : :class:`.{0}`\n')
+                                   '\n    exp : :class:`.{0}`\n')
 
                         f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)
-
