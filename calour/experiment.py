@@ -11,12 +11,6 @@ Classes
 
    Experiment
 
-Functions
-^^^^^^^^^
-.. autosummary::
-   :toctree: generated
-
-   add_functions
 '''
 
 # ----------------------------------------------------------------------------
@@ -29,9 +23,7 @@ Functions
 
 from logging import getLogger
 from copy import deepcopy, copy
-from importlib import import_module
 from functools import wraps
-import inspect
 
 import pandas as pd
 import numpy as np
@@ -441,30 +433,3 @@ class Experiment:
         newexp = cls(df.values, sample_metadata, feature_metadata,
                      exp_metadata=exp_metadata, description=description, sparse=False)
         return newexp
-
-
-def add_functions(cls,
-                  modules=['.io', '.sorting', '.filtering', '.analysis', '.training',
-                           '.transforming', '.heatmap.heatmap', '.plotting',
-                           '.manipulation', '.database']):
-    '''Dynamically add functions to the class as methods.
-
-    Parameters
-    ----------
-    cls : ``class`` object
-        The class that the functions will be added to
-    modules : iterable of str
-        The modules where the functions are defined
-    '''
-    for module_name in modules:
-        module = import_module(module_name, 'calour')
-        functions = inspect.getmembers(module, inspect.isfunction)
-        for fn, f in functions:
-            # skip private functions
-            if not fn.startswith('_'):
-                params = inspect.signature(f).parameters
-                if params:
-                    # if the func accepts parameters
-                    first = next(iter(params.values()))
-                    if first.annotation is cls:
-                        setattr(cls, fn, f)

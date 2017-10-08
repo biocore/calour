@@ -9,6 +9,8 @@ Functions
 .. autosummary::
    :toctree: generated
 
+   compute_prevalence
+   register_functions
    set_log_level
 '''
 
@@ -20,15 +22,16 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from logging import getLogger
-from functools import wraps
+import os
 import hashlib
 import inspect
 import configparser
-from pkg_resources import resource_filename
+from importlib import import_module
 from collections import Iterable
+from logging import getLogger
+from functools import wraps
 from numbers import Real
-import os
+from pkg_resources import resource_filename
 
 import numpy as np
 import scipy
@@ -410,3 +413,31 @@ def _argsort(values):
     # values = [(str(type(x)), x) if not np.isnan(x) else (str(type(x)), np.inf) for x in values]
     # return sorted(range(len(values)), key=values.__getitem__)
     return sorted(range(len(pairs)), key=pairs.__getitem__)
+
+
+def register_functions(cls, modules=None):
+    '''Dynamically add functions to the class as methods.
+
+    Parameters
+    ----------
+    cls : ``class`` object
+        The class that the functions will be added to
+    modules : iterable of str
+        The module names where the functions are defined
+    '''
+    if modules is None:
+        modules = ['calour.' + i for i in
+                   ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
+                    'heatmap.heatmap', 'plotting', 'manipulation', 'database']]
+    for module_name in modules:
+        module = import_module(module_name)
+        functions = inspect.getmembers(module, inspect.isfunction)
+        for fn, f in functions:
+            # skip private functions
+            if not fn.startswith('_'):
+                params = inspect.signature(f).parameters
+                if params:
+                    # if the func accepts parameters, ie params is not empty
+                    first = next(iter(params.values()))
+                    if first.annotation is cls:
+                        setattr(cls, fn, f)

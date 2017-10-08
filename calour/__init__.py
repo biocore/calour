@@ -11,10 +11,10 @@ from logging.config import fileConfig
 
 from pkg_resources import resource_filename
 
-from .experiment import Experiment, add_functions
+from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
 from .io import read, read_amplicon, read_open_ms
-from .util import set_log_level, _convert_axis_name
+from .util import set_log_level, _convert_axis_name, register_functions
 
 
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
@@ -25,7 +25,8 @@ __all__ = ['read', 'read_amplicon', 'read_open_ms',
            'set_log_level']
 
 # add member functions to the class
-add_functions(Experiment)
+register_functions(Experiment)
+register_functions(AmpliconExperiment)
 
 # decorate all the class functions to convert axis
 for fn, f in inspect.getmembers(Experiment, predicate=inspect.isfunction):
