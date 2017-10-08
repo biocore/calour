@@ -85,7 +85,7 @@ class Experiment:
 
     See Also
     --------
-    AmpliconExperiment
+    :class:`.AmpliconExperiment`
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -204,11 +204,14 @@ class Experiment:
         return dat[sample_pos, feature_pos]
 
     def copy(self):
-        '''Copy the object.
+        '''Copy the object (deeply).
+
+        It calls :func:`Experiment.__deepcopy__` to make copy.
 
         Returns
         -------
-        Experiment
+        ``Experiment``
+
         '''
         return deepcopy(self)
 
