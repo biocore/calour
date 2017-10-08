@@ -25,11 +25,13 @@ Functions
 import os
 import hashlib
 import inspect
+import re
 import configparser
+from types import FunctionType
+from functools import wraps, update_wrapper
 from importlib import import_module
 from collections import Iterable
 from logging import getLogger
-from functools import wraps
 from numbers import Real
 from pkg_resources import resource_filename
 
@@ -415,16 +417,30 @@ def _argsort(values):
     return sorted(range(len(pairs)), key=pairs.__getitem__)
 
 
+def _clone_function(f):
+    '''Make a copy of a function'''
+    # based on http://stackoverflow.com/a/13503277/2289509
+    new_f = FunctionType(f.__code__, f.__globals__,
+                         name=f.__name__,
+                         argdefs=f.__defaults__,
+                         closure=f.__closure__)
+    new_f = update_wrapper(new_f, f)
+    new_f.__kwdefaults__ = f.__kwdefaults__
+    return new_f
+
+
 def register_functions(cls, modules=None):
-    '''Dynamically add functions to the class as methods.
+    '''Dynamically register functions to the class as methods.
 
     Parameters
     ----------
     cls : ``class`` object
         The class that the functions will be added to
-    modules : iterable of str
-        The module names where the functions are defined
+    modules : iterable of str (optional)
+        The module names where the functions are defined. ``None`` means all public
+        modules in `calour`.
     '''
+    p = re.compile(r"(\n +Parameters\n +-+ *\n)")
     if modules is None:
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
@@ -440,4 +456,14 @@ def register_functions(cls, modules=None):
                     # if the func accepts parameters, ie params is not empty
                     first = next(iter(params.values()))
                     if first.annotation is cls:
-                        setattr(cls, fn, f)
+                        # make a copy of the function because we want
+                        # to update the docstring of the original
+                        # function but not that of the registered
+                        # version
+                        setattr(cls, fn, _clone_function(f))
+                        updated = ('    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
+                                   '\\1'
+                                   '    exp : :class:`.{0}`\n')
+
+                        f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)
+
