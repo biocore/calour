@@ -76,11 +76,6 @@ class AmpliconExperiment(Experiment):
         self.heatmap_feature_field = 'taxonomy'
         self.heatmap_databases = ('dbbact',)
 
-    def __repr__(self):
-        '''Return a string representation of this object.'''
-        return 'AmpliconExperiment %s with %d samples, %d features' % (
-            self.description, self.data.shape[0], self.data.shape[1])
-
     def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
 

@@ -118,10 +118,9 @@ class Experiment:
 
     def __repr__(self):
         '''Return a string representation of this object.'''
+        l1 = self.__class__.__name__
         if self.description:
-            l1 = 'Experiment %s' % self.description
-        else:
-            l1 = 'Experiment'
+            l1 = '%s %s' % (l1, self.description)
         l2 = '-' * len(l1)
         lines = [l1, l2,
                  'data dimension: %d samples, %d features' % self.data.shape]

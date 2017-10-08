@@ -6,6 +6,8 @@
 Welcome to calour's documentation!
 ==================================
 
+.. sectnum::
+
 Key classes and utility functions
 ---------------------------------
 
