@@ -72,8 +72,6 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
-    heatmap_feature_field : str or None
-        The default field used for the y-axis labels (feature lables)
 
     See Also
     --------
@@ -98,9 +96,6 @@ class Experiment:
         # remeber how many reads per sample/feature before any procesing
         self.sample_metadata['_calour_original_abundance'] = self.data.sum(axis=1)
         # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
-
-        # the default y-axis field used for plotting
-        self.heatmap_feature_field = None
 
         # the default databases to use for feature information
         self.heatmap_databases = []

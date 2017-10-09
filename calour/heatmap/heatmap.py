@@ -100,7 +100,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     .. note:: By default it log transforms the abundance values and then plot heatmap.
        The original object is not modified.
 
-
     Parameters
     ----------
     sample_field : str or ``None`` (optional)
@@ -120,10 +119,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         max number of y ticks to render on the heatmap. If ``None``,
         allow all ticks for each feature in the table, which can be
         very slow if there are a large number of features.
-    clim : tuple of (float, float) or None (optional)
-        the min and max values for the heatmap or None to use all range. It uses the min
-        and max values in the ``data`` array by default.
-    cmap : ``None``, str, or matplotlib colormap
+    clim : tuple of (float, float), optional
+        the min and max values for the heatmap color limits. It uses the min
+        and max values in the input :attr:`.Experiment.data` array by default.
+    cmap : ``None``, str, or :class:`matplotlib.colors.ListedColormap`
         None (default) to use matplotlib default color map. str to use colormap named str.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
     norm : :class:`matplotlib.colors.Normalize` or ``None``

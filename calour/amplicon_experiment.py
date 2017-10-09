@@ -66,14 +66,13 @@ class AmpliconExperiment(Experiment):
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
-        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or dense numpy array.
     description : str
         name of the experiment
 
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.heatmap_feature_field = 'taxonomy'
         self.heatmap_databases = ('dbbact',)
 
     def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
