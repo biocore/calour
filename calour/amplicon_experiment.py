@@ -235,7 +235,7 @@ class AmpliconExperiment(Experiment):
             return ';'.join(ctax[:level])
 
         newexp.feature_metadata['_calour_tax_group'] = newexp.feature_metadata['taxonomy'].apply(_tax_level, level=level)
-        newexp.merge_identical('_calour_tax_group', method='sum', axis=1, inplace=True)
+        newexp.aggregate_by_metadata('_calour_tax_group', agg='sum', axis=1, inplace=True)
         newexp.feature_metadata['taxonomy'] = newexp.feature_metadata['_calour_tax_group']
         return newexp
 
