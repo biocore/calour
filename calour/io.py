@@ -371,6 +371,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     sample_metadata = _read_metadata(sid, sample_metadata_file, sample_metadata_kwargs)
     feature_metadata = _read_metadata(fid, feature_metadata_file, feature_metadata_kwargs)
 
+    # store the abund  per sample/feature before any procesing
+    sample_metadata['_calour_original_abundance'] = data.sum(axis=1)
+    # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
+
     if fmd is not None:
         # combine it with the feature metadata
         feature_metadata = pd.concat([feature_metadata, fmd], axis=1)

@@ -93,12 +93,8 @@ class Experiment:
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
 
-        # remeber how many reads per sample/feature before any procesing
-        self.sample_metadata['_calour_original_abundance'] = self.data.sum(axis=1)
-        # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
-
         # the default databases to use for feature information
-        self.heatmap_databases = []
+        self.heatmap_databases = ()
 
     @property
     def sparse(self):
