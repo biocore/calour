@@ -65,11 +65,16 @@ class PlotGUI_Jupyter(PlotGUI):
         # zoom_out_y.on_click(self._zoom_out_y)
         # display(ipywidgets.HBox([zoom_in_y, zoom_out_y]))
 
-        print_axes_lim = ipywidgets.Button(description='print axes ranges')
+        print_axes_lim = ipywidgets.Button(
+            description='print axes ranges',
+            tooltip=('Print the x axis and y axis ranges. Useful to pass to `rect` '
+                     'parameter of heatmap() to zoom in the region automatically.'))
         print_axes_lim.on_click(self._print_axes_lim)
         # TODO
-        save_selection = ipywidgets.Button(description='Save')
-        save_selection.on_click(self._annotate)
+        save_selection = ipywidgets.Button(
+            description='Save',
+            tooltip='Save the selection(s)')
+        # save_selection.on_click(self._save)
         annotate_selection = ipywidgets.Button(description='Annotate')
         annotate_selection.on_click(self._annotate)
         display(ipywidgets.HBox([print_axes_lim, save_selection, annotate_selection]))

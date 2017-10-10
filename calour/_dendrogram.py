@@ -469,12 +469,14 @@ def plot_tree(exp, tree, ax):
 
 def _match_tips(exp, tree):
     """ Returns the contingency table and tree with matched tips.
+
     Sorts the columns of the contingency table to match the tips in
     the tree.  The ordering of the tips is in post-traversal order.
     If the tree is multi-furcating, then the tree is reduced to a
     bifurcating tree by randomly inserting internal nodes.
     The intersection of samples in the contingency table and the
     tree will returned.
+
     Parameters
     ----------
     table : pd.DataFrame
@@ -482,16 +484,19 @@ def _match_tips(exp, tree):
         features correspond to columns.
     tree : skbio.TreeNode
         Tree object where the leafs correspond to the features.
+
     Returns
     -------
     pd.DataFrame :
         Subset of the original contingency table with the common features.
     skbio.TreeNode :
         Sub-tree with the common features.
+
     Raises
     ------
     ValueError:
         Raised if `table` and `tree` have incompatible sizes.
+
     See Also
     --------
     skbio.TreeNode.bifurcate
