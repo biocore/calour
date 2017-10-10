@@ -1,6 +1,6 @@
 '''
-plotting (:mod:`calour.plotting`)
-=================================
+other plotting functions (:mod:`calour.plotting`)
+=================================================
 
 .. currentmodule:: calour.plotting
 

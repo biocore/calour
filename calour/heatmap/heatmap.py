@@ -90,7 +90,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
             max_yticks=100,
-            clim=(None, None), cmap=None, norm=mpl.colors.LogNorm(),
+            clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
             title=None, rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
 
@@ -99,6 +99,56 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
 
     .. note:: By default it log transforms the abundance values and then plot heatmap.
        The original object is not modified.
+
+    Examples
+    --------
+    .. plot::
+
+       Let's create a very simple data set:
+
+       >>> from calour import Experiment
+       >>> import matplotlib as mpl
+       >>> import pandas as pd
+       >>> from matplotlib import pyplot as plt
+       >>> exp = Experiment(np.array([[0,9], [7, 4]]), sparse=False,
+       ...                  sample_metadata=pd.DataFrame({'category': ['A', 'B'],
+       ...                                                'ph': [6.6, 7.7]},
+       ...                                               index=['s1', 's2']),
+       ...                  feature_metadata=pd.DataFrame({'motile': ['y', 'n']}, index=['otu1', 'otu2']))
+
+       Let's then plot the heatmap:
+
+       >>> fig, ax = plt.subplots()
+       >>> exp.heatmap(sample_field='category', feature_field='motile', title='Fig 1 log scale', ax=ax)   # doctest: +SKIP
+
+       By default, the color is plot in log scale. Let's say we would like to plot heatmap in normal scale instead of log scale:
+
+       >>> fig, ax = plt.subplots()
+       >>> norm = mpl.colors.Normalize()
+       >>> exp.heatmap(sample_field='category', feature_field='motile', title='Fig 2 normal scale',
+       ...             norm=norm, ax=ax)             # doctest: +SKIP
+
+       Let's say we would like to show the presence/absence of each
+       OTUs across samples in heatmap. And we define presence as
+       abundance larger than 4:
+
+       >>> expbin = exp.binarize(4)
+       >>> expbin.data
+       array([[0, 1],
+              [1, 0]])
+
+       Now we have converted the abundance table to the binary
+       table. Let's define a binary color map and use it to plot the
+       heatmap:
+
+       >>> # define the colors
+       >>> cmap = mpl.colors.ListedColormap(['r', 'k'])
+       >>> # create a normalize object the describes the limits of each color
+       >>> norm = mpl.colors.BoundaryNorm([0., 0.5, 1.], cmap.N)
+       >>> fig, ax = plt.subplots()
+       >>> expbin.heatmap(sample_field='category', feature_field='motile', title='Fig 3 binary',
+       ...                cmap=cmap, norm=norm, ax=ax)         # doctest: +SKIP
+
 
     Parameters
     ----------
@@ -122,8 +172,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     clim : tuple of (float, float), optional
         the min and max values for the heatmap color limits. It uses the min
         and max values in the input :attr:`.Experiment.data` array by default.
-    cmap : ``None``, str, or :class:`matplotlib.colors.ListedColormap`
-        None (default) to use matplotlib default color map. str to use colormap named str.
+    cmap : str or :class:`matplotlib.colors.ListedColormap`
+        str to indicate the colormap name. Default is "viridis" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
     norm : :class:`matplotlib.colors.Normalize` or ``None``
         passed to ``norm`` parameter of :func:`matplotlib.pyplot.imshow`. Default is log scale.
@@ -344,7 +394,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
 def plot(exp: Experiment, title=None,
          barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
          bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
-         gui='cli', databases=False, tree=None, tree_size=8, **heatmap_kwargs):
+         tree=None, tree_size=8, gui='cli', databases=False, **heatmap_kwargs):
 
     '''Plot the interactive heatmap and its associated axes.
 
@@ -393,18 +443,6 @@ def plot(exp: Experiment, title=None,
 
     Parameters
     ----------
-    gui : str, optional
-        GUI to use. Choice includes 'cli', 'jupyter', or 'qt5'
-    databases : Iterable of str or None or False (optional)
-        a list of databases to access or add annotation
-        False (default) to use the default field based on the experiment subclass
-        None to not use databases
-    tree : skbio.TreeNode or None (optional)
-        None (default) to not plot a tree
-        otherwise, plot the tree dendrogram on the left.
-        NOTE: features are reordered according to the tree
-    tree_size : int (optional)
-        The width of the tree relative to the main heatmap (12 is identical size)
     title : str (optional)
         The title of the figure.
     barx_fields, bary_fields : str or list of str, optional
@@ -413,18 +451,29 @@ def plot(exp: Experiment, title=None,
     barx_width, bary_width : float, optional
         The width of the bars
     barx_colors, bary_colors : dict, :class:`matplotlib.colors.ListedColormap`, optional
-        The colors for each unique values in the column of sample metadata / feature metadata
+        The colors for each unique values in the column of sample/feature metadata
     barx_label, bary_label : bool, optional
         whether to show the labels on the bars.
     barx_label_kwargs, bary_label_kwargs : dict, optional
         keyword arguments passing to :meth:`matplotlib.axes.Axes.annotate` for labels on the bars
+    tree : skbio.TreeNode or None (optional)
+        None (default) to not plot a tree
+        otherwise, plot the tree dendrogram on the left.
+        NOTE: features are reordered according to the tree
+    tree_size : int (optional)
+        The width of the tree relative to the main heatmap (12 is identical size)
+    gui : str, optional
+        GUI to use. Choice includes 'cli', 'jupyter', or 'qt5'
+    databases : list of str or ``None``
+        a list of databases to access or add annotation
+        ``None`` (default) to use the default field based on the experiment.
     heatmap_kwargs : dict, optional
         keyword arguments passing to :func:`heatmap` function.
 
     Returns
     -------
     ``PlottingGUI``
-        This object contains the figure of the plot as ``.figure`` attribute
+        This object contains the figure of the plot (including all the subplots) as its ``.figure`` attribute
 
     '''
     # set the databases if default requested (i.e. False)
