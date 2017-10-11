@@ -200,8 +200,8 @@ class ExperimentTests(Tests):
         df = df.sort_values(df.index.values[0], axis=1)
         res = ca.Experiment.from_pandas(df, self.test1)
         # we need to reorder the original experiment
-        exp = self.test1.sort_by_data(subset=[10], key='mean')
-        exp = exp.sort_by_data(subset=[0], key='mean', axis=1)
+        exp = self.test1.sort_by_data(subset=[10], key=np.mean)
+        exp = exp.sort_by_data(subset=[0], key=np.mean, axis=1)
         assert_experiment_equal(res, exp)
 
     def test_from_pandas_round_trip(self):

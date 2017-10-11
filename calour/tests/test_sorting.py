@@ -10,6 +10,7 @@ from unittest import main
 from os.path import join
 
 import pandas.util.testing as pdt
+import numpy as np
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
@@ -102,7 +103,7 @@ class SortingTests(Tests):
         self.assertEqual(exp.feature_metadata.index[1], self.test1.feature_metadata.index[4])
 
     def test_sort_abundance_mean(self):
-        exp = self.test1.sort_abundance(key='mean')
+        exp = self.test1.sort_abundance(key=np.mean)
         new_ids = ['GA', 'GT', 'badfeature', 'TT', 'AC', 'AA', 'AG', 'TA', 'AT', 'TG', 'TC', 'GG']
         self.assertEqual(exp.feature_metadata.index.tolist(), new_ids)
         self.assertEqual(exp.shape, self.test1.shape)
@@ -114,10 +115,15 @@ class SortingTests(Tests):
         self.assertEqual(exp.shape, self.test1.shape)
 
     def test_sort_abundance_subgroup(self):
-        exp = self.test1.sort_abundance(subset={'id': ['2']}, key='mean')
+        exp = self.test1.sort_abundance(subgroup={'id': ['2']}, key=np.mean)
         new_ids = ['AC', 'TT', 'GA', 'GT', 'badfeature', 'AG', 'AA', 'TA', 'AT', 'TG', 'GG', 'TC']
         self.assertListEqual(exp.feature_metadata.index.tolist(), new_ids)
         self.assertEqual(exp.shape, self.test1.shape)
+
+    def test_sort_ids_raise(self):
+        fids = ['GG', 'pita']
+        with self.assertRaisesRegex(ValueError, 'pita'):
+            self.test1.sort_ids(fids)
 
     def test_sort_ids(self):
         # keep only samples S6 and S5
