@@ -15,7 +15,7 @@ Functions
    filter_ids
    filter_mean
    filter_prevalence
-   filter_min_abundance
+   filter_abundance
    filter_sample_categories
 '''
 
@@ -30,6 +30,7 @@ Functions
 from heapq import nlargest
 from logging import getLogger
 from collections import Callable
+import reprlib
 
 import numpy as np
 from scipy.sparse import issparse
@@ -61,11 +62,11 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
         with < num_keep
     inplace : bool (optional)
         False (default) to do the filtering on a copy.
-        True to do the filtering on the original ``Experiment``
+        True to do the filtering on the original :class:`.Experiment`
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
     '''
     logger.debug('downsample on field %s' % field)
     if axis == 0:
@@ -121,8 +122,7 @@ def filter_sample_categories(exp: Experiment, field, min_samples=5, inplace=Fals
 
     Returns
     -------
-    ``Experiment``
-        filtered so contains only features/samples present in exp and in ids
+    :class:`.Experiment`
 
     '''
     exp = exp.reorder(exp.sample_metadata[field].notnull(), inplace=inplace)
@@ -154,11 +154,11 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
     negate : bool, optional
         discard instead of keep the select if set to ``True``
     inplace : bool, optional
-        do the filtering on the original ``Experiment`` object or a copied one.
+        do the filtering on the original :class:`.Experiment` object or a copied one.
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the filtered object
     '''
     if axis == 0:
@@ -187,11 +187,16 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     predicate : str or callable
         The callable accepts a list of numeric and return a bool. Alternatively
         it also accepts the following strings:
-        'sum_abundance': calls ``_sum_abundance``,
-        'freq_ratio': calls ``_freq_ratio``,
-        'unique_cut': calls ``_unique_cut``,
-        'mean_abundance': calls ``_mean_abundance``,
-        'prevalence': calls ``_prevalence``
+
+        * 'sum_abundance': calls ``_sum_abundance``,
+
+        * 'freq_ratio': calls ``_freq_ratio``,
+
+        * 'unique_cut': calls ``_unique_cut``,
+
+        * 'mean_abundance': calls ``_mean_abundance``,
+
+        * 'prevalence': calls ``_prevalence``
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
     negate : bool
@@ -201,7 +206,7 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the filtered object
     '''
     # test for functions that can be applied to full matrix
@@ -209,7 +214,7 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     fast_func = {'sum_abundance': _sum_abundance,
                  'mean_abundance': _mean_abundance}
     if predicate in fast_func:
-        logger.debug('filter_by_data using fast function %r' % predicate)
+        logger.debug('filter_by_data using predicate function %r' % predicate)
         select = fast_func[predicate](exp.data, axis=1-axis, **kwargs)
     else:
         func = {'freq_ratio': _freq_ratio,
@@ -239,7 +244,7 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     if negate is True:
         select = ~ select
 
-    logger.info('%s remaining' % np.sum(select))
+    logger.info('After filtering, %s remaining' % np.sum(select))
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
@@ -394,11 +399,11 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
     negate : bool, optional
         discard instead of keep the samples if set to ``True``
     inplace : bool, optional
-        return the filtering on the original ``Experiment`` object or a copied one.
+        return the filtering on the original :class:`.Experiment` object or a copied one.
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the filtered object
 
     '''
@@ -408,7 +413,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 
 
 @Experiment._record_sig
-def filter_min_abundance(exp: Experiment, min_abundance, **kwargs):
+def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
     This is a convenience function wrapping filter_by_data()
 
@@ -419,7 +424,7 @@ def filter_min_abundance(exp: Experiment, min_abundance, **kwargs):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the filtered object
 
     '''
@@ -441,7 +446,8 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
 
     Returns
     -------
-    ``Experiment`` with only features present in at least fraction of samples
+    :class:`.Experiment`
+        with only features present in at least fraction of samples
     '''
     newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
     return newexp
@@ -461,7 +467,7 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
     '''
     factor = np.mean(exp.data.sum(axis=1))
     newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
@@ -485,23 +491,20 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         filtered so contains only features/samples present in exp and in ids
     '''
-    okpos = []
-    tot_ids = 0
     if axis == 0:
         index = exp.sample_metadata.index
     else:
         index = exp.feature_metadata.index
-    for cid in ids:
-        tot_ids += 1
-        if cid in index:
-            pos = index.get_loc(cid)
-            okpos.append(pos)
-    logger.debug('list contained %d sequences. Found %d sequences in experiment' % (tot_ids, len(okpos)))
+    try:
+        ids_pos = [index.get_loc(i) for i in ids]
+    except KeyError as e:
+        raise ValueError('Unknown IDs provided: %s' % str(e))
+    # use reprlib to shorten the list if it is too long
+    logger.debug('Filter by IDs %s on axis %d' % (reprlib.repr(ids), axis))
     if negate:
-        okpos = np.setdiff1d(np.arange(len(index)), okpos, assume_unique=True)
-
-    newexp = exp.reorder(okpos, axis=axis, inplace=inplace)
+        ids_pos = np.setdiff1d(np.arange(len(index)), ids_pos, assume_unique=True)
+    newexp = exp.reorder(ids_pos, axis=axis, inplace=inplace)
     return newexp
