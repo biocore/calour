@@ -31,9 +31,11 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          
          
-         AmpliconExperiment.add_terms_to_features
+         AmpliconExperiment.aggregate_by_metadata
          
          AmpliconExperiment.binarize
+         
+         AmpliconExperiment.center_log
          
          AmpliconExperiment.cluster_data
          
@@ -45,15 +47,13 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.correlation
          
-         AmpliconExperiment.deepcopy
-         
          AmpliconExperiment.diff_abundance
          
          AmpliconExperiment.diff_abundance_kw
          
          AmpliconExperiment.downsample
          
-         AmpliconExperiment.enrichment
+         AmpliconExperiment.filter_abundance
          
          AmpliconExperiment.filter_by_data
          
@@ -65,11 +65,11 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.filter_mean
          
-         AmpliconExperiment.filter_min_abundance
-         
          AmpliconExperiment.filter_orig_reads
          
          AmpliconExperiment.filter_prevalence
+         
+         AmpliconExperiment.filter_sample_categories
          
          AmpliconExperiment.filter_samples
          
@@ -77,33 +77,15 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.from_pandas
          
-         AmpliconExperiment.getLogger
-         
-         AmpliconExperiment.get_config_file
-         
-         AmpliconExperiment.get_config_sections
-         
-         AmpliconExperiment.get_config_value
-         
          AmpliconExperiment.get_data
-         
-         AmpliconExperiment.get_data_md5
-         
-         AmpliconExperiment.get_file_md5
          
          AmpliconExperiment.heatmap
          
-         AmpliconExperiment.issparse
-         
          AmpliconExperiment.join_experiments
          
-         AmpliconExperiment.join_fields
+         AmpliconExperiment.join_metadata_fields
          
          AmpliconExperiment.log_n
-         
-         AmpliconExperiment.merge_identical
-         
-         AmpliconExperiment.nlargest
          
          AmpliconExperiment.normalize
          
@@ -111,7 +93,11 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.normalize_compositional
          
+         AmpliconExperiment.onehot_encode_features
+         
          AmpliconExperiment.plot
+         
+         AmpliconExperiment.plot_abund_prevalence
          
          AmpliconExperiment.plot_diff_abundance_enrichment
          
@@ -119,17 +105,11 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.plot_hist
          
-         AmpliconExperiment.plot_sort
+         AmpliconExperiment.plot_shareness
          
-         AmpliconExperiment.plot_tree
+         AmpliconExperiment.plot_stacked_bar
          
          AmpliconExperiment.random_permute_data
-         
-         AmpliconExperiment.read
-         
-         AmpliconExperiment.read_amplicon
-         
-         AmpliconExperiment.read_open_ms
          
          AmpliconExperiment.reorder
          
@@ -141,9 +121,7 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          
          AmpliconExperiment.save_fasta
          
-         AmpliconExperiment.save_feature_metadata
-         
-         AmpliconExperiment.save_sample_metadata
+         AmpliconExperiment.save_metadata
          
          AmpliconExperiment.scale
          
@@ -162,6 +140,8 @@ calour\.amplicon\_experiment\.AmpliconExperiment
          AmpliconExperiment.sort_taxonomy
          
          AmpliconExperiment.split_taxonomy
+         
+         AmpliconExperiment.subsample_count
          
          AmpliconExperiment.to_pandas
          

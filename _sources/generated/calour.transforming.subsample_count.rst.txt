@@ -1,0 +1,6 @@
+calour\.transforming\.subsample\_count
+======================================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: subsample_count

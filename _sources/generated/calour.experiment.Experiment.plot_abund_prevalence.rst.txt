@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.plot_abund_prevalence
+==================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.plot_abund_prevalence

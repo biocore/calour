@@ -5,17 +5,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>read &amp; write (calour.io) &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>read &amp; write (calour.io) &#8212; calour 0.99-beta documentation</title>
     
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/sandstone/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.0.dev0',
+        VERSION:     '0.99-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -69,7 +67,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.0.dev0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -88,14 +86,17 @@
 <li class="toctree-l1"><a class="reference internal" href="experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
 </ul>
 </ul>
 </li>
@@ -167,11 +168,8 @@
 <tr class="row-odd"><td><a class="reference internal" href="generated/calour.io.save_biom.html#calour.io.save_biom" title="calour.io.save_biom"><code class="xref py py-obj docutils literal"><span class="pre">save_biom</span></code></a>(exp,&nbsp;f[,&nbsp;fmt,&nbsp;add_metadata])</td>
 <td>Save experiment to biom format</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/calour.io.save_sample_metadata.html#calour.io.save_sample_metadata" title="calour.io.save_sample_metadata"><code class="xref py py-obj docutils literal"><span class="pre">save_sample_metadata</span></code></a>(exp,&nbsp;f)</td>
-<td>Save sample metadata to file.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.io.save_feature_metadata.html#calour.io.save_feature_metadata" title="calour.io.save_feature_metadata"><code class="xref py py-obj docutils literal"><span class="pre">save_feature_metadata</span></code></a>(exp,&nbsp;f)</td>
-<td>Save feature metadata to file.</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.io.save_metadata.html#calour.io.save_metadata" title="calour.io.save_metadata"><code class="xref py py-obj docutils literal"><span class="pre">save_metadata</span></code></a>(exp,&nbsp;f[,&nbsp;axis])</td>
+<td>Save sample/feature metadata to file.</td>
 </tr>
 </tbody>
 </table>
@@ -190,8 +188,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+        &copy; Copyright 2016--, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

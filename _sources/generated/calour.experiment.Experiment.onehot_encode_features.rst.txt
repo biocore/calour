@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.onehot_encode_features
+===================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.onehot_encode_features

@@ -1,0 +1,6 @@
+calour\.training\.onehot\_encode\_features
+==========================================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: onehot_encode_features

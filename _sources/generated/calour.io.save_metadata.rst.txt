@@ -1,0 +1,6 @@
+calour\.io\.save\_metadata
+==========================
+
+.. currentmodule:: calour.io
+
+.. autofunction:: save_metadata

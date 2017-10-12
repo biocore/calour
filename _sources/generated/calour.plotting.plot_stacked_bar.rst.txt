@@ -1,0 +1,6 @@
+calour\.plotting\.plot\_stacked\_bar
+====================================
+
+.. currentmodule:: calour.plotting
+
+.. autofunction:: plot_stacked_bar

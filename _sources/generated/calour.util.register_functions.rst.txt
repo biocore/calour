@@ -1,0 +1,6 @@
+calour\.util\.register\_functions
+=================================
+
+.. currentmodule:: calour.util
+
+.. autofunction:: register_functions

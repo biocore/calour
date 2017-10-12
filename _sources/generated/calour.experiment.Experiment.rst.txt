@@ -31,9 +31,11 @@ calour\.experiment\.Experiment
          
          
          
-         Experiment.add_terms_to_features
+         Experiment.aggregate_by_metadata
          
          Experiment.binarize
+         
+         Experiment.center_log
          
          Experiment.cluster_data
          
@@ -43,15 +45,13 @@ calour\.experiment\.Experiment
          
          Experiment.correlation
          
-         Experiment.deepcopy
-         
          Experiment.diff_abundance
          
          Experiment.diff_abundance_kw
          
          Experiment.downsample
          
-         Experiment.enrichment
+         Experiment.filter_abundance
          
          Experiment.filter_by_data
          
@@ -61,41 +61,23 @@ calour\.experiment\.Experiment
          
          Experiment.filter_mean
          
-         Experiment.filter_min_abundance
-         
          Experiment.filter_prevalence
+         
+         Experiment.filter_sample_categories
          
          Experiment.filter_samples
          
          Experiment.from_pandas
          
-         Experiment.getLogger
-         
-         Experiment.get_config_file
-         
-         Experiment.get_config_sections
-         
-         Experiment.get_config_value
-         
          Experiment.get_data
-         
-         Experiment.get_data_md5
-         
-         Experiment.get_file_md5
          
          Experiment.heatmap
          
-         Experiment.issparse
-         
          Experiment.join_experiments
          
-         Experiment.join_fields
+         Experiment.join_metadata_fields
          
          Experiment.log_n
-         
-         Experiment.merge_identical
-         
-         Experiment.nlargest
          
          Experiment.normalize
          
@@ -103,7 +85,11 @@ calour\.experiment\.Experiment
          
          Experiment.normalize_compositional
          
+         Experiment.onehot_encode_features
+         
          Experiment.plot
+         
+         Experiment.plot_abund_prevalence
          
          Experiment.plot_diff_abundance_enrichment
          
@@ -111,17 +97,11 @@ calour\.experiment\.Experiment
          
          Experiment.plot_hist
          
-         Experiment.plot_sort
+         Experiment.plot_shareness
          
-         Experiment.plot_tree
+         Experiment.plot_stacked_bar
          
          Experiment.random_permute_data
-         
-         Experiment.read
-         
-         Experiment.read_amplicon
-         
-         Experiment.read_open_ms
          
          Experiment.reorder
          
@@ -133,9 +113,7 @@ calour\.experiment\.Experiment
          
          Experiment.save_fasta
          
-         Experiment.save_feature_metadata
-         
-         Experiment.save_sample_metadata
+         Experiment.save_metadata
          
          Experiment.scale
          
@@ -150,6 +128,8 @@ calour\.experiment\.Experiment
          Experiment.sort_ids
          
          Experiment.sort_samples
+         
+         Experiment.subsample_count
          
          Experiment.to_pandas
          

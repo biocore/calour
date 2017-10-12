@@ -1,0 +1,6 @@
+calour\.util\.compute\_prevalence
+=================================
+
+.. currentmodule:: calour.util
+
+.. autofunction:: compute_prevalence

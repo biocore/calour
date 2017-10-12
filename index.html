@@ -5,17 +5,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to calour’s documentation! &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>1   Welcome to calour’s documentation! &#8212; calour 0.99-beta documentation</title>
     
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/sandstone/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.0.dev0',
+        VERSION:     '0.99-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -68,7 +66,7 @@
         </button>
         <a class="navbar-brand" href="#">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.0.dev0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -87,14 +85,17 @@
 <li class="toctree-l1"><a class="reference internal" href="experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
 </ul>
 </ul>
 </li>
@@ -108,8 +109,12 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Welcome to calour&#8217;s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">1&nbsp;&nbsp;&nbsp;Welcome to calour&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#key-classes-and-utility-functions">1.1&nbsp;&nbsp;&nbsp;Key classes and utility functions</a></li>
+<li><a class="reference internal" href="#functions-operating-on-experiment-object">1.2&nbsp;&nbsp;&nbsp;Functions operating on <code class="docutils literal"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">2&nbsp;&nbsp;&nbsp;Indices and tables</a></li>
 </ul>
 </ul>
 </li>
@@ -140,26 +145,73 @@
     <div class="col-md-12 content">
       
   <div class="section" id="welcome-to-calour-s-documentation">
-<h1>Welcome to calour&#8217;s documentation!<a class="headerlink" href="#welcome-to-calour-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+<h1>1&nbsp;&nbsp;&nbsp;Welcome to calour&#8217;s documentation!<a class="headerlink" href="#welcome-to-calour-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="key-classes-and-utility-functions">
+<h2>1.1&nbsp;&nbsp;&nbsp;Key classes and utility functions<a class="headerlink" href="#key-classes-and-utility-functions" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
 </ul>
 </div>
 </div>
+<div class="section" id="functions-operating-on-experiment-object">
+<h2>1.2&nbsp;&nbsp;&nbsp;Functions operating on <code class="docutils literal"><span class="pre">Experiment</span></code> object<a class="headerlink" href="#functions-operating-on-experiment-object" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+</ul>
+</div>
+<p>The above modules contain functions that operate on the
+<code class="docutils literal"><span class="pre">Experiment</span></code> (or its child classes) object. They can be called in
+two manners equivalently: 1) called as normal functions with an
+<code class="docutils literal"><span class="pre">Experiment</span></code> object as first parameter; 2) called as a method
+upon the <code class="docutils literal"><span class="pre">Experiment</span></code> object.</p>
+<p>For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calour</span> <span class="k">import</span> <span class="n">Experiment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]),</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>                 <span class="n">sample_metadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                               <span class="s1">&#39;ph&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">6.6</span><span class="p">,</span> <span class="mf">7.7</span><span class="p">]},</span>
+<span class="gp">... </span>                                              <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;s1&#39;</span><span class="p">,</span> <span class="s1">&#39;s2&#39;</span><span class="p">]),</span>
+<span class="gp">... </span>                 <span class="n">feature_metadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;motile&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">]},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;otu1&#39;</span><span class="p">,</span> <span class="s1">&#39;otu2&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>Let&#8217;s filter samples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new1</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new1</span>
+<span class="go">Experiment</span>
+<span class="go">----------</span>
+<span class="go">data dimension: 1 samples, 2 features</span>
+<span class="go">sample IDs: Index([&#39;s1&#39;], dtype=&#39;object&#39;)</span>
+<span class="go">feature IDs: Index([&#39;otu1&#39;, &#39;otu2&#39;], dtype=&#39;object&#39;)</span>
+</pre></div>
+</div>
+<p>Equivalently, we can filter in this way:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calour.filtering</span> <span class="k">import</span> <span class="n">filter_samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new2</span> <span class="o">=</span> <span class="n">filter_samples</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new2</span>
+<span class="go">Experiment</span>
+<span class="go">----------</span>
+<span class="go">data dimension: 1 samples, 2 features</span>
+<span class="go">sample IDs: Index([&#39;s1&#39;], dtype=&#39;object&#39;)</span>
+<span class="go">feature IDs: Index([&#39;otu1&#39;, &#39;otu2&#39;], dtype=&#39;object&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new1</span> <span class="o">==</span> <span class="n">new2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>2&nbsp;&nbsp;&nbsp;Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
 <li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
@@ -179,8 +231,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+        &copy; Copyright 2016--, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

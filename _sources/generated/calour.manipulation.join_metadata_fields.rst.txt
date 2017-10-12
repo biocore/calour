@@ -1,0 +1,6 @@
+calour\.manipulation\.join\_metadata\_fields
+============================================
+
+.. currentmodule:: calour.manipulation
+
+.. autofunction:: join_metadata_fields

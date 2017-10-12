@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.subsample_count
+============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.subsample_count

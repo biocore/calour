@@ -5,17 +5,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>calour.experiment.Experiment.plot &#8212; calour 0.1.0.dev0 documentation</title>
+    <title>calour.experiment.Experiment.plot &#8212; calour 0.99-beta documentation</title>
     
-    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootswatch-3.3.6/sandstone/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.0.dev0',
+        VERSION:     '0.99-beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -67,7 +65,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1.0.dev0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -86,14 +84,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plotting.html">plotting (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
 </ul>
 </ul>
 </li>
@@ -141,7 +142,7 @@
 <h1>calour.experiment.Experiment.plot<a class="headerlink" href="#calour-experiment-experiment-plot" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.plot">
-<code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_color_bars=None</em>, <em>feature_color_bars=None</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>color_bar_label=True</em>, <em>tree=None</em>, <em>tree_size=8</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/master/calour/util.py#L56"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>title=None</em>, <em>barx_fields=None</em>, <em>barx_width=0.3</em>, <em>barx_colors=None</em>, <em>barx_label=True</em>, <em>barx_label_kwargs=None</em>, <em>bary_fields=None</em>, <em>bary_width=0.3</em>, <em>bary_colors=None</em>, <em>bary_label=True</em>, <em>bary_label_kwargs=None</em>, <em>tree=None</em>, <em>tree_size=8</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>**heatmap_kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/0.99-beta/calour/util.py#L122"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the interactive heatmap and its associated axes.</p>
 <p>The heatmap is interactive and can be dynamically updated with
 following key and mouse events:</p>
@@ -203,37 +204,34 @@ column</td>
 </tr>
 </tbody>
 </table>
-<table class="docutils field-list" frame="void" id="plot-ref" rules="none">
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exp</strong> : <code class="docutils literal"><span class="pre">Experiment</span></code></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>title</strong> : str (optional)</p>
 <blockquote>
-<div><p>the object to plot</p>
+<div><p>The title of the figure.</p>
 </div></blockquote>
-<p><strong>sample_color_bars</strong> : list or str, optional</p>
+<p><strong>barx_fields, bary_fields</strong> : str or list of str, optional</p>
 <blockquote>
-<div><p>list of column names in the sample metadata. It plots a color bar
+<div><p>column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
 for each column. It doesn&#8217;t plot color bars by default (<code class="docutils literal"><span class="pre">None</span></code>)</p>
 </div></blockquote>
-<p><strong>feature_color_bars</strong> : list or str, optional</p>
+<p><strong>barx_width, bary_width</strong> : float, optional</p>
 <blockquote>
-<div><p>list of column names in the feature metadata. It plots a color bar
-for each column. It doesn&#8217;t plot color bars by default (<code class="docutils literal"><span class="pre">None</span></code>)</p>
+<div><p>The width of the bars</p>
 </div></blockquote>
-<p><strong>color_bar_label</strong> : bool, optional</p>
+<p><strong>barx_colors, bary_colors</strong> : dict, <a class="reference external" href="http://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.colors.ListedColormap</span></code></a>, optional</p>
 <blockquote>
-<div><p>whether to show the label for the color bars</p>
+<div><p>The colors for each unique values in the column of sample/feature metadata</p>
 </div></blockquote>
-<p><strong>gui</strong> : str, optional</p>
+<p><strong>barx_label, bary_label</strong> : bool, optional</p>
 <blockquote>
-<div><p>GUI to use</p>
+<div><p>whether to show the labels on the bars.</p>
 </div></blockquote>
-<p><strong>databases</strong> : Iterable of str or None or False (optional)</p>
+<p><strong>barx_label_kwargs, bary_label_kwargs</strong> : dict, optional</p>
 <blockquote>
-<div><p>a list of databases to access or add annotation
-False (default) to use the default field based on the experiment subclass
-None to not use databases</p>
+<div><p>keyword arguments passing to <a class="reference external" href="http://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.annotate.html#matplotlib.axes.Axes.annotate" title="(in Matplotlib v2.1.0)"><code class="xref py py-meth docutils literal"><span class="pre">matplotlib.axes.Axes.annotate()</span></code></a> for labels on the bars</p>
 </div></blockquote>
 <p><strong>tree</strong> : skbio.TreeNode or None (optional)</p>
 <blockquote>
@@ -245,15 +243,24 @@ NOTE: features are reordered according to the tree</p>
 <blockquote>
 <div><p>The width of the tree relative to the main heatmap (12 is identical size)</p>
 </div></blockquote>
-<p><strong>kwargs</strong> : dict, optional</p>
+<p><strong>gui</strong> : str, optional</p>
 <blockquote>
-<div><p>keyword arguments passing to <a class="reference internal" href="calour.heatmap.heatmap.html#heatmap-ref"><span class="std std-ref">heatmap</span></a> function.</p>
+<div><p>GUI to use. Choice includes &#8216;cli&#8217;, &#8216;jupyter&#8217;, or &#8216;qt5&#8217;</p>
+</div></blockquote>
+<p><strong>databases</strong> : list of str or <code class="docutils literal"><span class="pre">None</span></code></p>
+<blockquote>
+<div><p>a list of databases to access or add annotation
+<code class="docutils literal"><span class="pre">None</span></code> (default) to use the default field based on the experiment.</p>
+</div></blockquote>
+<p><strong>heatmap_kwargs</strong> : dict, optional</p>
+<blockquote>
+<div><p>keyword arguments passing to <a class="reference internal" href="calour.experiment.Experiment.heatmap.html#calour.experiment.Experiment.heatmap" title="calour.experiment.Experiment.heatmap"><code class="xref py py-func docutils literal"><span class="pre">heatmap()</span></code></a> function.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">PlottingGUI</span></code></p>
 <blockquote class="last">
-<div><p>Contains the figure of the output plot in .figure parameter</p>
+<div><p>This object contains the figure of the plot (including all the subplots) as its <code class="docutils literal"><span class="pre">.figure</span></code> attribute</p>
 </div></blockquote>
 </td>
 </tr>
@@ -275,8 +282,8 @@ NOTE: features are reordered according to the tree</p>
       
     </p>
     <p>
-        &copy; Copyright 2014--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+        &copy; Copyright 2016--, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

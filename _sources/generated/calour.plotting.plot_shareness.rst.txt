@@ -1,0 +1,6 @@
+calour\.plotting\.plot\_shareness
+=================================
+
+.. currentmodule:: calour.plotting
+
+.. autofunction:: plot_shareness

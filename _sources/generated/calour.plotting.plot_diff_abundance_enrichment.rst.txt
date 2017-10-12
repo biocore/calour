@@ -1,0 +1,6 @@
+calour\.plotting\.plot\_diff\_abundance\_enrichment
+===================================================
+
+.. currentmodule:: calour.plotting
+
+.. autofunction:: plot_diff_abundance_enrichment

@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.aggregate_by_metadata
+==================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.aggregate_by_metadata

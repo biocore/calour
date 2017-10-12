@@ -1,0 +1,6 @@
+calour\.manipulation\.aggregate\_by\_metadata
+=============================================
+
+.. currentmodule:: calour.manipulation
+
+.. autofunction:: aggregate_by_metadata

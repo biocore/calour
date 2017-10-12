@@ -1,0 +1,6 @@
+calour\.filtering\.filter\_abundance
+====================================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_abundance

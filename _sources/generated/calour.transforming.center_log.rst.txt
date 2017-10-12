@@ -1,0 +1,6 @@
+calour\.transforming\.center\_log
+=================================
+
+.. currentmodule:: calour.transforming
+
+.. autofunction:: center_log

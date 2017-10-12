@@ -1,0 +1,6 @@
+calour\.filtering\.filter\_sample\_categories
+=============================================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_sample_categories
