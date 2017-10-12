@@ -9,6 +9,8 @@ Functions
 .. autosummary::
    :toctree: generated
 
+   compute_prevalence
+   register_functions
    set_log_level
 '''
 
@@ -20,15 +22,18 @@ Functions
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from logging import getLogger
-from functools import wraps
+import os
 import hashlib
 import inspect
+import re
 import configparser
-from pkg_resources import resource_filename
-from collections import Iterable
+from types import FunctionType
+from functools import wraps, update_wrapper
+from importlib import import_module
+from collections import Sequence
+from logging import getLogger
 from numbers import Real
-import os
+from pkg_resources import resource_filename
 
 import numpy as np
 import scipy
@@ -184,12 +189,12 @@ def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     return taxonomy
 
 
-def get_file_md5(filename, encoding='utf-8'):
+def get_file_md5(f, encoding='utf-8'):
     '''get the md5 of the text file.
 
     Parameters
     ----------
-    filename : str
+    f : str
         name of the file to calculate md5 on
     encoding : str or None (optional)
         encoding of the text file (see python str.encode() ). None to use 'utf-8'
@@ -197,21 +202,18 @@ def get_file_md5(filename, encoding='utf-8'):
     Returns
     -------
     flmd5: str
-        the md5 of the file filename
+        the md5 of the file f
     '''
-    logger.debug('getting file md5 for file %s' % filename)
-    if encoding is None:
-        encoding = 'utf-8'
-    with open(filename, 'r', encoding=encoding) as fl:
+    logger.debug('getting file md5 for file %s' % f)
+    if f is None:
+        return None
+    with open(f, 'rb') as fl:
         flmd5 = hashlib.md5()
-        for cline in fl:
-            try:
-                flmd5.update(cline.encode('utf-8'))
-            except:
-                logger.warn('map md5 cannot be calculated - utf problems?')
-                return ''
+        chunk_size = 4096
+        for chunk in iter(lambda: fl.read(chunk_size), b""):
+            flmd5.update(chunk)
         flmd5 = flmd5.hexdigest()
-        logger.debug('md5 is %s' % flmd5)
+        logger.debug('md5 of %s: %s' % (f, flmd5))
         return flmd5
 
 
@@ -227,23 +229,14 @@ def get_data_md5(data):
     Returns
     -------
     datmd5 : str
-        the md5 of the data (row by row)
+        the md5 of the data
     '''
     logger.debug('caculating data md5')
-    datmd5 = hashlib.md5()
     if scipy.sparse.issparse(data):
-        issparse = True
-    else:
-        issparse = False
-    for crow in range(data.shape[0]):
-        if issparse:
-            # if sparse need to convert to numpy array
-            cdat = data[crow, :].toarray()[0]
-        else:
-            cdat = data[crow, :]
-        # convert to string of raw data since hashlib.md5 does not take numpy array as input
-        datmd5.update(cdat.tostring())
-
+        # if sparse need to convert to numpy array
+        data = data.toarray()
+    # convert to string of raw data since hashlib.md5 does not take numpy array as input
+    datmd5 = hashlib.md5(data.tobytes())
     datmd5 = datmd5.hexdigest()
     logger.debug('data md5 is: %s' % datmd5)
     return datmd5
@@ -251,11 +244,9 @@ def get_data_md5(data):
 
 def get_config_file():
     '''Get the calour config file location
-    If the environment CALOUR_CONFIG_FILE is set, take the config file from it
-    otherwise return CALOUR_PACKAGE_LOCATION/calour/config.calour.txt
 
-    Parameters
-    ----------
+    If the environment CALOUR_CONFIG_FILE is set, take the config file from it
+    otherwise return CALOUR_PACKAGE_LOCATION/calour/calour.config
 
     Returns
     -------
@@ -366,27 +357,18 @@ def set_log_level(level):
     ----------
     level : int or str
         10 for debug, 20 for info, 30 for warn, etc.
-        It is passing to ``logger.setLevel``.
+        It is passing to :func:`logging.Logger.setLevel`
+
     '''
     clog = getLogger('calour')
     clog.setLevel(level)
 
 
 def _to_list(x):
-    '''if x is non iterable or string, convert to iterable [x]
-
-    Parameters
-    ----------
-    x : any type (can be iterable)
-
-    Returns
-    -------
-    iterable
-        With the same values as x
-    '''
+    '''if x is non iterable or string, convert to iterable '''
     if isinstance(x, str):
         return [x]
-    if isinstance(x, Iterable):
+    if isinstance(x, Sequence):
         return x
     return [x]
 
@@ -399,13 +381,13 @@ def _argsort(values):
 
     Examples
     --------
-    >>> l = [10, 'b', 2.5, 'a']
+    >>> l = [10, 'b', np.nan, 2.5, 'a']
     >>> idx = _argsort(l)
     >>> idx
-    [2, 0, 3, 1]
+    [3, 0, 2, 4, 1]
     >>> l_sorted = [l[i] for i in idx]
     >>> l_sorted
-    [2.5, 10, 'a', 'b']
+    [2.5, 10, nan, 'a', 'b']
 
     Parameters
     ----------
@@ -433,3 +415,55 @@ def _argsort(values):
     # values = [(str(type(x)), x) if not np.isnan(x) else (str(type(x)), np.inf) for x in values]
     # return sorted(range(len(values)), key=values.__getitem__)
     return sorted(range(len(pairs)), key=pairs.__getitem__)
+
+
+def _clone_function(f):
+    '''Make a copy of a function'''
+    # based on http://stackoverflow.com/a/13503277/2289509
+    new_f = FunctionType(f.__code__, f.__globals__,
+                         name=f.__name__,
+                         argdefs=f.__defaults__,
+                         closure=f.__closure__)
+    new_f = update_wrapper(new_f, f)
+    new_f.__kwdefaults__ = f.__kwdefaults__
+    return new_f
+
+
+def register_functions(cls, modules=None):
+    '''Dynamically register functions to the class as methods.
+
+    Parameters
+    ----------
+    cls : ``class`` object
+        The class that the functions will be added to
+    modules : iterable of str (optional)
+        The module names where the functions are defined. ``None`` means all public
+        modules in `calour`.
+    '''
+    # pattern to recognize the Parameters section
+    p = re.compile(r"(\n +Parameters\n +-+ *)")
+    if modules is None:
+        modules = ['calour.' + i for i in
+                   ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
+                    'heatmap.heatmap', 'plotting', 'manipulation', 'database']]
+    for module_name in modules:
+        module = import_module(module_name)
+        functions = inspect.getmembers(module, inspect.isfunction)
+        for fn, f in functions:
+            # skip private functions
+            if not fn.startswith('_'):
+                params = inspect.signature(f).parameters
+                if params:
+                    # if the func accepts parameters, ie params is not empty
+                    first = next(iter(params.values()))
+                    if first.annotation is cls:
+                        # make a copy of the function because we want
+                        # to update the docstring of the original
+                        # function but not that of the registered
+                        # version
+                        setattr(cls, fn, _clone_function(f))
+                        updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
+                                   '\\1'
+                                   '\n    exp : :class:`.{0}`\n')
+
+                        f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)

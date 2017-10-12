@@ -119,13 +119,14 @@ import calour
 # If your documentation needs a minimal Sphinx version, state it here.
 # Using `sphinx_version` doesn't work, likely because Sphinx is expecting a
 # version string of the form X.Y, not X.Y.Z.
-needs_sphinx = '1.2'
+needs_sphinx = '1.5'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
     'sphinx.ext.mathjax',
     'numpydoc',
     'sphinx.ext.coverage',
@@ -166,7 +167,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'calour'
-copyright = u'2014--, calour development team'
+copyright = u'2016--, calour development team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

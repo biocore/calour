@@ -11,12 +11,6 @@ Classes
 
    Experiment
 
-Functions
-^^^^^^^^^
-.. autosummary::
-   :toctree: generated
-
-   add_functions
 '''
 
 # ----------------------------------------------------------------------------
@@ -29,9 +23,7 @@ Functions
 
 from logging import getLogger
 from copy import deepcopy, copy
-from importlib import import_module
 from functools import wraps
-import inspect
 
 import pandas as pd
 import numpy as np
@@ -59,7 +51,7 @@ class Experiment:
         The metadata on the features
     description : str
         name of experiment
-    sparse : :class:`bool`
+    sparse : ``bool``
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
 
@@ -80,12 +72,10 @@ class Experiment:
         store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
     description : str
         name of the experiment
-    heatmap_feature_field : str or None
-        The default field used for the y-axis labels (feature lables)
 
     See Also
     --------
-    AmpliconExperiment
+    :class:`.AmpliconExperiment`
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -103,15 +93,8 @@ class Experiment:
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
 
-        # remeber how many reads per sample/feature before any procesing
-        self.sample_metadata['_calour_original_abundance'] = self.data.sum(axis=1)
-        # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
-
-        # the default y-axis field used for plotting
-        self.heatmap_feature_field = None
-
         # the default databases to use for feature information
-        self.heatmap_databases = []
+        self.heatmap_databases = ()
 
     @property
     def sparse(self):
@@ -126,8 +109,21 @@ class Experiment:
 
     def __repr__(self):
         '''Return a string representation of this object.'''
-        return 'Experiment %s with %d samples, %d features' % (
-            self.description, self.data.shape[0], self.data.shape[1])
+        l1 = self.__class__.__name__
+        if self.description:
+            l1 = '%s %s' % (l1, self.description)
+        l2 = '-' * len(l1)
+        lines = [l1, l2,
+                 'data dimension: %d samples, %d features' % self.data.shape]
+        try:
+            lines.append('sample IDs: %r' % self.sample_metadata.index)
+        except AttributeError:
+            lines.append('No sample metadata')
+        try:
+            lines.append('feature IDs: %r' % self.feature_metadata.index)
+        except AttributeError:
+            lines.append('No feature metadata')
+        return '\n'.join(lines)
 
     def __eq__(self, other):
         '''Check equality.
@@ -190,11 +186,14 @@ class Experiment:
         return dat[sample_pos, feature_pos]
 
     def copy(self):
-        '''Copy the object.
+        '''Copy the object (deeply).
+
+        It calls :func:`Experiment.__deepcopy__` to make copy.
 
         Returns
         -------
-        Experiment
+        :class:`.Experiment`
+
         '''
         return deepcopy(self)
 
@@ -221,8 +220,8 @@ class Experiment:
     def _record_sig(func):
         '''Record the function calls to history.
 
-        Note this require the function decorated to return an
-        ``Experiment`` object.
+        Note this requires the function decorated to return an
+        :class:`.Experiment` object.
         '''
         fn = func.__qualname__
 
@@ -309,7 +308,7 @@ class Experiment:
 
         Returns
         -------
-        Experiment
+        :class:`.Experiment`
             experiment with reordered samples
         '''
         if inplace is False:
@@ -362,7 +361,7 @@ class Experiment:
 
         Returns
         -------
-        ``pandas.Dataframe`` or ``pandas.SparseDataframe``
+        :class:`pandas.Dataframe` or :class:`pandas.SparseDataFrame`
         '''
         if sample_field is None:
             ind = self.sample_metadata.index
@@ -397,12 +396,12 @@ class Experiment:
         df : Pandas.DataFrame
             The dataframe to use. should contain samples in rows, features in columns.
             Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
-        exp : Experiment (optional)
+        exp : :class:`.Experiment` (optional)
             If not None, use sample and feature metadata from the experiment
 
         Returns
         -------
-        Experiment
+        :class:`.Experiment`
             with non-sparse data
 
         '''
@@ -424,25 +423,3 @@ class Experiment:
         newexp = cls(df.values, sample_metadata, feature_metadata,
                      exp_metadata=exp_metadata, description=description, sparse=False)
         return newexp
-
-
-def add_functions(cls,
-                  modules=['.io', '.sorting', '.filtering', '.analysis',
-                           '.transforming', '.heatmap.heatmap', '.plotting',
-                           '.manipulation', '.database']):
-    '''Dynamically add functions to the class as methods.
-
-    Parameters
-    ----------
-    cls : ``class`` object
-        The class that the functions will be added to
-    modules : iterable of str
-        The modules where the functions are defined
-    '''
-    for module_name in modules:
-        module = import_module(module_name, 'calour')
-        functions = inspect.getmembers(module, inspect.isfunction)
-        for fn, f in functions:
-            # skip private functions
-            if not fn.startswith('_'):
-                setattr(cls, fn, f)

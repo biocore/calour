@@ -27,23 +27,23 @@ class TestTesting(Tests):
             assert_experiment_equal(self.test1, self.timeseries)
 
         # is copy working?
-        newexp = self.test1.deepcopy()
+        newexp = self.test1.copy()
         assert_experiment_equal(self.test1, newexp)
 
         # just data
-        newexp = self.test1.deepcopy()
+        newexp = self.test1.copy()
         newexp.data[2, 2] = 43
         with self.assertRaises(AssertionError):
             assert_experiment_equal(self.test1, newexp)
 
         # just sample metadata
-        newexp = self.test1.deepcopy()
+        newexp = self.test1.copy()
         newexp.sample_metadata.loc[newexp.sample_metadata.index[0], 'id'] = 42
         with self.assertRaises(AssertionError):
             assert_experiment_equal(self.test1, newexp)
 
         # just feature metadata
-        newexp = self.test1.deepcopy()
+        newexp = self.test1.copy()
         newexp.feature_metadata.loc[newexp.feature_metadata.index[0], 'taxonomy'] = '42'
         with self.assertRaises(AssertionError):
             assert_experiment_equal(self.test1, newexp)

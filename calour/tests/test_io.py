@@ -10,16 +10,16 @@ from unittest import main
 from tempfile import mkdtemp
 from os.path import join
 import shutil
+import logging
 
-import scipy.sparse
-from numpy.testing import assert_array_almost_equal
-import numpy as np
 import skbio
+import scipy.sparse
+import numpy as np
+import pandas as pd
+from numpy.testing import assert_array_almost_equal
 
 import calour as ca
-
 from calour._testing import Tests, assert_experiment_equal
-
 from calour.io import _create_biom_table_from_exp
 
 
@@ -28,33 +28,108 @@ class IOTests(Tests):
         super().setUp()
 
     def _validate_read(self, exp, validate_sample_metadata=True):
-        # number of bacteria is 12
+        # number of bacteria is 12 in biom table
         self.assertEqual(exp.data.shape[1], 12)
-        # number of samples is 20 (should not read the samples only in map or only in biom table)
-        # self.assertEqual(exp.data.shape[0],20)
+        # number of samples is 21 (should not read the samples only in mapping file)
+        self.assertEqual(exp.data.shape[0], 21)
         # test an OTU/sample to see it is in the right place
-        sseq = ('TACGTAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGTGCGCA'
-                'GGCGGTTTTGTAAGTCTGATGTGAAATCCCCGGGCTCAACCTGGGAATTG'
-                'CATTGGAGACTGCAAGGCTAGAATCTGGCAGAGGGGGGTAGAATTCCACG')
-        ssample = 'S6'
+        fid = 'GG'
+        sid = 'S12'
         # test sample and sequence are in the table
-        self.assertIn(sseq, exp.feature_metadata.index)
-        self.assertIn(ssample, exp.sample_metadata.index)
+        self.assertIn(fid, exp.feature_metadata.index)
+        self.assertIn(sid, exp.sample_metadata.index)
         # test the location in the sample/feature metadata corresponds to the data
-        samplepos = exp.sample_metadata.index.get_loc(ssample)
-        seqpos = exp.feature_metadata.index.get_loc(sseq)
-        self.assertEqual(exp.data[samplepos, seqpos], 6)
+        spos = exp.sample_metadata.index.get_loc(sid)
+        fpos = exp.feature_metadata.index.get_loc(fid)
+        # there is only one cell with value of 1200
+        self.assertEqual(exp.data[spos, fpos], 1200)
         # test the taxonomy is loaded correctly
-        self.assertIn('g__Janthinobacterium', exp.feature_metadata['taxonomy'][seqpos])
+        self.assertEqual('Unknown', exp.feature_metadata['taxonomy'][fid])
         # test the sample metadata is loaded correctly
         if validate_sample_metadata:
-            self.assertEqual(exp.sample_metadata['id'][samplepos], 6)
+            self.assertEqual(exp.sample_metadata['id'][spos], 12)
 
     def test_read(self):
-        # load the simple dataset as sparse
-        exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
-        self.assertTrue(scipy.sparse.issparse(exp.data))
-        self._validate_read(exp)
+        # re-enable logging because it is disabled in setUp
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='INFO') as cm:
+            # load the simple dataset as sparse
+            exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
+            # test the log messages are correct
+            self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
+            self.assertRegex(cm.output[1], "dropped: {'SAMPLE_NOT_EXIST'}")
+            self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
+            self.assertRegex(cm.output[3], "dropped: {'FEATURE_NOT_EXIST'}")
+            self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
+
+            self.assertTrue(scipy.sparse.issparse(exp.data))
+            self._validate_read(exp)
+
+    def test_read_not_sparse(self):
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='INFO') as cm:
+            # load the simple dataset as dense
+            exp = ca.read(self.test1_biom, self.test1_samp, sparse=False, normalize=None)
+            self.assertFalse(scipy.sparse.issparse(exp.data))
+            self._validate_read(exp, cm.output)
+
+    def test_read_sample_kwargs(self):
+        # re-enable logging because it is disabled in setUp
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='INFO') as cm:
+            # load the simple dataset as sparse
+            exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None,
+                          sample_metadata_kwargs={'parse_dates': ['collection_date']})
+            # test the log messages are correct
+            self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
+            self.assertRegex(cm.output[1], "dropped: {'SAMPLE_NOT_EXIST'}")
+            self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
+            self.assertRegex(cm.output[3], "dropped: {'FEATURE_NOT_EXIST'}")
+            self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
+
+            self.assertTrue(scipy.sparse.issparse(exp.data))
+            self._validate_read(exp)
+
+            obs_dates = exp.sample_metadata['collection_date'].tolist()
+            # the last sample in OTU table does not have metadata, so NaT
+            exp_dates = [pd.Timestamp('2017-8-1')] * 20 + [pd.NaT]
+            self.assertListEqual(obs_dates, exp_dates)
+
+    def test_read_feature_kwargs(self):
+        # re-enable logging because it is disabled in setUp
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='INFO') as cm:
+            # load the simple dataset as sparse
+            exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None,
+                          feature_metadata_kwargs={'dtype': {'ph': str}})
+            # test the log messages are correct
+            self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
+            self.assertRegex(cm.output[1], "dropped: {'SAMPLE_NOT_EXIST'}")
+            self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
+            self.assertRegex(cm.output[3], "dropped: {'FEATURE_NOT_EXIST'}")
+            self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
+
+            self.assertTrue(scipy.sparse.issparse(exp.data))
+            self._validate_read(exp)
+            # read as str not float
+            self.assertEqual(exp.feature_metadata.loc['AA', 'ph'], '4.0')
+
+    def test_read_no_metadata(self):
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='INFO') as cm:
+            # test loading without a mapping file
+            exp = ca.read(self.test1_biom, normalize=None)
+            self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
+            self._validate_read(exp, validate_sample_metadata=False)
+
+    def test_read_amplicon(self):
+        # test loading a taxonomy biom table and filtering/normalizing
+        exp1 = ca.read_amplicon(self.test1_biom, min_reads=1000, normalize=10000)
+        exp2 = ca.read(self.test1_biom, normalize=None)
+        exp2.filter_by_data('sum_abundance', cutoff=1000, inplace=True)
+        exp2.normalize(inplace=True)
+        assert_experiment_equal(exp1, exp2)
+        self.assertIn('taxonomy', exp1.feature_metadata.columns)
 
     def test_read_openms_bucket_table(self):
         # load the openms bucket table with no metadata
@@ -104,26 +179,6 @@ class IOTests(Tests):
         # exp = ca.read(self.qiime2table, data_file_type='qiime2', normalize=None)
         # self.assertEqual(exp.shape, (104, 658))
         pass
-
-    def test_read_not_sparse(self):
-        # load the simple dataset as dense
-        exp = ca.read(self.test1_biom, self.test1_samp, sparse=False, normalize=None)
-        self.assertFalse(scipy.sparse.issparse(exp.data))
-        self._validate_read(exp)
-
-    def test_read_no_sample_metadata(self):
-        # test loading without a mapping file
-        exp = ca.read(self.test1_biom, normalize=None)
-        self._validate_read(exp, validate_sample_metadata=False)
-
-    def test_read_amplicon(self):
-        # test loading a taxonomy biom table and filtering/normalizing
-        exp = ca.read_amplicon(self.test1_biom, min_reads=1000, normalize=10000)
-        exp2 = ca.read(self.test1_biom, normalize=None)
-        exp2.filter_by_data('sum_abundance', cutoff=1000, inplace=True)
-        exp2.normalize(inplace=True)
-        assert_experiment_equal(exp, exp2)
-        self.assertIn('taxonomy', exp.feature_metadata)
 
     def test_create_biom_table_from_exp(self):
         exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)

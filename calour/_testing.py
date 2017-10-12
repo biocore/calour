@@ -8,6 +8,7 @@
 
 from unittest import TestCase
 from os.path import join, dirname, abspath
+import logging
 
 import pandas.util.testing as pdt
 import numpy.testing as npt
@@ -17,6 +18,9 @@ import calour as ca
 
 class Tests(TestCase):
     def setUp(self):
+        # disable logging
+        logging.disable(logging.CRITICAL)
+
         test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
         self.test_data_dir = test_data_dir
         # a simple artificial biom table
@@ -56,8 +60,8 @@ def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, 
 
     Parameters
     ----------
-    exp1 : Experiment
-    exp2 : Experiment
+    exp1 : :class:`.Experiment`
+    exp2 : :class:`.Experiment`
     check_history : bool (optional)
         False (default) to skip testing the command history, True to compare also the command history
     almost_equal : bool (optional)

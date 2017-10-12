@@ -411,9 +411,9 @@ def _plot_dendrogram(ax_dendrogram, table, edges):
     """ Plots the actual dendrogram.
     Parameters
     ----------
-    ax_dendrogram : matplotlib axes object
+    ax_dendrogram : :class:`matplotlib.axes.Axes`
         Contains the matplotlib axes in which the dendrogram will be plotted.
-    table : pd.DataFrame
+    table : :class:`pandas.DataFrame`
         Contain sample/feature labels along with table of values.
         Rows correspond to samples, and columns correspond to features.
     edges : pd.DataFrame
@@ -429,20 +429,20 @@ def _plot_dendrogram(ax_dendrogram, table, edges):
     ax_dendrogram.set_xticks([])
 
 
-def plot_tree(exp, tree, axes):
+def plot_tree(exp, tree, ax):
     '''Plot a tree into the given axes
 
     Parameters
     ----------
-    exp: ``Experiment``
+    exp: :class:`.Experiment`
     tree: skbio.TreeNode
         The tree to plot
-    axes: matplotlib.Axis
-        The axis where to plot the tree to
+    ax: :class:`matplotlib.axes.Axes`
+        The axes where to plot the tree to
 
     Returns
     -------
-    ``Experiment``, sckbio.TreeNode
+    :class:`.Experiment`, :class:`skbio.TreeNode`
         both filtered to have common nodes and Experiment reordered to match the tree
     '''
     # reorder the tree and exp to match (exp features are sorted according to tree)
@@ -462,19 +462,21 @@ def plot_tree(exp, tree, axes):
     edges['y0'] = [pts.loc[n].y for n in edges.src_node]
     edges['y1'] = [pts.loc[n].y for n in edges.dest_node]
 
-    _plot_dendrogram(axes, exp.get_data().transpose(), edges)
+    _plot_dendrogram(ax, exp.get_data().transpose(), edges)
 
     return exp, tree
 
 
 def _match_tips(exp, tree):
     """ Returns the contingency table and tree with matched tips.
+
     Sorts the columns of the contingency table to match the tips in
     the tree.  The ordering of the tips is in post-traversal order.
     If the tree is multi-furcating, then the tree is reduced to a
     bifurcating tree by randomly inserting internal nodes.
     The intersection of samples in the contingency table and the
     tree will returned.
+
     Parameters
     ----------
     table : pd.DataFrame
@@ -482,16 +484,19 @@ def _match_tips(exp, tree):
         features correspond to columns.
     tree : skbio.TreeNode
         Tree object where the leafs correspond to the features.
+
     Returns
     -------
     pd.DataFrame :
         Subset of the original contingency table with the common features.
     skbio.TreeNode :
         Sub-tree with the common features.
+
     Raises
     ------
     ValueError:
         Raised if `table` and `tree` have incompatible sizes.
+
     See Also
     --------
     skbio.TreeNode.bifurcate

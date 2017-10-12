@@ -8,13 +8,14 @@
 
 from unittest import main
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+import pandas as pd
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from matplotlib import pyplot as plt
 
 import calour as ca
 from calour._testing import Tests
-from calour.heatmap.heatmap import _ax_color_bar, _create_plot_gui
+from calour.heatmap.heatmap import _ax_bar, _create_plot_gui
 
 
 class PlotTests(Tests):
@@ -36,8 +37,7 @@ class PlotTests(Tests):
     def test_heatmap(self):
         ax = self.test1.heatmap(sample_field='group',
                                 feature_field='ph',
-                                yticklabels_max=None,
-                                transform=None)
+                                max_yticks=3)
         obs_images = ax.images
         # test only one heatmap exists
         self.assertEqual(len(obs_images), 1)
@@ -56,19 +56,22 @@ class PlotTests(Tests):
         # test axis tick labels
         obs_xticklabels = [i.get_text() for i in ax.xaxis.get_ticklabels()]
         self.assertListEqual(obs_xticklabels, ['1', '2'])
-        obs_yticklabels = [i.get_text() for i in ax.yaxis.get_ticklabels()]
-        self.assertListEqual(obs_yticklabels,
-                             self.test1.feature_metadata['ph'].astype(str).tolist())
+        # remove the 1st and last ticks because they are only the bounds
+        obs_yticks = ax.get_yticks()[1:-1]
+        # assert the tick locations are the same
+        assert_array_equal(obs_yticks, np.array([0., 3., 6.]))
 
-    def test_ax_color_bar(self):
+    def test_ax_bar(self):
         fig, ax = plt.subplots()
-        colors = [(1.0, 0.0, 0.0, 1), (0.0, 0.5, 0.0, 1)]
-        axes = _ax_color_bar(ax, ['a', 'a', 'b'], 0.3, 0, colors)
+        colors = pd.Series({'a': (1.0, 0.0, 0.0, 1),
+                            'b': (0.0, 0.5, 0.0, 1)})
+        axes = _ax_bar(ax, ['a', 'a', 'b'], colors, 0.3, 0)
         self.assertIs(ax, axes)
+
         # test face color rectangle in the bar
         self.assertListEqual(
             [i.get_facecolor() for i in axes.patches],
-            colors)
+            list(colors.values))
         # test the position rectangle in the bar
         self.assertListEqual(
             [i.get_xy() for i in axes.patches],

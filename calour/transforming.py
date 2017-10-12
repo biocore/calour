@@ -37,22 +37,21 @@ from collections import defaultdict
 
 import numpy as np
 from sklearn import preprocessing
-
-from .experiment import Experiment
 from skbio.stats.composition import clr, centralize
 from skbio.stats import subsample_counts
+
+from .experiment import Experiment
 
 
 logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def normalize(exp, total=10000, axis=0, inplace=False):
+def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
     '''Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total
 
     Parameters
     ----------
-    exp : Experiment
     total : float
         the sum (along axis) to normalize to
     axis : 0, 1, 's', or 'f', optional
@@ -63,7 +62,7 @@ def normalize(exp, total=10000, axis=0, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the normalized experiment
     '''
     if isinstance(total, bool):
@@ -79,14 +78,13 @@ def normalize(exp, total=10000, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def rescale(exp, total=10000, axis=0, inplace=False):
+def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
     '''Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.
 
     This function rescales by multiplying ALL entries in exp.data by same number.
 
     Parameters
     ----------
-    exp : Experiment
     total : float
         the mean sum (along axis) to normalize to
     axis : 0, 1, 's', or 'f', optional
@@ -97,11 +95,9 @@ def rescale(exp, total=10000, axis=0, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the normalized experiment
     '''
-    if isinstance(total, bool):
-        raise ValueError('Rescaling total (%s) not numeric' % total)
     if not inplace:
         exp = deepcopy(exp)
     current_mean = np.mean(exp.data.sum(axis=1-axis))
@@ -110,7 +106,7 @@ def rescale(exp, total=10000, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def scale(exp, axis=0, inplace=False):
+def scale(exp: Experiment, axis=0, inplace=False):
     '''Standardize a dataset along an axis
 
     .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
@@ -122,7 +118,7 @@ def scale(exp, axis=0, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
     '''
     logger.debug('scaling the data, axis=%d' % axis)
     if not inplace:
@@ -134,7 +130,7 @@ def scale(exp, axis=0, inplace=False):
 
 
 @Experiment._record_sig
-def binarize(exp, threshold=1, inplace=False):
+def binarize(exp: Experiment, threshold=1, inplace=False):
     '''Binarize the data with a threshold.
 
     It calls scikit-learn to do the real work.
@@ -147,7 +143,7 @@ def binarize(exp, threshold=1, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
     '''
     logger.debug('binarizing the data. threshold=%f' % threshold)
     if not inplace:
@@ -157,7 +153,7 @@ def binarize(exp, threshold=1, inplace=False):
 
 
 @Experiment._record_sig
-def log_n(exp, n=1, inplace=False):
+def log_n(exp: Experiment, n=1, inplace=False):
     '''Log transform the data
 
     Parameters
@@ -168,7 +164,7 @@ def log_n(exp, n=1, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
     '''
     logger.debug('log_n transforming the data, min. threshold=%f' % n)
     if not inplace:
@@ -184,26 +180,26 @@ def log_n(exp, n=1, inplace=False):
 
 
 @Experiment._record_sig
-def transform(exp, steps=[], inplace=False, **kwargs):
+def transform(exp: Experiment, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.
 
     Parameters
     ----------
     steps : list of callable
-        each callable is a transformer that takes ``Experiment`` object as
+        each callable is a transformer that takes :class:`.Experiment` object as
         its 1st argument and has a boolean parameter of ``inplace``. Each
-        callable should return an ``Experiment`` object.
+        callable should return an :class:`.Experiment` object.
     inplace : bool
         transformation occuring in the original data or a copy
     kwargs : dict
         keyword arguments to pass to each transformers. The key should
         be in the form of "<transformer_name>__<param_name>". For
-        example, "transform(exp, steps=[log_n], log_n__n=3)" will set
+        example, "transform(exp: Experiment, steps=[log_n], log_n__n=3)" will set
         "n" of function "log_n" to 3
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         with its data transformed
 
     '''
@@ -222,7 +218,7 @@ def transform(exp, steps=[], inplace=False, **kwargs):
 
 
 @Experiment._record_sig
-def normalize_by_subset_features(exp, features, total=10000, negate=True, inplace=False):
+def normalize_by_subset_features(exp: Experiment, features, total=10000, negate=True, inplace=False):
     '''Normalize each sample by their total sums without a list of features
 
     Normalizes all features (including in the exclude list) by the
@@ -247,7 +243,7 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
@@ -265,7 +261,7 @@ def normalize_by_subset_features(exp, features, total=10000, negate=True, inplac
     return newexp
 
 
-def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
+def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace=False):
     '''Normalize each sample by ignoring the features with mean>=min_frac in all the experiment
 
     This assumes that the majority of features have less than min_frac mean, and that the majority of features don't change
@@ -282,7 +278,7 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         The normalized experiment. Note that all features are normalized (including the ones with mean>=min_frac)
     '''
     comp_features = exp.filter_mean(min_frac)
@@ -292,7 +288,7 @@ def normalize_compositional(exp, min_frac=0.05, total=10000, inplace=False):
     return newexp
 
 
-def random_permute_data(exp, normalize=True):
+def random_permute_data(exp: Experiment, normalize=True):
     '''Shuffle independently the reads of each feature
 
     Creates a new experiment with no dependence between the features.
@@ -305,7 +301,7 @@ def random_permute_data(exp, normalize=True):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         With each feature shuffled independently
     '''
     newexp = exp.copy()
@@ -318,7 +314,7 @@ def random_permute_data(exp, normalize=True):
 
 
 @Experiment._record_sig
-def center_log(exp, delta=1, method=None, inplace=False):
+def center_log(exp: Experiment, delta=1, method=None, inplace=False):
     """ Performs a clr transform to normalize each sample.
 
     Parameters
@@ -333,7 +329,7 @@ def center_log(exp, delta=1, method=None, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         The normalized experiment. Note that all features are clr normalized.
 
     See Also
@@ -354,14 +350,14 @@ def center_log(exp, delta=1, method=None, inplace=False):
 
 
 @Experiment._record_sig
-def subsample_count(exp, total, replace=False, inplace=False):
+def subsample_count(exp: Experiment, total, replace=False, inplace=False):
     """Randomly subsample each sample to the same number of counts.
 
-    .. warning:: This function will change the data matrix in
-    ``Experiment`` object from sparse to dense. The input
-    ``Experiment`` object should not have been normalized by total sum
-    and its data should be discrete count. The samples that have few
-    total count than ``total`` will be dropped.
+    .. warning:: This function will change the :attr:`Experiment.data`
+       object from sparse to dense. The input ``Experiment`` object
+       should not have been normalized by total sum and its data
+       should be discrete count. The samples that have few total count
+       than ``total`` will be dropped.
 
     Parameters
     ----------
@@ -374,12 +370,12 @@ def subsample_count(exp, total, replace=False, inplace=False):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         The subsampled experiment.
 
     See Also
     --------
-    skbio.stats.subsample_counts
+    :func:`skbio.stats.subsample_counts`
 
     """
     if inplace:
@@ -391,7 +387,7 @@ def subsample_count(exp, total, replace=False, inplace=False):
     # subsample_counts() require int as input;
     # check if it is normalized: if so, raise error
     if exp.exp_metadata.get('normalized'):
-        raise ValueError('Your ``Experiment`` object is normalized: subsample operates on integer raw data, not on normalized data.')
+        raise ValueError('Your `Experiment` object is normalized: subsample operates on integer raw data, not on normalized data.')
     newexp.data = newexp.data.astype(int)
     drops = []
     for row in range(newexp.data.shape[0]):

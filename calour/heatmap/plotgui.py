@@ -19,19 +19,25 @@ logger = getLogger(__name__)
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
-    The grid of axes looks like this:
+    The grid of subplots looks like this:
 
     +------------------------------------+---+----------------+
-    |        sample color bar            |   |            |   |
+    |          sample color bar          |   |            |   |
     |------------------------------------+---+------------+---|
     |                                    | f |            |   |
-    |                                    | e |            | l |
-    |                                    | a |            | e |
-    |                                    | t |    tree    | g |
-    |           HEATMAP                  | u | (optional  | e |
-    |                                    | r |  column)   | n |
-    |                                    | e |            | d |
-    |                                    |   |            |   |
+    |                                    | e |            |   |
+    |                                    | a |            | c |
+    |                                    | t |            | o |
+    |              heatmap               | u |            | l |
+    |                                    | r |            | o |
+    |                                    | e |            | r |
+    |                                    |   |    tree    |   |
+    |                                    | c | (optional  | l |
+    |                                    | o |  column)   | e |
+    |                                    | l |            | g |
+    |                                    | o |            | e |
+    |                                    | r |            | n |
+    |                                    |   |            | d |
     |                                    | b |            |   |
     |                                    | a |            |   |
     |                                    | r |            |   |
@@ -39,7 +45,7 @@ class PlotGUI(ABC):
 
     Attributes
     ----------
-    exp : ``Experiment``
+    exp : :class:`.Experiment`
         the experiment associated with this gui
     selected_features : dict of matplotlib.lines.Line2D
         used to track the selected features and plot horizontal lines for each selectiom
@@ -55,18 +61,19 @@ class PlotGUI(ABC):
         The amount of columns/rows to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
         >0 : scroll than constant number of columns/rows per keypress
-    figure : ``matplotlib.figure.Figure``
+    figure : :class:`matplotlib.figure.Figure`
         The figure where the heatmap and other axes will be plotted into.
-    axes : the matplotlib axis from ``figure`` of the heatmap.
-    xax : the matplotlib axis of the sample colorbar
-    yax : the matplotlib axis of the feature colorbar
-    tree_axes : the matplotlib axis of the dendrogram
+    ax_hm : the :class:`matplotlib.axes.Axes` of the heatmap.
+    ax_sbar : the :class:`matplotlib.axes.Axes` of the sample colorbar
+    ax_fbar : the :class:`matplotlib.axes.Axes` of the feature colorbar
+    ax_tre : the :class:`matplotlib.axes.Axes` of the dendrogram/tree
+    ax_legend : the :class:`matplotlib.axes.Axes` of the color legend
     databases : list
         the databases to interact with
 
     Parameters
     ----------
-    exp : the ``Experiment`` object associated with this GUI
+    exp : the :class:`.Experiment` object associated with this GUI
     zoom_scale : the scaling factor for zooming
     scroll_offset : The amount of columns/rows to scroll when arrow key pressed
     databases : the databases to interact with
@@ -101,24 +108,24 @@ class PlotGUI(ABC):
         if tree_size == 0:
             gs = GridSpec(2, 3, width_ratios=[12, 1, 0.5], height_ratios=[1, 12])
             hm_ax = self.figure.add_subplot(gs[3])
-            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
-            self.xax.axis('off')
-            self.yax = self.figure.add_subplot(gs[4], sharey=hm_ax)
-            self.yax.axis('off')
-            self.axes = hm_ax
-            self.legend = self.figure.add_subplot(gs[5])
+            self.ax_sbar = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.ax_sbar.axis('off')
+            self.ax_fbar = self.figure.add_subplot(gs[4], sharey=hm_ax)
+            self.ax_fbar.axis('off')
+            self.ax_hm = hm_ax
+            self.ax_legend = self.figure.add_subplot(gs[5])
             self.gridspec = gs
         else:
             gs = GridSpec(2, 4, width_ratios=[12, 1, tree_size, 0.5], height_ratios=[1, 12])
             hm_ax = self.figure.add_subplot(gs[4])
-            self.xax = self.figure.add_subplot(gs[0], sharex=hm_ax)
-            self.xax.axis('off')
-            self.yax = self.figure.add_subplot(gs[5], sharey=hm_ax)
-            self.yax.axis('off')
-            self.axes = hm_ax
-            self.tree_axes = self.figure.add_subplot(gs[6], sharey=hm_ax)
-            self.tree_axes.axis('off')
-            self.legend = self.figure.add_subplot(gs[7])
+            self.ax_sbar = self.figure.add_subplot(gs[0], sharex=hm_ax)
+            self.ax_sbar.axis('off')
+            self.ax_fbar = self.figure.add_subplot(gs[5], sharey=hm_ax)
+            self.ax_fbar.axis('off')
+            self.ax_hm = hm_ax
+            self.ax_tre = self.figure.add_subplot(gs[6], sharey=hm_ax)
+            self.ax_tre.axis('off')
+            self.ax_legend = self.figure.add_subplot(gs[7])
             self.gridspec = gs
 
     def save_figure(self, *args, **kwargs):
@@ -131,7 +138,7 @@ class PlotGUI(ABC):
         '''
         # try:
         #     # create color bar for the heatmap before saving
-        #     self.figure.colorbar(self.axes.images[0])
+        #     self.figure.colorbar(self.ax_hm.images[0])
         # except IndexError:
         #     logger.warning('no heatmap are plotted')
         self.figure.savefig(*args, **kwargs)
@@ -352,11 +359,11 @@ class PlotGUI(ABC):
     def clear_selection(self):
         '''Delete all shown selection lines '''
         for cline in self.selected_samples.values():
-            self.axes.lines.remove(cline)
+            self.ax_hm.lines.remove(cline)
             logger.debug('remove sample selection %r' % cline)
         self.selected_samples = {}
         for cline in self.selected_features.values():
-            self.axes.lines.remove(cline)
+            self.ax_hm.lines.remove(cline)
             logger.debug('remove sample selection %r' % cline)
         self.selected_features = {}
 
@@ -375,21 +382,21 @@ class PlotGUI(ABC):
         '''
         for cpos in samplepos:
             if cpos not in self.selected_samples:
-                self.selected_samples[cpos] = self.axes.axvline(
+                self.selected_samples[cpos] = self.ax_hm.axvline(
                     x=cpos, color='white', linestyle='dotted', alpha=0.7, linewidth=0.7)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.axes.lines.remove(self.selected_samples[cpos])
+                    self.ax_hm.lines.remove(self.selected_samples[cpos])
                     del self.selected_samples[cpos]
         for cpos in featurepos:
             if cpos not in self.selected_features:
-                self.selected_features[cpos] = self.axes.axhline(
+                self.selected_features[cpos] = self.ax_hm.axhline(
                     y=cpos, color='white', linestyle='dotted', alpha=0.7, linewidth=0.7)
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.axes.lines.remove(self.selected_features[cpos])
+                    self.ax_hm.lines.remove(self.selected_features[cpos])
                     del self.selected_features[cpos]
         self.figure.canvas.draw()
 

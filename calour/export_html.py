@@ -10,7 +10,10 @@ from logging import getLogger
 from io import BytesIO
 import urllib
 from pkg_resources import resource_filename
+
 import numpy as np
+
+from . import Experiment
 from .transforming import log_n
 from .heatmap.heatmap import _transition_index
 
@@ -40,7 +43,7 @@ def _list_to_string(l):
     return cstr
 
 
-def export_html(exp, sample_field=None, feature_field=False, title=None,
+def export_html(exp: Experiment, sample_field=None, feature_field=False, title=None,
                 xticklabel_len=50, cmap=None, clim=None, transform=log_n,
                 output_file='out', html_template=None, **kwargs):
     '''Export an interactive html heatmap for the experiment.
