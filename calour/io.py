@@ -14,8 +14,7 @@ Functions
    read_open_ms
    save
    save_biom
-   save_sample_metadata
-   save_feature_metadata
+   save_metadata
 '''
 
 
@@ -127,7 +126,7 @@ def _get_md_from_biom(table):
 
     Return
     ------
-    ``pandas.DataFrame`` or ``None``
+    :class:`pandas.DataFrame` or ``None``
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
@@ -162,7 +161,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : pandas DataFram
+    feature_md : :class:`pandas.DataFrame`
         the feature metadata (if availble in table)
     '''
     logger.debug('loading OpenMS bucket table %s' % fp)
@@ -217,7 +216,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     Returns
     -------
-    exp : ``Experiment``
+    :class:`.Experiment`
     '''
     logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     if rows_are_samples:
@@ -271,11 +270,11 @@ def _read_metadata(ids, f, kwargs):
     f : str
         file path of metadata
     kwargs : dict
-        keyword argument passed to ``pandas.read_table``
+        keyword argument passed to :func:`pandas.read_table`
 
     Returns
     -------
-    ``pandas.DataFrame`` of metadata
+    :class:`pandas.DataFrame` of metadata
     '''
     # load the sample/feature metadata file
     if f is not None:
@@ -286,6 +285,9 @@ def _read_metadata(ids, f, kwargs):
         else:
             kwargs.update(default)
         metadata = pd.read_table(f, **kwargs)
+        if metadata.index.dtype.char not in {'S', 'O'}:
+            # if the index is not string or object, convert it to str
+            metadata.index = metadata.index.astype(str)
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
         if diff:
@@ -330,18 +332,18 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None (optional)
-        keyword arguments passing to :function:`pandas.read_table` when reading sample metadata
+        keyword arguments passing to :func:`pandas.read_table` when reading sample metadata
         or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
         as int and parse the file as latin-8 instead of utf-8.
     cls : ``class``, optional
-        what class object to read the data into (``Experiment`` by default)
+        what class object to read the data into (:class:`.Experiment` by default)
     normalize : int or None
         normalize each sample to the specified read count. ``None`` to not normalize
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
         the new object created
 
     '''
@@ -368,6 +370,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     sample_metadata = _read_metadata(sid, sample_metadata_file, sample_metadata_kwargs)
     feature_metadata = _read_metadata(fid, feature_metadata_file, feature_metadata_kwargs)
+
+    # store the abund  per sample/feature before any procesing
+    sample_metadata['_calour_original_abundance'] = data.sum(axis=1)
+    # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
 
     if fmd is not None:
         # combine it with the feature metadata
@@ -398,7 +404,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     '''Load an amplicon experiment.
 
     Fix taxonomy, normalize reads, and filter low abundance
-    samples. This wraps ``read()``.  Also convert feature metadata
+    samples. This wraps :func:`read`.  Also convert feature metadata
     index (sequences) to upper case
 
     Parameters
@@ -406,14 +412,14 @@ def read_amplicon(data_file, sample_metadata_file=None,
     sample_metadata_file : None or str (optional)
         None (default) to just use samplenames (no additional metadata).
     min_reads : int or None
-        int (default) to remove all samples with less than ``min_reads``.
+        int to remove all samples with less than ``min_reads``.
         ``None`` to not filter
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
     Returns
     -------
-    ``AmpliconExperiment``
+    :class:`.AmpliconExperiment`
         after removing low read sampls and normalizing
     '''
     # don't do normalize before the possible filtering
@@ -435,7 +441,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     return exp
 
 
-def save(exp, prefix, fmt='hdf5'):
+def save(exp: Experiment, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
 
     Parameters
@@ -446,11 +452,11 @@ def save(exp, prefix, fmt='hdf5'):
         format for the data table. could be 'hdf5', 'txt', or 'json'.
     '''
     exp.save_biom('%s.biom' % prefix, fmt=fmt)
-    exp.save_sample_metadata('%s_sample.txt' % prefix)
-    exp.save_feature_metadata('%s_feature.txt' % prefix)
+    exp.save_metadata('%s_sample.txt' % prefix, axis=0)
+    exp.save_metadata('%s_feature.txt' % prefix, axis=1)
 
 
-def save_biom(exp, f, fmt='hdf5', add_metadata='taxonomy'):
+def save_biom(exp: Experiment, f, fmt='hdf5', add_metadata='taxonomy'):
     '''Save experiment to biom format
 
     Parameters
@@ -488,18 +494,29 @@ def save_biom(exp, f, fmt='hdf5', add_metadata='taxonomy'):
     logger.debug('biom table saved to file %s' % f)
 
 
-def save_sample_metadata(exp, f):
-    '''Save sample metadata to file. '''
-    exp.sample_metadata.to_csv(f, sep='\t')
+def save_metadata(exp: Experiment, f, axis=0, **kwargs):
+    '''Save sample/feature metadata to file.
+
+    Parameters
+    ----------
+    f : str
+        file path to save to
+    axis : 0 ('s') or 1 ('f')
+        0 or 's' to save sample metadata; 1 or 'f' to save feature metadata
+    kwargs : dict
+        keyword arguments passing to :func:`pandas.DataFrame.to_csv`
+    '''
+    if axis == 0:
+        exp.sample_metadata.to_csv(f, sep='\t', **kwargs)
+    elif axis == 1:
+        exp.feature_metadata.to_csv(f, sep='\t', **kwargs)
+    else:
+        raise ValueError('Unknown axis: %r' % axis)
 
 
-def save_feature_metadata(exp, f):
-    '''Save feature metadata to file. '''
-    exp.feature_metadata.to_csv(f, sep='\t')
-
-
-def save_fasta(exp, f, seqs=None):
+def save_fasta(exp: Experiment, f, seqs=None):
     '''Save a list of sequences to fasta.
+
     Use taxonomy information if available, otherwise just use sequence as header.
 
     Parameters
@@ -510,7 +527,7 @@ def save_fasta(exp, f, seqs=None):
         None (default) to save all sequences in exp, or list of sequences to only save these sequences.
         Note: sequences not in exp will not be saved
     '''
-    logger.debug('save_fasta to file %s' % f)
+    logger.debug('Save seq to fasta file %s' % f)
     if seqs is None:
         logger.debug('no sequences supplied - saving all sequences')
         seqs = exp.feature_metadata.index.values

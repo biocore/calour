@@ -18,7 +18,7 @@ and activate it using:
 source activate calour
 ```
 
-Install biom-format and scikit-bio:
+Install dependecies of biom-format and scikit-bio:
 ```
 conda install -c biocore biom-format scikit-bio
 ```
@@ -28,32 +28,52 @@ Install calour:
 pip install git+git://github.com/biocore/calour.git
 ```
 
+Install database interfaces (optional)
+--------------------------------------
 Install the [dbBact](http://www.dbbact.org) calour interface:
 ```
 pip install git+git://github.com/amnona/dbbact-calour
 ```
-
-Optionally, can also install the calour GUI interface [EZCalour](https://github.com/amnona/EZCalour):
-```
-pip install git+git://github.com/amnona/EZCalour
-```
-
 
 For metabolomics, also install the [GNPS](http://gnps.ucsd.edu/) calour interface:
 ```
 pip install git+git://github.com/amnona/gnps-calour
 ```
 
-Using calour
-============
-Calour can be used from within an ipython session / jupyter notebook or as a standalone GUI (EZCalour).
+Install additional user interfaces
+----------------------------------
 
-Sample jupyter notebooks are located in:
-[https://github.com/biocore/calour/blob/master/notebooks](https://github.com/biocore/calour/blob/master/notebooks)
+If you use calour in Jupyter Notebook, it is highly recommended to
+install [ipywidgets](https://github.com/jupyter-widgets/ipywidgets):
+```
+conda install -c conda-forge ipywidgets
+```
+or
+```
+pip install ipywidgets
+```
 
-Full Documentation is located in:
-[http://biocore.github.io/calour/](http://biocore.github.io/calour/)
+If you would like to use the graphical user interface, you will need to install
+the GUI interface [EZCalour](https://github.com/amnona/EZCalour):
+```
+pip install git+git://github.com/amnona/EZCalour
+```
 
 
-Keys and mouses instructions is [here](http://biocore.github.io/calour/generated/calour.heatmap.plot.html#calour.heatmap.plot)
+Use Calour
+==========
+
+Full documentation is located
+[here](http://biocore.github.io/calour/). One strength of Calour is
+that users can interactivelly explore the data patterns on the
+heatmap. The key and mouse instructions to explore and manuvor the heatmap is explained
+[here](http://biocore.github.io/calour/generated/calour.heatmap.plot.html#calour.heatmap.plot)
+
+You can also check out a very simple demo of Calour usage in [this
+Jupyter
+Notebook](https://github.com/biocore/calour/blob/master/notebooks/demo.ipynb).
+A real use case of Calour on a real microbiome data set is also shown
+in [this Jupyter
+Notebook](https://github.com/biocore/calour/blob/master/notebooks/.ipynb).
+
 

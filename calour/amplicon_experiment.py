@@ -5,7 +5,7 @@ amplicon experiment (:mod:`calour.amplicon_experiment`)
 .. currentmodule:: calour.amplicon_experiment
 
 Classes
-^^^^^^^^
+^^^^^^^
 .. autosummary::
    :toctree: generated
 
@@ -33,7 +33,9 @@ logger = getLogger(__name__)
 
 
 class AmpliconExperiment(Experiment):
-    '''This class contains the data for a experiment or a meta experiment.
+    '''This class stores amplicon data and associated metadata.
+
+    This is a child class of :class:`.Experiment`
 
     Parameters
     ----------
@@ -64,25 +66,16 @@ class AmpliconExperiment(Experiment):
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
-        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+        store the data as sparse matrix (scipy.sparse.csr_matrix) or dense numpy array.
     description : str
         name of the experiment
 
-    See Also
-    --------
-    Experiment
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.heatmap_feature_field = 'taxonomy'
         self.heatmap_databases = ('dbbact',)
 
-    def __repr__(self):
-        '''Return a string representation of this object.'''
-        return 'AmpliconExperiment %s with %d samples, %d features' % (
-            self.description, self.data.shape[0], self.data.shape[1])
-
-    def filter_taxonomy(exp, values, negate=False, inplace=False, substring=True):
+    def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
 
         if substring=True, look for partial match instead of identity.
@@ -95,14 +88,14 @@ class AmpliconExperiment(Experiment):
         negate : bool (optional)
             False (default) to keep matching taxonomies, True to remove matching taxonomies
         inplace : bool (optional)
-            do the filtering on the original ``Experiment`` object or a copied one.
+            do the filtering on the original :class:`.Experiment` object or a copied one.
         substring : bool (optional)
             True (default) to do partial (substring) matching for the taxonomy string,
             False to do exact matching
 
         Returns
         -------
-        ``AmpliconExperiment``
+        :class:`.AmpliconExperiment`
             With only features with matching taxonomy
         '''
         if 'taxonomy' not in exp.feature_metadata.columns:
@@ -123,10 +116,10 @@ class AmpliconExperiment(Experiment):
         if negate is True:
             select = ~ select
 
-        logger.warn('%s remaining' % np.sum(select))
+        logger.info('%s remaining' % np.sum(select))
         return exp.reorder(select, axis=1, inplace=inplace)
 
-    def filter_fasta(exp, filename, negate=False, inplace=False):
+    def filter_fasta(exp: Experiment, filename, negate=False, inplace=False):
         '''Filter features from experiment based on fasta file
 
         Parameters
@@ -141,10 +134,10 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        newexp : Experiment
+        newexp : :class:`.Experiment`
             filtered so contains only sequence present in exp and in the fasta file
         '''
-        logger.debug('filter_fasta using file %s' % filename)
+        logger.debug('Filter by sequence using fasta file %s' % filename)
         okpos = []
         tot_seqs = 0
         for cseq in skbio.read(filename, format='fasta'):
@@ -161,7 +154,7 @@ class AmpliconExperiment(Experiment):
         return newexp
 
     @Experiment._record_sig
-    def sort_taxonomy(exp, inplace=False):
+    def sort_taxonomy(exp: Experiment, inplace=False):
         '''Sort the features based on the taxonomy
 
         Sort features based on the taxonomy (alphabetical)
@@ -174,7 +167,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        exp : Experiment
+        :class:`.Experiment`
             sorted by taxonomy
         '''
         logger.debug('sort features by taxonomies')
@@ -198,7 +191,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        ``AmpliconExperiment`` - with only samples with enough original reads
+        :class:`.AmpliconExperiment` - with only samples with enough original reads
         '''
         origread_field = '_calour_original_abundance'
         if origread_field not in exp.sample_metadata.columns:
@@ -208,7 +201,7 @@ class AmpliconExperiment(Experiment):
         newexp = exp.reorder(good_pos, axis=0, **kwargs)
         return newexp
 
-    def collapse_taxonomy(exp, level='genus', inplace=False):
+    def collapse_taxonomy(exp: Experiment, level='genus', inplace=False):
         '''Collapse all features sharing the same taxonomy up to level into a single feature
 
         Sums abundances of all features sharing the same taxonomy up to level.
@@ -242,7 +235,7 @@ class AmpliconExperiment(Experiment):
             return ';'.join(ctax[:level])
 
         newexp.feature_metadata['_calour_tax_group'] = newexp.feature_metadata['taxonomy'].apply(_tax_level, level=level)
-        newexp.merge_identical('_calour_tax_group', method='sum', axis=1, inplace=True)
+        newexp.aggregate_by_metadata('_calour_tax_group', agg='sum', axis=1, inplace=True)
         newexp.feature_metadata['taxonomy'] = newexp.feature_metadata['_calour_tax_group']
         return newexp
 

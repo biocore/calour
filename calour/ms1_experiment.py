@@ -29,7 +29,7 @@ logger = getLogger(__name__)
 
 
 class MS1Experiment(Experiment):
-    '''This class contains the data for a Mass-Spec ms1 spectra experiment or a meta experiment.
+    '''This class contains the data of Mass-Spec ms1 spectra experiment.
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ class MS1Experiment(Experiment):
 
     See Also
     --------
-    Experiment
+    :class:`.Experiment`
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -95,20 +95,3 @@ class MS1Experiment(Experiment):
         logger.debug('Adding gnps terms as "gnps" column in feature metadta')
         self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
         logger.debug('Added terms')
-
-    @Experiment._record_sig
-    def sort_mz(exp, inplace=False):
-        '''Sort the features based on the taxonomy
-
-        Sort features based on the taxonomy (alphabetical)
-
-        Parameters
-        ----------
-        inplace : bool (optional)
-            False (default) to create a copy
-            True to Replace data in exp
-        Returns
-        -------
-        exp : Experiment
-            sorted by taxonomy
-        '''

@@ -145,8 +145,8 @@ class FilteringTests(Tests):
             else:
                 self.assertIsNot(obs, self.test2)
 
-    def test_filter_min_abundance(self):
-        exp = self.test1.filter_min_abundance(17008)
+    def test_filter_abundance(self):
+        exp = self.test1.filter_abundance(17008)
         self.assertEqual(exp.shape[1], 2)
         fids = ['TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
@@ -167,14 +167,19 @@ class FilteringTests(Tests):
         self.assertEqual(exp.shape[1], 3)
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
+    def test_filter_ids_raise(self):
+        fids = ['GG', 'pita']
+        with self.assertRaisesRegex(ValueError, 'pita'):
+            self.test1.filter_ids(fids)
+
     def test_filter_ids_default(self):
-        fids = ['GG', 'AA', 'TT', 'pita']
+        fids = ['GG', 'AA', 'TT']
         exp = self.test1.filter_ids(fids)
-        self.assertListEqual(exp.feature_metadata.index.tolist(), fids[:-1])
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
         self.assertIsNot(exp, self.test1)
 
     def test_filter_ids_samples_inplace_negate(self):
-        badsamples = ['S1', 'S3', 'S5', 'S7', 'S9', 'S11', 'S13', 'S15', 'S17', 'S19', 'pita']
+        badsamples = ['S1', 'S3', 'S5', 'S7', 'S9', 'S11', 'S13', 'S15', 'S17', 'S19']
         oksamples = list(set(self.test1.sample_metadata.index.values).difference(set(badsamples)))
         exp = self.test1.filter_ids(badsamples, axis=0, negate=True, inplace=True)
         self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)

@@ -200,8 +200,8 @@ class ExperimentTests(Tests):
         df = df.sort_values(df.index.values[0], axis=1)
         res = ca.Experiment.from_pandas(df, self.test1)
         # we need to reorder the original experiment
-        exp = self.test1.sort_by_data(subset=[10], key='mean')
-        exp = exp.sort_by_data(subset=[0], key='mean', axis=1)
+        exp = self.test1.sort_by_data(subset=[10], key=np.mean)
+        exp = exp.sort_by_data(subset=[0], key=np.mean, axis=1)
         assert_experiment_equal(res, exp)
 
     def test_from_pandas_round_trip(self):
@@ -230,6 +230,19 @@ class ExperimentTests(Tests):
         # 2nd feature
         npt.assert_array_equal(self.test1[:, 'AT'],
                                self.test1.data.toarray()[:, 1])
+
+    def test_repr(self):
+        self.assertEqual(repr(self.test1),
+                         '''Experiment test1.biom
+---------------------
+data dimension: 21 samples, 12 features
+sample IDs: Index(['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11',
+       'S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19', 'S20',
+       'badsample'],
+      dtype='object', name='#SampleID')
+feature IDs: Index(['AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 'GA', 'GT', 'GG',
+       'badfeature'],
+      dtype='object')''')
 
 
 if __name__ == "__main__":
