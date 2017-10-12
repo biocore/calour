@@ -337,7 +337,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
         as int and parse the file as latin-8 instead of utf-8.
     cls : ``class``, optional
-        what class object to read the data into (``Experiment`` by default)
+        what class object to read the data into (:class:`.Experiment` by default)
     normalize : int or None
         normalize each sample to the specified read count. ``None`` to not normalize
 

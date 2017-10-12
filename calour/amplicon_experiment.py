@@ -88,14 +88,14 @@ class AmpliconExperiment(Experiment):
         negate : bool (optional)
             False (default) to keep matching taxonomies, True to remove matching taxonomies
         inplace : bool (optional)
-            do the filtering on the original ``Experiment`` object or a copied one.
+            do the filtering on the original :class:`.Experiment` object or a copied one.
         substring : bool (optional)
             True (default) to do partial (substring) matching for the taxonomy string,
             False to do exact matching
 
         Returns
         -------
-        ``AmpliconExperiment``
+        :class:`.AmpliconExperiment`
             With only features with matching taxonomy
         '''
         if 'taxonomy' not in exp.feature_metadata.columns:
@@ -116,7 +116,7 @@ class AmpliconExperiment(Experiment):
         if negate is True:
             select = ~ select
 
-        logger.warn('%s remaining' % np.sum(select))
+        logger.info('%s remaining' % np.sum(select))
         return exp.reorder(select, axis=1, inplace=inplace)
 
     def filter_fasta(exp: Experiment, filename, negate=False, inplace=False):
@@ -134,10 +134,10 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        newexp : Experiment
+        newexp : :class:`.Experiment`
             filtered so contains only sequence present in exp and in the fasta file
         '''
-        logger.debug('filter_fasta using file %s' % filename)
+        logger.debug('Filter by sequence using fasta file %s' % filename)
         okpos = []
         tot_seqs = 0
         for cseq in skbio.read(filename, format='fasta'):
@@ -191,7 +191,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        ``AmpliconExperiment`` - with only samples with enough original reads
+        :class:`.AmpliconExperiment` - with only samples with enough original reads
         '''
         origread_field = '_calour_original_abundance'
         if origread_field not in exp.sample_metadata.columns:

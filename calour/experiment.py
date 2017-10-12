@@ -192,7 +192,7 @@ class Experiment:
 
         Returns
         -------
-        ``Experiment``
+        :class:`.Experiment`
 
         '''
         return deepcopy(self)
@@ -221,7 +221,7 @@ class Experiment:
         '''Record the function calls to history.
 
         Note this requires the function decorated to return an
-        ``Experiment`` object.
+        :class:`.Experiment` object.
         '''
         fn = func.__qualname__
 
@@ -308,7 +308,7 @@ class Experiment:
 
         Returns
         -------
-        Experiment
+        :class:`.Experiment`
             experiment with reordered samples
         '''
         if inplace is False:
@@ -396,12 +396,12 @@ class Experiment:
         df : Pandas.DataFrame
             The dataframe to use. should contain samples in rows, features in columns.
             Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
-        exp : Experiment (optional)
+        exp : :class:`.Experiment` (optional)
             If not None, use sample and feature metadata from the experiment
 
         Returns
         -------
-        Experiment
+        :class:`.Experiment`
             with non-sparse data
 
         '''

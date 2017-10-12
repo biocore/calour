@@ -186,7 +186,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
 @Experiment._record_sig
 def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=None):
-    '''Combine two :class:`Experiment` objects into one.
+    '''Combine two :class:`.Experiment` objects into one.
 
     A new column will be added to the combined
     :attr:`.Experiment.sample_metadata` to store which of the 2

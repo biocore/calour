@@ -77,9 +77,9 @@ def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
         data table
     sparse : bool or ``None`` (optional)
         use sparse or dense data matrix. When it is ``None``, it will follow
-        the same sparsity of the current data table in the ``Experiment`` object
+        the same sparsity of the current data table in the :class:`.Experiment` object
     inplace : bool
-        change the ``Experiment`` object in place or return a copy of changed.
+        change the :class:`.Experiment` object in place or return a copy of changed.
 
     Returns
     -------

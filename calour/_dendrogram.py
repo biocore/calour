@@ -434,7 +434,7 @@ def plot_tree(exp, tree, ax):
 
     Parameters
     ----------
-    exp: ``Experiment``
+    exp: :class:`.Experiment`
     tree: skbio.TreeNode
         The tree to plot
     ax: :class:`matplotlib.axes.Axes`
@@ -442,7 +442,7 @@ def plot_tree(exp, tree, ax):
 
     Returns
     -------
-    ``Experiment``, :class:`skbio.TreeNode`
+    :class:`.Experiment`, :class:`skbio.TreeNode`
         both filtered to have common nodes and Experiment reordered to match the tree
     '''
     # reorder the tree and exp to match (exp features are sorted according to tree)

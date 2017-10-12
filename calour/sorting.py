@@ -56,7 +56,7 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     transform : callable (optional)
         a callable transform on a 2-d matrix. Input and output of transform are :class:`.Experiment`.
         The transform function can modify ``Experiment.data`` (it is a copy).
-        It should not change the dimension of ``data`` in :class:`.Experiment`.
+        It should not change the dimension of :attr:`.Experiment.data`.
     inplace : bool (optional)
         False (default) to create a copy
         True to Replace data in exp

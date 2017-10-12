@@ -63,7 +63,7 @@ class MockDatabase(Database):
         ----------
         features : list of str
             the features to get the terms for
-        exp : calour.Experiment (optional)
+        exp : :class:`.Experiment` (optional)
             not None to store results inthe exp (to save time for multiple queries)
 
         Returns

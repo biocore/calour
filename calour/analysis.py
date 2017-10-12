@@ -38,11 +38,11 @@ logger = getLogger(__name__)
 @Experiment._record_sig
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr'):
     '''Find features with correlation to a numeric metadata field
+
     With permutation based p-values and multiple hypothesis correction
 
     Parameters
     ----------
-    exp: calour.Experiment
     field: str
         The field to test by. Values are converted to numeric.
     method : str or function
@@ -70,10 +70,10 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
     Returns
     -------
-    newexp : calour.Experiment
-        The experiment with only significant (FDR<=maxfval) correlated features, sorted according to correlation coefficient
+    :class:`.Experiment`
+        The experiment with only correlated features, sorted according to correlation coefficient
     '''
-    cexp = exp.filter_min_abundance(0, strict=True)
+    cexp = exp.filter_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
 
@@ -108,7 +108,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     Parameters
     ----------
-    exp: calour.Experiment
+    exp: :class:`.Experiment`
     field: str
         The field to test by
     val1: str or list of str
@@ -135,7 +135,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     Returns
     -------
-    newexp : calour.Experiment
+    newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
 
@@ -149,7 +149,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         cexp = exp
 
     # remove features not present in both groups
-    cexp = cexp.filter_min_abundance(0, strict=True)
+    cexp = cexp.filter_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels.
@@ -168,7 +168,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     Parameters
     ----------
-    exp: calour.Experiment
+    exp: :class:`.Experiment`
     field: str
         The field to test by
     transform : str or None
@@ -184,13 +184,13 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     Returns
     -------
-    newexp : calour.Experiment
+    newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
     logger.debug('diff_abundance_kw for field %s' % field)
 
     # remove features with 0 abundance
-    cexp = exp.filter_min_abundance(0, strict=True)
+    cexp = exp.filter_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels. If correlation method, get the values, otherwise the group
@@ -210,9 +210,9 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
 
     Parameters
     ----------
-    cexp : ``Experiment``
+    cexp : :class:`.Experiment`
         The experiment used for the actual diff. abundance (filtered for relevant samples/non-zero features)
-    exp : ``Experiment``
+    exp : :class:`.Experiment`
         The original experiment being analysed (with all samples/features)
     keep : np.array of bool
         One entry per exp feature. True for the features which are significant (following FDR correction)
@@ -223,7 +223,7 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
 
     Returns
     -------
-    ``Experiment``
+    :class:`.Experiment`
     Containing only significant features, sorted by effect size.
     Each feature contains 2 new metadata fields: _calour_diff_abundance_pval, _calour_diff_abundance_effect
     '''

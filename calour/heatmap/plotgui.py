@@ -45,7 +45,7 @@ class PlotGUI(ABC):
 
     Attributes
     ----------
-    exp : ``Experiment``
+    exp : :class:`.Experiment`
         the experiment associated with this gui
     selected_features : dict of matplotlib.lines.Line2D
         used to track the selected features and plot horizontal lines for each selectiom
@@ -73,7 +73,7 @@ class PlotGUI(ABC):
 
     Parameters
     ----------
-    exp : the ``Experiment`` object associated with this GUI
+    exp : the :class:`.Experiment` object associated with this GUI
     zoom_scale : the scaling factor for zooming
     scroll_offset : The amount of columns/rows to scroll when arrow key pressed
     databases : the databases to interact with
