@@ -4,6 +4,7 @@ from collections import defaultdict
 import importlib
 
 from .util import get_config_value, get_config_file, get_config_sections
+from .experiment import Experiment
 
 logger = getLogger(__name__)
 
@@ -56,7 +57,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
+def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
     '''Add a field to the feature metadata, with most common term for each feature
 
     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
@@ -102,7 +103,7 @@ def add_terms_to_features(exp, dbname, use_term_list=None, field_name='common_te
     return exp
 
 
-def enrichment(exp, features, dbname, *kargs, **kwargs):
+def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
     '''Get the list of enriched annotation terms in features compared to all features in exp.
 
     Uses the database specific enrichment analysis method.
