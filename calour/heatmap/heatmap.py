@@ -87,11 +87,14 @@ def _truncate_middle(x, length=16):
 
 
 def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
-    ''''''
-    try:
-        ticks = _transition_index(ticklabels)
-    except KeyError:
-        raise ValueError('Sample field %r not in sample metadata' % sample_field)
+    '''Plot tick and ticklabels of x or y axis.
+
+    Parameters mean axes, x or y axis, list of tick labels, max number
+    of ticks, the upper bound of xlim/ylim, dict passing as text
+    property, the length of each tick label.
+
+    '''
+    ticks = _transition_index(ticklabels)
     tick_pos, tick_val = zip(*ticks)
 
     axis = getattr(ax, which + 'axis')
@@ -110,6 +113,8 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
                 method = 'axvline'
             elif which == 'y':
                 method = 'axhline'
+            else:
+                raise ValueError('Unknow axis: %r.' % which)
             getattr(ax, method)(pos, color='white', linewidth=1)
 
         # set tick/label at the middle of each sample group
@@ -297,7 +302,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             ticklabels = exp.feature_metadata[feature_field]
         except KeyError:
             raise ValueError('Feature field %r not in feature metadata' % feature_field)
-        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numrows, yticklabel_kwargs, xticklabel_len)
+        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numrows, yticklabel_kwargs, yticklabel_len)
         ax.set_ylabel(feature_field)
 
     # set the mouse hover string to the value of abundance (in normal scale)
