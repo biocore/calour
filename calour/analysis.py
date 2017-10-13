@@ -26,6 +26,7 @@ from logging import getLogger
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 from .experiment import Experiment
 from .util import _to_list
@@ -100,28 +101,42 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @Experiment._record_sig
-def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
-    '''
-    test the differential expression between 2 groups (val1 and val2 in field field)
-    using permutation based fdr (dsfdr)
-    for bacteria that have a significant difference.
+def diff_abundance(exp: Experiment, field, *args, method='delta mean', fdr_method='dsfdr',
+                   transform='rankdata', numperm=1000, alpha=0.1):
+    '''Test the differential abundance between groups.
+
+    Using permutation based statistic tests to identify features that
+    are differentially abundant in sample groups.
 
     Parameters
     ----------
-    exp: :class:`.Experiment`
-    field: str
-        The field to test by
-    val1: str or list of str
-        The values for the first group.
-    val2: str or list of str or None (optional)
-        None (default) to compare to all other samples (not in val1)
-    method : str or function
-        the method to use for the t-statistic test. options:
-        'meandiff' : mean(A)-mean(B) (binary)
-        'mannwhitney' : mann-whitneu u-test (binary)
-        'kruwallis' : kruskal-wallis test (multiple groups)
-        'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
-        function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
+    field : str
+        The field of metadata to group samples
+    args : tuple of str or list of str
+        These give the sample groups.
+    method : str or callable
+        The statistic method to test difference. It can be a callable that takes
+        input of data, labels and outputs array of float). The builtin options:
+
+        * 'mw', 'mann-whitney' or 'wilcoxon rank-sum' : Mann-Whitney U
+          test (aka Wilcoxon rank-sum test). This is a nonparametric
+          test between 2 independent sample groups
+
+        * 'kw' or 'kruskal-wallis' : Kruskal-Wallis test. This is an
+          extension of Mann-Whitney U test to more than 2 sample
+          groups.
+
+        * 'delta mean' : compute the delta between the means of 2
+          sample groups (i.e. mean(group 1) - mean(group 2)) and
+          compare it to the random permutations.
+
+        * 'delta mean norm' : compute the delta means normalized by
+          standard deviations between 2 sample groups
+          (i.e. (mean(group 1) - mean(group 2)) / (std(group 1) +
+          std(group 2))) and compare it to the random permutations.
+
+    fdr_method : str
+        FDR method. Choice include 'bonferroni', 'dsFDR', 'BH', ''
     transform : str or None
         transformation to apply to the data before caluculating the statistic
         'rankdata' : rank transfrom each OTU reads
@@ -129,79 +144,49 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
     alpha : float
-        the desired FDR control level
+        the desired FDR false discovery level
     numperm : int
         number of permutations to perform
 
     Returns
     -------
-    newexp : :class:`.Experiment`
+    :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
+
+    Examples
+    --------
+
+    Let's say you have 4 sample types ('HC', 'CD', 'UC', and 'IBS')
+    labeled in the column of 'sample_type' in the sample metadata. To
+    identify features that are different between 'HC' and 'CD' sample
+    groups:
+
+    >>> exp.diff_abundance('sample_type', 'HC', 'CD')   # doctest: +SKIP
+
+    To identify features that are different between 'HC' group and 'CD' and 'UC' groups combined:
+
+    >>> exp.diff_abundance('sample_type', 'HC', ['CD', 'UC'])   # doctest: +SKIP
+
+    To identify features that are different between 'HC', 'IBS' and 'CD', 'UC':
+
+    >>> exp.diff_abundance('sample_type', ['HC', 'IBS'], ['CD', 'UC'])   # doctest: +SKIP
+
+    To identify features that are different between any pair of the 4 groups:
+
+    >>> exp.diff_abundance('sample_type')   # doctest: +SKIP
+
     '''
-
-    # if val2 is not none, need to get rid of all other samples (not val1/val2)
-    val1 = _to_list(val1)
-    if val2 is not None:
-        val2 = _to_list(val2)
-        cexp = exp.filter_samples(field, val1+val2, negate=False)
-        logger.info('%d samples with both values' % cexp.shape[0])
-    else:
-        cexp = exp
-
-    # remove features not present in both groups
-    cexp = cexp.filter_abundance(0, strict=True)
-
-    data = cexp.get_data(copy=True, sparse=False).transpose()
+    logger.info('The groups for diff abundance test:\n%r' % exp.sample_metadata[field].value_counts())
+    # remove features not present in any group
+    exp = exp.filter_abundance(0, strict=True)
+    data = exp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels.
-    labels = np.zeros(len(cexp.sample_metadata))
-    labels[cexp.sample_metadata[field].isin(val1).values] = 1
-    logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
+    le = LabelEncoder()
+    # transform the str labels into int labels
+    labels = le.fit_transform(exp.sample_metadata[field])
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
-
-
-@Experiment._record_sig
-def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
-    '''Test the differential expression between multiple sample groups using the Kruskal Wallis test.
-    uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.
-
-    Parameters
-    ----------
-    exp: :class:`.Experiment`
-    field: str
-        The field to test by
-    transform : str or None
-        transformation to apply to the data before caluculating the statistic
-        'rankdata' : rank transfrom each OTU reads
-        'log2data' : calculate log2 for each OTU using minimal cutoff of 2
-        'normdata' : normalize the data to constant sum per samples
-        'binarydata' : convert to binary absence/presence
-    alpha : float
-        the desired FDR control level
-    numperm : int
-        number of permutations to perform
-
-    Returns
-    -------
-    newexp : :class:`.Experiment`
-        The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
-    '''
-    logger.debug('diff_abundance_kw for field %s' % field)
-
-    # remove features with 0 abundance
-    cexp = exp.filter_abundance(0, strict=True)
-
-    data = cexp.get_data(copy=True, sparse=False).transpose()
-    # prepare the labels. If correlation method, get the values, otherwise the group
-    labels = np.zeros(len(exp.sample_metadata))
-    for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
-        labels[exp.sample_metadata[field].values == clabel] = idx
-    logger.debug('Found %d unique sample labels' % (idx+1))
-    keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
-
-    logger.info('Found %d significant features' % (np.sum(keep)))
-    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    return _new_experiment_from_pvals(exp, exp, keep, odif, pvals)
 
 
 def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
