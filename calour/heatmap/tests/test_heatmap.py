@@ -37,7 +37,7 @@ class PlotTests(Tests):
     def test_heatmap(self):
         ax = self.test1.heatmap(sample_field='group',
                                 feature_field='ph',
-                                max_yticks=3)
+                                yticks_max=3)
         obs_images = ax.images
         # test only one heatmap exists
         self.assertEqual(len(obs_images), 1)

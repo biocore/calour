@@ -28,11 +28,12 @@ pep8:
 	flake8 calour setup.py
 html:
 	make -C doc clean html
+# only run publish cmd in local if you need to update online doc manually
 publish:
 	make -C doc clean
-	git clone -b gh-pages --single-branch git@github.com:biocore/calour.git doc/_build/html
+	git clone -b gh-pages --single-branch git@github.com:biocore/calour.git doc/build/html
 	make -C doc html
-	cd doc/_build/html && git add * && git commit -m "$(MSG)" && git push origin gh-pages
+	cd doc/build/html && git add * && git commit -m "$(MSG)" && git push origin gh-pages
 
 all: test pep8 html
 
