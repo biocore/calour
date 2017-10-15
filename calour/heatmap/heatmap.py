@@ -86,10 +86,60 @@ def _truncate_middle(x, length=16):
         return ['%s..%s' % (i[:mid], i[-mid:]) if len(i) > length else i for i in y]
 
 
+def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
+    '''Plot tick and ticklabels of x or y axis.
+
+    Parameters mean axes, x or y axis, list of tick labels, max number
+    of ticks, the upper bound of xlim/ylim, dict passing as text
+    property, the length of each tick label.
+
+    '''
+    ticks = _transition_index(ticklabels)
+    tick_pos, tick_val = zip(*ticks)
+
+    axis = getattr(ax, which + 'axis')
+
+    if tickmax is None:
+        # show all labels
+        tickmax = n
+    # should be not larger than maxticks
+    tickmax = min(tickmax, mpl.ticker.Locator.MAXTICKS)
+    if len(tick_pos) <= tickmax:
+        tick_pos = np.array([0.] + list(tick_pos))
+        # samples position - 0.5 before and go to 0.5 after
+        tick_pos -= 0.5
+        for pos in tick_pos[1:-1]:
+            if which == 'x':
+                method = 'axvline'
+            elif which == 'y':
+                method = 'axhline'
+            else:
+                raise ValueError('Unknow axis: %r.' % which)
+            getattr(ax, method)(pos, color='white', linewidth=1)
+
+        # set tick/label at the middle of each sample group
+        axis.set_ticks(tick_pos[:-1] + (tick_pos[1:] - tick_pos[:-1]) / 2)
+        axis.set_ticklabels(_truncate_middle(tick_val, ticklabel_len))
+    else:
+        def format_fn(tick_val, tick_pos):
+            # cf http://matplotlib.org/gallery/ticks_and_spines/tick_labels_from_values.html
+            if 0 <= tick_val < n:
+                return ticklabels[int(tick_val)]
+            else:
+                return ''
+        # set the maximal number of feature labels
+        axis.set_major_formatter(mpl.ticker.FuncFormatter(format_fn))
+        axis.set_major_locator(mpl.ticker.MaxNLocator(tickmax, integer=True))
+    if kwargs is None:
+        kwargs = {'rotation': 45, 'ha': 'right'}
+    for t in axis.get_ticklabels():
+        t.set(**kwargs)
+
+
 def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
-            max_yticks=100,
+            xticks_max=10, yticks_max=30,
             clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
             title=None, rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
@@ -99,6 +149,49 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
 
     .. note:: By default it log transforms the abundance values and then plot heatmap.
        The original object is not modified.
+
+    Parameters
+    ----------
+    sample_field : str or ``None`` (optional)
+        The field of sample metadata to display on the x-axis or None (default) to not show x axis.
+    feature_field : str or ``None`` (optional)
+        The field of feature meadata to display on the y-axis or None (default) to not show y axis.
+    xticklabel_kwargs, yticklabel_kwargs : dict or None (optional)
+        keyword arguments passing as properties to :class:`matplotlib.text.Text` for
+        tick labels on x axis and y axis. As an example,
+        ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
+        'family': 'serif', 'size'=7}``
+    xticklabel_len, yticklabel_len : int or ``None``
+        The maximal length for the tick labels on x axis and y axis (will be cut to
+        this length if longer). Used to prevent long labels from
+        taking too much space. None indicates no shortening
+    xticks_max, yticks_max : int or ``None``
+        max number of ticks to render on the heatmap. If ``None``,
+        allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
+        which can be very slow if there are a large number of samples or features.
+    clim : tuple of (float, float), optional
+        the min and max values for the heatmap color limits. It uses the min
+        and max values in the input :attr:`.Experiment.data` array by default.
+    cmap : str or :class:`matplotlib.colors.ListedColormap`
+        str to indicate the colormap name. Default is "viridis" colormap.
+        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    norm : :class:`matplotlib.colors.Normalize` or ``None``
+        passed to ``norm`` parameter of :func:`matplotlib.pyplot.imshow`. Default is log scale.
+    title : None or str (optional)
+        None (default) to not show title. str to set title to str.
+    rect : tuple of (int, int, int, int) or None (optional)
+        None (default) to set initial zoom window to the whole experiment.
+        [x_min, x_max, y_min, y_max] to set initial zoom window
+    cax : :class:`matplotlib.axes.Axes`, optional
+        plot a legend colorbar for the heatmap in the cax; no legend if ``None``
+    ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
+        The axes where the heatmap is plotted. None (default) to create a new figure and
+        axes to plot heatmap into the axes
+
+    Returns
+    -------
+    :class:`matplotlib.axes.Axes` of the heatmap
+
 
     Examples
     --------
@@ -149,49 +242,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        >>> expbin.heatmap(sample_field='category', feature_field='motile', title='Fig 3 binary',
        ...                cmap=cmap, norm=norm, ax=ax)         # doctest: +SKIP
 
-
-    Parameters
-    ----------
-    sample_field : str or ``None`` (optional)
-        The field of sample metadata to display on the x-axis or None (default) to not show x axis.
-    feature_field : str or ``None`` (optional)
-        The field of feature meadata to display on the y-axis or None (default) to not show y axis.
-    xticklabel_kwargs, yticklabel_kwargs : dict or None (optional)
-        keyword arguments passing as properties to :class:`matplotlib.text.Text` for
-        tick labels on x axis and y axis. As an example,
-        ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
-        'family': 'serif', 'size'=7}``
-    xticklabel_len, yticklabel_len : int or ``None``
-        The maximal length for the tick labels on x axis and y axis (will be cut to
-        this length if longer). Used to prevent long labels from
-        taking too much space. None indicates no shortening
-    max_yticks : int or ``None``
-        max number of y ticks to render on the heatmap. If ``None``,
-        allow all ticks for each feature in the table, which can be
-        very slow if there are a large number of features.
-    clim : tuple of (float, float), optional
-        the min and max values for the heatmap color limits. It uses the min
-        and max values in the input :attr:`.Experiment.data` array by default.
-    cmap : str or :class:`matplotlib.colors.ListedColormap`
-        str to indicate the colormap name. Default is "viridis" colormap.
-        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
-    norm : :class:`matplotlib.colors.Normalize` or ``None``
-        passed to ``norm`` parameter of :func:`matplotlib.pyplot.imshow`. Default is log scale.
-    title : None or str (optional)
-        None (default) to not show title. str to set title to str.
-    rect : tuple of (int, int, int, int) or None (optional)
-        None (default) to set initial zoom window to the whole experiment.
-        [x_min, x_max, y_min, y_max] to set initial zoom window
-    cax : :class:`matplotlib.axes.Axes`, optional
-        plot a legend colorbar for the heatmap in the cax; no legend if ``None``
-    ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
-        The axes where the heatmap is plotted. None (default) to create a new figure and
-        axes to plot heatmap into the axes
-
-    Returns
-    -------
-    :class:`matplotlib.axes.Axes` of the heatmap
-
     '''
     logger.debug('Plot heatmap')
     # import pyplot is less polite. do it locally
@@ -238,20 +288,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         ax.xaxis.set_visible(False)
     else:
         try:
-            xticks = _transition_index(exp.sample_metadata[sample_field])
+            ticklabels = exp.sample_metadata[sample_field]
         except KeyError:
             raise ValueError('Sample field %r not in sample metadata' % sample_field)
-        tick_pos, tick_val = zip(*xticks)
-        tick_pos = np.array([0.] + list(tick_pos))
-        # samples position - 0.5 before and go to 0.5 after
-        tick_pos -= 0.5
-        for pos in tick_pos[1:-1]:
-            ax.axvline(x=pos, color='white', linewidth=1)
-        # set tick/label at the middle of each sample group
-        ax.set_xticks(tick_pos[:-1] + (tick_pos[1:] - tick_pos[:-1]) / 2)
-        if xticklabel_kwargs is None:
-            xticklabel_kwargs = {'rotation': 45, 'ha': 'right'}
-        ax.set_xticklabels(_truncate_middle(tick_val, xticklabel_len), **xticklabel_kwargs)
+        _set_axis_ticks(ax, 'x', ticklabels, xticks_max, numcols, xticklabel_kwargs, xticklabel_len)
         ax.set_xlabel(sample_field)
 
     # plot y tick labels dynamically
@@ -259,28 +299,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         ax.yaxis.set_visible(False)
     else:
         try:
-            yticklabels = _truncate_middle(exp.feature_metadata[feature_field], yticklabel_len)
+            ticklabels = exp.feature_metadata[feature_field]
         except KeyError:
             raise ValueError('Feature field %r not in feature metadata' % feature_field)
-        if max_yticks is None:
-            # show all labels
-            max_yticks = numcols
-        # should be not larger than maxticks
-        max_yticks = min(max_yticks, mpl.ticker.Locator.MAXTICKS)
-
-        def format_fn(tick_val, tick_pos):
-            # cf http://matplotlib.org/gallery/ticks_and_spines/tick_labels_from_values.html
-            if 0 <= tick_val < numcols:
-                return yticklabels[int(tick_val)]
-            else:
-                return ''
-        # set the maximal number of feature labels
-        ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_fn))
-        ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(max_yticks, integer=True))
-        if yticklabel_kwargs is None:
-            yticklabel_kwargs = {'rotation': 45, 'ha': 'right', 'size': 6}
-        for t in ax.get_yticklabels():
-            t.set(**yticklabel_kwargs)
+        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numrows, yticklabel_kwargs, yticklabel_len)
         ax.set_ylabel(feature_field)
 
     # set the mouse hover string to the value of abundance (in normal scale)
@@ -339,7 +361,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
     '''
     if label_kwargs is None:
         label_kwargs = {}
-    kwargs = {'color': 'w', 'weight': 'bold', 'fontsize': 6,
+    kwargs = {'color': 'w', 'weight': 'bold', 'size': 6,
               'ha': 'center', 'va': 'center'}
     kwargs.update(label_kwargs)
 

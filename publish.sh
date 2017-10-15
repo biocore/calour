@@ -1,8 +1,8 @@
 #!/bin/bash
 if [ "${TRAVIS_SECURE_ENV_VARS}" == "true" ] && [ "${CONDA_PY}" == "35" ] && [ "${TRAVIS_OS_NAME}" == "linux" ] ; then
     echo "Publish sphinx documentation"
-    git config --global user.email "$GIT_EMAIL"
-    git config --global user.name "$GIT_NAME"
+    git config --global user.email "travis@foo.com"
+    git config --global user.name "travis"
     # clear the old html if there is any
     make -C doc clean
     # clone the gh-pages branch so we can keep its commit history
