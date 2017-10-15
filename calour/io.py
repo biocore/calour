@@ -35,7 +35,7 @@ import biom
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
 from .ms1_experiment import MS1Experiment
-from .util import get_file_md5, _get_taxonomy_string
+from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 
 
 logger = getLogger(__name__)
@@ -349,7 +349,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     '''
     logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
-    exp_metadata = {'map_md5': ''}
+    exp_metadata = {'sample_metadata_md5': '', 'data_md5': ''}
     # load the data table
     fmd = None
     if data_file_type == 'biom':
@@ -381,6 +381,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     # init the experiment metadata details
     exp_metadata['data_file'] = data_file
+    exp_metadata['data_md5'] = get_data_md5(data)
     exp_metadata['sample_metadata_file'] = sample_metadata_file
     exp_metadata['sample_metadata_md5'] = get_file_md5(sample_metadata_file)
     exp_metadata['feature_metadata_file'] = feature_metadata_file
