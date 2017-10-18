@@ -328,8 +328,9 @@ class PlotGUI(ABC):
                 xlim_lower,
                 xlim_lower + (xlim_upper - xlim_lower) * self.zoom_scale)
         elif event.key == 'down':
-            if ylim_lower - y_offset > self.exp.data.shape[1] - 0.5:
-                y_offset = ylim_lower + 0.5 - self.exp.data.shape[1]
+            max_y = self.exp.data.shape[1] - 0.5
+            if ylim_lower - y_offset > max_y:
+                y_offset = ylim_lower - max_y
             ax.set_ylim(ylim_lower - y_offset, ylim_upper - y_offset)
         elif event.key == 'up':
             if ylim_upper + y_offset < -0.5:
@@ -340,8 +341,9 @@ class PlotGUI(ABC):
                 x_offset = xlim_lower + 0.5
             ax.set_xlim(xlim_lower - x_offset, xlim_upper - x_offset)
         elif event.key == 'right':
-            if xlim_upper + x_offset > self.exp.data.shape[0] - 0.5:
-                x_offset = xlim_upper + 0.5 - self.exp.data.shape[0]
+            max_x = self.exp.data.shape[0] - 0.5
+            if xlim_upper + x_offset > max_x:
+                x_offset = xlim_upper - max_x
             ax.set_xlim(xlim_lower + x_offset, xlim_upper + x_offset)
         elif event.key in {'.', ',', '<', '>'}:
             shift = {'.': (0, 1),
