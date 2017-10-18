@@ -53,11 +53,11 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
 
     Parameters
     ----------
-    transform : callable (optional)
+    transform : callable, optional
         a callable transform on a 2-d matrix. Input and output of transform are :class:`.Experiment`.
         The transform function can modify ``Experiment.data`` (it is a copy).
         It should not change the dimension of :attr:`.Experiment.data`.
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy
         True to Replace data in exp
     kwargs : dict
@@ -95,7 +95,7 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
 
     Parameters
     ----------
-    aixs : 0, 1, 's', or 'f' (optional)
+    aixs : 0, 1, 's', or 'f', optional
         'f' or 1 (default) means clustering features; 's' or 0 means clustering samples
     transform : Callable
         a callable transform on a 2-d matrix. Input and output of transform are :class:`.Experiment`.
@@ -104,7 +104,7 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
     metric : str or callable
         the clustering metric to use. It should be able to be passed to
         ``scipy.spatial.distance.pdist``.
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy.
         True to Replace data in exp.
     kwargs : dict
@@ -182,7 +182,7 @@ def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
     axis : 0, 1, 's', or 'f'
         sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
         in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy
         True to Replace data in exp
 
@@ -213,7 +213,7 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
     ----------
     axis : 0, 1, 's', or 'f'
         Apply ``key`` function on row (sort the samples) (0 or 's') or column (sort the features) (1 or 'f')
-    subset : ``None``, boolean mask, :class:`slice`, or int indices (optional)
+    subset : ``None``, boolean mask, :class:`slice`, or int indices, optional
         Sorting using only subset of the data. The subsetting occurs on the opposite of
         the specified axis. Default is to use the whole data set.
     key : str or callable
@@ -226,9 +226,9 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
         * 'log_mean': sort by the mean of the log;
 
         * 'prevalence': sort by the prevalence;
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy. True to modify in place.
-    reverse : bool (optional)
+    reverse : bool, optional
         True to reverse the order of the sort. Similar to :func:`sorted`
     kwargs : dict
         keyword parameters passed to ``key``
@@ -362,7 +362,7 @@ def sort_ids(exp: Experiment, ids, axis=1, inplace=False):
     axis : 0, 1, 's', or 'f'
         sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
         in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy of the experiment, True to filter inplace
 
     Returns

@@ -57,7 +57,7 @@ def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
     axis : 0, 1, 's', or 'f', optional
         the axis to normalize. 0 or 's' (default) is normalize each sample;
         1 or 'f' to normalize each feature
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy, True to replace values in exp
 
     Returns
@@ -90,7 +90,7 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
     axis : 0, 1, 's', or 'f', optional
         the axis to normalize. 0 or 's' (default) is normalize each sample;
         1 or 'f' to normalize each feature
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy, True to replace values in exp
 
     Returns
@@ -233,12 +233,12 @@ def normalize_by_subset_features(exp: Experiment, features, total=10000, negate=
     ----------
     features : list of str
         The feature IDs to exclude (or include if negate=False)
-    total : int (optional)
+    total : int, optional
         The total abundance for the non-excluded features per sample
-    negate : bool (optional)
+    negate : bool, optional
         True (default) to calculate normalization factor without features in features list.
         False to calculate normalization factor only with features in features list.
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a new experiment, True to normalize in place
 
     Returns
@@ -269,11 +269,11 @@ def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace
 
     Parameters
     ----------
-    min_frac : float (optional)
+    min_frac : float, optional
         ignore features with mean (over all samples) >= min_frac.
-    total : int (optional)
+    total : int, optional
         The total abundance for the non-excluded features per sample
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a new experiment, True to normalize in place
 
     Returns
@@ -295,7 +295,7 @@ def random_permute_data(exp: Experiment, normalize=True):
 
     Parameters
     ----------
-    normalize : bool (optional)
+    normalize : bool, optional
         True (default) to normalize each sample after completing the feature shuffling.
         False to not normalize
 

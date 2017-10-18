@@ -57,7 +57,7 @@ class PlotGUI(ABC):
         current selected point
     zoom_scale : numeric
         the scaling factor for zooming
-    scroll_offset : numeric (optional)
+    scroll_offset : numeric, optional
         The amount of columns/rows to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
         >0 : scroll than constant number of columns/rows per keypress
@@ -372,11 +372,11 @@ class PlotGUI(ABC):
 
         Parameters
         ----------
-        samplepos : iterable of int (optional)
+        samplepos : iterable of int, optional
             positions of samples to be added
-        featurepos : iterable of int (optional)
+        featurepos : iterable of int, optional
             positions of features to be added
-        toggle: bool (optional)
+        toggle: bool, optional
             True (default) to remove lines in the lists that are already selected.
             False to ignore
         '''

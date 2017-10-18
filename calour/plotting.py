@@ -80,12 +80,12 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
     enriched : pandas.DataFrame
         The enriched terms ( from exp.enrichment() )
         must contain columns 'term', 'odif'
-    max_show: int or (int, int) or None (optional)
+    max_show: int or (int, int) or None, optional
         The maximal number of terms to show
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    ax: :class:`matplotlib.axes.Axes` or ``None`` (optional)
+    ax: :class:`matplotlib.axes.Axes` or ``None``, optional
         The axes to which to plot the figure. None (default) to create a new figure
 
     Returns
@@ -130,15 +130,15 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     Parameters
     ----------
-    max_show: int or (int, int) or None (optional)
+    max_show: int or (int, int) or None, optional
         The maximal number of terms to show
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    ax: :class:`matplotlib.axes.Axes` or None (optional)
+    ax: :class:`matplotlib.axes.Axes` or None, optional
         The axis to which to plot the figure
         None (default) to create a new figure
-    ignore_exp : list None (optional)
+    ignore_exp : list None, optional
         list of experiment ids to ignore when doing the enrichment_analysis.
         Useful when you don't want to get terms from your own experiment analysis.
         For dbbact it is a list of int

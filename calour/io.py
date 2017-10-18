@@ -149,7 +149,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
-    rows_are_samples : bool (optional)
+    rows_are_samples : bool, optional
         True to csv datafile has samples as rows,
         False (default) if columns are samples (rows are features)
 
@@ -189,25 +189,25 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     ----------
     data_file : str
         name of the OpenMS bucket table CSV file.
-    sample_metadata_file : str or None (optional)
+    sample_metadata_file : str or None, optional
         None (default) to not load metadata per sample
         str to specify name of sample mapping file (tsv)
-    gnps_file : str or None (optional)
+    gnps_file : str or None, optional
         name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file
         for use with the 'gnps' database in plot
-    feature_metadata_file : str or None (optional)
+    feature_metadata_file : str or None, optional
         Name of table containing additional metadata about each feature
         None (default) to not load
-    description : str or None (optional)
+    description : str or None, optional
         Name of the experiment (for display purposes).
         None (default) to assign file name
-    sparse : bool (optional)
+    sparse : bool, optional
         False (default) to store data as dense matrix (faster but more memory)
         True to store as sparse (CSR)
-    rows_are_samples : bool (optional)
+    rows_are_samples : bool, optional
         True to treat csv data file rows as samples,
         False (default) to treat csv data files rows as features
-    mz_rt_sep: str or None (optional)
+    mz_rt_sep: str or None, optional
         The separator for the mz/rt fields in the feature names in data_file.
         None (default) for autodetect
         '_' or ' ' are typical options
@@ -315,23 +315,23 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     ----------
     data_file : str
         file path to the biom table.
-    sample_metadata_file : None or str (optional)
+    sample_metadata_file : None or str, optional
         None (default) to just use sample names (no additional metadata).
         if not None, file path to the sample metadata (aka mapping file in QIIME).
-    feature_metadata_file : None or str (optional)
+    feature_metadata_file : None or str, optional
         file path to the feature metadata.
     description : str
         description of the experiment
     sparse : bool
         read the biom table into sparse or dense array
-    data_file_type : str (optional)
+    data_file_type : str, optional
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
         'tsv': a tab-separated table with (samples in column and feature in row)
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
         'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
-    sample_metadata_kwargs, feature_metadata_kwargs : dict or None (optional)
+    sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
         keyword arguments passing to :func:`pandas.read_table` when reading sample metadata
         or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
@@ -410,7 +410,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     Parameters
     ----------
-    sample_metadata_file : None or str (optional)
+    sample_metadata_file : None or str, optional
         None (default) to just use samplenames (no additional metadata).
     min_reads : int or None
         int to remove all samples with less than ``min_reads``.
@@ -464,12 +464,12 @@ def save_biom(exp: Experiment, f, fmt='hdf5', add_metadata='taxonomy'):
     ----------
     f : str
         the file to save to
-    fmt : str (optional)
+    fmt : str, optional
         the output biom table format. options are:
         'hdf5' (default) save to hdf5 biom table.
         'json' same to json biom table.
         'txt' save to text (tsv) biom table.
-    add_metadata : str or None (optional)
+    add_metadata : str or None, optional
         add metadata column from ``Experiment.feature_metadata`` to biom table.
         Don't add if it is ``None``.
 
@@ -524,7 +524,7 @@ def save_fasta(exp: Experiment, f, seqs=None):
     ----------
     f : str
         the filename to save to
-    seqs : list of str sequences ('ACGT') or None (optional)
+    seqs : list of str sequences ('ACGT') or None, optional
         None (default) to save all sequences in exp, or list of sequences to only save these sequences.
         Note: sequences not in exp will not be saved
     '''
@@ -557,10 +557,10 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     Parameters
     ----------
     exp : Experiment
-    add_metadata : str or None (optional)
+    add_metadata : str or None, optional
         add metadata column from ``Experiment.feature_metadata`` to biom table.
         Don't add if it is ``None``.
-    to_list: bool (optional)
+    to_list: bool, optional
         True to convert the metadata field to list (for hdf5)
 
     Returns

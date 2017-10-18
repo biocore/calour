@@ -62,9 +62,9 @@ def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, 
     ----------
     exp1 : :class:`.Experiment`
     exp2 : :class:`.Experiment`
-    check_history : bool (optional)
+    check_history : bool, optional
         False (default) to skip testing the command history, True to compare also the command history
-    almost_equal : bool (optional)
+    almost_equal : bool, optional
         True (default) to test for almost identical, False to test the data matrix for exact identity
     ignore_md_fields : tuple of str or None
         list of metadata fields to ignore in the comparison. Default is ignoring the original read count (when sample loaded)

@@ -52,29 +52,29 @@ def export_html(exp: Experiment, sample_field=None, feature_field=False, title=N
 
     Parameters
     ----------
-    sample_field : str or None (optional)
+    sample_field : str or None, optional
         The field to display on the x-axis (sample):
         None (default) to not show x labels.
         str to display field values for this field
     feature_field : str or None or False(optional)
         Name of the field to display on the y-axis (features) or None not to display names
         Flase (default) to use the experiment subclass default field
-    title : None or str (optional)
+    title : None or str, optional
         None (default) to show experiment description field as title. str to set title to str.
-    xticklabel_len : int (optional) or None
+    xticklabel_len : int, optional or None
         The maximal length for the x label strings (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no cutting
-    cmap : None or str (optional)
+    cmap : None or str, optional
         None (default) to use mpl default color map. str to use colormap named str.
-    clim : tuple of (float, float) or None (optional)
+    clim : tuple of (float, float) or None, optional
         the min and max values for the heatmap or None to use all range. It uses the min
         and max values in the ``data`` array by default.
-    transform : function (optional)
+    transform : function, optional
         The transform function to apply to the data before plotting. default is log_n
-    output_file : str (optional)
+    output_file : str, optional
         Name of the output html file (no .html ending - it will be appended).
-    html_template : str or None (optional)
+    html_template : str or None, optional
         Name of the html template to use. None to use the default export_html_template.html template
     '''
     import matplotlib.pyplot as plt

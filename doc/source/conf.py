@@ -523,10 +523,10 @@ def linkcode_resolve(domain, info):
     fn = relpath(fn, start=dirname(calour.__file__))
 
     if 'dev' in calour.__version__:
-        return "http://github.com/amnona/calour/blob/master/calour/%s%s" % (
+        return "http://github.com/biocore/calour/blob/master/calour/%s%s" % (
            fn, linespec)
     else:
-        return "http://github.com/amnona/calour/blob/%s/calour/%s%s" % (
+        return "http://github.com/biocore/calour/blob/%s/calour/%s%s" % (
            calour.__version__, fn, linespec)
 
 #------------------------------------------------------------------------------

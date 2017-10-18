@@ -254,10 +254,10 @@ class Experiment:
 
         Parameters
         ----------
-        sparse : None or bool (optional)
+        sparse : None or bool, optional
             None (default) to pass original data (sparse or dense).
             True to get as sparse. False to get as dense
-        copy : bool (optional)
+        copy : bool, optional
             True to get a copy of the data; otherwise, it can be
             the original data or a copy (default).
 
@@ -348,13 +348,13 @@ class Experiment:
 
         Parameters
         ----------
-        sample_field : str or None (optional)
+        sample_field : str or None, optional
             Name of the sample_metadata column to use for index.
             None (default) is the sample_metadata index
-        feature_field : str or None (optional)
+        feature_field : str or None, optional
             Name of the feature_metadata column to use for column names.
             None (default) is the feature_metadata index
-        sparse: bool or None (optional)
+        sparse: bool or None, optional
             None (default) to get sparsity based on the underlying Experiment sparsity
             True to force to sparse pandas.Dataframe
             False to force to standard pandas.Dataframe
@@ -396,7 +396,7 @@ class Experiment:
         df : Pandas.DataFrame
             The dataframe to use. should contain samples in rows, features in columns.
             Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
-        exp : :class:`.Experiment` (optional)
+        exp : :class:`.Experiment`, optional
             If not None, use sample and feature metadata from the experiment
 
         Returns

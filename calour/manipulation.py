@@ -43,14 +43,14 @@ def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0,
         Name of the first sample metadata field to join
     field2 : str
         Name of the second sample metadata field to join
-    newfield : str or None (optional)
+    newfield : str or None, optional
         name of the new (joined) sample metadata field
         None (default) to name it as field1 + sep + field2
     axis : 0, 1, 's', or 'f', optional
         0 or 's' (default) to modify sample metadata fields; 1 or 'f' to modify feature metadata fields
-    sep : str (optional)
+    sep : str, optional
         The separator between the values of the two fields when joining
-    inplace : bool (optional)
+    inplace : bool, optional
         True (default) to add in current experiment, False to create a new Experiment
 
     Returns
@@ -107,7 +107,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
     ----------
     field : str
         The sample/feature metadata field to group samples/features
-    agg : str (optional)
+    agg : str, optional
         aggregate method. Choice includes:
 
         * 'mean' : the mean of the group
@@ -117,7 +117,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         * 'sum' : the sum of of the group
     axis : 0, 1, 's', or 'f', optional
         0 or 's' (default) to aggregate samples; 1 or 'f' to aggregate features
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create new Experiment, True to perform inplace
 
     Returns
@@ -199,10 +199,10 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
         both experiments contain the same feature metadata column and
         there is a conflict between the two, the value will be taken
         from exp and not from other.
-    field_name : ``None`` or str (optional)
+    field_name : ``None`` or str, optional
         Name of the new ``sample_metdata`` field containing the experiment each sample is coming from.
         If it is None, don't add such column.
-    prefixes : tuple of (str, str) (optional)
+    prefixes : tuple of (str, str), optional
         Prefix to append to the sample_metadata index for identical samples in the 2 experiments.
         Required only if the two experiments share any identical sample ID
 

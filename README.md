@@ -74,6 +74,6 @@ Jupyter
 Notebook](https://github.com/biocore/calour/blob/master/notebooks/demo.ipynb).
 A real use case of Calour on a real microbiome data set is also shown
 in [this Jupyter
-Notebook](https://github.com/biocore/calour/blob/master/notebooks/.ipynb).
+Notebook](https://github.com/biocore/calour/blob/master/notebooks/moving-picture/readme.ipynb).
 
 

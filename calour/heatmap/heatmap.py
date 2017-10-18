@@ -30,14 +30,14 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
 
     Parameters
     ----------
-    gui : str or None (optional)
+    gui : str or None, optional
         If None, just plot a simple matplotlib figure with the heatmap and no interactive elements.
         is str, name of the gui module to use for displaying the heatmap. options:
         'cli' (default) : just cli information about selected sample/feature.
         'qt5' : gui using QT5 (with full dbBact interface)
         'jupyter' : gui for Jupyter notebooks (using widgets)
         Other string : name of child class of plotgui (which should reside in heatmap/lower(classname).py)
-    databases : list of str (optional)
+    databases : list of str, optional
         Names of the databases to use to obtain info about sequences. options:
         'dbbact' : the dbBact manual annotation database
         'spongeworld' : the sponge microbiome automatic annotation database
@@ -152,11 +152,11 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
 
     Parameters
     ----------
-    sample_field : str or ``None`` (optional)
+    sample_field : str or ``None``, optional
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
-    feature_field : str or ``None`` (optional)
+    feature_field : str or ``None``, optional
         The field of feature meadata to display on the y-axis or None (default) to not show y axis.
-    xticklabel_kwargs, yticklabel_kwargs : dict or None (optional)
+    xticklabel_kwargs, yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
         ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
@@ -176,15 +176,15 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         str to indicate the colormap name. Default is "viridis" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
     norm : :class:`matplotlib.colors.Normalize` or ``None``
-        passed to ``norm`` parameter of :func:`matplotlib.pyplot.imshow`. Default is log scale.
-    title : None or str (optional)
+        passed to ``norm`` parameter of matplotlib.pyplot.imshow. Default is log scale.
+    title : None or str, optional
         None (default) to not show title. str to set title to str.
-    rect : tuple of (int, int, int, int) or None (optional)
+    rect : tuple of (int, int, int, int) or None, optional
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
     cax : :class:`matplotlib.axes.Axes`, optional
         plot a legend colorbar for the heatmap in the cax; no legend if ``None``
-    ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
+    ax : :class:`matplotlib.axes.Axes` or None, optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot heatmap into the axes
 
@@ -465,7 +465,7 @@ def plot(exp: Experiment, title=None,
 
     Parameters
     ----------
-    title : str (optional)
+    title : str, optional
         The title of the figure.
     barx_fields, bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
@@ -478,18 +478,18 @@ def plot(exp: Experiment, title=None,
         whether to show the labels on the bars.
     barx_label_kwargs, bary_label_kwargs : dict, optional
         keyword arguments passing to :meth:`matplotlib.axes.Axes.annotate` for labels on the bars
-    tree : skbio.TreeNode or None (optional)
+    tree : skbio.TreeNode or None, optional
         None (default) to not plot a tree
         otherwise, plot the tree dendrogram on the left.
         NOTE: features are reordered according to the tree
-    tree_size : int (optional)
+    tree_size : int, optional
         The width of the tree relative to the main heatmap (12 is identical size)
     gui : str, optional
         GUI to use. Choice includes 'cli', 'jupyter', or 'qt5'
     databases : list of str or ``None``
         a list of databases to access or add annotation
         ``None`` (default) to use the default field based on the experiment.
-    heatmap_kwargs : dict, optional
+    **heatmap_kwargs : any, optional
         keyword arguments passing to :func:`heatmap` function.
 
     Returns

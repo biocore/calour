@@ -50,7 +50,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         'spearman' : spearman correlation (numeric)
         'pearson' : pearson correlation (numeric)
         function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
-    nonzero : bool (optional)
+    nonzero : bool, optional
         True to calculate the correlation only for samples where the feature is present (>0).
         False (default) to calculate the correlation over all samples
         Note: setting nonzero to True slows down the calculation

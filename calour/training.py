@@ -75,7 +75,7 @@ def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
         the column names in the sample metadata. These columns will be
         converted to one-hot numeric code and then concatenated to the
         data table
-    sparse : bool or ``None`` (optional)
+    sparse : bool or ``None``, optional
         use sparse or dense data matrix. When it is ``None``, it will follow
         the same sparsity of the current data table in the :class:`.Experiment` object
     inplace : bool
