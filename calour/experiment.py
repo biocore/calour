@@ -42,27 +42,27 @@ class Experiment:
 
     Parameters
     ----------
-    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+    data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : :class:`pandas.DataFrame`
+    sample_metadata : pandas.DataFrame
         The metadata on the samples
-    feature_metadata : :class:`pandas.DataFrame`
+    feature_metadata : pandas.DataFrame
         The metadata on the features
     description : str
         name of experiment
-    sparse : ``bool``
+    sparse : bool
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
 
     Attributes
     ----------
-    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+    data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : :class:`pandas.DataFrame`
+    sample_metadata : pandas.DataFrame
         The metadata on the samples
-    feature_metadata : :class:`pandas.DataFrame`
+    feature_metadata : pandas.DataFrame
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
@@ -75,7 +75,7 @@ class Experiment:
 
     See Also
     --------
-    :class:`.AmpliconExperiment`
+    AmpliconExperiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None,
                  exp_metadata={}, description='', sparse=True):
@@ -192,7 +192,7 @@ class Experiment:
 
         Returns
         -------
-        :class:`.Experiment`
+        Experiment
 
         '''
         return deepcopy(self)
@@ -308,7 +308,7 @@ class Experiment:
 
         Returns
         -------
-        :class:`.Experiment`
+        Experiment
             experiment with reordered samples
         '''
         if inplace is False:
@@ -361,7 +361,7 @@ class Experiment:
 
         Returns
         -------
-        :class:`pandas.Dataframe` or :class:`pandas.SparseDataFrame`
+        pandas.Dataframe or pandas.SparseDataFrame
         '''
         if sample_field is None:
             ind = self.sample_metadata.index
@@ -396,12 +396,12 @@ class Experiment:
         df : Pandas.DataFrame
             The dataframe to use. should contain samples in rows, features in columns.
             Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
-        exp : :class:`.Experiment`, optional
+        exp : Experiment, optional
             If not None, use sample and feature metadata from the experiment
 
         Returns
         -------
-        :class:`.Experiment`
+        Experiment
             with non-sparse data
 
         '''

@@ -61,7 +61,7 @@ def _read_biom(fp, transpose=True):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : :class:`pandas.DataFrame`
+    feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
     logger.debug('loading biom table %s' % fp)
@@ -99,7 +99,7 @@ def _read_qiime2(fp, transpose=True):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : :class:`pandas.DataFrame`
+    feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
     import qiime2
@@ -126,7 +126,7 @@ def _get_md_from_biom(table):
 
     Return
     ------
-    :class:`pandas.DataFrame` or ``None``
+    pandas.DataFrame or None
     '''
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
@@ -161,7 +161,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
         the feature ids
     data : numpy array (2d) of float
         the table
-    feature_md : :class:`pandas.DataFrame`
+    feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
     logger.debug('loading OpenMS bucket table %s' % fp)
@@ -216,7 +216,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     if rows_are_samples:
@@ -274,7 +274,7 @@ def _read_metadata(ids, f, kwargs):
 
     Returns
     -------
-    :class:`pandas.DataFrame` of metadata
+    pandas.DataFrame of metadata
     '''
     # load the sample/feature metadata file
     if f is not None:
@@ -343,7 +343,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the new object created
 
     '''
@@ -420,7 +420,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     Returns
     -------
-    :class:`.AmpliconExperiment`
+    .AmpliconExperiment
         after removing low read sampls and normalizing
     '''
     # don't do normalize before the possible filtering

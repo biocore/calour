@@ -70,7 +70,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The experiment with only correlated features, sorted according to correlation coefficient
     '''
     cexp = exp.filter_abundance(0, strict=True)
@@ -108,7 +108,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     Parameters
     ----------
-    exp: :class:`.Experiment`
+    exp: Experiment
     field: str
         The field to test by
     val1: str or list of str
@@ -135,7 +135,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     Returns
     -------
-    newexp : :class:`.Experiment`
+    newexp : Experiment
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
 
@@ -168,7 +168,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     Parameters
     ----------
-    exp: :class:`.Experiment`
+    exp: Experiment
     field: str
         The field to test by
     transform : str or None
@@ -184,7 +184,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     Returns
     -------
-    newexp : :class:`.Experiment`
+    newexp : Experiment
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
     logger.debug('diff_abundance_kw for field %s' % field)
@@ -210,9 +210,9 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
 
     Parameters
     ----------
-    cexp : :class:`.Experiment`
+    cexp : Experiment
         The experiment used for the actual diff. abundance (filtered for relevant samples/non-zero features)
-    exp : :class:`.Experiment`
+    exp : Experiment
         The original experiment being analysed (with all samples/features)
     keep : np.array of bool
         One entry per exp feature. True for the features which are significant (following FDR correction)
@@ -223,7 +223,7 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     Containing only significant features, sorted by effect size.
     Each feature contains 2 new metadata fields: _calour_diff_abundance_pval, _calour_diff_abundance_effect
     '''

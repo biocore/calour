@@ -152,45 +152,45 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
 
     Parameters
     ----------
-    sample_field : str or ``None``, optional
+    sample_field : str or None, optional
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
-    feature_field : str or ``None``, optional
+    feature_field : str or None, optional
         The field of feature meadata to display on the y-axis or None (default) to not show y axis.
     xticklabel_kwargs, yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
         ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
         'family': 'serif', 'size'=7}``
-    xticklabel_len, yticklabel_len : int or ``None``
+    xticklabel_len, yticklabel_len : int or None
         The maximal length for the tick labels on x axis and y axis (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no shortening
-    xticks_max, yticks_max : int or ``None``
+    xticks_max, yticks_max : int or None
         max number of ticks to render on the heatmap. If ``None``,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
     clim : tuple of (float, float), optional
         the min and max values for the heatmap color limits. It uses the min
         and max values in the input :attr:`.Experiment.data` array by default.
-    cmap : str or :class:`matplotlib.colors.ListedColormap`
+    cmap : str or matplotlib.colors.ListedColormap
         str to indicate the colormap name. Default is "viridis" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
-    norm : :class:`matplotlib.colors.Normalize` or ``None``
+    norm : matplotlib.colors.Normalize or None
         passed to ``norm`` parameter of matplotlib.pyplot.imshow. Default is log scale.
     title : None or str, optional
         None (default) to not show title. str to set title to str.
     rect : tuple of (int, int, int, int) or None, optional
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
-    cax : :class:`matplotlib.axes.Axes`, optional
+    cax : matplotlib.axes.Axes, optional
         plot a legend colorbar for the heatmap in the cax; no legend if ``None``
-    ax : :class:`matplotlib.axes.Axes` or None, optional
+    ax : matplotlib.axes.Axes or None, optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot heatmap into the axes
 
     Returns
     -------
-    :class:`matplotlib.axes.Axes` of the heatmap
+    matplotlib.axes.Axes of the heatmap
 
 
     Examples
@@ -338,7 +338,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
 
     Parameters
     ----------
-    ax : :class:`matplotlib.axes.Axes`
+    ax : matplotlib.axes.Axes
         the axes to plot the color bars in.
     values : Iterable
         the values informing the colors on the bar
@@ -357,7 +357,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
 
     Returns
     -------
-    :class:`matplotlib.axes.Axes`
+    matplotlib.axes.Axes
     '''
     if label_kwargs is None:
         label_kwargs = {}
@@ -469,10 +469,10 @@ def plot(exp: Experiment, title=None,
         The title of the figure.
     barx_fields, bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
-        for each column. It doesn't plot color bars by default (``None``)
+        for each column. It doesn't plot color bars by default (None)
     barx_width, bary_width : float, optional
         The width of the bars
-    barx_colors, bary_colors : dict, :class:`matplotlib.colors.ListedColormap`, optional
+    barx_colors, bary_colors : dict, matplotlib.colors.ListedColormap, optional
         The colors for each unique values in the column of sample/feature metadata
     barx_label, bary_label : bool, optional
         whether to show the labels on the bars.

@@ -66,7 +66,7 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('downsample on field %s' % field)
     if axis == 0:
@@ -122,7 +122,7 @@ def filter_sample_categories(exp: Experiment, field, min_samples=5, inplace=Fals
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
 
     '''
     exp = exp.reorder(exp.sample_metadata[field].notnull(), inplace=inplace)
@@ -158,7 +158,7 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
     '''
     if axis == 0:
@@ -206,7 +206,7 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
     '''
     # test for functions that can be applied to full matrix
@@ -403,7 +403,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
 
     '''
@@ -424,7 +424,7 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
 
     '''
@@ -446,7 +446,7 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with only features present in at least fraction of samples
     '''
     newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
@@ -467,7 +467,7 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     factor = np.mean(exp.data.sum(axis=1))
     newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
@@ -491,7 +491,7 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         filtered so contains only features/samples present in exp and in ids
     '''
     if axis == 0:

@@ -77,7 +77,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         list of experiments to ignore when adding the terms
     Returns
     -------
-    exp : :class:`.Experiment`
+    exp : Experiment
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
@@ -145,7 +145,7 @@ class Database(ABC):
 
         Parameters
         ----------
-        exp : :class:`.Experiment` or None, optional
+        exp : Experiment or None, optional
             The experiment link for the database (if needed)
         database_name : str, optional
             name of the database
@@ -212,7 +212,7 @@ class Database(ABC):
         ----------
         features : list of str
             the features to add to the database
-        exp : :class:`.Experiment`
+        exp : Experiment
             the experiment where the features are coming from
 
         Returns
@@ -230,7 +230,7 @@ class Database(ABC):
         ----------
         annotation : dict
             The annotation to update (keys/values are database specific)
-        exp : :class:`.Experiment`, optional
+        exp : Experiment, optional
             The calour experiment from which the annotation is coming from
         Returns
         -------
@@ -283,7 +283,7 @@ class Database(ABC):
         ----------
         features : list of str
             the features to get the terms for
-        exp : :class:`.Experiment`, optional
+        exp : Experiment, optional
             not None to store results inthe exp (to save time for multiple queries)
 
         Returns
@@ -299,7 +299,7 @@ class Database(ABC):
 
         Parameters
         ----------
-        exp : :class:`.Experiment`
+        exp : Experiment
             The experiment to compare the features to
         features : list of str
             The features (from exp) to test for enrichmnt

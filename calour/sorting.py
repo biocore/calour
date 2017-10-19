@@ -65,7 +65,7 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         features sorted by center of mass
 
     '''
@@ -112,7 +112,7 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         With samples/features clustered (reordered)
 
     '''
@@ -150,7 +150,7 @@ def cluster_features(exp: Experiment, min_abundance=0, inplace=False, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         object with features filtered, log transformed and scaled.
 
     See Also
@@ -188,7 +188,7 @@ def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('sorting samples by field %s' % field)
     if axis == 0:
@@ -213,7 +213,7 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
     ----------
     axis : 0, 1, 's', or 'f'
         Apply ``key`` function on row (sort the samples) (0 or 's') or column (sort the features) (1 or 'f')
-    subset : ``None``, boolean mask, :class:`slice`, or int indices, optional
+    subset : None, boolean mask, :class:`slice`, or int indices, optional
         Sorting using only subset of the data. The subsetting occurs on the opposite of
         the specified axis. Default is to use the whole data set.
     key : str or callable
@@ -235,7 +235,7 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     if subset is None:
         data_subset = exp.data
@@ -314,7 +314,7 @@ def sort_samples(exp: Experiment, field, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment` with samples sorted according to values in field
+    Experiment with samples sorted according to values in field
     '''
     newexp = exp.sort_by_metadata(field=field, **kwargs)
     return newexp
@@ -337,7 +337,7 @@ def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with features sorted by abundance
     '''
     if subgroup is None:
@@ -367,7 +367,7 @@ def sort_ids(exp: Experiment, ids, axis=1, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with features/samples first according to the ids list and then the rest
     '''
     if axis == 0:

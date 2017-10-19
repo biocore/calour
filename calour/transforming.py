@@ -62,7 +62,7 @@ def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the normalized experiment
     '''
     if isinstance(total, bool):
@@ -95,7 +95,7 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the normalized experiment
     '''
     if not inplace:
@@ -118,7 +118,7 @@ def scale(exp: Experiment, axis=0, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('scaling the data, axis=%d' % axis)
     if not inplace:
@@ -143,7 +143,7 @@ def binarize(exp: Experiment, threshold=1, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('binarizing the data. threshold=%f' % threshold)
     if not inplace:
@@ -164,7 +164,7 @@ def log_n(exp: Experiment, n=1, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('log_n transforming the data, min. threshold=%f' % n)
     if not inplace:
@@ -199,7 +199,7 @@ def transform(exp: Experiment, steps=[], inplace=False, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with its data transformed
 
     '''
@@ -243,7 +243,7 @@ def normalize_by_subset_features(exp: Experiment, features, total=10000, negate=
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
@@ -278,7 +278,7 @@ def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The normalized experiment. Note that all features are normalized (including the ones with mean>=min_frac)
     '''
     comp_features = exp.filter_mean(min_frac)
@@ -301,7 +301,7 @@ def random_permute_data(exp: Experiment, normalize=True):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         With each feature shuffled independently
     '''
     newexp = exp.copy()
@@ -329,7 +329,7 @@ def center_log(exp: Experiment, delta=1, method=None, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The normalized experiment. Note that all features are clr normalized.
 
     See Also
@@ -370,7 +370,7 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The subsampled experiment.
 
     See Also

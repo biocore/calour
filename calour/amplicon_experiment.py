@@ -39,12 +39,12 @@ class AmpliconExperiment(Experiment):
 
     Parameters
     ----------
-    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+    data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : :class:`pandas.DataFrame`
+    sample_metadata : pandas.DataFrame
         The metadata on the samples
-    feature_metadata : :class:`pandas.DataFrame`
+    feature_metadata : pandas.DataFrame
         The metadata on the features
     description : str
         name of experiment
@@ -54,12 +54,12 @@ class AmpliconExperiment(Experiment):
 
     Attributes
     ----------
-    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+    data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : :class:`pandas.DataFrame`
+    sample_metadata : pandas.DataFrame
         The metadata on the samples
-    feature_metadata : :class:`pandas.DataFrame`
+    feature_metadata : pandas.DataFrame
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
@@ -95,7 +95,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        :class:`.AmpliconExperiment`
+        AmpliconExperiment
             With only features with matching taxonomy
         '''
         if 'taxonomy' not in exp.feature_metadata.columns:
@@ -134,7 +134,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        newexp : :class:`.Experiment`
+        newexp : Experiment
             filtered so contains only sequence present in exp and in the fasta file
         '''
         logger.debug('Filter by sequence using fasta file %s' % filename)
@@ -167,7 +167,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        :class:`.Experiment`
+        Experiment
             sorted by taxonomy
         '''
         logger.debug('sort features by taxonomies')
@@ -191,7 +191,7 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        :class:`.AmpliconExperiment` - with only samples with enough original reads
+        AmpliconExperiment - with only samples with enough original reads
         '''
         origread_field = '_calour_original_abundance'
         if origread_field not in exp.sample_metadata.columns:

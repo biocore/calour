@@ -55,7 +55,7 @@ def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0,
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with an added sample metadata field
     '''
     logger.debug('joining fields %s and %s into %s' % (field1, field2, newfield))
@@ -122,7 +122,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
 
     '''
     logger.debug('Merge data using field %s, agg %s' % (field, agg))
@@ -194,12 +194,12 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
 
     Parameters
     ----------
-    other : :class:`.Experiment`
+    other : Experiment
         The ``Experiment`` object to combine with the current one.  If
         both experiments contain the same feature metadata column and
         there is a conflict between the two, the value will be taken
         from exp and not from other.
-    field_name : ``None`` or str, optional
+    field_name : None or str, optional
         Name of the new ``sample_metdata`` field containing the experiment each sample is coming from.
         If it is None, don't add such column.
     prefixes : tuple of (str, str), optional
@@ -208,7 +208,7 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         A new experiment with samples from both experiments concatenated, features from both
         experiments merged.
 
