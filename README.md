@@ -30,12 +30,20 @@ pip install git+git://github.com/biocore/calour.git
 
 Install database interfaces (optional)
 --------------------------------------
-Install the [dbBact](http://www.dbbact.org) calour interface:
+* Install the [dbBact](http://www.dbbact.org) calour interface:
 ```
 pip install git+git://github.com/amnona/dbbact-calour
 ```
 
-For metabolomics, also install the [GNPS](http://gnps.ucsd.edu/) calour interface:
+
+* Install the [phenotype-database](https://doi.org/10.6084/m9.figshare.4272392) calour interface:
+
+(based on : [Hiding in Plain Sight: Mining Bacterial Species Records for Phenotypic Trait Information](http://msphere.asm.org/content/2/4/e00237-17) - Barberán et al. 2017)
+```
+pip install git+git://github.com/amnona/pheno-calour
+```
+
+* For metabolomics, also install the [GNPS](http://gnps.ucsd.edu/) calour interface:
 ```
 pip install git+git://github.com/amnona/gnps-calour
 ```
