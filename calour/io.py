@@ -283,11 +283,12 @@ def _read_metadata(ids, f, kwargs):
             # use first column as sample ID
             kwargs = default
         else:
-            kwargs.update(default)
+            if 'index_col' not in kwargs:
+                kwargs.update(default)
         metadata = pd.read_table(f, **kwargs)
         if metadata.index.dtype.char not in {'S', 'O'}:
             # if the index is not string or object, convert it to str
-            metadata.index = metadata.index.astype(str)
+            metadata.index = metadata.index.values.astype(str)
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
         if diff:
@@ -331,11 +332,13 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
         'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
-    sample_metadata_kwargs, feature_metadata_kwargs : dict or None (optional)
+    sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
         keyword arguments passing to :func:`pandas.read_table` when reading sample metadata
         or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
-        as int and parse the file as latin-8 instead of utf-8.
+        as int and parse the file as latin-8 instead of utf-8. By default, it assumes the first column in
+        the metadata files is sample/feature IDs and is read in as row index. To avoid this, please provide
+        {'index_col': False}.
     cls : ``class``, optional
         what class object to read the data into (:class:`.Experiment` by default)
     normalize : int or None

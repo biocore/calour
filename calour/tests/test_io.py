@@ -9,6 +9,7 @@
 from unittest import main
 from tempfile import mkdtemp
 from os.path import join
+from io import StringIO
 import shutil
 import logging
 
@@ -48,6 +49,17 @@ class IOTests(Tests):
         # test the sample metadata is loaded correctly
         if validate_sample_metadata:
             self.assertEqual(exp.sample_metadata['id'][spos], 12)
+
+    def test_read_metadata(self):
+        # test it's ok to read the IDs of numbers as str
+        f = StringIO('''SampleID	foo
+100.02	a
+100.03	b
+''')
+        try:
+            ca.io._read_metadata(['100.02', '100.03'], f, None)
+        except TypeError:
+            self.fail('Should not raise exception while reading metadata.')
 
     def test_read(self):
         # re-enable logging because it is disabled in setUp
