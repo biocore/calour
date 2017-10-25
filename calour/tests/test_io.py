@@ -53,12 +53,12 @@ class IOTests(Tests):
     def test_read_metadata(self):
         # test it's ok to read the IDs of numbers as str
         f = StringIO('''SampleID	foo
-100.02	a
-100.03	b
+0100.02	a
+100.030	b
 ''')
         try:
-            ca.io._read_metadata(['100.02', '100.03'], f, None)
-        except TypeError:
+            ca.io._read_metadata(['0100.02', '100.030'], f, None)
+        except:
             self.fail('Should not raise exception while reading metadata.')
 
     def test_read(self):

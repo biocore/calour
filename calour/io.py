@@ -277,18 +277,25 @@ def _read_metadata(ids, f, kwargs):
     :class:`pandas.DataFrame` of metadata
     '''
     # load the sample/feature metadata file
-    if f is not None:
-        default = {'index_col': 0}
+    if f is None:
+        metadata = pd.DataFrame(index=ids)
+    else:
         if kwargs is None:
-            # use first column as sample ID
-            kwargs = default
+            kwargs = {}
+        # the following code force the read the index_col as string
+        # by reading it as a normal column and specify its dtype and then
+        # setting it as index. There seems no better solution
+        if 'index_col' in kwargs:
+            index_col = kwargs.pop('index_col')
         else:
-            if 'index_col' not in kwargs:
-                kwargs.update(default)
+            index_col = 0
+        if 'dtype' in kwargs:
+            kwargs['dtype'][index_col] = str
+        else:
+            kwargs['dtype'] = {index_col: str}
+
         metadata = pd.read_table(f, **kwargs)
-        if metadata.index.dtype.char not in {'S', 'O'}:
-            # if the index is not string or object, convert it to str
-            metadata.index = metadata.index.values.astype(str)
+        metadata.set_index(metadata.columns[index_col], inplace=True)
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
         if diff:
@@ -298,8 +305,6 @@ def _read_metadata(ids, f, kwargs):
             logger.warning('These have data but do not have metadata: %r' % diff)
         # reorder the id in metadata to align with biom
         metadata = metadata.loc[ids, ]
-    else:
-        metadata = pd.DataFrame(index=ids)
     return metadata
 
 
