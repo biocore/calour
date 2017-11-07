@@ -54,7 +54,9 @@ def stdmeandiff(data, labels):
     mean1 = np.mean(data[:, labels == 1], axis=1)
     sd0 = np.std(data[:, labels == 0], axis=1, ddof=1)
     sd1 = np.std(data[:, labels == 1], axis=1, ddof=1)
-    tstat = (mean1 - mean0) / (sd1 + sd0)
+    sdsum = sd0 + sd1
+    sdsum[sdsum==0] = 1
+    tstat = (mean1 - mean0) / sdsum
     return tstat
 
 

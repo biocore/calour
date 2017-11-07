@@ -305,7 +305,6 @@ def get_config_sections(config_file_name=None):
         config_file_name = get_config_file()
     config = configparser.ConfigParser()
     config.read(config_file_name)
-
     return config.sections()
 
 
