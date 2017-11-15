@@ -29,7 +29,8 @@ Try to run the command:
 pip install biom-format
 ```
 If it fails (Error and then red colored text), it means you need to install the Microsoft Build Tools 2015 as follows:
-go to [http://landinghub.visualstudio.com/visual-cpp-build-tools](http://landinghub.visualstudio.com/visual-cpp-build-tools), download "Build tools 2015", and run the installer. You can select all default options.
+
+go to [http://landinghub.visualstudio.com/visual-cpp-build-tools](http://landinghub.visualstudio.com/visual-cpp-build-tools), download "Build tools 2015", and run the installer (You can select all default options).
 
 Then retry:
 ```
