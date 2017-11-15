@@ -8,6 +8,9 @@ exploratory and interactive microbiome analysis based on heatmaps
 
 Install
 =======
+
+Note: these installation instructions are for Mac/Unix. For Windows installation instructions [click here](https://github.com/biocore/calour/installation-pc.md)
+
 Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment for calour:
 ```
 conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn statsmodels
