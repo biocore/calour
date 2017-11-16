@@ -385,8 +385,19 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     if fmd is not None:
         # combine it with the feature metadata
+        renames={}
+        for ccol in fmd.columns:
+            print('-'+ccol)
+            if ccol in feature_metadata.columns:
+                renames[ccol] = ccol+'_biom'
+            if len(renames) > 0:
+                print(renames)
+                print(fmd.columns)
+                fmd.rename(columns=renames, inplace=True)
+                print(fmd.columns)
         feature_metadata = pd.concat([feature_metadata, fmd], axis=1)
 
+    print(feature_metadata.columns)
     # init the experiment metadata details
     exp_metadata['data_file'] = data_file
     exp_metadata['data_md5'] = get_data_md5(data)
