@@ -384,17 +384,14 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
 
     if fmd is not None:
-        # combine it with the feature metadata
+        # rename columns in biom table if exist in feature metadata file
         renames={}
         for ccol in fmd.columns:
-            print('-'+ccol)
             if ccol in feature_metadata.columns:
                 renames[ccol] = ccol+'_biom'
             if len(renames) > 0:
-                print(renames)
-                print(fmd.columns)
                 fmd.rename(columns=renames, inplace=True)
-                print(fmd.columns)
+        # combine it with the feature metadata
         feature_metadata = pd.concat([feature_metadata, fmd], axis=1)
 
     print(feature_metadata.columns)
