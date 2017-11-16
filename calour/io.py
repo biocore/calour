@@ -385,7 +385,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     if fmd is not None:
         # rename columns in biom table if exist in feature metadata file
-        renames={}
+        renames = {}
         for ccol in fmd.columns:
             if ccol in feature_metadata.columns:
                 renames[ccol] = ccol+'_biom'
