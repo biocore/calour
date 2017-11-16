@@ -49,7 +49,7 @@ Try to run the command:
 pip install git+git://github.com/biocore/calour.git
 ```
 
-If if fails, it probably means you don't have git commands installed. Do the following:
+If it fails, it probably means you don't have git commands installed. Do the following:
 Get git for windows from: [https://git-for-windows.github.io/](https://git-for-windows.github.io/)
 
 (use windows default console)
