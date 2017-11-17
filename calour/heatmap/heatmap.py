@@ -94,8 +94,10 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
     property, the length of each tick label.
 
     '''
+    ticklabels = _truncate_middle(ticklabels, ticklabel_len)
+
     ticks = _transition_index(ticklabels)
-    tick_pos, tick_val = zip(*ticks)
+    tick_pos, tick_lab = zip(*ticks)
 
     axis = getattr(ax, which + 'axis')
 
@@ -119,8 +121,9 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
 
         # set tick/label at the middle of each sample group
         axis.set_ticks(tick_pos[:-1] + (tick_pos[1:] - tick_pos[:-1]) / 2)
-        axis.set_ticklabels(_truncate_middle(tick_val, ticklabel_len))
+        axis.set_ticklabels(tick_lab)
     else:
+        print(n)
         def format_fn(tick_val, tick_pos):
             # cf http://matplotlib.org/gallery/ticks_and_spines/tick_labels_from_values.html
             if 0 <= tick_val < n:
@@ -291,7 +294,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             ticklabels = exp.sample_metadata[sample_field]
         except KeyError:
             raise ValueError('Sample field %r not in sample metadata' % sample_field)
-        _set_axis_ticks(ax, 'x', ticklabels, xticks_max, numcols, xticklabel_kwargs, xticklabel_len)
+        # numrows instead of numcols because it is transposed
+        _set_axis_ticks(ax, 'x', ticklabels, xticks_max, numrows, xticklabel_kwargs, xticklabel_len)
         ax.set_xlabel(sample_field)
 
     # plot y tick labels dynamically
@@ -302,7 +306,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             ticklabels = exp.feature_metadata[feature_field]
         except KeyError:
             raise ValueError('Feature field %r not in feature metadata' % feature_field)
-        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numrows, yticklabel_kwargs, yticklabel_len)
+        # numcols instead of numrows because it is transposed
+        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numcols, yticklabel_kwargs, yticklabel_len)
         ax.set_ylabel(feature_field)
 
     # set the mouse hover string to the value of abundance (in normal scale)
