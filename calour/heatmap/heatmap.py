@@ -123,7 +123,6 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
         axis.set_ticks(tick_pos[:-1] + (tick_pos[1:] - tick_pos[:-1]) / 2)
         axis.set_ticklabels(tick_lab)
     else:
-        print(n)
         def format_fn(tick_val, tick_pos):
             # cf http://matplotlib.org/gallery/ticks_and_spines/tick_labels_from_values.html
             if 0 <= tick_val < n:
