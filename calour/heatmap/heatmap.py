@@ -183,10 +183,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
     cax : :class:`matplotlib.axes.Axes`, optional
-        plot a legend colorbar for the heatmap in the cax; no legend if ``None``
+        The axes where a legend colorbar for the heatmap is plotted.
     ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
-        axes to plot heatmap into the axes
+        axes to plot the heatmap
 
     Returns
     -------
