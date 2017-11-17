@@ -394,7 +394,6 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         # combine it with the feature metadata
         feature_metadata = pd.concat([feature_metadata, fmd], axis=1)
 
-    print(feature_metadata.columns)
     # init the experiment metadata details
     exp_metadata['data_file'] = data_file
     exp_metadata['data_md5'] = get_data_md5(data)
