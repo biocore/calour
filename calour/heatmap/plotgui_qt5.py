@@ -38,10 +38,16 @@ class PlotGUI_QT5(PlotGUI):
         self.app = app
         if not hasattr(app, 'references'):
             # store references to all the windows
+            logger.debug('creating references set')
             app.references = set()
         # create app window
         self.app_window = ApplicationWindow(self)
+        # add the window reference to the app references list.
+        # this is in order to prevent garbage collection that will lead
+        # to closing of the window.
+        # the reference is removed from the list in the window closeEvent handler.
         app.references.add(self.app_window)
+        logger.debug('app window references: %r' % app.references)
         self.app_window.setWindowTitle("Calour")
         self._set_figure(self.app_window.plotfigure, kwargs['tree_size'])
 
@@ -55,13 +61,8 @@ class PlotGUI_QT5(PlotGUI):
             self.app_window.raise_()
             # run the event loop
             self.app.exec_()
-        finally:
-            # clean up when the qt app is closed
-            if self.app_window in self.app.references:
-                logger.debug('removing window from app window list')
-                self.app.references.remove(self.app_window)
-            else:
-                logger.debug('window not in app window list. Not removed')
+        except:
+            logger.warning('Error opening Qt5 window')
 
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
@@ -265,6 +266,16 @@ class ApplicationWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)
 
     def fileQuit(self):
+        # remove the window from the app list - memory can be cleared
+        app = QtCore.QCoreApplication.instance()
+        if app is not None:
+            if self in app.references:
+                logger.debug('removing window from app window list')
+                app.references.remove(self)
+            else:
+                logger.warn('window not in app window list. Not removed')
+        else:
+            logger.warn('App not found - not removing window from list')
         self.close()
 
     def closeEvent(self, ce):
