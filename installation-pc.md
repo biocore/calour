@@ -39,7 +39,7 @@ pip install biom-format
 
 Install scikit-bio dependency:
 ```
-conda install -c biocore biom-format scikit-bio
+pip install scikit-bio
 ```
 
 Install calour
