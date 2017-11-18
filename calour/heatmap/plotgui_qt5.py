@@ -45,7 +45,8 @@ class PlotGUI_QT5(PlotGUI):
         # add the window reference to the app references list.
         # this is in order to prevent garbage collection that will lead
         # to closing of the window.
-        # the reference is removed from the list in the window closeEvent handler.
+        # the reference is removed from the list in the window closeEvent handler
+        # (called when the window is closed)
         app.references.add(self.app_window)
         logger.debug('app window references: %r' % app.references)
         self.app_window.setWindowTitle("Calour")
@@ -266,7 +267,7 @@ class ApplicationWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)
 
     def fileQuit(self):
-        # remove the window from the app list - memory can be cleared
+        # remove the window from the app list - memory can be cleared.
         app = QtCore.QCoreApplication.instance()
         if app is not None:
             if self in app.references:
@@ -279,6 +280,10 @@ class ApplicationWindow(QMainWindow):
         self.close()
 
     def closeEvent(self, ce):
+        # called when the window is closed.
+        # in that case, we need to remove the reference to the window from the app
+        # window list, so it will be garbage collected now.
+        # happens in fileQuit() method.
         self.fileQuit()
 
     def annotation_list_right_clicked(self, QPos):
