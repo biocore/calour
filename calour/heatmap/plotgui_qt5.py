@@ -55,15 +55,12 @@ class PlotGUI_QT5(PlotGUI):
     def __call__(self):
         logger.debug('opening Qt5 window')
         super().__call__()
-        try:
-            self.app_window.show()
-            # move the window to the front
-            self.app_window.activateWindow()
-            self.app_window.raise_()
-            # run the event loop
-            self.app.exec_()
-        except:
-            logger.warning('Error opening Qt5 window')
+        self.app_window.show()
+        # move the window to the front
+        self.app_window.activateWindow()
+        self.app_window.raise_()
+        # run the event loop
+        self.app.exec_()
 
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
