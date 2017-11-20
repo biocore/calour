@@ -9,7 +9,7 @@ exploratory and interactive microbiome analysis based on heatmaps
 Install
 =======
 
-Note: these installation instructions are for Mac/Unix. For Windows installation instructions [click here](https://github.com/amnona/calour/blob/calour-pc-install/installation-pc.md)
+Note: these installation instructions are for Mac/Unix. For Windows installation instructions [click here](https://github.com/biocore/calour/blob/calour-pc-install/installation-pc.md)
 
 Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment for calour:
 ```
@@ -85,6 +85,6 @@ Jupyter
 Notebook](https://github.com/biocore/calour/blob/master/notebooks/demo.ipynb).
 A real use case of Calour on a real microbiome data set is also shown
 in [this Jupyter
-Notebook](https://github.com/biocore/calour/blob/master/notebooks/.ipynb).
+Notebook](https://github.com/biocore/calour/blob/master/notebooks/moving-picture/readme.ipynb).
 
 
