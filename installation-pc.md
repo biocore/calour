@@ -1,35 +1,67 @@
-CALOUR
-======
+CALOUR installation instructions for windows 10
+===============================================
 
-[![Build Status](https://travis-ci.org/biocore/calour.png?branch=master)](https://travis-ci.org/biocore/calour)
-[![Coverage Status](https://coveralls.io/repos/github/biocore/calour/badge.svg?branch=master)](https://coveralls.io/github/biocore/calour?branch=master)
+Install miniconda (if already installed - skip this step):
+----------------------------------------------------------
+Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3.6 64 bit exe installer, and run it.
 
-exploratory and interactive microbiome analysis based on heatmaps
+You can select all the default options in the installer.
 
-Install
-=======
-
-Note: these installation instructions are for Mac/Unix. For Windows installation instructions [click here](https://github.com/amnona/calour/blob/calour-pc-install/installation-pc.md)
+Create the Calour conda environment
+-----------------------------------
+In the windows start menu, select "anaconda prompt". You will get a command prompt.
 
 Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment for calour:
 ```
 conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn statsmodels
 ```
+(answer 'y' to the installation question)
 
 and activate it using:
 ```
-source activate calour
+activate calour
 ```
 
-Install dependecies of biom-format and scikit-bio:
+Install biom-format
+-------------------
+Try to run the command:
 ```
-conda install -c biocore biom-format scikit-bio
+pip install biom-format
+```
+If it fails (Error and then red colored text), it means you need to install the Microsoft Build Tools 2015 as follows:
+
+go to [http://landinghub.visualstudio.com/visual-cpp-build-tools](http://landinghub.visualstudio.com/visual-cpp-build-tools), download "Build tools 2015", and run the installer (You can select all default options).
+
+Then retry:
+```
+pip install biom-format
 ```
 
-Install calour:
+Install scikit-bio dependency:
+```
+pip install scikit-bio
+```
+
+Install calour
+--------------
+Try to run the command:
 ```
 pip install git+git://github.com/biocore/calour.git
 ```
+
+If it fails, it probably means you don't have git commands installed. Do the following:
+Get git for windows from: [https://git-for-windows.github.io/](https://git-for-windows.github.io/)
+
+(use windows default console)
+
+then close the anaconda prompt window and re-open using the Start menu->"anaconda prompt"
+
+type:
+```
+activate calour
+pip install git+git://github.com/biocore/calour.git
+```
+
 
 Install database interfaces (optional)
 --------------------------------------
@@ -70,10 +102,24 @@ the GUI interface [EZCalour](https://github.com/amnona/EZCalour):
 pip install git+git://github.com/amnona/EZCalour
 ```
 
+Running Calour
+==============
+From the Start menu, select "anaconda prompt". In the command prompt, type:
+```
+activate calour
+```
+To use calour in a [jupyter notebook](http://jupyter.org/), type:
+```
+jupyter notebook
+```
 
-Use Calour
-==========
+To use the calour GUI, type:
+```
+ezcalour.py
+```
 
+Using Calour
+============
 Full documentation is located
 [here](http://biocore.github.io/calour/). One strength of Calour is
 that users can interactivelly explore the data patterns on the
@@ -86,5 +132,3 @@ Notebook](https://github.com/biocore/calour/blob/master/notebooks/demo.ipynb).
 A real use case of Calour on a real microbiome data set is also shown
 in [this Jupyter
 Notebook](https://github.com/biocore/calour/blob/master/notebooks/.ipynb).
-
-

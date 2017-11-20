@@ -303,9 +303,10 @@ def get_config_sections(config_file_name=None):
     '''
     if config_file_name is None:
         config_file_name = get_config_file()
+    logger.debug('getting sections from config file %s' % config_file_name)
     config = configparser.ConfigParser()
     config.read(config_file_name)
-
+    logger.debug('found sections: %r' % config.sections())
     return config.sections()
 
 
@@ -328,6 +329,7 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
     value : str
         value of the key or fallback if file/section/key does not exist
     '''
+    logger.debug('get_config_value for key %s' % key)
     if config_file_name is None:
         config_file_name = get_config_file()
 
