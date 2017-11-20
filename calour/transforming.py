@@ -37,7 +37,7 @@ from collections import defaultdict
 
 import numpy as np
 from sklearn import preprocessing
-from skbio.stats.composition import clr, centralize
+from skbio.stats.composition import clr, centralize as skbio_centralize
 from skbio.stats import subsample_counts
 
 from .experiment import Experiment
@@ -314,16 +314,16 @@ def random_permute_data(exp: Experiment, normalize=True):
 
 
 @Experiment._record_sig
-def center_log(exp: Experiment, delta=1, method=None, inplace=False):
+def center_log(exp: Experiment, method=lambda matrix: matrix + 1, centralize=False, inplace=False):
     """ Performs a clr transform to normalize each sample.
 
     Parameters
     ----------
-    delta : numeric, optional
-        cap the tiny values and then clr transform the data.
     method : callable, optional
         An optional function to specify how the pseudocount method should be
-        handled.
+        handled (to deal with zeros in the matrix)
+    centralize : bool, optional
+        centralize feature-wise to zero or not
     inplace : bool, optional
         False (default) to create a new experiment, True to normalize in place
 
@@ -337,15 +337,15 @@ def center_log(exp: Experiment, delta=1, method=None, inplace=False):
     skbio.stats.composition.clr
     skbio.stats.composition.centralize
     """
-    logger.debug('clr transforming the data, min. threshold=%f' % delta)
+    logger.debug('clr transforming the data')
     if not inplace:
         exp = deepcopy(exp)
     if exp.sparse:
         exp.sparse = False
-    if method is None:
-        def method(x): return x + delta
-
-    exp.data = clr(centralize(method(exp.data)))
+    if centralize:
+        exp.data = clr(skbio_centralize(method(exp.data)))
+    else:
+        exp.data = clr(method(exp.data))
     return exp
 
 
