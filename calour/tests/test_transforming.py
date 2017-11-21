@@ -83,19 +83,21 @@ class TestTransforming(Tests):
         self.assertIs(obs, self.test2)
 
     def test_center_log(self):
+        dat = np.array(
+            [[10, 20, 1, 20, 5, 100, 844, 100],
+             [10, 20, 2, 19, 0, 100, 849, 200],
+             [10, 20, 3, 18, 5, 100, 844, 300],
+             [10, 20, 4, 17, 0, 100, 849, 400],
+             [10, 20, 5, 16, 4, 100, 845, 500],
+             [10, 20, 6, 15, 0, 100, 849, 600],
+             [10, 20, 7, 14, 3, 100, 846, 700],
+             [10, 20, 8, 13, 0, 100, 849, 800],
+             [10, 20, 9, 12, 7, 100, 842, 900]]) + 1
         obs = self.test2.center_log()
-        exp = clr(centralize(
-            np.array(
-                [[10, 20, 1, 20, 5, 100, 844, 100],
-                 [10, 20, 2, 19, 0, 100, 849, 200],
-                 [10, 20, 3, 18, 5, 100, 844, 300],
-                 [10, 20, 4, 17, 0, 100, 849, 400],
-                 [10, 20, 5, 16, 4, 100, 845, 500],
-                 [10, 20, 6, 15, 0, 100, 849, 600],
-                 [10, 20, 7, 14, 3, 100, 846, 700],
-                 [10, 20, 8, 13, 0, 100, 849, 800],
-                 [10, 20, 9, 12, 7, 100, 842, 900]]) + 1
-            ))
+        exp = clr(dat)
+        assert_array_almost_equal(exp, obs.data)
+        obs = self.test2.center_log(centralize=True)
+        exp = clr(centralize(dat))
         assert_array_almost_equal(exp, obs.data)
 
     def test_normalize(self):
