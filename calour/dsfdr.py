@@ -55,7 +55,9 @@ def stdmeandiff(data, labels):
     sd0 = np.std(data[:, labels == 0], axis=1, ddof=1)
     sd1 = np.std(data[:, labels == 1], axis=1, ddof=1)
     sdsum = sd0 + sd1
-    sdsum[sdsum==0] = 1
+    # if feature has identical values in all samples in each group, std is 0
+    # fix it to 1 so won't divide by 0 (mean/std is undefined)
+    sdsum[sdsum == 0] = 1
     tstat = (mean1 - mean0) / sdsum
     return tstat
 
