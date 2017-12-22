@@ -102,6 +102,22 @@ class PlotTests(Tests):
         self.assertListEqual(steps, [5, 3, 2])
         assert_array_almost_equal(frac, np.array([0, 0.25, 4/7]))
 
+    def test_plot_scatter_matrix(self):
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=100)
+        fids = ['AA', 'AT', 'AG', 'AC']
+        fig = self.test2.plot_scatter_matrix('ori.order', fids, ncols=2, nrows=2)
+        self.assertEqual(len(fig.axes), 4)
+        for ax, fid in zip(fig.axes, fids):
+            # check the trend line
+            self.assertEqual(len(ax.lines), 1)
+            xobs = ax.lines[0].get_data()[0]
+            xexp = self.test2.sample_metadata['ori.order'].values
+            assert_array_almost_equal(xobs, xexp)
+            yobs = ax.get_children()[0].get_offsets()[:,1]
+            yexp = self.test2[:, fid]
+            assert_array_almost_equal(yobs, yexp)
+
+
 
 if __name__ == '__main__':
     main()

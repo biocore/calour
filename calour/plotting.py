@@ -29,6 +29,7 @@ from logging import getLogger
 from itertools import cycle
 
 import numpy as np
+from scipy import stats
 
 from . import Experiment
 from .util import _to_list, compute_prevalence
@@ -164,7 +165,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
 
 def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
-    '''Plot the number of shared features against the number of samples subsampled.
+    '''Plot the number of shared features against the number of samples.
 
     To see if there is a core feature set shared across most of the samples.
 
@@ -173,6 +174,10 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     across mammalian phylogeny and within humans. Science 332, 970–974
     (2011).
 
+    .. warning:: The samples should be normalized by rarefaction
+    instead of other normalization methods. Otherwise, the samples
+    with higher sequencing depth will artificially share more OTUs
+    with each other.
 
     Parameters
     ----------
@@ -421,4 +426,52 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.01, wspace=0.01)
+    return fig
+
+
+def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
+                       transform_y=None, transform_x=None,
+                       ncols=5, nrows=6, figsize=(10, 12)):
+    '''This plots an array of scatter plots between each features against the specified sample metadata.
+
+    For each panel of scatter plot, the x-axis is the co-variates
+    specified by sample metadata field; the y-axis is the feature
+    abundance.
+
+    Parameters
+    ----------
+    field : str
+        the column in the sample metadata to plot against
+    feature_ids : object
+        the IDs of features
+    ncols, nrows : int
+        plot nrows x ncols number of scatter plots
+    figsize : tuple of int
+        the size of the figure passing to :func:`matplotlib.pyplot.subplots`.
+
+    '''
+    from matplotlib import pyplot as plt
+
+    x = exp.sample_metadata[field].values
+    if transform_x is not None:
+        x = transform_x(x)
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+    for ax, fid in zip(axs.flat, feature_ids):
+        # y is 1d np array
+        y = exp[:, fid]
+        if transform_y is not None:
+            y = transform_y(y)
+        r, p = stats.spearmanr(x, y)
+        if r > 0:
+            c = 'green'
+        else:
+            c = 'red'
+        fit = np.polyfit(x, y, deg=1)
+        ax.plot(x, fit[0] * x + fit[1], color=c)
+        ax.scatter(x, y, alpha=0.2, color=c)
+        ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
+        if title_field is not None:
+            title = exp.feature_metadata.loc[fid, title_field]
+            ax.set_title(title)
+    fig.tight_layout()
     return fig
