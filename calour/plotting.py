@@ -29,6 +29,7 @@ from logging import getLogger
 from itertools import cycle
 
 import numpy as np
+import pandas as pd
 
 from . import Experiment
 from .util import _to_list, compute_prevalence
@@ -125,7 +126,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None):
+def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None, score_method='all_mean'):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -142,6 +143,17 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         list of experiment ids to ignore when doing the enrichment_analysis.
         Useful when you don't want to get terms from your own experiment analysis.
         For dbbact it is a list of int
+    score_method : str (optional)
+        The scoring function used to give each term the score (for each feature).
+        This parameter manages how the different annotations (such as 'common'/'high freq')
+        from different experiments are used to give each term the score (which is later
+        used as the statistic for the enrichment analysis).
+        Options are:
+        'all_mean' (default) : for each experiment, for each term use the mean of the term score over
+        all annotations cotaining this term (from the experiment). This means if we see the term in
+        a lot of annotations from the same experiment, we treat it the same as if we see it in an experiment
+        with only one annotation
+        'sum' : treat each annotation independently
 
     Returns
     -------
@@ -155,11 +167,15 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     positive = exp.feature_metadata.index.values[positive.values]
 
     # get the enrichment
-    enriched = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp)
+    enriched, term_features, features = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp, score_method=score_method)
+    # features=pd.DataFrame({'sequence': features}, index=features)
+    newexp = Experiment(term_features,sample_metadata=features, feature_metadata=enriched)
 
     # and plot
     ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
     enriched = enriched.sort_values('odif')
+
+    return newexp
     return ax2, enriched
 
 

@@ -320,3 +320,22 @@ class Database(ABC):
         '''
         logger.debug('Generic function for enrichment')
         return None
+
+    def show_term_details(self, term, exp, features, *kargs, **kwargs):
+        '''
+        Show details about the specific term in the database and in what features it appears
+
+        Parameters
+        ----------
+        term : str
+            The term to get the details for
+        exp : :class:`.Experiment`
+            The calour experiment for showing the term details in
+        features: list of str
+            The features in the experiment for which to show the term details
+
+        Returns
+        -------
+        '''
+        logger.debug('Generic function for term details')
+        return None

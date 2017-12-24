@@ -61,9 +61,9 @@
       var yaxiswidth = 100;
       var xaxisheight = 20;
 
-      // fix for safari image smoothing interpolation - we want it pixelated!
-      var ctx = document.getElementById('canvas').getContext('2d');
-      ctx.webkitImageSmoothingEnabled = false;
+      // // fix for safari image smoothing interpolation - we want it pixelated!
+      // var ctx = document.getElementById('canvas').getContext('2d');
+      // ctx.webkitImageSmoothingEnabled = false;
 
       // set the title
       $('#field_name').html(field_name);
@@ -369,7 +369,7 @@
         $('#sampleid').html(csamp);
         // Get dbBact annotations for selection
         $.ajax({
-          url: 'http://dbbact.org/REST-API/sequences/get_string_annotations',
+          url: 'http://api.dbbact.org/sequences/get_string_annotations',
           type: 'POST',
           data: JSON.stringify({'sequence': cid}),
           dataType: 'json',
