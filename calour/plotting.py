@@ -29,7 +29,6 @@ from logging import getLogger
 from itertools import cycle
 
 import numpy as np
-import pandas as pd
 
 from . import Experiment
 from .util import _to_list, compute_prevalence
@@ -172,7 +171,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     # Create an new experiment where features are the enriched terms, and samples are the features
     # The newexp.feature_metadata contains the 'odif', 'pval' fields for each term
-    newexp = Experiment(term_features,sample_metadata=features, feature_metadata=enriched)
+    newexp = Experiment(term_features, sample_metadata=features, feature_metadata=enriched)
 
     # and plot
     ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)

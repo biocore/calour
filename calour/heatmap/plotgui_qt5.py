@@ -388,7 +388,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     ccolor = 'red'
                 cname = cres['term']
-                dblclick_data={}
+                dblclick_data = {}
                 dblclick_data['database'] = cdb
                 dblclick_data['term'] = cname
                 dblclick_data['exp'] = exp
