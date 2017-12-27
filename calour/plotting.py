@@ -157,7 +157,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     Returns
     -------
-    tuple of :class:`matplotlib.axes.Axes`, result of :func:`.database.enrichment`
+    tuple of :class:`matplotlib.axes.Axes`, :class:`.Experiment` with terms as features, (original features) as samples
     '''
     if '_calour_diff_abundance_effect' not in exp.feature_metadata.columns:
         raise ValueError('Experiment does not seem to be the results of differential_abundance().')
@@ -169,14 +169,16 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     # get the enrichment
     enriched, term_features, features = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp, score_method=score_method)
     # features=pd.DataFrame({'sequence': features}, index=features)
+
+    # Create an new experiment where features are the enriched terms, and samples are the features
+    # The newexp.feature_metadata contains the 'odif', 'pval' fields for each term
     newexp = Experiment(term_features,sample_metadata=features, feature_metadata=enriched)
 
     # and plot
     ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
-    enriched = enriched.sort_values('odif')
+    # enriched = enriched.sort_values('odif')
 
-    return newexp
-    return ax2, enriched
+    return ax2, newexp
 
 
 def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
