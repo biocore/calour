@@ -12,10 +12,11 @@ from PyQt5.QtCore import Qt
 
 from .plotgui import PlotGUI
 
-
 logger = getLogger(__name__)
 
 
+@ds.get_sectionsf('PlotGUI_QT5')
+@ds.dedent
 class PlotGUI_QT5(PlotGUI):
     '''QT5 version of plot winfow GUI
 
@@ -27,6 +28,17 @@ class PlotGUI_QT5(PlotGUI):
     app : QT5 App created
     app_window : Windows belonging to the QT5 App
     databases :
+
+    oogi
+    ----
+    %(pita.parameters)s
+
+    kwargs
+    ------
+    %(PlotGUI.parameters)s
+    %(pita.parameters)s
+
+    agvania
     '''
     def __init__(self, *kargs, **kwargs):
         super().__init__(*kargs, **kwargs)
