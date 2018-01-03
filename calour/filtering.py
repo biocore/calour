@@ -37,6 +37,8 @@ from scipy.sparse import issparse
 
 from .experiment import Experiment
 from .util import _to_list
+from .doc_init import ds
+
 
 logger = getLogger(__name__)
 
@@ -178,6 +180,8 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
+@ds.get_sectionsf('filter_by_data')
+@ds.dedent
 @Experiment._record_sig
 def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
@@ -187,15 +191,10 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     predicate : str or callable
         The callable accepts a list of numeric and return a bool. Alternatively
         it also accepts the following strings:
-
         * 'sum_abundance': calls ``_sum_abundance``,
-
         * 'freq_ratio': calls ``_freq_ratio``,
-
         * 'unique_cut': calls ``_unique_cut``,
-
         * 'mean_abundance': calls ``_mean_abundance``,
-
         * 'prevalence': calls ``_prevalence``
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
@@ -412,6 +411,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
                               negate=negate, inplace=inplace)
 
 
+@ds.dedent
 @Experiment._record_sig
 def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
@@ -421,6 +421,13 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     ----------
     min_abundance : numeric
         The minimal total abundance for each feature over all samples
+
+    Other parameters
+    ----------------
+    **kwargs : dict, optional
+        keyword arguments passing to :func:`filter_by_data` function.
+        These include:
+    %(filter_by_data.parameters)s
 
     Returns
     -------

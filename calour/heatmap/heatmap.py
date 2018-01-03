@@ -147,8 +147,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticks_max=10, yticks_max=30,
             clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
             title=None, rect=None, cax=None, ax=None):
-    '''
-    Plot a heatmap for the experiment.
+    '''Plot a heatmap for the experiment.
 
     Plot either a simple heatmap for the experiment with features in row
     and samples in column.
@@ -498,9 +497,13 @@ def plot(exp: Experiment, title=None,
     databases : list of str or ``None``
         a list of databases to access or add annotation
         ``None`` (default) to use the default field based on the experiment.
+
+    Other parameters
+    ----------------
     heatmap_kwargs : dict, optional
-        keyword arguments passing to :func:`heatmap` function. These include:
-        %(heatmap.parameters)s
+        keyword arguments passing to :func:`heatmap` function.
+        These include:
+    %(heatmap.parameters)s
 
     Returns
     -------

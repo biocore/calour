@@ -8,16 +8,36 @@ Calour documentation
 
 Calour is a python module for processing, analysis and interactive exploration of microbiome (and other matrix form data).
 We recommend using calour inside a **jupyter notebook** environment.
+
 For a full graphical user interface (point and click - no python skills needed), you can use **EZCalour**
 
 The full per-function python API documentation is available **here**
+
 
 Installing Calour
 -----------------
 Installation instructions are available for **mac/linux** and for **windows**
 
-Using Calour
-------------
+General Calour concepts
+-----------------------
+
+Usage/Analysis examples
+-----------------------
+
+Microbiome
+----------
+   * Loading and processing a simple microbiome experiment
+   * Differential abundance analysis
+   * Using dbBact for advanced microbiome analysis
+   * Filtering and reordering
+   * Normalization
+   * Using databases
+
+Mass-Spec
+---------
+
+Gene expression
+---------------
 
 
 .. sectnum::
