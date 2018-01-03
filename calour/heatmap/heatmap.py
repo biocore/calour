@@ -498,12 +498,11 @@ def plot(exp: Experiment, title=None,
         a list of databases to access or add annotation
         ``None`` (default) to use the default field based on the experiment.
 
-    Other parameters
+    Other Parameters
     ----------------
     heatmap_kwargs : dict, optional
-        keyword arguments passing to :func:`heatmap` function.
-        These include:
-    %(heatmap.parameters)s
+        keyword arguments passing to :func:`heatmap` function. These include:
+%(heatmap.parameters)s
 
     Returns
     -------
