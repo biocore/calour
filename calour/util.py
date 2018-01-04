@@ -306,7 +306,6 @@ def get_config_sections(config_file_name=None):
     logger.debug('getting sections from config file %s' % config_file_name)
     config = configparser.ConfigParser()
     config.read(config_file_name)
-    logger.debug('found sections: %r' % config.sections())
     return config.sections()
 
 
