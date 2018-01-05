@@ -234,6 +234,8 @@ class ApplicationWindow(QMainWindow):
         lbox_buttons_bottom.addWidget(self.w_save_fasta)
         self.w_enrichment = QPushButton(text='Enrichment')
         lbox_buttons_bottom.addWidget(self.w_enrichment)
+        self.w_save_fig = QPushButton(text='Save Fig')
+        lbox_buttons_bottom.addWidget(self.w_save_fig)
         userside.addLayout(lbox_buttons_bottom)
 
         # the heatmap on the left side
@@ -257,6 +259,7 @@ class ApplicationWindow(QMainWindow):
         self.w_sequence.clicked.connect(self.copy_sequence)
         self.w_save_fasta.clicked.connect(self.save_fasta)
         self.w_enrichment.clicked.connect(self.enrichment)
+        self.w_save_fig.clicked.connect(self.save_fig)
         self.w_sfield.currentIndexChanged.connect(self.info_field_changed)
         self.w_ffield.currentIndexChanged.connect(self.info_field_changed)
 
@@ -354,6 +357,14 @@ class ApplicationWindow(QMainWindow):
         seqs = self.gui.get_selected_seqs()
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, caption='Save selected seqs to fasta')
         self.gui.exp.save_fasta(str(filename), seqs)
+
+    def save_fig(self):
+        '''Save the figure to a pdf/svg/png.
+        Called from the Save Fig button in the gui.
+        '''
+        cfig = self.plotfigure
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, caption='Save figure', filter='PDF (*.pdf);;SVG (*.svg);; PNG (*.png)', initialFilter='PDF (*.pdf)')
+        cfig.savefig(str(filename))
 
     def enrichment(self):
         '''Get and display the list of enriched database terms for the selected features.
