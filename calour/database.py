@@ -103,7 +103,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     return exp
 
 
-def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
+def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
     '''Get the list of enriched annotation terms in features compared to all features in exp.
 
     Uses the database specific enrichment analysis method.
@@ -114,7 +114,7 @@ def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
         The features to test for enrichment (compared to all other features in exp)
     dbname : str
         the database to use for the annotation terms and enrichment analysis
-    *kargs, **kwargs
+    *args, **kwargs
         Additional database specific parameters
 
     Returns
@@ -136,7 +136,7 @@ def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
     db = _get_database_class(dbname, exp=exp)
     if not db.can_do_enrichment:
         raise ValueError('database %s does not support enrichment analysis' % dbname)
-    return db.enrichment(exp, features, *kargs, **kwargs)
+    return db.enrichment(exp, features, *args, **kwargs)
 
 
 class Database(ABC):
@@ -294,7 +294,7 @@ class Database(ABC):
         logger.debug('Generic function for get_feature_terms')
         return {}
 
-    def enrichment(self, exp, features, *kargs, **kwargs):
+    def enrichment(self, exp, features, *args, **kwargs):
         '''Get the list of enriched terms in features compared to all features in exp.
 
         Parameters
@@ -303,7 +303,7 @@ class Database(ABC):
             The experiment to compare the features to
         features : list of str
             The features (from exp) to test for enrichmnt
-        *kargs, **kwargs : additional dtabase specific parameters
+        *args, **kwargs : additional dtabase specific parameters
 
         Returns
         -------
@@ -321,7 +321,7 @@ class Database(ABC):
         logger.debug('Generic function for enrichment')
         return None
 
-    def show_term_details(self, term, exp, features, *kargs, **kwargs):
+    def show_term_details(self, term, exp, features, *args, **kwargs):
         '''
         Show details about the specific term in the database and in what features it appears
 

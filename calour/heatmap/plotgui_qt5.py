@@ -388,6 +388,11 @@ class ApplicationWindow(QMainWindow):
                 else:
                     ccolor = 'red'
                 cname = cres['term']
+                # For each enriched term, double clicking will display a heatmap
+                # where all annotations containing the term are the features,
+                # and bacteria (from the two compared groups) are the samples.
+                # This enables seeing where does the enrichment for this term come from.
+                # i.e. which bacteria are present in each annotation containing this term.
                 dblclick_data = {}
                 dblclick_data['database'] = cdb
                 dblclick_data['term'] = cname
