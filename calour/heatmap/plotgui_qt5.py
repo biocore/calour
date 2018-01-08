@@ -69,8 +69,8 @@ class PlotGUI_QT5(PlotGUI):
 
     def _update_info_labels(self, sid, fid, abd):
         self.app_window.w_abund.setText('{:.01f}'.format(abd))
-        self.app_window.w_fid.setText(fid)
-        self.app_window.w_sid.setText(sid)
+        self.app_window.w_fid.setText(str(fid))
+        self.app_window.w_sid.setText(str(sid))
         sample_field = str(self.app_window.w_sfield.currentText())
         self.app_window.w_sfield_val.setText(
             str(self.exp.sample_metadata[sample_field][self.current_select[0]]))
@@ -383,7 +383,7 @@ class ApplicationWindow(QMainWindow):
             if not cdb.can_do_enrichment:
                 continue
             logger.debug('Database: %s' % cdb.database_name)
-            enriched = cdb.enrichment(exp, group1_seqs, term_type='term')
+            enriched, term_feature_scores, efeatures = cdb.enrichment(exp, group1_seqs, term_type='term')
             # enriched = cdb.enrichment(exp, group1_seqs, term_type='annotation')
             logger.debug('Got %d enriched terms' % len(enriched))
             if len(enriched) == 0:
@@ -399,7 +399,18 @@ class ApplicationWindow(QMainWindow):
                 else:
                     ccolor = 'red'
                 cname = cres['term']
-                listwin.add_item('%s - effect %f, pval %f ' % (cname, cres['odif'], cres['pvals']), color=ccolor)
+                # For each enriched term, double clicking will display a heatmap
+                # where all annotations containing the term are the features,
+                # and bacteria (from the two compared groups) are the samples.
+                # This enables seeing where does the enrichment for this term come from.
+                # i.e. which bacteria are present in each annotation containing this term.
+                dblclick_data = {}
+                dblclick_data['database'] = cdb
+                dblclick_data['term'] = cname
+                dblclick_data['exp'] = exp
+                dblclick_data['features1'] = group1_seqs
+                dblclick_data['features2'] = list(group2_seqs)
+                listwin.add_item('%s - effect %f, pval %f ' % (cname, cres['odif'], cres['pvals']), color=ccolor, dblclick_data=dblclick_data)
             listwin.exec_()
 
     def double_click_annotation(self, item):
@@ -458,10 +469,12 @@ class SListWindow(QtWidgets.QDialog):
         for citem in listdata:
             self.w_list.addItem(citem)
 
+        self.w_list.itemDoubleClicked.connect(self.list_double_click)
+
         self.show()
         self.adjustSize()
 
-    def add_item(self, text, color='black'):
+    def add_item(self, text, color='black', dblclick_data=None):
         '''Add an item to the list
 
         Parameters
@@ -470,6 +483,8 @@ class SListWindow(QtWidgets.QDialog):
             the string to add
         color : str (optional)
             the color of the text to add
+        dblclick_function : function or None
+            the function to call when this item is double clicked (or None to ignore)
         '''
         item = QtWidgets.QListWidgetItem()
         item.setText(text)
@@ -482,4 +497,10 @@ class SListWindow(QtWidgets.QDialog):
         elif color == 'green':
             ccolor = QtGui.QColor(0, 155, 0)
         item.setForeground(ccolor)
+        item.setData(QtCore.Qt.UserRole, dblclick_data)
         self.w_list.addItem(item)
+
+    def list_double_click(self, item):
+        data = item.data(QtCore.Qt.UserRole)
+        if data is not None:
+            data['database'].show_term_details(data['term'], data['exp'], data['features1'], data['features2'])
