@@ -137,8 +137,10 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
             'dsfdr' : the discrete FDR control method
             'bhfdr' : Benjamini-Hochberg FDR method
             'byfdr' : Benjamini-Yekutielli FDR method
-            'filterBH' : Benjamini-Hochberg FDR method with filtering
-
+            'filterBH' : Benjamini-Hochberg FDR method following removal of all features
+                         with minimal possible p-value less than alpha (e.g. a feature
+                         that appears in only 1 sample can obtain a minimal p-value of 0.5
+                         and will therefore be removed when say alpha=0.1)
 
     Returns
     -------
