@@ -1,0 +1,21 @@
+name: calour-environment
+channels:
+  - conda-forge
+dependencies:
+  - python
+  -nose
+  -pep8
+  -flake8=3.3.0
+  -numpy
+  -scipy
+  -pyqt>=5
+  -pandas
+  -matplotlib
+  -scikit-learn
+  -scikit-bio>=0.5.1
+  -biom-format
+  -statsmodels
+  -ipywidgets
+  -numpydoc
+  -sphinx
+  -sphinx_bootstrap_theme
