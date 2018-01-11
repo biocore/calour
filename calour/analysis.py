@@ -128,10 +128,17 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
-    alpha : float
+    alpha : float (optional)
         the desired FDR control level
-    numperm : int
+    numperm : int (optional)
         number of permutations to perform
+    fdr_method : str (optional)
+        The method used to control the False Discovery Rate. options are:
+            'dsfdr' : the discrete FDR control method
+            'bhfdr' : Benjamini-Hochberg FDR method
+            'byfdr' : Benjamini-Yekutielli FDR method
+            'filterBH' : Benjamini-Hochberg FDR method with filtering
+
 
     Returns
     -------
