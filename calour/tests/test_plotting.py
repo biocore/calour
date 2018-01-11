@@ -113,10 +113,9 @@ class PlotTests(Tests):
             xobs = ax.lines[0].get_data()[0]
             xexp = self.test2.sample_metadata['ori.order'].values
             assert_array_almost_equal(xobs, xexp)
-            yobs = ax.get_children()[0].get_offsets()[:,1]
+            yobs = ax.get_children()[0].get_offsets()[:, 1]
             yexp = self.test2[:, fid]
             assert_array_almost_equal(yobs, yexp)
-
 
 
 if __name__ == '__main__':

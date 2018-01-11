@@ -430,8 +430,8 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
 
 def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
-                       transform_y=None, transform_x=None,
-                       ncols=5, nrows=6, figsize=(10, 12)):
+                        transform_x=None, transform_y=None,
+                        ncols=5, nrows=None, size=2, aspect=1):
     '''This plots an array of scatter plots between each features against the specified sample metadata.
 
     For each panel of scatter plot, the x-axis is the co-variates
@@ -442,20 +442,33 @@ def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
     ----------
     field : str
         the column in the sample metadata to plot against
-    feature_ids : object
+    feature_ids : list-like
         the IDs of features
+    transform_x, transform_y : callable
+        the transformation for values on x- and y-axis
     ncols, nrows : int
-        plot nrows x ncols number of scatter plots
-    figsize : tuple of int
-        the size of the figure passing to :func:`matplotlib.pyplot.subplots`.
-
+        plot nrows x ncols number of scatter plots. If nrows is None, then its value is determined
+        automatically by the-number-features / ncols
+    size : numeric
+        the height of each figure panel in inches
+    aspect : numeric
+        Aspect ratio of each figure panel, so that aspect * size gives its width
     '''
     from matplotlib import pyplot as plt
 
     x = exp.sample_metadata[field].values
     if transform_x is not None:
         x = transform_x(x)
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+    if nrows is None:
+        # get the ceiling of the division
+        nrows = -(-len(feature_ids) // ncols)
+        max_rows = 50
+        if nrows > max_rows:
+            raise ResourceWarning('There are over %d figure rows; it will be slow. '
+                                  'If you really want to plot this number of figures, '
+                                  'please explicitly specify it in the nrows function argument.''' % max_rows)
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols,
+                            figsize=(size * ncols * aspect, size * nrows))
     for ax, fid in zip(axs.flat, feature_ids):
         # y is 1d np array
         y = exp[:, fid]
