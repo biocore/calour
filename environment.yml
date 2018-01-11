@@ -1,6 +1,7 @@
 name: calour-environment
 channels:
   - conda-forge
+  - biocore
 dependencies:
   - python
   - nose
@@ -19,3 +20,5 @@ dependencies:
   - numpydoc
   - sphinx
   - sphinx_bootstrap_theme
+  - biom-format
+  - scikit-bio
