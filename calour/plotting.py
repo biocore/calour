@@ -72,7 +72,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green','red')):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -87,6 +87,11 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
     ax: :class:`matplotlib.axes.Axes` or ``None`` (optional)
         The axes to which to plot the figure. None (default) to create a new figure
+    lables: tuple of (str, str) or None (optional)
+        name for terms enriched in group1 or group2 respectively, or None to not show legend
+    colors: tuple of (str, str) or None (optional)
+        Colors for terms enriched in group1 or group2 respectively
+
 
     Returns
     -------
@@ -106,12 +111,12 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
     positive = np.min([np.sum(enriched['odif'].values > 0), max_show[0]])
     negative = np.min([np.sum(enriched['odif'].values < 0), max_show[1]])
     if negative + positive == 0:
-        print('No significantly enriched categories found')
+        logger.warn('No significantly enriched categories found')
         return ax
     if positive > 0:
-        ax.barh(np.arange(positive) + negative, evals[-positive:])
+        ax.barh(np.arange(positive) + negative, evals[-positive:], color=colors[0])
     if negative > 0:
-        ax.barh(np.arange(negative), evals[:negative])
+        ax.barh(np.arange(negative), evals[:negative], color=colors[1])
     use = np.zeros(len(enriched), dtype=bool)
     use[:positive] = True
     use[-negative:] = True
@@ -122,10 +127,12 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
     ax.set_yticks(np.arange(negative+positive))
     ax.set_yticklabels(ticks)
     ax.set_xlabel('effect size (positive is higher in group1')
+    if labels is not None:
+        ax.label(labels)
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None):
+def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None, colors=('green','red')):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -142,6 +149,8 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         list of experiment ids to ignore when doing the enrichment_analysis.
         Useful when you don't want to get terms from your own experiment analysis.
         For dbbact it is a list of int
+    colors: tuple of (str, str) or None (optional)
+        Colors for terms enriched in group1 or group2 respectively
 
     Returns
     -------
@@ -158,7 +167,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     enriched = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp)
 
     # and plot
-    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
+    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=('pita','lala'), colors=colors)
     enriched = enriched.sort_values('odif')
     return ax2, enriched
 
