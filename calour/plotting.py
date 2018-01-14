@@ -127,13 +127,14 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     ticks = [x[:max_len] for x in ticks]
     ax.set_yticks(np.arange(negative+positive))
     ax.set_yticklabels(ticks)
-    ax.set_xlabel('effect size (positive is higher in group1')
     if labels is not None:
-        ax.label(labels)
+        ax.set_xlabel('effect size (positive is higher in %s)' % labels[0])
+        ax.legend(labels)
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None, score_method='all_mean', colors=('green','red')):
+def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None,
+                                   score_method='all_mean', colors=('green','red'), show_legend=True):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -163,6 +164,8 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         'sum' : treat each annotation independently
     colors: tuple of (str, str) or None (optional)
         Colors for terms enriched in group1 or group2 respectively
+    show_legend: bool (optional)
+        True to show the color legend, False to hide it
 
     Returns
     -------
@@ -183,9 +186,20 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     # The newexp.feature_metadata contains the 'odif', 'pval' fields for each term
     newexp = Experiment(term_features, sample_metadata=features, feature_metadata=enriched)
 
+    # get the labels for the two groups
+    if show_legend:
+        labels=['group1', 'group2']
+        names1=exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] > 0]
+        if len(names1) > 0:
+            labels[0] = names1.values[0]
+        names2=exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] < 0]
+        if len(names2) > 0:
+            labels[1] = names2.values[0]
+    else:
+        labels = None
+
     # and plot
-    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=('pita','lala'), colors=colors)
-    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
+    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors)
     # enriched = enriched.sort_values('odif')
 
     return ax2, newexp
