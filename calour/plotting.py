@@ -130,6 +130,8 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     if labels is not None:
         ax.set_xlabel('effect size (positive is higher in %s)' % labels[0])
         ax.legend(labels)
+    ax.figure.tight_layout()
+
     return ax
 
 

@@ -125,6 +125,8 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
             feature : str the feature
             pval : the p-value for the enrichment (float)
             odif : the effect size (float)
+            group : str
+                The value group where the tern in enriched
             observed : the number of observations of this term in group1 (int)
             expected : the expected (based on all features) number of observations of this term in group1 (float)
             frac_group1 : fraction of total terms in group 1 which are the specific term (float)
