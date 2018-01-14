@@ -29,6 +29,7 @@ from logging import getLogger
 from itertools import cycle
 
 import numpy as np
+from scipy import stats
 
 from . import Experiment
 from .util import _to_list, compute_prevalence
@@ -132,7 +133,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None, colors=('green','red')):
+def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None, score_method='all_mean', colors=('green','red')):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -149,12 +150,23 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         list of experiment ids to ignore when doing the enrichment_analysis.
         Useful when you don't want to get terms from your own experiment analysis.
         For dbbact it is a list of int
+    score_method : str (optional)
+        The scoring function used to give each term the score (for each feature).
+        This parameter manages how the different annotations (such as 'common'/'high freq')
+        from different experiments are used to give each term the score (which is later
+        used as the statistic for the enrichment analysis).
+        Options are:
+        'all_mean' (default) : for each experiment, for each term use the mean of the term score over
+        all annotations cotaining this term (from the experiment). This means if we see the term in
+        a lot of annotations from the same experiment, we treat it the same as if we see it in an experiment
+        with only one annotation
+        'sum' : treat each annotation independently
     colors: tuple of (str, str) or None (optional)
         Colors for terms enriched in group1 or group2 respectively
 
     Returns
     -------
-    tuple of :class:`matplotlib.axes.Axes`, result of :func:`.database.enrichment`
+    tuple of :class:`matplotlib.axes.Axes`, :class:`.Experiment` with terms as features, (original features) as samples
     '''
     if '_calour_diff_abundance_effect' not in exp.feature_metadata.columns:
         raise ValueError('Experiment does not seem to be the results of differential_abundance().')
@@ -164,16 +176,23 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     positive = exp.feature_metadata.index.values[positive.values]
 
     # get the enrichment
-    enriched = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp)
+    enriched, term_features, features = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp, score_method=score_method)
+    # features=pd.DataFrame({'sequence': features}, index=features)
+
+    # Create an new experiment where features are the enriched terms, and samples are the features
+    # The newexp.feature_metadata contains the 'odif', 'pval' fields for each term
+    newexp = Experiment(term_features, sample_metadata=features, feature_metadata=enriched)
 
     # and plot
     ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=('pita','lala'), colors=colors)
-    enriched = enriched.sort_values('odif')
-    return ax2, enriched
+    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
+    # enriched = enriched.sort_values('odif')
+
+    return ax2, newexp
 
 
 def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
-    '''Plot the number of shared features against the number of samples subsampled.
+    '''Plot the number of shared features against the number of samples.
 
     To see if there is a core feature set shared across most of the samples.
 
@@ -182,6 +201,10 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     across mammalian phylogeny and within humans. Science 332, 970–974
     (2011).
 
+    .. warning:: The samples should be normalized by rarefaction
+    instead of other normalization methods. Otherwise, the samples
+    with higher sequencing depth will artificially share more OTUs
+    with each other.
 
     Parameters
     ----------
@@ -430,4 +453,65 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.01, wspace=0.01)
+    return fig
+
+
+def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
+                        transform_x=None, transform_y=None,
+                        ncols=5, nrows=None, size=2, aspect=1):
+    '''This plots an array of scatter plots between each features against the specified sample metadata.
+
+    For each panel of scatter plot, the x-axis is the co-variates
+    specified by sample metadata field; the y-axis is the feature
+    abundance.
+
+    Parameters
+    ----------
+    field : str
+        the column in the sample metadata to plot against
+    feature_ids : list-like
+        the IDs of features
+    transform_x, transform_y : callable
+        the transformation for values on x- and y-axis
+    ncols, nrows : int
+        plot nrows x ncols number of scatter plots. If nrows is None, then its value is determined
+        automatically by the-number-features / ncols
+    size : numeric
+        the height of each figure panel in inches
+    aspect : numeric
+        Aspect ratio of each figure panel, so that aspect * size gives its width
+    '''
+    from matplotlib import pyplot as plt
+
+    x = exp.sample_metadata[field].values
+    if transform_x is not None:
+        x = transform_x(x)
+    if nrows is None:
+        # get the ceiling of the division
+        nrows = -(-len(feature_ids) // ncols)
+        max_rows = 50
+        if nrows > max_rows:
+            raise ResourceWarning('There are over %d figure rows; it will be slow. '
+                                  'If you really want to plot this number of figures, '
+                                  'please explicitly specify it in the nrows function argument.''' % max_rows)
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols,
+                            figsize=(size * ncols * aspect, size * nrows))
+    for ax, fid in zip(axs.flat, feature_ids):
+        # y is 1d np array
+        y = exp[:, fid]
+        if transform_y is not None:
+            y = transform_y(y)
+        r, p = stats.spearmanr(x, y)
+        if r > 0:
+            c = 'green'
+        else:
+            c = 'red'
+        fit = np.polyfit(x, y, deg=1)
+        ax.plot(x, fit[0] * x + fit[1], color=c)
+        ax.scatter(x, y, alpha=0.2, color=c)
+        ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
+        if title_field is not None:
+            title = exp.feature_metadata.loc[fid, title_field]
+            ax.set_title(title)
+    fig.tight_layout()
     return fig

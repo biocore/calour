@@ -58,7 +58,7 @@ def export_html(exp: Experiment, sample_field=None, feature_field=False, title=N
         str to display field values for this field
     feature_field : str or None or False(optional)
         Name of the field to display on the y-axis (features) or None not to display names
-        Flase (default) to use the experiment subclass default field
+        False (default) to use the experiment subclass default field
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
     xticklabel_len : int (optional) or None
