@@ -24,7 +24,7 @@ from ..doc_init import ds
 logger = getLogger(__name__)
 
 
-def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
+def _create_plot_gui(exp: Experiment, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
     It still waits for the heatmap to be plotted and set up.
@@ -90,6 +90,10 @@ def _truncate_middle(x, length=16):
 def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
     '''Plot tick and ticklabels of x or y axis.
 
+    Parameters
+    ----------
+    ax : :class:`matplotlib.axes.Axes`
+        The axes to plot into
     Parameters mean axes, x or y axis, list of tick labels, max number
     of ticks, the upper bound of xlim/ylim, dict passing as text
     property, the length of each tick label.
@@ -470,7 +474,6 @@ def plot(exp: Experiment, title=None,
     |`→` or `>`                 |scroll the heatmap right on x axis |
     +---------------------------+-----------------------------------+
 
-
     Parameters
     ----------
     title : str (optional)
@@ -500,9 +503,7 @@ def plot(exp: Experiment, title=None,
 
     Other Parameters
     ----------------
-    heatmap_kwargs : dict, optional
-        keyword arguments passing to :func:`heatmap` function. These include:
-%(heatmap.parameters)s
+        %(heatmap.parameters)s
 
     Returns
     -------
