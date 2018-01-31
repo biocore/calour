@@ -27,7 +27,9 @@ logger = getLogger(__name__)
 def _create_plot_gui(exp: Experiment, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
-    It still waits for the heatmap to be plotted and set up.
+    Initializes the relevant plot GUI and links the databases to it.
+
+    .. note:: The heatmap is not plotted into the GUI in this function.
 
     Parameters
     ----------
@@ -196,6 +198,14 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot the heatmap
+
+    Attributes
+    ----------
+    lala : pita
+        pooka
+    pita : lala
+        piki
+
 
     Returns
     -------
@@ -424,7 +434,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
     return ax
 
 
-@ds.dedent
+@ds.with_indent(4)
 def plot(exp: Experiment, title=None,
          barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
          bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
@@ -502,7 +512,7 @@ def plot(exp: Experiment, title=None,
         ``None`` (default) to use the default field based on the experiment.
 
     Other Parameters
-    ----------------
+    ---------------------
         %(heatmap.parameters)s
 
     Returns
