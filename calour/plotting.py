@@ -73,7 +73,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green','red')):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red')):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -136,7 +136,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
 
 
 def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None,
-                                   score_method='all_mean', colors=('green','red'), show_legend=True):
+                                   score_method='all_mean', colors=('green', 'red'), show_legend=True):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -190,11 +190,11 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     # get the labels for the two groups
     if show_legend:
-        labels=['group1', 'group2']
-        names1=exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] > 0]
+        labels = ['group1', 'group2']
+        names1 = exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] > 0]
         if len(names1) > 0:
             labels[0] = names1.values[0]
-        names2=exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] < 0]
+        names2 = exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] < 0]
         if len(names2) > 0:
             labels[1] = names2.values[0]
     else:

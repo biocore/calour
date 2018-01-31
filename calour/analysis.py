@@ -171,8 +171,8 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
-    orig_group = [name1 if x>0 else name2 for x in newexp.feature_metadata['_calour_diff_abundance_effect']]
-    newexp.feature_metadata['_calour_diff_abundance_group']=orig_group
+    orig_group = [name1 if x > 0 else name2 for x in newexp.feature_metadata['_calour_diff_abundance_effect']]
+    newexp.feature_metadata['_calour_diff_abundance_group'] = orig_group
     return newexp
 
 
