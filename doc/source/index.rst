@@ -3,23 +3,45 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Calour documentation
-====================
+Welcome to Calour
+=================
 
-Calour is a python module for processing, analysis and interactive exploration of microbiome (and other matrix form data).
+Calour is a python module for processing, analysis and interactive exploration of microbiome (and other matrix form data), incorporating external databases.
+
 We recommend using calour inside a **jupyter notebook** environment.
 
-For a full graphical user interface (point and click - no python skills needed), you can use **EZCalour**
+For a full graphical user interface (point and click - **no python skills needed**), you can use **EZCalour**
 
 The full per-function python API documentation is available **here**
+
+Things you can do with Calour
+-----------------------------
+* Read and write micrbiome data (biom tables, qiime2 tables), metabolomics data (MS1 or MS2 bucket tables) or any tabular data, along with associated sample/feature metadata files and associated feature phylogenetic tree.
+
+* Normalize, filter, reorder and cluster your data.
+
+* Permutation based differential abundance testing with powerful dsFDR correction.
+
+* Interactive heatmap plotting withh convenient zoom, pan, multiple feature selection and information about selected feature/sequence
+
+* Integration with databases (dbBact.org, phenoDB, SpongeEMP for microbiome, GNPS for metabolomics) enables viewing and statistical analysis of database information about the experiment features.
 
 
 Installing Calour
 -----------------
 Installation instructions are available for **mac/linux** and for **windows**
 
+You can also try Calour (without installing) on an online **mybinder server**
+
+
 General Calour concepts
 -----------------------
+Calour mostly handles **Experiment** data. An Experiment is made of **Samples**, each containing counts of **Features**. For example, in a typical microbiome amplicon Experiment, each Sample is a swab from an individual, and Features are the unique bacteria present in the Samples.
+
+Calour stores an Experiment as a synchronized set of: per-Sample metadata table (i.e. age, material, name, etc.), per-Feature metadata table (i.e. taxonomy, etc.) and a (sparse or dense) data matrix where position (i,j) stores the number of times (or frequency) feature i was observed in sample j.
+
+Calour contains severl functions for loading (or generating) such an Experiment. Additionally, Calour contains functions for filtering/reordering and statistical analysis of the Samples and Features. Finally, Calour can plot interactive heatmaps for exploring the Experiment and interfacing external databases (see **here** for example).
+
 
 Usage/Analysis examples
 -----------------------
