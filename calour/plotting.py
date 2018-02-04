@@ -141,6 +141,13 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     Parameters
     ----------
+    term_type : str (optional)
+        What types of annotations/terms to include in enrichment analysis.
+        Options are:
+        'term' - ontology terms associated with each feature.
+        'parentterm' - ontology terms including parent terms associated with each feature.
+        'annotation' - the full annotation strings associated with each feature
+        'combined' - combine 'term' and 'annotation'
     max_show: int or (int, int) or None (optional)
         The maximal number of terms to show
         if None, show all terms
