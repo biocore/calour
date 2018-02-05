@@ -153,7 +153,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     name1 = ','.join(val1)
     if val2 is not None:
         val2 = _to_list(val2)
-        cexp = exp.filter_samples(field, val1+val2, negate=False)
+        cexp = exp.filter_samples(field, val1 + val2, negate=False)
         logger.info('%d samples with both values' % cexp.shape[0])
         name2 = ','.join(val2)
     else:
@@ -212,7 +212,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     labels = np.zeros(len(exp.sample_metadata))
     for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
         labels[exp.sample_metadata[field].values == clabel] = idx
-    logger.debug('Found %d unique sample labels' % (idx+1))
+    logger.debug('Found %d unique sample labels' % (idx + 1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
 
     logger.info('Found %d significant features' % (np.sum(keep)))
