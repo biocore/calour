@@ -37,7 +37,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         try:
             # import the database module
             db_module = importlib.import_module(module_name)
-        except:
+        except ImportError:
             raise ValueError('Database interface %s not installed. Did you do pip install for it?' % module_name)
         # get the class
         DBClass = getattr(db_module, class_name)
