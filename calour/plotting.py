@@ -112,7 +112,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     positive = np.min([np.sum(enriched['odif'].values > 0), max_show[0]])
     negative = np.min([np.sum(enriched['odif'].values < 0), max_show[1]])
     if negative + positive == 0:
-        logger.warn('No significantly enriched categories found')
+        logger.warning('No significantly enriched categories found')
         return ax
     if positive > 0:
         ax.barh(np.arange(positive) + negative, evals[-positive:], color=colors[0])
