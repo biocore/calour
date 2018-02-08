@@ -89,6 +89,7 @@ Functions operating on ``Experiment`` object
    analysis
    manipulation
    training
+   database
 
 The above modules contain functions that operate on the
 ``Experiment`` (or its child classes) object. They can be called in
