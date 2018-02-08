@@ -60,7 +60,7 @@ def compute_prevalence(abundance):
     >>> x
     array([0, 1, 2, 4])
     >>> y
-    array([ 0.66666667,  0.33333333,  0.16666667,  0.        ])
+    array([0.66666667, 0.33333333, 0.16666667, 0.        ])
 
     '''
     # unique values are sorted
