@@ -37,7 +37,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         try:
             # import the database module
             db_module = importlib.import_module(module_name)
-        except:
+        except ImportError:
             raise ValueError('Database interface %s not installed. Did you do pip install for it?' % module_name)
         # get the class
         DBClass = getattr(db_module, class_name)
@@ -125,6 +125,8 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
             feature : str the feature
             pval : the p-value for the enrichment (float)
             odif : the effect size (float)
+            group : str
+                The value group where the tern in enriched
             observed : the number of observations of this term in group1 (int)
             expected : the expected (based on all features) number of observations of this term in group1 (float)
             frac_group1 : fraction of total terms in group 1 which are the specific term (float)

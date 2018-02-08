@@ -150,12 +150,15 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     val1 = _to_list(val1)
+    name1 = ','.join(val1)
     if val2 is not None:
         val2 = _to_list(val2)
-        cexp = exp.filter_samples(field, val1+val2, negate=False)
+        cexp = exp.filter_samples(field, val1 + val2, negate=False)
         logger.info('%d samples with both values' % cexp.shape[0])
+        name2 = ','.join(val2)
     else:
         cexp = exp
+        name2 = 'NOT %s' % name1
 
     # remove features not present in both groups
     cexp = cexp.filter_abundance(0, strict=True)
@@ -167,7 +170,10 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    orig_group = [name1 if x > 0 else name2 for x in newexp.feature_metadata['_calour_diff_abundance_effect']]
+    newexp.feature_metadata['_calour_diff_abundance_group'] = orig_group
+    return newexp
 
 
 @Experiment._record_sig
@@ -206,7 +212,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     labels = np.zeros(len(exp.sample_metadata))
     for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
         labels[exp.sample_metadata[field].values == clabel] = idx
-    logger.debug('Found %d unique sample labels' % (idx+1))
+    logger.debug('Found %d unique sample labels' % (idx + 1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
 
     logger.info('Found %d significant features' % (np.sum(keep)))

@@ -66,8 +66,8 @@ def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
     otu1            y
     otu2            n
     >>> new.data
-    array([[ 1. ,  0. ,  6.6,  1. ,  2. ],
-           [ 0. ,  1. ,  7.7,  3. ,  4. ]])
+    array([[1. , 0. , 6.6, 1. , 2. ],
+           [0. , 1. , 7.7, 3. , 4. ]])
 
     Parameters
     ----------

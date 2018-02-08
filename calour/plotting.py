@@ -73,7 +73,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red')):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -88,6 +88,11 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
     ax: :class:`matplotlib.axes.Axes` or ``None`` (optional)
         The axes to which to plot the figure. None (default) to create a new figure
+    lables: tuple of (str, str) or None (optional)
+        name for terms enriched in group1 or group2 respectively, or None to not show legend
+    colors: tuple of (str, str) or None (optional)
+        Colors for terms enriched in group1 or group2 respectively
+
 
     Returns
     -------
@@ -107,12 +112,12 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
     positive = np.min([np.sum(enriched['odif'].values > 0), max_show[0]])
     negative = np.min([np.sum(enriched['odif'].values < 0), max_show[1]])
     if negative + positive == 0:
-        print('No significantly enriched categories found')
+        logger.warning('No significantly enriched categories found')
         return ax
     if positive > 0:
-        ax.barh(np.arange(positive) + negative, evals[-positive:])
+        ax.barh(np.arange(positive) + negative, evals[-positive:], color=colors[0])
     if negative > 0:
-        ax.barh(np.arange(negative), evals[:negative])
+        ax.barh(np.arange(negative), evals[:negative], color=colors[1])
     use = np.zeros(len(enriched), dtype=bool)
     use[:positive] = True
     use[-negative:] = True
@@ -122,15 +127,27 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None)
     ticks = [x[:max_len] for x in ticks]
     ax.set_yticks(np.arange(negative+positive))
     ax.set_yticklabels(ticks)
-    ax.set_xlabel('effect size (positive is higher in group1')
+    if labels is not None:
+        ax.set_xlabel('effect size (positive is higher in %s)' % labels[0])
+        ax.legend(labels)
+    ax.figure.tight_layout()
+
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None, score_method='all_mean'):
+def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None,
+                                   score_method='all_mean', colors=('green', 'red'), show_legend=True):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
     ----------
+    term_type : str (optional)
+        What types of annotations/terms to include in enrichment analysis.
+        Options are:
+        'term' - ontology terms associated with each feature.
+        'parentterm' - ontology terms including parent terms associated with each feature.
+        'annotation' - the full annotation strings associated with each feature
+        'combined' - combine 'term' and 'annotation'
     max_show: int or (int, int) or None (optional)
         The maximal number of terms to show
         if None, show all terms
@@ -154,6 +171,10 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         a lot of annotations from the same experiment, we treat it the same as if we see it in an experiment
         with only one annotation
         'sum' : treat each annotation independently
+    colors: tuple of (str, str) or None (optional)
+        Colors for terms enriched in group1 or group2 respectively
+    show_legend: bool (optional)
+        True to show the color legend, False to hide it
 
     Returns
     -------
@@ -174,8 +195,20 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     # The newexp.feature_metadata contains the 'odif', 'pval' fields for each term
     newexp = Experiment(term_features, sample_metadata=features, feature_metadata=enriched)
 
+    # get the labels for the two groups
+    if show_legend:
+        labels = ['group1', 'group2']
+        names1 = exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] > 0]
+        if len(names1) > 0:
+            labels[0] = names1.values[0]
+        names2 = exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] < 0]
+        if len(names2) > 0:
+            labels[1] = names2.values[0]
+    else:
+        labels = None
+
     # and plot
-    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax)
+    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors)
     # enriched = enriched.sort_values('odif')
 
     return ax2, newexp
