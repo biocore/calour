@@ -16,7 +16,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
 
     Parameters
     ----------
-    dbname : str
+    dbname : sitr
         the database name. common options are:
             'dbbact' : the amplicon sequence manual annotation database
             'spongeworld' : the sponge microbiome database
@@ -58,27 +58,27 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
 
 
 def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
-    '''Add a field to the feature metadata, with most common term for each feature
+    # '''Add a field to the feature metadata, with most common term for each feature
 
-    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
-    Note : Adds annotations in-place.
+    # Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
+    # Note : Adds annotations in-place.
 
-    Parameters
-    ----------
-    use_term_list : list of str or None (optional)
-        Use only terms appearing in this list
-        None (default) to use all terms
-    field_name : str (optional)
-        Name of feature_metadata field to store the annotatiosn.
-    term_type : str or None (optional)
-        type of the annotation summary to get from the database (db specific)
-        None to get default type
-    ignore_exp : list of int or None (optional)
-        list of experiments to ignore when adding the terms
-    Returns
-    -------
-    Experiment with feature_metadata field containing the most common database term for each feature
-    '''
+    # Parameters
+    # ----------
+    # use_term_list : list of str or None (optional)
+    #     Use only terms appearing in this list
+    #     None (default) to use all terms
+    # field_name : str (optional)
+    #     Name of feature_metadata field to store the annotatiosn.
+    # term_type : str or None (optional)
+    #     type of the annotation summary to get from the database (db specific)
+    #     None to get default type
+    # ignore_exp : list of int or None (optional)
+    #     list of experiments to ignore when adding the terms
+    # Returns
+    # -------
+    # Experiment with feature_metadata field containing the most common database term for each feature
+    # '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
     term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
