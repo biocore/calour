@@ -1,22 +1,16 @@
 Microbiome tutorials
 ====================
+pita
 
-pooka
+.. toctree::
+   :maxdepth: 3
 
-Looking at interavtive heatmaps
--------------------------------
-.. toc::
-	:maxdepth: 1
-	:glob:
+   microbiome_step_by_step.ipynb
+   microbiome_manipulation.ipynb
 
-   simple.ipynb
-
-lala
 
 Differential abundance
 ----------------------
-lilili
-
 .. toctree::
    :maxdepth: 1
 

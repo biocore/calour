@@ -7,11 +7,31 @@ Calour stores an Experiment as a synchronized set of: per-Sample metadata table 
 Calour contains severl functions for loading (or generating) such an Experiment. Additionally, Calour contains functions for filtering/reordering and statistical analysis of the Samples and Features. Finally, Calour can plot interactive heatmaps for exploring the Experiment and interfacing external databases (see **here** for example).
 
 
-Microbiome analysis - step by step
-==================================
-pitapita
+Running Calour
+==============
+Since calour is a python module, there is no need to run it. Instead, Calour is usually imported into the jupyter notebook you are using for analysis.
+
+For a full GUI using Calour, install `EZCalour <https://github.com/amnona/EZCalour>`_.
 
 
-Metabolomics analysis - step by step
-====================================
-patapata
+Starting a Calour analysis notebook
+-----------------------------------
+If you installed Calour in a conda environment (usually the environment is named calour), first activate the environment:
+
+```source activate calour``` (in max/linux)
+
+or
+
+```activate calour``` (in windows)
+
+In order to run the jupyter notebook server, change directory to the directory where your analysis notebook is located and then type:
+
+```jupyter notebook```
+
+and within the notebook, just import the Calour module using:
+
+```import calour as ca```
+
+For a generic Calour microbiome analysis notebook that contains the standard analysis workflow, you can download the `simple_microbiome_analysis.ipynb <https://raw.githubusercontent.com/biocore/calour/master/notebooks/demo.ipynb>`_.
+
+

@@ -115,14 +115,14 @@ class Experiment:
         l2 = '-' * len(l1)
         lines = [l1, l2,
                  'data dimension: %d samples, %d features' % self.data.shape]
-        try:
-            lines.append('sample IDs: %r' % self.sample_metadata.index)
-        except AttributeError:
-            lines.append('No sample metadata')
-        try:
-            lines.append('feature IDs: %r' % self.feature_metadata.index)
-        except AttributeError:
-            lines.append('No feature metadata')
+        # try:
+        #     lines.append('sample IDs: %r' % self.sample_metadata.index)
+        # except AttributeError:
+        #     lines.append('No sample metadata')
+        # try:
+        #     lines.append('feature IDs: %r' % self.feature_metadata.index)
+        # except AttributeError:
+        #     lines.append('No feature metadata')
         return '\n'.join(lines)
 
     def __eq__(self, other):
