@@ -145,7 +145,7 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
         t.set(**kwargs)
 
 
-@ds.get_sectionsf('heatmap')
+@ds.get_sectionsf('heatmap.heatmap')
 @ds.dedent
 def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
@@ -198,14 +198,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot the heatmap
-
-    Attributes
-    ----------
-    lala : pita
-        pooka
-    pita : lala
-        piki
-
 
     Returns
     -------
@@ -512,8 +504,8 @@ def plot(exp: Experiment, title=None,
         ``None`` (default) to use the default field based on the experiment.
 
     Other Parameters
-    ---------------------
-        %(heatmap.parameters)s
+    ----------------
+        %(heatmap.heatmap.parameters)s
 
     Returns
     -------

@@ -1,3 +1,4 @@
 coveralls
 sphinx-autodoc-typehints
 docrep
+nbsphinx

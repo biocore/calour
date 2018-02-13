@@ -411,7 +411,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
                               negate=negate, inplace=inplace)
 
 
-@ds.dedent
+@ds.with_indent(4)
 @Experiment._record_sig
 def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
@@ -424,9 +424,6 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
 
     Other parameters
     ----------------
-    **kwargs : dict, optional
-        keyword arguments passing to :func:`filter_by_data` function.
-        These include:
     %(filter_by_data.parameters)s
 
     Returns
@@ -439,6 +436,7 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     return newexp
 
 
+@ds.with_indent(4)
 @Experiment._record_sig
 def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
@@ -451,6 +449,10 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     cutoff : float (optional)
         The minimal fraction of reads for the otu to be called present in a sample
 
+    Other parameters
+    ----------------
+    %(filter_by_data.parameters)s
+
     Returns
     -------
     :class:`.Experiment`
@@ -460,17 +462,22 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     return newexp
 
 
+@ds.with_indent(4)
 @Experiment._record_sig
 def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
 
-    In order to keep features with mean abundance of 1%, use ``filter_mean(cutoff=0.01)``
+    In order to keep features with mean abundance of 1% use ``filter_mean(cutoff=0.01)``
 
     Parameters
     ----------
     cutoff : float (optional)
         The minimal mean abundance fraction (out of the mean of total abundance per sample) for a feature in order
         to keep it. Default is 0.01 - keep features with mean abundance >=1% of mean total abundance per sample
+
+    Other parameters
+    ----------------
+    %(filter_by_data.parameters)s
 
     Returns
     -------

@@ -16,6 +16,7 @@ Functions
    sort_ids
    cluster_data
    cluster_features
+   sort_centroid
 '''
 
 # ----------------------------------------------------------------------------
@@ -36,10 +37,13 @@ from scipy import cluster, spatial
 from . import Experiment
 from .transforming import log_n, transform, scale
 from .util import _argsort
+from .doc_init import ds
+
 
 logger = getLogger(__name__)
 
 
+@ds.with_indent(4)
 @Experiment._record_sig
 def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
@@ -62,6 +66,10 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
         True to Replace data in exp
     kwargs : dict
         additional keyword parameters passed to ``transform``.
+
+    Other Parameters
+    ----------------
+        %(trasforming.transform.parameters)s
 
     Returns
     -------
