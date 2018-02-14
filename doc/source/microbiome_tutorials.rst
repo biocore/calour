@@ -7,27 +7,9 @@ pita
 
    microbiome_step_by_step.ipynb
    microbiome_manipulation.ipynb
-
-
-Differential abundance
-----------------------
-.. toctree::
-   :maxdepth: 1
-
-   microbiome_step_by_step.ipynb
-   simple.ipynb
-
-
-Filtering
----------
-filtering
-
-
-Microbiome
-----------
-   * Loading and processing a simple microbiome experiment
-   * Differential abundance analysis
-   * Using dbBact for advanced microbiome analysis
-   * Filtering and reordering
-   * Normalization
-   * Using databases
+   microbiome_diff_abundance.ipynb
+   microbiome_export_html.ipynb
+   microbiome_normalization.ipynb
+   microbiome_databases.ipynb
+   microbiome_internal_structure.ipynb
+   microbiome_dbbact.ipynb

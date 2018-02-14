@@ -100,7 +100,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @Experiment._record_sig
-def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''
     test the differential expression between 2 groups (val1 and val2 in field field)
     using permutation based fdr (dsfdr)
@@ -141,12 +141,17 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
                          with minimal possible p-value less than alpha (e.g. a feature
                          that appears in only 1 sample can obtain a minimal p-value of 0.5
                          and will therefore be removed when say alpha=0.1)
+    random_seed : int or None (optional)
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
     newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
+    if random_seed is not None:
+        np.random.seed(random_seed)
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     val1 = _to_list(val1)

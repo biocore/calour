@@ -13,6 +13,14 @@ Functions
    enrichment
 '''
 
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
+
 from logging import getLogger
 from abc import ABC
 from collections import defaultdict
