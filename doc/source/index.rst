@@ -54,7 +54,7 @@ API Documentation
 .. toctree::
    :maxdepth: 2
 
-   microbiome_tutorials
+   api_docs
 
 Indices and tables
 ==================
