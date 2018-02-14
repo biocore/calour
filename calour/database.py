@@ -71,7 +71,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp: Experiment):
+def pitapita(exp: Experiment):
     '''testing
 
     Parameters
