@@ -11,29 +11,39 @@ Functions
 .. autosummary::
    :toctree: generated
 
-   onehot_encode_features
+   add_sample_metadata_as_features
 '''
 
 
 from logging import getLogger
 
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.model_selection._split import check_cv
+from sklearn.model_selection import train_test_split
+from sklearn.base import is_classifier
 from scipy.sparse import hstack
 import pandas as pd
 import numpy as np
 
 from .experiment import Experiment
+from .amplicon_experiment import AmpliconExperiment
 
 
 logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
+def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplace=False):
     '''Add covariates from sample metadata to the data table as features for machine learning.
 
-    This will convert the columns of categorical strings using one-hot encoding scheme and add them
-    into the data table as new features.
+    This will convert the columns of categorical strings using one-hot
+    encoding scheme and add them into the data table as new features.
+
+    .. note:: This is only for numeric and/or nominal covariates in
+    sample metadata. If you want to add a ordinal column as a feature,
+    use `pandas.Series.map` to convert ordinal column to numeric
+    column first.
 
     Examples
     --------
@@ -47,7 +57,7 @@ def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
 
     Let's add the columns of `category` and `ph` as features into data table:
 
-    >>> new = exp.onehot_encode_features(['category', 'ph'])
+    >>> new = exp.add_sample_metadata_as_features(['category', 'ph'])
     >>> new
     Experiment with 2 samples, 5 features
     >>> new.feature_metadata
@@ -89,12 +99,56 @@ def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
     md = new.sample_metadata[fields]
     if sparse is None:
         sparse = new.sparse
+
     vec = DictVectorizer(sparse=sparse)
     encoded = vec.fit_transform(md.to_dict(orient='records'))
+
     if sparse:
-        new.data = hstack((encoded, new.data))
+        new.data = hstack((encoded, new.data), format='csr')
     else:
         new.data = np.concatenate([encoded, new.data], axis=1)
     # the order in the concatenation should be consistent with the data table
     new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata])
     return new
+
+
+def split_train_test(exp: Experiment, field, test_size, train_size=None, stratify=None, random_state=None):
+    '''Split experiment data into train and test set.
+
+    '''
+    if isinstance(stratify, str):
+        stratify = exp.sample_metadata[stratify]
+    y = exp.sample_metadata[field]
+    train_X, test_X, train_y, test_y = train_test_split(
+        exp.data, y, test_size=test_size, train_size=train_size, stratify=stratify, random_state=random_state)
+    return train_X, test_X, train_y, test_y
+
+
+@Experiment._record_sig
+def collect_cv_prediction(exp: Experiment, field, estimator, cv, scoring, inplace=False):
+    '''Do the CV
+
+    '''
+    logger.debug('')
+    if inplace:
+        new = exp
+    else:
+        new = exp.copy()
+    cv = check_cv(cv, y, classifier=is_classifier(estimator))
+    for params in paramgrid:
+        for train_x, train_y in cv:
+            estimator.fit(train_x, train_y)
+
+    return yobs, yhat, model
+
+
+@Experiment._record_sig
+def learning_curve_depths(exp: AmpliconExperiment, field, groups=None,
+                          train_depths=np.array([0.1, 0.325, 0.55, 0.775, 1.]),
+                          cv=None, scoring=None, exploit_incremental_learning=False,
+                          n_jobs=1, pre_dispatch='all', verbose=0, shuffle=False,
+                          random_state=None):
+
+    '''Compute the learning curve with regarding to sequencing depths.'''
+    X = exp.data
+    y = exp.sample_metadata[field]

@@ -467,4 +467,7 @@ def register_functions(cls, modules=None):
                                    '\n    exp : {0}'
                                    '\n        Input experiment object.')
 
+                        if not f.__doc__:
+                            f.__doc__ = ''
+
                         f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)

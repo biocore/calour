@@ -13,7 +13,7 @@ Functions
    plot_enrichment
    plot_diff_abundance_enrichment
    plot_stacked_bar
-   plot_shareness
+   plot_core_features
    plot_abund_prevalence
    plot_scatter_matrix
 '''
@@ -218,8 +218,8 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     return ax2, newexp
 
 
-def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
-    '''Plot the number of shared features against the number of samples.
+def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0.9, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
+    '''Plot the percentage of core features shared in increasing number of samples.
 
     To see if there is a core feature set shared across most of the samples.
 
@@ -238,7 +238,12 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     field : str
         sample metadata field to group samples
     steps : iterable of int
-        the sizes of subsamples to compute the shareness.
+        the sizes of subsamples to compute the fraction of core features.
+    cutoff : numeric
+        the feature is considered present in a sample only if its abundance is >= cutoff.
+    frac : numeric
+        Must between 0 and 1. The feature would be considered as a core feature
+        if it is present in ``fac`` faction of samples.
     iterations : int
         repeat the subsampling multiple times and plot all the iterations
     alpha : float
@@ -252,7 +257,6 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     -------
     matplotlib.axes.Axes
         The Axes object containing the plot.
-
     '''
     if ax is None:
         from matplotlib import pyplot as plt
@@ -265,16 +269,16 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     def plot_lines(data, steps, label):
         y_sum = np.zeros(len(steps))
         for i in range(iterations):
-            x, y = _compute_frac_nonzero(data, steps)
+            y = _compute_frac_nonzero(data, steps, cutoff, frac, i)
             y = y * 100
             y_sum += y
             if i == 0:
-                line, = ax.plot(x, y, alpha=alpha, linewidth=linewidth)
+                line, = ax.plot(steps, y, alpha=alpha, linewidth=linewidth)
             else:
-                ax.plot(x, y, alpha=alpha, linewidth=linewidth, color=line.get_color())
+                ax.plot(steps, y, alpha=alpha, linewidth=linewidth, color=line.get_color())
         y_ave = y_sum / iterations
         # plot average of the iterations
-        ax.plot(x, y_ave, linewidth=linewidth * 3, label=label, color=line.get_color())
+        ax.plot(steps, y_ave, linewidth=linewidth * 3, label=label, color=line.get_color())
 
     if field is None:
         plot_lines(exp.data, steps, label='all samples')
@@ -288,11 +292,11 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     # because the shareness drops quickly, we plot it in log scale
     ax.set_xscale('log')
     ax.set_xlabel('sample number')
-    ax.set_ylabel('percentage of shared features')
+    ax.set_ylabel('shared features (%)')
     return ax
 
 
-def _compute_frac_nonzero(data, steps):
+def _compute_frac_nonzero(data, steps, cutoff=2, frac=0.9, random_state=None):
     '''iteratively compute the fraction of non-zeros in each column after subsampling rows.
 
     Parameters
@@ -300,27 +304,43 @@ def _compute_frac_nonzero(data, steps):
     data : 2-d array of numeric
         sample in row and feature in column
     steps : iterable of int
-        the sizes of subsamples
+        the subsample sizes (should be in descending order)
+    cutoff : numeric
+        the feature is considered present in a sample only if its abundance is >= cutoff.
+    frac : numeric
+        Must between 0 and 1. The feature would be considered as a core feature
+        if it is present in ``fac`` faction of samples.
+    random_state : int, RandomState instance or None, optional, default=None
+        If int, random_state is the seed used by the random number generator;
+        If RandomState instance, random_state is the random number generator;
+        If None, the random number generator is the RandomState instance used
+        by `np.random`.
 
     Return
     ------
-    tuple of 2 lists
-        steps and fractions
+    numpy.array
+        fractions of core features for each subsample size
     '''
     n_samples, n_features = data.shape
-
-    shared = []
-    for i in steps:
-        data = data[np.random.choice(n_samples, i, replace=False), :]
-        x = data > 0
+    shared = np.zeros(len(steps))
+    rand = np.random.RandomState(random_state)
+    if cutoff <= 0:
+        raise ValueError('You need to provide a positive value for `cutoff`: %r' % cutoff)
+    if frac <= 0 or frac > 1:
+        raise ValueError('You need to provide a value among (0, 1] for `frac`: %r' % frac)
+    for n, i in enumerate(steps):
+        data = data[rand.choice(n_samples, i, replace=False), :]
+        print(data)
+        x = data >= cutoff
         # the count of samples that have the given feature
         counts = x.sum(axis=0)
-        all_presence = np.sum(counts == i)
+        all_presence = np.sum(counts >= np.ceil(i * frac))
         all_absence = np.sum(counts == 0)
         # important: remove the features that are all zeros across the subset of samples
-        shared.append(all_presence / (n_features - all_absence))
+        shared[n] = all_presence / (n_features - all_absence)
+        # don't forget to update sample count
         n_samples = data.shape[0]
-    return steps, shared
+    return shared
 
 
 def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alpha=0.5, linewidth=0.7, ax=None):

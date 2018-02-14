@@ -81,12 +81,12 @@ class PlotTests(Tests):
         assert_array_almost_equal(np.array([[i, j] for i, j in zip(x, y)]),
                                   lines[1].get_xydata())
 
-    def test_plot_shareness(self):
+    def test_plot_core_features(self):
         np.random.seed(12345)
         self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=100)
         self.test1.sparse = False
         ax = self.test1.filter_samples(
-            'group', ['1', '2']).plot_shareness(
+            'group', ['1', '2']).plot_core_features(
                 field='group', steps=(2, 12), iterations=2)
         lines = ax.get_lines()
         self.assertEqual(len(lines), 6)
@@ -97,10 +97,15 @@ class PlotTests(Tests):
                          [4, 0, 4, 3, 0, 2, 0, 5],
                          [2, 4, 0, 4, 2, 0, 1, 0],
                          [3, 3, 5, 3, 1, 0, 0, 1]])
-        np.random.seed(1)
-        steps, frac = _compute_frac_nonzero(data, [5, 3, 2])
-        self.assertListEqual(steps, [5, 3, 2])
+
+        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=0.1, frac=1, random_state=1)
         assert_array_almost_equal(frac, np.array([0, 0.25, 4/7]))
+
+        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=0.1, frac=0.00001, random_state=1)
+        assert_array_almost_equal(frac, np.array([1, 1, 1]))
+
+        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=5, frac=1, random_state=1)
+        assert_array_almost_equal(frac, np.array([0, 0, 0]))
 
     def test_plot_scatter_matrix(self):
         self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=100)

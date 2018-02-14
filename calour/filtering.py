@@ -514,7 +514,9 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
 
 @Experiment._record_sig
 def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
-    '''Filter samples or features based on a list index values
+    '''Filter samples or features based on a list IDs.
+
+    .. note:: the order of samples or features is updated as the order given in ``ids``.
 
     Parameters
     ----------

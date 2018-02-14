@@ -254,3 +254,14 @@ class AmpliconExperiment(Experiment):
             the column names for the new columns split from ``field``
         '''
         self.feature_metadata[names] = self.feature_metadata[field].str.split(sep, expand=True)
+        # return so you can chain the functions
+        return self
+
+    def find_lowest_taxonomy(self, field='taxonomy', new_field='taxa'):
+        def find_highest(s):
+            l = s.split(';')
+            b = [len(i) > 3 for i in l]
+            return np.array(l)[b][-1]
+        self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_highest)
+        return self
+
