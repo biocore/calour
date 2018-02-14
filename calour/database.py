@@ -9,13 +9,12 @@ Functions
 .. autosummary::
    :toctree: generated
 
-   add_terms_to_features
    enrichment
 '''
 
 from logging import getLogger
 from abc import ABC
-from collections import defaultdict
+# from collections import defaultdict
 import importlib
 
 from .util import get_config_value, get_config_file, get_config_sections
