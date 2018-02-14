@@ -1,6 +1,6 @@
 '''
 database access functions (:mod:`calour.database`)
-==============================
+==================================================
 
 .. currentmodule:: calour.database
 

@@ -1,5 +1,13 @@
 General Calour concepts
 =======================
+Introduction
+------------
+Calour is a python/jupyter notebook module for analysis of tabular (sample X feature) data and associated metadata. Initially desgined for microbiome amplicon experiment analysis (where features are bacteria and the table contains the amount of reads for each features in each sample), Calour has been extended to also facilitate analysis of metabolomics data (where features are unique MS1 or MS2 ids).
+
+
+
+Main data structures
+--------------------
 Calour mostly handles **Experiment** data. An Experiment is made of **Samples**, each containing counts of **Features**. For example, in a typical microbiome amplicon Experiment, each Sample is a swab from an individual, and Features are the unique bacteria present in the Samples.
 
 Calour stores an Experiment as a synchronized set of: per-Sample metadata table (i.e. age, material, name, etc.), per-Feature metadata table (i.e. taxonomy, etc.) and a (sparse or dense) data matrix where position (i,j) stores the number of times (or frequency) feature i was observed in sample j.
