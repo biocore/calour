@@ -67,7 +67,6 @@ def compute_prevalence(abundance):
     cutoffs, counts = np.unique(abundance, return_counts=True)
     cum_counts = np.cumsum(counts)
     prevalences = 1 - cum_counts / counts.sum()
-    # print(cutoffs, prevalences)
     return cutoffs, prevalences
 
 

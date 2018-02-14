@@ -126,7 +126,7 @@ needs_sphinx = '1.5'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx_autodoc_typehints',
+    # 'sphinx_autodoc_typehints',
     'sphinx.ext.mathjax',
     'numpydoc',
     'sphinx.ext.coverage',
