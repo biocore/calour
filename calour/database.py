@@ -72,50 +72,64 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
-    '''Add a field to the feature metadata, with most common term for each feature
-
-    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
-    Note : Adds annotations in-place.
+def add_terms_to_features(exp: Experiment):
+    '''testing
 
     Parameters
     ----------
-    use_term_list : list of str or None (optional)
-        Use only terms appearing in this list
-        None (default) to use all terms
-    field_name : str (optional)
-        Name of feature_metadata field to store the annotatiosn.
-    term_type : str or None (optional)
-        type of the annotation summary to get from the database (db specific)
-        None to get default type
-    ignore_exp : list of int or None (optional)
-        list of experiments to ignore when adding the terms
+    testing: str
+
     Returns
     -------
-    Experiment with feature_metadata field containing the most common database term for each feature
+    lala: int
     '''
-    db = _get_database_class(dbname, exp)
-    features = exp.feature_metadata.index.values
-    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
-    feature_terms = []
-    for cfeature in features:
-        term_count = defaultdict(int)
-        if len(term_list[cfeature]) == 0:
-            feature_terms.append('NA')
-            continue
-        for cterm in term_list[cfeature]:
-            if use_term_list is not None:
-                if cterm in use_term_list:
-                    term_count[cterm] += 1
-            else:
-                term_count[cterm] += 1
-        if len(term_count) == 0:
-            max_term = 'other'
-        else:
-            max_term = max(term_count, key=term_count.get)
-        feature_terms.append(max_term)
-    exp.feature_metadata[field_name] = feature_terms
-    return exp
+    pass
+
+
+# def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
+#     '''Add a field to the feature metadata, with most common term for each feature
+
+#     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
+#     Note : Adds annotations in-place.
+
+#     Parameters
+#     ----------
+#     use_term_list : list of str or None (optional)
+#         Use only terms appearing in this list
+#         None (default) to use all terms
+#     field_name : str (optional)
+#         Name of feature_metadata field to store the annotatiosn.
+#     term_type : str or None (optional)
+#         type of the annotation summary to get from the database (db specific)
+#         None to get default type
+#     ignore_exp : list of int or None (optional)
+#         list of experiments to ignore when adding the terms
+#     Returns
+#     -------
+#     Experiment with feature_metadata field containing the most common database term for each feature
+#     '''
+#     db = _get_database_class(dbname, exp)
+#     features = exp.feature_metadata.index.values
+#     term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
+#     feature_terms = []
+#     for cfeature in features:
+#         term_count = defaultdict(int)
+#         if len(term_list[cfeature]) == 0:
+#             feature_terms.append('NA')
+#             continue
+#         for cterm in term_list[cfeature]:
+#             if use_term_list is not None:
+#                 if cterm in use_term_list:
+#                     term_count[cterm] += 1
+#             else:
+#                 term_count[cterm] += 1
+#         if len(term_count) == 0:
+#             max_term = 'other'
+#         else:
+#             max_term = max(term_count, key=term_count.get)
+#         feature_terms.append(max_term)
+#     exp.feature_metadata[field_name] = feature_terms
+#     return exp
 
 
 def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
