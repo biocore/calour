@@ -37,7 +37,7 @@ from .amplicon_experiment import AmpliconExperiment
 from .ms1_experiment import MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 
-# from .doc_init import ds
+from .doc_init import ds
 
 
 logger = getLogger(__name__)
@@ -183,7 +183,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
     return sid, fid, data
 
 
-# @ds.with_indent(4)
+@ds.with_indent(4)
 def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
                  description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
@@ -315,8 +315,8 @@ def _read_metadata(ids, f, kwargs):
     return metadata
 
 
-# @ds.get_sectionsf('read')
-# @ds.dedent
+@ds.get_sectionsf('read')
+@ds.dedent
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True, data_file_type='biom',
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,

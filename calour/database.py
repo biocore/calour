@@ -39,7 +39,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
 
     Parameters
     ----------
-    dbname : sitr
+    dbname : str
         the database name. common options are:
             'dbbact' : the amplicon sequence manual annotation database
             'spongeworld' : the sponge microbiome database
@@ -100,7 +100,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         list of experiments to ignore when adding the terms
     Returns
     -------
-    Experiment with feature_metadata field containing the most common database term for each feature
+    exp : :class:`.Experiment` with feature_metadata field containing the most common database term for each feature
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
