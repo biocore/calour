@@ -108,14 +108,14 @@ class Experiment:
             self.data = self.data.toarray()
 
     def __repr__(self):
-        '''Return a string representation of this object.'''
+        '''Return a string representation of this object.
+        The form is: class (description) with X samples, Y features
+        '''
         l1 = self.__class__.__name__
         if self.description:
-            l1 = '%s %s' % (l1, self.description)
-        l2 = '-' * len(l1)
-        lines = [l1, l2,
-                 'data dimension: %d samples, %d features' % self.data.shape]
-        return '\n'.join(lines)
+            l1 += ' ("%s")' % self.description
+        l1 += ' with %d samples, %d features' % self.data.shape
+        return l1
 
     def __eq__(self, other):
         '''Check equality.

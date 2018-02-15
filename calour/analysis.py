@@ -150,6 +150,8 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
+    # if random seed is supplied, set the numpy random.seed
+    # )if random seed is None, we don't change the numpy seed)
     if random_seed is not None:
         np.random.seed(random_seed)
 

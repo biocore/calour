@@ -24,7 +24,7 @@ from ..doc_init import ds
 logger = getLogger(__name__)
 
 
-def _create_plot_gui(exp: Experiment, gui='cli', databases=('dbbact',), tree_size=0):
+def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
     Initializes the relevant plot GUI and links the databases to it.
