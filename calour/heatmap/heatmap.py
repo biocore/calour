@@ -503,8 +503,8 @@ def plot(exp: Experiment, title=None,
         a list of databases to access or add annotation
         ``None`` (default) to use the default field based on the experiment.
 
-    Other Parameters
-    ----------------
+    Other parameters
+    -----------------
         %(heatmap.heatmap.parameters)s
 
     Returns
