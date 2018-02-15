@@ -69,7 +69,7 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
 
     Other Parameters
     ----------------
-        %(trasforming.transform.parameters)s
+        %(transforming.transform.parameters)s
 
     Returns
     -------

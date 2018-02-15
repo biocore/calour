@@ -232,7 +232,7 @@ class ExperimentTests(Tests):
                                self.test1.data.toarray()[:, 1])
 
     def test_repr(self):
-        self.assertEqual(repr(self.test1),'Experiment ("test1.biom") with 21 samples, 12 features')
+        self.assertEqual(repr(self.test1), 'Experiment ("test1.biom") with 21 samples, 12 features')
 
 
 if __name__ == "__main__":
