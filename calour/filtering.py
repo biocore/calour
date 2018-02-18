@@ -411,7 +411,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
                               negate=negate, inplace=inplace)
 
 
-@ds.with_indent(4)
+@ds.with_indent(8)
 @Experiment._record_sig
 def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
@@ -422,9 +422,12 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     min_abundance : numeric
         The minimal total abundance for each feature over all samples
 
-    Other parameters
+    Other Parameters
     ----------------
-    %(filter_by_data.parameters)s
+    **kwargs : `filter_by_data()` properties, optional
+        Options include:
+
+        %(filter_by_data.parameters)s
 
     Returns
     -------
