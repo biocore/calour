@@ -146,7 +146,6 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
 
 
 @ds.get_sectionsf('heatmap.heatmap')
-@ds.dedent
 def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
@@ -426,7 +425,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
     return ax
 
 
-@ds.with_indent(4)
+@ds.with_indent(8)
 def plot(exp: Experiment, title=None,
          barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
          bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
@@ -504,7 +503,10 @@ def plot(exp: Experiment, title=None,
         ``None`` (default) to use the default field based on the experiment.
 
     Other parameters
-    -----------------
+    ----------------
+    **heatmap_kwargs : :func:`heatmap()` properties, optional.
+        Parameters include:
+
         %(heatmap.heatmap.parameters)s
 
     Returns

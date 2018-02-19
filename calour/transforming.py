@@ -181,7 +181,6 @@ def log_n(exp: Experiment, n=1, inplace=False):
 
 
 @ds.get_sectionsf('transforming.transform')
-@ds.dedent
 @Experiment._record_sig
 def transform(exp: Experiment, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.

@@ -180,8 +180,7 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-@ds.get_sectionsf('filter_by_data')
-@ds.dedent
+@ds.get_sectionsf('filtering.filter_by_data')
 @Experiment._record_sig
 def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=False, **kwargs):
     '''Filter samples or features by data.
@@ -424,10 +423,10 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
 
     Other Parameters
     ----------------
-    **kwargs : `filter_by_data()` properties, optional
-        Options include:
+    **kwargs : :func:`filter_by_data()` properties, optional.
+        Parameters include:
 
-        %(filter_by_data.parameters)s
+        %(filtering.filter_by_data.parameters)s
 
     Returns
     -------
@@ -439,7 +438,7 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     return newexp
 
 
-@ds.with_indent(4)
+@ds.with_indent(8)
 @Experiment._record_sig
 def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
@@ -452,9 +451,12 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     cutoff : float (optional)
         The minimal fraction of reads for the otu to be called present in a sample
 
-    Other parameters
+    Other Parameters
     ----------------
-    %(filter_by_data.parameters)s
+    **kwargs : :func:`filter_by_data()` properties, optional.
+        Parameters include:
+
+        %(filtering.filter_by_data.parameters)s
 
     Returns
     -------
@@ -465,7 +467,7 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     return newexp
 
 
-@ds.with_indent(4)
+@ds.with_indent(8)
 @Experiment._record_sig
 def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
@@ -478,9 +480,12 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
         The minimal mean abundance fraction (out of the mean of total abundance per sample) for a feature in order
         to keep it. Default is 0.01 - keep features with mean abundance >=1% of mean total abundance per sample
 
-    Other parameters
+    Other Parameters
     ----------------
-    %(filter_by_data.parameters)s
+    **kwargs : :func:`filter_by_data()` properties, optional.
+        Parameters include:
+
+        %(filtering.filter_by_data.parameters)s
 
     Returns
     -------

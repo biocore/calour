@@ -231,8 +231,7 @@ def _read_metadata(ids, f, kwargs):
     return metadata
 
 
-@ds.get_sectionsf('read')
-@ds.dedent
+@ds.get_sectionsf('io.read')
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True, data_file_type='biom',
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,
@@ -340,6 +339,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     return exp
 
 
+@ds.with_indent(8)
 def read_amplicon(data_file, sample_metadata_file=None,
                   *, min_reads, normalize, **kwargs):
     '''Load an amplicon experiment.
@@ -357,6 +357,13 @@ def read_amplicon(data_file, sample_metadata_file=None,
         ``None`` to not filter
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`read()` properties, optional.
+        Parameters include:
+
+        %(io.read.parameters)s
 
     Returns
     -------
@@ -382,7 +389,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     return exp
 
 
-@ds.with_indent(4)
+@ds.with_indent(8)
 def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
                  description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
@@ -418,7 +425,10 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     Other Parameters
     ----------------
-        %(read.parameters)s
+    **kwargs : :func:`read()` properties, optional.
+        Parameters include:
+
+        %(io.read.parameters)s
 
     Returns
     -------

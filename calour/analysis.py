@@ -36,7 +36,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Find features with correlation to a numeric metadata field
 
     With permutation based p-values and multiple hypothesis correction
@@ -67,12 +67,20 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         number of permutations to perform
     fdr_method : str
         method to compute FDR. Allowed method include "", ""
+    random_seed : int or None (optional)
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
     :class:`.Experiment`
         The experiment with only correlated features, sorted according to correlation coefficient
     '''
+    # if random seed is supplied, set the numpy random.seed
+    # (if random seed is None, we don't change the numpy seed)
+    if random_seed is not None:
+        np.random.seed(random_seed)
+
     cexp = exp.filter_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
@@ -151,7 +159,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
     # if random seed is supplied, set the numpy random.seed
-    # )if random seed is None, we don't change the numpy seed)
+    # (if random seed is None, we don't change the numpy seed)
     if random_seed is not None:
         np.random.seed(random_seed)
 
@@ -184,7 +192,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
 
 @Experiment._record_sig
-def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Test the differential expression between multiple sample groups using the Kruskal Wallis test.
     uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.
 
@@ -203,12 +211,20 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
         the desired FDR control level
     numperm : int
         number of permutations to perform
+    random_seed : int or None (optional)
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
     newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
+    # if random seed is supplied, set the numpy random.seed
+    # (if random seed is None, we don't change the numpy seed)
+    if random_seed is not None:
+        np.random.seed(random_seed)
+
     logger.debug('diff_abundance_kw for field %s' % field)
 
     # remove features with 0 abundance
