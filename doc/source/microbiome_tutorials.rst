@@ -5,10 +5,10 @@ Example jupyter notebooks explaining various Calour commands for microbiome anal
 .. toctree::
    :maxdepth: 3
 
-   microbiome_step_by_step.ipynb
-   microbiome_manipulation.ipynb
-   microbiome_diff_abundance.ipynb
-   microbiome_internal_structure.ipynb
-   microbiome_export_html.ipynb
-   microbiome_normalization.ipynb
-   microbiome_databases.ipynb
+   notebooks/microbiome_step_by_step.ipynb
+   notebooks/microbiome_manipulation.ipynb
+   notebooks/microbiome_diff_abundance.ipynb
+   notebooks/microbiome_internal_structure.ipynb
+   notebooks/microbiome_export_html.ipynb
+   notebooks/microbiome_normalization.ipynb
+   notebooks/microbiome_databases.ipynb
