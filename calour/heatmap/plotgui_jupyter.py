@@ -5,6 +5,7 @@ from IPython.display import display, clear_output
 import matplotlib
 
 from .plotgui import PlotGUI
+from ..doc_init import ds
 
 
 logger = getLogger(__name__)
@@ -19,7 +20,18 @@ class PlotGUI_Jupyter(PlotGUI):
     Parameters
     ----------
     '''
+
+    @ds.with_indent(4)
     def __init__(self, *kargs, **kwargs):
+        '''Init the GUI using the interactive Jupyter Notebook framework.
+
+        .. note:: in order to use the interactive features, you need to first use
+        the ``%matplotlib notebook`` directive inside the notebook
+
+        Other Parameters
+        ----------------
+            %(PlotGUI.parameters)s
+        '''
         super().__init__(*kargs, **kwargs)
         # create the figure to plot the heatmap into
         self._set_figure(None, kwargs['tree_size'])
@@ -166,12 +178,12 @@ class PlotGUI_Jupyter(PlotGUI):
                 annt_type = details.get('annotationtype', 'None')
                 annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
-                l = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
-                     'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
-                     '<p style="color:%s;white-space:nowrap;">'
-                     '<a href="http://dbbact.org/annotation_info/%s"'
-                     '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, annt_id, cstr)
-                idata.append(l)
+                cline = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
+                         'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
+                         '<p style="color:%s;white-space:nowrap;">'
+                         '<a href="http://dbbact.org/annotation_info/%s"'
+                         '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, annt_id, cstr)
+                idata.append(cline)
         except Exception as e:
             # use try/except to catch and show the error; otherwise the error goes unnoticed
             self._ipyw_annt.value = repr(e)

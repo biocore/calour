@@ -16,6 +16,7 @@ Functions
    sort_ids
    cluster_data
    cluster_features
+   sort_centroid
 '''
 
 # ----------------------------------------------------------------------------
@@ -36,10 +37,13 @@ from scipy import cluster, spatial
 from . import Experiment
 from .transforming import log_n, transform, scale
 from .util import _argsort
+from .doc_init import ds
+
 
 logger = getLogger(__name__)
 
 
+@ds.with_indent(8)
 @Experiment._record_sig
 def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     '''Sort the features based on the center of mass
@@ -62,6 +66,13 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
         True to Replace data in exp
     kwargs : dict
         additional keyword parameters passed to ``transform``.
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`transforming.transform()` properties, optional.
+        Parameters include:
+
+        %(transforming.transform.parameters)s
 
     Returns
     -------
@@ -86,6 +97,8 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     return exp
 
 
+@ds.get_sectionsf('sorting.cluster_data')
+@ds.with_indent(8)
 @Experiment._record_sig
 def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', inplace=False, **kwargs):
     '''Cluster the samples/features.
@@ -107,8 +120,13 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
     inplace : bool (optional)
         False (default) to create a copy.
         True to Replace data in exp.
-    kwargs : dict
-        additional keyword parameters passed to ``transform``.
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`transforming.transform()` properties, optional.
+        Parameters include:
+
+        %(transforming.transform.parameters)s
 
     Returns
     -------
@@ -145,8 +163,13 @@ def cluster_features(exp: Experiment, min_abundance=0, inplace=False, **kwargs):
     ----------
     min_abundance : Number, optional
         filter away features less than ``min_abundance``. Default to 0.
-    kwargs : dict
-        keyword arguments passing to ``cluster_data``
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`cluster_data()` properties, optional.
+        Parameters include:
+
+        %(sorting.cluster_data.parameters)s
 
     Returns
     -------
@@ -171,6 +194,7 @@ def cluster_features(exp: Experiment, min_abundance=0, inplace=False, **kwargs):
         **kwargs)
 
 
+@ds.get_sectionsf('sorting.sort_by_metadata')
 @Experiment._record_sig
 def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
     '''Sort samples or features based on metadata values in the field.
@@ -201,6 +225,7 @@ def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
     return exp.reorder(idx, axis=axis, inplace=inplace)
 
 
+@ds.get_sectionsf('sorting.sort_by_data')
 @Experiment._record_sig
 def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=False, reverse=False, **kwargs):
     '''Sort features based on their mean frequency.
@@ -302,6 +327,7 @@ def _prevalence(x, cutoff=0):
     return np.sum(i >= cutoff for i in x) / len(x)
 
 
+@ds.with_indent(8)
 @Experiment._record_sig
 def sort_samples(exp: Experiment, field, **kwargs):
     '''Sort samples by field
@@ -312,6 +338,13 @@ def sort_samples(exp: Experiment, field, **kwargs):
     field : str
         The field to sort the samples by
 
+    Other Parameters
+    ----------------
+    **kwargs : :func:`sort_by_metadata()` properties, optional.
+        Parameters include:
+
+        %(sorting.sort_by_metadata.parameters)s
+
     Returns
     -------
     :class:`.Experiment` with samples sorted according to values in field
@@ -320,6 +353,7 @@ def sort_samples(exp: Experiment, field, **kwargs):
     return newexp
 
 
+@ds.with_indent(8)
 @Experiment._record_sig
 def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
     '''Sort features based on their abundance in a subset of the samples.
@@ -332,8 +366,13 @@ def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
         None (default) to sort on all samples. Subset samples by
         columns (specified by dict keys) in sample metadata matching
         the dict values (a list). sorting is only on samples matching this list
-    kwargs : dict
-        keyword arguments passing to :func:`sort_by_data`.
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`sort_by_data()` properties, optional.
+        Parameters include:
+
+        %(sorting.sort_by_data.parameters)s
 
     Returns
     -------

@@ -1,3 +1,26 @@
+'''
+database access functions (:mod:`calour.database`)
+==================================================
+
+.. currentmodule:: calour.database
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   add_terms_to_features
+   enrichment
+'''
+
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
+
 from logging import getLogger
 from abc import ABC
 from collections import defaultdict
@@ -37,7 +60,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         try:
             # import the database module
             db_module = importlib.import_module(module_name)
-        except:
+        except ImportError:
             raise ValueError('Database interface %s not installed. Did you do pip install for it?' % module_name)
         # get the class
         DBClass = getattr(db_module, class_name)
@@ -77,7 +100,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         list of experiments to ignore when adding the terms
     Returns
     -------
-    exp : :class:`.Experiment`
+    exp : :class:`.Experiment` with feature_metadata field containing the most common database term for each feature
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
@@ -103,7 +126,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     return exp
 
 
-def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
+def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
     '''Get the list of enriched annotation terms in features compared to all features in exp.
 
     Uses the database specific enrichment analysis method.
@@ -114,7 +137,7 @@ def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
         The features to test for enrichment (compared to all other features in exp)
     dbname : str
         the database to use for the annotation terms and enrichment analysis
-    *kargs, **kwargs
+    *args, **kwargs
         Additional database specific parameters
 
     Returns
@@ -125,6 +148,8 @@ def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
             feature : str the feature
             pval : the p-value for the enrichment (float)
             odif : the effect size (float)
+            group : str
+                The value group where the tern in enriched
             observed : the number of observations of this term in group1 (int)
             expected : the expected (based on all features) number of observations of this term in group1 (float)
             frac_group1 : fraction of total terms in group 1 which are the specific term (float)
@@ -136,7 +161,7 @@ def enrichment(exp: Experiment, features, dbname, *kargs, **kwargs):
     db = _get_database_class(dbname, exp=exp)
     if not db.can_do_enrichment:
         raise ValueError('database %s does not support enrichment analysis' % dbname)
-    return db.enrichment(exp, features, *kargs, **kwargs)
+    return db.enrichment(exp, features, *args, **kwargs)
 
 
 class Database(ABC):
@@ -294,7 +319,7 @@ class Database(ABC):
         logger.debug('Generic function for get_feature_terms')
         return {}
 
-    def enrichment(self, exp, features, *kargs, **kwargs):
+    def enrichment(self, exp, features, *args, **kwargs):
         '''Get the list of enriched terms in features compared to all features in exp.
 
         Parameters
@@ -303,7 +328,7 @@ class Database(ABC):
             The experiment to compare the features to
         features : list of str
             The features (from exp) to test for enrichmnt
-        *kargs, **kwargs : additional dtabase specific parameters
+        *args, **kwargs : additional dtabase specific parameters
 
         Returns
         -------
@@ -319,4 +344,23 @@ class Database(ABC):
                     the enriched term
         '''
         logger.debug('Generic function for enrichment')
+        return None
+
+    def show_term_details(self, term, exp, features, *args, **kwargs):
+        '''
+        Show details about the specific term in the database and in what features it appears
+
+        Parameters
+        ----------
+        term : str
+            The term to get the details for
+        exp : :class:`.Experiment`
+            The calour experiment for showing the term details in
+        features: list of str
+            The features in the experiment for which to show the term details
+
+        Returns
+        -------
+        '''
+        logger.debug('Generic function for term details')
         return None

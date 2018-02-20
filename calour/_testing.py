@@ -23,10 +23,11 @@ class Tests(TestCase):
 
         test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
         self.test_data_dir = test_data_dir
-        # a simple artificial biom table
+        # a simple artificial biom table 21 sample x 12 feature
         self.test1_biom = join(test_data_dir, 'test1.biom')
         self.test1_samp = join(test_data_dir, 'test1.sample')
         self.test1_feat = join(test_data_dir, 'test1.feature')
+        # a simpler artificial data set 9 sample x 8 feature
         self.test2_biom = join(test_data_dir, 'test2.biom')
         self.test2_samp = join(test_data_dir, 'test2.sample')
         self.test2_feat = join(test_data_dir, 'test2.feature')

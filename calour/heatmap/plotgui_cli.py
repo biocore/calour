@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from .plotgui import PlotGUI
+from ..doc_init import ds
 
 
 class PlotGUI_CLI(PlotGUI):
@@ -15,7 +16,17 @@ class PlotGUI_CLI(PlotGUI):
     It uses ``matplotlib`` only to display the plot and prints info on the
     terminal screen.
     '''
+    @ds.dedent
     def __init__(self, *kargs, **kwargs):
+        '''Init the GUI using the cli GUI.
+
+        This GUI only enables the zooming/panning and displays information following a mouse click
+        in the terminal window
+
+        Other Parameters
+        ----------------
+            %(PlotGUI.parameters)s
+        '''
         super().__init__(*kargs, **kwargs)
         # create the figure to plot the heatmap into
         self._set_figure(None, kwargs['tree_size'])

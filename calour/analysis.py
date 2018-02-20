@@ -36,7 +36,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Find features with correlation to a numeric metadata field
 
     With permutation based p-values and multiple hypothesis correction
@@ -67,12 +67,20 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         number of permutations to perform
     fdr_method : str
         method to compute FDR. Allowed method include "", ""
+    random_seed : int or None (optional)
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
     :class:`.Experiment`
         The experiment with only correlated features, sorted according to correlation coefficient
     '''
+    # if random seed is supplied, set the numpy random.seed
+    # (if random seed is None, we don't change the numpy seed)
+    if random_seed is not None:
+        np.random.seed(random_seed)
+
     cexp = exp.filter_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
@@ -100,7 +108,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @Experiment._record_sig
-def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''
     test the differential expression between 2 groups (val1 and val2 in field field)
     using permutation based fdr (dsfdr)
@@ -128,25 +136,44 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
-    alpha : float
+    alpha : float (optional)
         the desired FDR control level
-    numperm : int
+    numperm : int (optional)
         number of permutations to perform
+    fdr_method : str (optional)
+        The method used to control the False Discovery Rate. options are:
+            'dsfdr' : the discrete FDR control method
+            'bhfdr' : Benjamini-Hochberg FDR method
+            'byfdr' : Benjamini-Yekutielli FDR method
+            'filterBH' : Benjamini-Hochberg FDR method following removal of all features
+                         with minimal possible p-value less than alpha (e.g. a feature
+                         that appears in only 1 sample can obtain a minimal p-value of 0.5
+                         and will therefore be removed when say alpha=0.1)
+    random_seed : int or None (optional)
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
     newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
+    # if random seed is supplied, set the numpy random.seed
+    # (if random seed is None, we don't change the numpy seed)
+    if random_seed is not None:
+        np.random.seed(random_seed)
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     val1 = _to_list(val1)
+    name1 = ','.join(val1)
     if val2 is not None:
         val2 = _to_list(val2)
-        cexp = exp.filter_samples(field, val1+val2, negate=False)
+        cexp = exp.filter_samples(field, val1 + val2, negate=False)
         logger.info('%d samples with both values' % cexp.shape[0])
+        name2 = ','.join(val2)
     else:
         cexp = exp
+        name2 = 'NOT %s' % name1
 
     # remove features not present in both groups
     cexp = cexp.filter_abundance(0, strict=True)
@@ -158,11 +185,14 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    orig_group = [name1 if x > 0 else name2 for x in newexp.feature_metadata['_calour_diff_abundance_effect']]
+    newexp.feature_metadata['_calour_diff_abundance_group'] = orig_group
+    return newexp
 
 
 @Experiment._record_sig
-def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr'):
+def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Test the differential expression between multiple sample groups using the Kruskal Wallis test.
     uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.
 
@@ -181,12 +211,20 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
         the desired FDR control level
     numperm : int
         number of permutations to perform
+    random_seed : int or None (optional)
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
     newexp : :class:`.Experiment`
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
+    # if random seed is supplied, set the numpy random.seed
+    # (if random seed is None, we don't change the numpy seed)
+    if random_seed is not None:
+        np.random.seed(random_seed)
+
     logger.debug('diff_abundance_kw for field %s' % field)
 
     # remove features with 0 abundance
@@ -197,7 +235,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     labels = np.zeros(len(exp.sample_metadata))
     for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
         labels[exp.sample_metadata[field].values == clabel] = idx
-    logger.debug('Found %d unique sample labels' % (idx+1))
+    logger.debug('Found %d unique sample labels' % (idx + 1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
 
     logger.info('Found %d significant features' % (np.sum(keep)))

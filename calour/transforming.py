@@ -41,6 +41,7 @@ from skbio.stats.composition import clr, centralize as skbio_centralize
 from skbio.stats import subsample_counts
 
 from .experiment import Experiment
+from .doc_init import ds
 
 
 logger = getLogger(__name__)
@@ -179,6 +180,7 @@ def log_n(exp: Experiment, n=1, inplace=False):
     return exp
 
 
+@ds.get_sectionsf('transforming.transform')
 @Experiment._record_sig
 def transform(exp: Experiment, steps=[], inplace=False, **kwargs):
     '''Chain transformations together.

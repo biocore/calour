@@ -276,7 +276,7 @@ class UnrootedDendrogram(Dendrogram):
             for child in self.children:
                 # calculate the arc that covers the subtree.
                 ca = child.leafcount * da
-                points += child.update_coordinates(s, x2, y2, a+ca/2, da)
+                points += child.update_coordinates(s, x2, y2, a + ca / 2, da)
                 a += ca
         return points
 
@@ -375,14 +375,14 @@ class SquareDendrogram(RootedDendrogram):
     def ycoords(self, scale, y1):
         cys = [c.y1 for c in self.children]
         if cys:
-            y2 = (cys[0]+cys[-1]) / 2.0
+            y2 = (cys[0] + cys[-1]) / 2.0
         else:
             y2 = y1 - 0.5 * scale.y
         return (y2, y2)
 
     def xcoords(self, scale, x1):
         if self.is_tip():
-            return (x1, (scale.height-(self.height-self.length))*scale.x)
+            return (x1, (scale.height - (self.height - self.length)) * scale.x)
         else:
             # give some margins for internal nodes
             dx = scale.x * self.length * 0.95
@@ -423,8 +423,8 @@ def _plot_dendrogram(ax_dendrogram, table, edges):
     for i in range(len(edges.index)):
         row = edges.iloc[i]
         ax_dendrogram.plot([row.x0, row.x1],
-                           [row.y0-offset, row.y1-offset], '-k')
-    ax_dendrogram.set_ylim([-offset, table.shape[0]-offset])
+                           [row.y0 - offset, row.y1 - offset], '-k')
+    ax_dendrogram.set_ylim([- offset, table.shape[0] - offset])
     ax_dendrogram.set_yticks([])
     ax_dendrogram.set_xticks([])
 
