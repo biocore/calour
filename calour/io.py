@@ -37,6 +37,8 @@ from .amplicon_experiment import AmpliconExperiment
 from .ms1_experiment import MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 
+from .doc_init import ds
+
 
 logger = getLogger(__name__)
 
@@ -181,85 +183,6 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False):
     return sid, fid, data
 
 
-def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
-                 description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
-    '''Load an OpenMS metabolomics experiment.
-
-    Parameters
-    ----------
-    data_file : str
-        name of the OpenMS bucket table CSV file.
-    sample_metadata_file : str or None (optional)
-        None (default) to not load metadata per sample
-        str to specify name of sample mapping file (tsv)
-    gnps_file : str or None (optional)
-        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file
-        for use with the 'gnps' database in plot
-    feature_metadata_file : str or None (optional)
-        Name of table containing additional metadata about each feature
-        None (default) to not load
-    description : str or None (optional)
-        Name of the experiment (for display purposes).
-        None (default) to assign file name
-    sparse : bool (optional)
-        False (default) to store data as dense matrix (faster but more memory)
-        True to store as sparse (CSR)
-    rows_are_samples : bool (optional)
-        True to treat csv data file rows as samples,
-        False (default) to treat csv data files rows as features
-    mz_rt_sep: str or None (optional)
-        The separator for the mz/rt fields in the feature names in data_file.
-        None (default) for autodetect
-        '_' or ' ' are typical options
-    normalize : int or None
-        normalize each sample to the specified reads. ``None`` to not normalize
-
-    Returns
-    -------
-    :class:`.Experiment`
-    '''
-    logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
-    if rows_are_samples:
-        data_file_type = 'openms_transpose'
-    else:
-        data_file_type = 'openms'
-    exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type=data_file_type, sparse=sparse,
-               normalize=normalize, cls=MS1Experiment, **kwargs)
-
-    exp.sample_metadata['id'] = exp.sample_metadata.index.values
-
-    # generate nice M/Z (MZ) and retention time (RT) columns for each feature
-    exp.feature_metadata['id'] = exp.feature_metadata.index.values
-
-    if mz_rt_sep is None:
-        # autodetect the mz/rt separator
-        tmp = exp.feature_metadata['id'].iloc[0].split('_')
-        if len(tmp) == 2:
-            logger.debug('Autodetcted "_" as mz/rt separator')
-            mz_rt_sep = '_'
-        else:
-            tmp = exp.feature_metadata['id'].iloc[0].split()
-            if len(tmp) == 2:
-                logger.debug('Autodetcted " " as mz/rt separator')
-                mz_rt_sep = None
-            else:
-                raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
-
-    exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
-    # trim the whitespaces
-    exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].str.strip()
-    exp.feature_metadata['RT'] = exp.feature_metadata['RT'].str.strip()
-    if gnps_file:
-        # load the gnps table
-        gnps_data = pd.read_table(gnps_file, sep='\t')
-        exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
-        # add gnps names to the features
-        exp._prepare_gnps()
-
-    return exp
-
-
 def _read_metadata(ids, f, kwargs):
     '''read metadata table
 
@@ -308,6 +231,7 @@ def _read_metadata(ids, f, kwargs):
     return metadata
 
 
+@ds.get_sectionsf('io.read')
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True, data_file_type='biom',
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,
@@ -415,6 +339,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     return exp
 
 
+@ds.with_indent(8)
 def read_amplicon(data_file, sample_metadata_file=None,
                   *, min_reads, normalize, **kwargs):
     '''Load an amplicon experiment.
@@ -432,6 +357,13 @@ def read_amplicon(data_file, sample_metadata_file=None,
         ``None`` to not filter
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`read()` properties, optional.
+        Parameters include:
+
+        %(io.read.parameters)s
 
     Returns
     -------
@@ -453,6 +385,93 @@ def read_amplicon(data_file, sample_metadata_file=None,
         exp.filter_by_data('sum_abundance', cutoff=min_reads, inplace=True)
     if normalize is not None:
         exp.normalize(total=normalize, axis='s', inplace=True)
+
+    return exp
+
+
+@ds.with_indent(8)
+def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
+                 description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
+    '''Load an OpenMS metabolomics experiment.
+
+    Parameters
+    ----------
+    data_file : str
+        name of the OpenMS bucket table CSV file.
+    sample_metadata_file : str or None (optional)
+        None (default) to not load metadata per sample
+        str to specify name of sample mapping file (tsv)
+    gnps_file : str or None (optional)
+        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file
+        for use with the 'gnps' database in plot
+    feature_metadata_file : str or None (optional)
+        Name of table containing additional metadata about each feature
+        None (default) to not load
+    description : str or None (optional)
+        Name of the experiment (for display purposes).
+        None (default) to assign file name
+    sparse : bool (optional)
+        False (default) to store data as dense matrix (faster but more memory)
+        True to store as sparse (CSR)
+    rows_are_samples : bool (optional)
+        True to treat csv data file rows as samples,
+        False (default) to treat csv data files rows as features
+    mz_rt_sep: str or None (optional)
+        The separator for the mz/rt fields in the feature names in data_file.
+        None (default) for autodetect
+        '_' or ' ' are typical options
+    normalize : int or None
+        normalize each sample to the specified reads. ``None`` to not normalize
+
+    Other Parameters
+    ----------------
+    **kwargs : :func:`read()` properties, optional.
+        Parameters include:
+
+        %(io.read.parameters)s
+
+    Returns
+    -------
+    :class:`.Experiment`
+    '''
+    logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
+    if rows_are_samples:
+        data_file_type = 'openms_transpose'
+    else:
+        data_file_type = 'openms'
+    exp = read(data_file, sample_metadata_file, feature_metadata_file,
+               data_file_type=data_file_type, sparse=sparse,
+               normalize=normalize, cls=MS1Experiment, **kwargs)
+
+    exp.sample_metadata['id'] = exp.sample_metadata.index.values
+
+    # generate nice M/Z (MZ) and retention time (RT) columns for each feature
+    exp.feature_metadata['id'] = exp.feature_metadata.index.values
+
+    if mz_rt_sep is None:
+        # autodetect the mz/rt separator
+        tmp = exp.feature_metadata['id'].iloc[0].split('_')
+        if len(tmp) == 2:
+            logger.debug('Autodetcted "_" as mz/rt separator')
+            mz_rt_sep = '_'
+        else:
+            tmp = exp.feature_metadata['id'].iloc[0].split()
+            if len(tmp) == 2:
+                logger.debug('Autodetcted " " as mz/rt separator')
+                mz_rt_sep = None
+            else:
+                raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
+
+    exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
+    # trim the whitespaces
+    exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].str.strip()
+    exp.feature_metadata['RT'] = exp.feature_metadata['RT'].str.strip()
+    if gnps_file:
+        # load the gnps table
+        gnps_data = pd.read_table(gnps_file, sep='\t')
+        exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
+        # add gnps names to the features
+        exp._prepare_gnps()
 
     return exp
 

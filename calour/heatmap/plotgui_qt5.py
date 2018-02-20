@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
 from PyQt5.QtCore import Qt
 
 from .plotgui import PlotGUI
-
+from ..doc_init import ds
 
 logger = getLogger(__name__)
 
@@ -28,7 +28,15 @@ class PlotGUI_QT5(PlotGUI):
     app_window : Windows belonging to the QT5 App
     databases :
     '''
+
+    @ds.dedent
     def __init__(self, *kargs, **kwargs):
+        '''Init the GUI using the Qt5 framework.
+
+        Other Parameters
+        ----------------
+            %(PlotGUI.parameters)s
+        '''
         super().__init__(*kargs, **kwargs)
         # create qt app
         app = QtCore.QCoreApplication.instance()

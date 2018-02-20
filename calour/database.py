@@ -1,3 +1,26 @@
+'''
+database access functions (:mod:`calour.database`)
+==================================================
+
+.. currentmodule:: calour.database
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   add_terms_to_features
+   enrichment
+'''
+
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--,  Calour development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+# ----------------------------------------------------------------------------
+
 from logging import getLogger
 from abc import ABC
 from collections import defaultdict
@@ -77,7 +100,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         list of experiments to ignore when adding the terms
     Returns
     -------
-    exp : :class:`.Experiment`
+    exp : :class:`.Experiment` with feature_metadata field containing the most common database term for each feature
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values

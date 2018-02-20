@@ -67,7 +67,6 @@ def compute_prevalence(abundance):
     cutoffs, counts = np.unique(abundance, return_counts=True)
     cum_counts = np.cumsum(counts)
     prevalences = 1 - cum_counts / counts.sum()
-    # print(cutoffs, prevalences)
     return cutoffs, prevalences
 
 
@@ -465,6 +464,6 @@ def register_functions(cls, modules=None):
                         setattr(cls, fn, _clone_function(f))
                         updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
                                    '\\1'
-                                   '\n    exp : :class:`.{0}`\n')
+                                   '\n    exp : :class:`.{0}`')
 
                         f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)

@@ -5,6 +5,7 @@ from IPython.display import display, clear_output
 import matplotlib
 
 from .plotgui import PlotGUI
+from ..doc_init import ds
 
 
 logger = getLogger(__name__)
@@ -19,7 +20,18 @@ class PlotGUI_Jupyter(PlotGUI):
     Parameters
     ----------
     '''
+
+    @ds.with_indent(4)
     def __init__(self, *kargs, **kwargs):
+        '''Init the GUI using the interactive Jupyter Notebook framework.
+
+        .. note:: in order to use the interactive features, you need to first use
+        the ``%matplotlib notebook`` directive inside the notebook
+
+        Other Parameters
+        ----------------
+            %(PlotGUI.parameters)s
+        '''
         super().__init__(*kargs, **kwargs)
         # create the figure to plot the heatmap into
         self._set_figure(None, kwargs['tree_size'])

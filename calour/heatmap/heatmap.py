@@ -18,6 +18,7 @@ from .. import Experiment
 from ..database import _get_database_class
 from .._dendrogram import plot_tree
 from ..util import _to_list, _transition_index
+from ..doc_init import ds
 
 
 logger = getLogger(__name__)
@@ -26,7 +27,9 @@ logger = getLogger(__name__)
 def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     '''Create plot GUI object.
 
-    It still waits for the heatmap to be plotted and set up.
+    Initializes the relevant plot GUI and links the databases to it.
+
+    .. note:: The heatmap is not plotted into the GUI in this function.
 
     Parameters
     ----------
@@ -89,6 +92,10 @@ def _truncate_middle(x, length=16):
 def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
     '''Plot tick and ticklabels of x or y axis.
 
+    Parameters
+    ----------
+    ax : :class:`matplotlib.axes.Axes`
+        The axes to plot into
     Parameters mean axes, x or y axis, list of tick labels, max number
     of ticks, the upper bound of xlim/ylim, dict passing as text
     property, the length of each tick label.
@@ -138,6 +145,7 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
         t.set(**kwargs)
 
 
+@ds.get_sectionsf('heatmap.heatmap')
 def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
@@ -417,6 +425,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
     return ax
 
 
+@ds.with_indent(8)
 def plot(exp: Experiment, title=None,
          barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
          bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
@@ -466,7 +475,6 @@ def plot(exp: Experiment, title=None,
     |`→` or `>`                 |scroll the heatmap right on x axis |
     +---------------------------+-----------------------------------+
 
-
     Parameters
     ----------
     title : str (optional)
@@ -493,8 +501,13 @@ def plot(exp: Experiment, title=None,
     databases : list of str or ``None``
         a list of databases to access or add annotation
         ``None`` (default) to use the default field based on the experiment.
-    heatmap_kwargs : dict, optional
-        keyword arguments passing to :func:`heatmap` function.
+
+    Other parameters
+    ----------------
+    **heatmap_kwargs : :func:`heatmap()` properties, optional.
+        Parameters include:
+
+        %(heatmap.heatmap.parameters)s
 
     Returns
     -------

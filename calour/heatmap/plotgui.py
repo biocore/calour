@@ -12,10 +12,13 @@ from abc import ABC
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
+from ..doc_init import ds
 
 logger = getLogger(__name__)
 
 
+@ds.get_sectionsf('PlotGUI')
+@ds.dedent
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 

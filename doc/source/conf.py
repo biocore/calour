@@ -113,6 +113,7 @@ import calour
 # documentation root, use os.path.abspath to make it absolute, like shown here:
 #
 #    sys.path.insert(0, os.path.abspath('../sphinxext/foo'))
+sys.path.insert(0, os.path.abspath('../../notebooks'))
 
 # -- General configuration ------------------------------------------------
 
@@ -126,13 +127,14 @@ needs_sphinx = '1.5'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx_autodoc_typehints',
+    # 'sphinx_autodoc_typehints',
     'sphinx.ext.mathjax',
     'numpydoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'nbsphinx'
 ]
 
 # Determine if the matplotlib has a recent enough version of the
@@ -194,7 +196,7 @@ release = calour.__version__
 # Exclude this file since it is only used by autosummary to generate other RST
 # files during the build process, and it will generate sphinx errors and
 # warnings otherwise.
-exclude_patterns = ['_templates/autosummary/*.rst']
+exclude_patterns = ['_templates/autosummary/*.rst', '_build', '**.ipynb_checkpoints']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -269,6 +271,8 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static/']
+# if we need a custom css (similar to matplotlib)
+# html_style = 'my-styles.css'
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

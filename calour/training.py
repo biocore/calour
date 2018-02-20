@@ -43,21 +43,13 @@ def onehot_encode_features(exp: Experiment, fields, sparse=None, inplace=False):
     ...                                               index=['s1', 's2']),
     ...                  feature_metadata=pd.DataFrame({'motile': ['y', 'n']}, index=['otu1', 'otu2']))
     >>> exp
-    Experiment
-    ----------
-    data dimension: 2 samples, 2 features
-    sample IDs: Index(['s1', 's2'], dtype='object')
-    feature IDs: Index(['otu1', 'otu2'], dtype='object')
+    Experiment with 2 samples, 2 features
 
     Let's add the columns of `category` and `ph` as features into data table:
 
     >>> new = exp.onehot_encode_features(['category', 'ph'])
     >>> new
-    Experiment
-    ----------
-    data dimension: 2 samples, 5 features
-    sample IDs: Index(['s1', 's2'], dtype='object')
-    feature IDs: Index(['category=A', 'category=B', 'ph', 'otu1', 'otu2'], dtype='object')
+    Experiment with 2 samples, 5 features
     >>> new.feature_metadata
                motile
     category=A    NaN
