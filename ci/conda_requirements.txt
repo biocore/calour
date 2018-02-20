@@ -13,4 +13,3 @@ statsmodels
 ipywidgets
 sphinx
 sphinx_bootstrap_theme
-pandoc

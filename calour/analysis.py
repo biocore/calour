@@ -56,7 +56,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         Note: setting nonzero to True slows down the calculation
         Note: can be set to True only using 'spearman' or 'pearson', not using a custom function
     transform : str or None
-        transformation to apply to the data before caluculating the statistic
+        transformation to apply to the data before caluculating the statistic.
         'rankdata' : rank transfrom each OTU reads
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
@@ -129,7 +129,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
         function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
     transform : str or None
-        transformation to apply to the data before caluculating the statistic
+        transformation to apply to the data before caluculating the statistic.
         'rankdata' : rank transfrom each OTU reads
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
@@ -141,18 +141,17 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     fdr_method : str (optional)
         The method used to control the False Discovery Rate. options are:
 
-            'dsfdr' : the discrete FDR control method
+        'dsfdr' : the discrete FDR control method
 
-            'bhfdr' : Benjamini-Hochberg FDR method
+        'bhfdr' : Benjamini-Hochberg FDR method
 
-            'byfdr' : Benjamini-Yekutielli FDR method
+        'byfdr' : Benjamini-Yekutielli FDR method
 
-            'filterBH' : Benjamini-Hochberg FDR method following
-                         removal of all features with minimal possible
-                         p-value less than alpha (e.g. a feature that
-                         appears in only 1 sample can obtain a minimal
-                         p-value of 0.5 and will therefore be removed
-                         when say alpha=0.1)
+        'filterBH' : Benjamini-Hochberg FDR method following
+        removal of all features with minimal possible p-value less
+        than alpha (e.g. a feature that appears in only 1 sample
+        can obtain a minimal p-value of 0.5 and will therefore be
+        removed when say alpha=0.1)
 
     random_seed : int or None (optional)
         int to set the numpy random seed to this number before running the random permutation test.
@@ -160,8 +159,8 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     Returns
     -------
-    newexp : Experiment
-        The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
+    Experiment
+        A new experiment with only significant (FDR <= maxfval) difference, sorted according to difference
 
     '''
     # if random seed is supplied, set the numpy random.seed

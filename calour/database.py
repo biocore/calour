@@ -137,26 +137,37 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
         The features to test for enrichment (compared to all other features in exp)
     dbname : str
         the database to use for the annotation terms and enrichment analysis
-    *args, **kwargs
+    *args : tuple
+    **kwargs : dict
         Additional database specific parameters
 
     Returns
     -------
     pandas.DataFrame
-    with info about significantly enriched terms.
-        columns:
-            feature : str the feature
-            pval : the p-value for the enrichment (float)
-            odif : the effect size (float)
-            group : str
-                The value group where the tern in enriched
-            observed : the number of observations of this term in group1 (int)
-            expected : the expected (based on all features) number of observations of this term in group1 (float)
-            frac_group1 : fraction of total terms in group 1 which are the specific term (float)
-            frac_group2 : fraction of total terms in group 2 which are the specific term (float)
-            num_group1 : number of total terms in group 1 which are the specific term (float)
-            num_group2 : number of total terms in group 2 which are the specific term (float)
-            description : the term (str)
+
+        The dataframe contains info about significantly enriched terms. The columns include:
+
+        feature : str the feature
+
+        pval : the p-value for the enrichment (float)
+
+        odif : the effect size (float)
+
+        group : str The value group where the tern in enriched
+
+        observed : the number of observations of this term in group1 (int)
+
+        expected : the expected (based on all features) number of observations of this term in group1 (float)
+
+        frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+
+        frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+
+        num_group1 : number of total terms in group 1 which are the specific term (float)
+
+        num_group2 : number of total terms in group 2 which are the specific term (float)
+
+        description : str. the term
     '''
     db = _get_database_class(dbname, exp=exp)
     if not db.can_do_enrichment:
@@ -327,21 +338,23 @@ class Database(ABC):
         exp : Experiment
             The experiment to compare the features to
         features : list of str
-            The features (from exp) to test for enrichmnt
-        *args, **kwargs : additional dtabase specific parameters
+            The features (from exp) to test for enrichment
+        *args : tuple
+        **kwargs : dict
+            Additional database specific parameters
 
         Returns
         -------
-        pandas.DataFrame with  info about significantly enriched terms.
-            columns:
-                feature : str
-                    the feature
-                pval : float
-                    the p-value for the enrichment
-                odif : float
-                    the effect size for the enrichment
-                term : str
-                    the enriched term
+        pandas.DataFrame
+            Its columns include:
+
+            feature : str. the feature
+
+            pval : float. the p-value for the enrichment
+
+            odif : float. the effect size for the enrichment
+
+            term : str. the enriched term
         '''
         logger.debug('Generic function for enrichment')
         return None

@@ -249,7 +249,7 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
 
     Returns
     -------
-    ax : matplotlib.axes.Axes
+    matplotlib.axes.Axes
         The Axes object containing the plot.
 
     '''
