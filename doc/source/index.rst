@@ -35,7 +35,7 @@ You can also try Calour (**without installing**) on an online `mybinder server <
 Getting started
 ---------------
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    getting_started
 
