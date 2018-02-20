@@ -58,12 +58,12 @@ def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
     axis : 0, 1, 's', or 'f', optional
         the axis to normalize. 0 or 's' (default) is normalize each sample;
         1 or 'f' to normalize each feature
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy, True to replace values in exp
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the normalized experiment
     '''
     if isinstance(total, bool):
@@ -91,12 +91,12 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
     axis : 0, 1, 's', or 'f', optional
         the axis to normalize. 0 or 's' (default) is normalize each sample;
         1 or 'f' to normalize each feature
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy, True to replace values in exp
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the normalized experiment
     '''
     if not inplace:
@@ -119,7 +119,7 @@ def scale(exp: Experiment, axis=0, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('scaling the data, axis=%d' % axis)
     if not inplace:
@@ -144,7 +144,7 @@ def binarize(exp: Experiment, threshold=1, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('binarizing the data. threshold=%f' % threshold)
     if not inplace:
@@ -165,7 +165,7 @@ def log_n(exp: Experiment, n=1, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('log_n transforming the data, min. threshold=%f' % n)
     if not inplace:
@@ -201,7 +201,7 @@ def transform(exp: Experiment, steps=[], inplace=False, **kwargs):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with its data transformed
 
     '''
@@ -235,17 +235,17 @@ def normalize_by_subset_features(exp: Experiment, features, total=10000, negate=
     ----------
     features : list of str
         The feature IDs to exclude (or include if negate=False)
-    total : int (optional)
+    total : int, optional
         The total abundance for the non-excluded features per sample
-    negate : bool (optional)
+    negate : bool, optional
         True (default) to calculate normalization factor without features in features list.
         False to calculate normalization factor only with features in features list.
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a new experiment, True to normalize in place
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The normalized experiment
     '''
     feature_pos = exp.feature_metadata.index.isin(features)
@@ -271,16 +271,16 @@ def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace
 
     Parameters
     ----------
-    min_frac : float (optional)
+    min_frac : float, optional
         ignore features with mean (over all samples) >= min_frac.
-    total : int (optional)
+    total : int, optional
         The total abundance for the non-excluded features per sample
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a new experiment, True to normalize in place
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The normalized experiment. Note that all features are normalized (including the ones with mean>=min_frac)
     '''
     comp_features = exp.filter_mean(min_frac)
@@ -297,13 +297,13 @@ def random_permute_data(exp: Experiment, normalize=True):
 
     Parameters
     ----------
-    normalize : bool (optional)
+    normalize : bool, optional
         True (default) to normalize each sample after completing the feature shuffling.
         False to not normalize
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         With each feature shuffled independently
     '''
     newexp = exp.copy()
@@ -331,7 +331,7 @@ def center_log(exp: Experiment, method=lambda matrix: matrix + 1, centralize=Fal
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The normalized experiment. Note that all features are clr normalized.
 
     See Also
@@ -372,7 +372,7 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The subsampled experiment.
 
     See Also

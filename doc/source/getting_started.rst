@@ -4,7 +4,7 @@ Introduction
 ------------
 Calour is a python/jupyter notebook module for analysis of tabular (sample X feature) data and associated metadata. Initially desgined for microbiome amplicon experiment analysis (where features are bacteria and the table contains the amount of reads for each features in each sample), Calour has been extended to also facilitate analysis of metabolomics data (where features are unique MS1 or MS2 ids).
 
-Calour synchronizes the 2D data table (feature X sample) with the associated sample metadata (i.e. the sample mapping file) and the feature metadata (i.e. per feature data such as taxonomy, MZ/RT etc.) and enables various data manipulation functions (such as sorting, clusterung, filtering, etc.)
+Calour synchronizes the 2D data table (feature by sample) with the associated sample metadata (i.e. the sample mapping file) and feature metadata (i.e. per feature data such as taxonomy, MZ/RT etc.) and enables various data manipulation functions (such as sorting, clustering, filtering, etc.)
 
 An important feature of calour is an interactive heatmap for exploration of the data. Since typical experiments may contain hundreds of samples and thousands of features, it is difficult to look at all the features/samples in a single static heatmap. The Calour heatmap allows easy zooming/panning, and displays information selected features/samples. This information can also include data from external databases (such as dbBact.org for amplicon experiments or GNPS for metabolomics experiments), which can display additional information about the selected feature.
 
@@ -19,32 +19,3 @@ Calour contains severl functions for loading (or generating) such an Experiment.
 Heatmap GUI
 -----------
 Calour can display the interactive heatmap either as a stand alone Qt5 window, or as an integrated jupyter notebook figure. The choice of the GUI is made in the `Experiment.plot()` function using the `gui='qt5'` or `gui='jupyter'` options. Additionaly, heatmaps can be generated as a non-interactive figure using the `gui='cli'` option.
-
-Running Calour
-==============
-Since calour is a python module, there is no need to run it. Instead, Calour is usually imported into the jupyter notebook you are using for analysis.
-
-For a full GUI using Calour, install `EZCalour <https://github.com/amnona/EZCalour>`_.
-
-
-Starting a Calour analysis notebook
------------------------------------
-If you installed Calour in a conda environment (usually the environment is named calour), first activate the environment:
-
-```source activate calour``` (in max/linux)
-
-or
-
-```activate calour``` (in windows)
-
-In order to run the jupyter notebook server, change directory to the directory where your analysis notebook is located and then type:
-
-```jupyter notebook```
-
-and within the notebook, just import the Calour module using:
-
-```import calour as ca```
-
-For a generic Calour microbiome analysis notebook that contains the standard analysis workflow, you can download the `simple_microbiome_analysis.ipynb <https://raw.githubusercontent.com/biocore/calour/master/notebooks/demo.ipynb>`_.
-
-

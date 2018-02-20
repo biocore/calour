@@ -27,7 +27,7 @@ Things you can do with Calour
 
 Installing Calour
 -----------------
-Installation instructions are available for **mac/linux** and for **windows**.
+You can install Calour locally following the `instructions <https://github.com/biocore/calour/blob/master/INSTALL.md>`_.
 
 You can also try Calour (**without installing**) on an online `mybinder server <https://mybinder.org/v2/gh/amnona/calour/mybinder>`_.
 
@@ -45,16 +45,19 @@ Tutorials
 .. toctree::
    :maxdepth: 2
 
-   microbiome_tutorials
-   metabolomics_tutorials
-   gene_expression_tutorials
+   tutorials_microbiome
+   tutorials_metabolome
+
+
+The Jupyter notebooks in this tutorial section can be downloaded `here <https://github.com/biocore/calour/tree/master/doc/source/notebooks>`_.
+
 
 API Documentation
 -----------------
 .. toctree::
    :maxdepth: 2
 
-   api_docs
+   api
 
 Indices and tables
 ==================

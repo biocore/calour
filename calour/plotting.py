@@ -48,14 +48,14 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
 
     Parameters
     ----------
-    ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
+    ax : matplotlib.axes.Axes or None (default), optional
         Axes object to draw the plot onto; otherwise uses the current Axes.
     kwargs : dict
         key word arguments passing to the :func:`matplotlib.pyplot.hist` plotting function.
 
     Returns
     -------
-    tuple of 1-D int array, 1-D float array, :class:`matplotlib.axes.Axes`
+    tuple of 1-D int array, 1-D float array, matplotlib.axes.Axes
         the count in each bin, the start coord of each bin, and hist figure
     '''
     if ax is None:
@@ -81,12 +81,12 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     enriched : pandas.DataFrame
         The enriched terms ( from exp.enrichment() )
         must contain columns 'term', 'odif'
-    max_show: int or (int, int) or None (optional)
+    max_show: int or (int, int) or None, optional
         The maximal number of terms to show
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    ax: :class:`matplotlib.axes.Axes` or ``None`` (optional)
+    ax: matplotlib.axes.Axes or None, optional
         The axes to which to plot the figure. None (default) to create a new figure
     lables: tuple of (str, str) or None (optional)
         name for terms enriched in group1 or group2 respectively, or None to not show legend
@@ -96,7 +96,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
 
     Returns
     -------
-    :class:`matplotlib.axes.Axes`
+    matplotlib.axes.Axes
     '''
     if ax is None:
         from matplotlib import pyplot as plt
@@ -153,10 +153,10 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         if None, show all terms
         if int, show at most the max_show maximal positive and negative terms
         if (int, int), show at most XXX maximal positive and YYY maximal negative terms
-    ax: :class:`matplotlib.axes.Axes` or None (optional)
+    ax: matplotlib.axes.Axes or None, optional
         The axis to which to plot the figure
         None (default) to create a new figure
-    ignore_exp : list None (optional)
+    ignore_exp : list None, optional
         list of experiment ids to ignore when doing the enrichment_analysis.
         Useful when you don't want to get terms from your own experiment analysis.
         For dbbact it is a list of int
@@ -178,7 +178,10 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     Returns
     -------
-    tuple of :class:`matplotlib.axes.Axes`, :class:`.Experiment` with terms as features, (original features) as samples
+    tuple of :class:`matplotlib.axes.Axes`, :class:`.Experiment` with
+    terms as features, (original features) as samples, result of
+    :func:`.database.enrichment`
+
     '''
     if '_calour_diff_abundance_effect' not in exp.feature_metadata.columns:
         raise ValueError('Experiment does not seem to be the results of differential_abundance().')
@@ -225,9 +228,9 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     (2011).
 
     .. warning:: The samples should be normalized by rarefaction
-    instead of other normalization methods. Otherwise, the samples
-    with higher sequencing depth will artificially share more OTUs
-    with each other.
+       instead of other normalization methods. Otherwise, the samples
+       with higher sequencing depth will artificially share more OTUs
+       with each other.
 
     Parameters
     ----------
@@ -241,12 +244,12 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
         the transparency (1 is most opaque and 0 is most transparent) to plot for each iteration.
     linewidth : float
         the linewidth of the plotting lines for each iteration
-    ax : :class:`matplotlib.axes.Axes`, optional
+    ax : matplotlib.axes.Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
 
     Returns
     -------
-    ax : :class:`matplotlib.axes.Axes`
+    ax : matplotlib.axes.Axes
         The Axes object containing the plot.
 
     '''
@@ -348,7 +351,7 @@ def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alph
     min_abund : numeric
         the min abundance. features with mean abundance
         less than min_abund in the each sample group will be not considered
-    ax : :class:`matplotlib.axes.Axes`, optional
+    ax : matplotlib.axes.Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
 
     '''
