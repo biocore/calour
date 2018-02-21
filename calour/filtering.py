@@ -190,10 +190,15 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     predicate : str or callable
         The callable accepts a list of numeric and return a bool. Alternatively
         it also accepts the following strings:
+
         * 'sum_abundance': calls ``_sum_abundance``,
+
         * 'freq_ratio': calls ``_freq_ratio``,
+
         * 'unique_cut': calls ``_unique_cut``,
+
         * 'mean_abundance': calls ``_mean_abundance``,
+
         * 'prevalence': calls ``_prevalence``
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
@@ -430,6 +435,10 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     Experiment
         the filtered object
 
+    See Also
+    --------
+    filter_by_data
+
     '''
     newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=min_abundance, **kwargs)
     return newexp
@@ -456,6 +465,11 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     -------
     Experiment
         with only features present in at least fraction of samples
+
+    See Also
+    --------
+    filter_by_data
+
     '''
     newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
     return newexp
@@ -481,6 +495,11 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
     Returns
     -------
     Experiment
+
+    See Also
+    --------
+    filter_by_data
+
     '''
     factor = np.mean(exp.data.sum(axis=1))
     newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)

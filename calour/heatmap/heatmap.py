@@ -517,9 +517,12 @@ def plot(exp: Experiment, title=None,
 
     Returns
     -------
-    ``PlottingGUI``
+    PlottingGUI
         This object contains the figure of the plot (including all the subplots) as its ``.figure`` attribute
 
+    See Also
+    --------
+    heatmap
     '''
     # set the databases if default requested (i.e. False)
     if databases is False:

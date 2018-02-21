@@ -76,6 +76,9 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     Experiment
         features sorted by center of mass
 
+    See Also
+    --------
+    transform
     '''
     logger.debug('sorting features by center of mass')
     if transform is None:
@@ -127,6 +130,9 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
     Experiment
         With samples/features clustered (reordered)
 
+    See Also
+    --------
+    transform
     '''
     logger.debug('clustering data on axis %s' % axis)
     if transform is None:
@@ -337,6 +343,10 @@ def sort_samples(exp: Experiment, field, **kwargs):
     Returns
     -------
     Experiment with samples sorted according to values in field
+
+    See Also
+    --------
+    sort_by_metadata
     '''
     newexp = exp.sort_by_metadata(field=field, **kwargs)
     return newexp
@@ -364,6 +374,10 @@ def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
     -------
     Experiment
         with features sorted by abundance
+
+    See Also
+    --------
+    sort_by_data
     '''
     if subgroup is None:
         select = None

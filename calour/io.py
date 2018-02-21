@@ -366,6 +366,10 @@ def read_amplicon(data_file, sample_metadata_file=None,
     -------
     .AmpliconExperiment
         after removing low read sampls and normalizing
+
+    See Also
+    --------
+    read
     '''
     # don't do normalize before the possible filtering
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
@@ -427,6 +431,10 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     Returns
     -------
     Experiment
+
+    See Also
+    --------
+    read
     '''
     logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     if rows_are_samples:
