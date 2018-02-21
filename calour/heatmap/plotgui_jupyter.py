@@ -157,8 +157,8 @@ class PlotGUI_Jupyter(PlotGUI):
 
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
-        self._ipyw_sid.value = sid
-        self._ipyw_fid.value = fid
+        self._ipyw_sid.value = str(sid)
+        self._ipyw_fid.value = str(fid)
         self._ipyw_abund.value = abd
         self._ipyw_selected.value = '%d features are selected' % len(self.selected_features)
         # need to convert all other types to str because it is a text widget.
@@ -176,13 +176,14 @@ class PlotGUI_Jupyter(PlotGUI):
                 cstr = cannt[1]
                 details = cannt[0]
                 annt_type = details.get('annotationtype', 'None')
-                annt_id = details.get('annotationid', 'NA')
+                # annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
+                link_address = details['_db_interface'].get_annotation_website(details)
                 cline = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
                          'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
                          '<p style="color:%s;white-space:nowrap;">'
-                         '<a href="http://dbbact.org/annotation_info/%s"'
-                         '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, annt_id, cstr)
+                         '<a href="%s"'
+                         '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, link_address, cstr)
                 idata.append(cline)
         except Exception as e:
             # use try/except to catch and show the error; otherwise the error goes unnoticed

@@ -96,6 +96,9 @@ class Experiment:
         # the default databases to use for feature information
         self.heatmap_databases = ()
 
+        # the default featureID field for heatmap plots
+        self.heatmap_feature_field = None
+
     @property
     def sparse(self):
         return scipy.sparse.issparse(self.data)

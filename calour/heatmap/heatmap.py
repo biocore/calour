@@ -146,7 +146,7 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
 
 
 @ds.get_sectionsf('heatmap.heatmap')
-def heatmap(exp: Experiment, sample_field=None, feature_field=None,
+def heatmap(exp: Experiment, sample_field=None, feature_field=False,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
@@ -164,8 +164,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     ----------
     sample_field : str or ``None`` (optional)
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
-    feature_field : str or ``None`` (optional)
-        The field of feature meadata to display on the y-axis or None (default) to not show y axis.
+    feature_field : str or None or False (optional)
+        The field of feature meadata to display on the y-axis.
+        False to use the default feature field (set by experiment type)
+        None (default) to not show y axis.
     xticklabel_kwargs, yticklabel_kwargs : dict or None (optional)
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
@@ -279,6 +281,12 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         cmap = plt.get_cmap(cmap)
     # this set cells of zero value.
     cmap.set_bad('black')
+
+    # set the default feature field based on experiment type
+    # (if feature_field is False)
+    if feature_field is False:
+        feature_field = exp.heatmap_feature_field
+
 
     # plot the heatmap
     vmin, vmax = clim
