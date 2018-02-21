@@ -86,8 +86,8 @@ pip install git+git://github.com/amnona/pheno-calour
 pip install git+git://github.com/amnona/gnps-calour
 ```
 
-Install additional user interfaces
-----------------------------------
+Install additional user interfaces (optional)
+---------------------------------------------
 
 If you use calour in Jupyter Notebook, it is highly recommended to
 install [ipywidgets](https://github.com/jupyter-widgets/ipywidgets):
