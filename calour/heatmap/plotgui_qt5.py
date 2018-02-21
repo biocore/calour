@@ -29,15 +29,15 @@ class PlotGUI_QT5(PlotGUI):
     databases :
     '''
 
-    @ds.dedent
-    def __init__(self, *kargs, **kwargs):
+    @ds.with_indent(8)
+    def __init__(self, **kwargs):
         '''Init the GUI using the Qt5 framework.
 
-        Other Parameters
-        ----------------
-            %(PlotGUI.parameters)s
+        Keyword Arguments
+        -----------------
+        %(PlotGUI.parameters)s
         '''
-        super().__init__(*kargs, **kwargs)
+        super().__init__(**kwargs)
         # create qt app
         app = QtCore.QCoreApplication.instance()
         if app is None:

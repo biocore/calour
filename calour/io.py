@@ -339,7 +339,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     return exp
 
 
-@ds.with_indent(8)
+@ds.with_indent(4)
 def read_amplicon(data_file, sample_metadata_file=None,
                   *, min_reads, normalize, **kwargs):
     '''Load an amplicon experiment.
@@ -358,12 +358,9 @@ def read_amplicon(data_file, sample_metadata_file=None,
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
-    Other Parameters
-    ----------------
-    **kwargs : :func:`read()` properties, optional.
-        Parameters include:
-
-        %(io.read.parameters)s
+    Keyword Arguments
+    -----------------
+    %(io.read.parameters)s
 
     Returns
     -------
@@ -389,7 +386,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     return exp
 
 
-@ds.with_indent(8)
+@ds.with_indent(4)
 def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
                  description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
     '''Load an OpenMS metabolomics experiment.
@@ -423,12 +420,9 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
-    Other Parameters
-    ----------------
-    **kwargs : :func:`read()` properties, optional.
-        Parameters include:
-
-        %(io.read.parameters)s
+    Keyword Arguments
+    -----------------
+    %(io.read.parameters)s
 
     Returns
     -------

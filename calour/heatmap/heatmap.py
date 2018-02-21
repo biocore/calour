@@ -166,12 +166,14 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
     feature_field : str or None, optional
         The field of feature meadata to display on the y-axis or None (default) to not show y axis.
-    xticklabel_kwargs, yticklabel_kwargs : dict or None, optional
+    xticklabel_kwargs :
+    yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
         ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
         'family': 'serif', 'size'=7}``
-    xticklabel_len, yticklabel_len : int or None
+    xticklabel_len : int or None
+    yticklabel_len : int or None
         The maximal length for the tick labels on x axis and y axis (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no shortening
@@ -192,15 +194,16 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     rect : tuple of (int, int, int, int) or None, optional
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
-    cax : :class:`matplotlib.axes.Axes`, optional
+    cax : matplotlib.axes.Axes, optional
         The axes where a legend colorbar for the heatmap is plotted.
-    ax : :class:`matplotlib.axes.Axes` or ``None`` (default), optional
+    ax : matplotlib.axes.Axes or None (default), optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot the heatmap
 
     Returns
     -------
-    matplotlib.axes.Axes of the heatmap
+    matplotlib.axes.Axes
+        The axes for the heatmap
 
 
     Examples
@@ -425,7 +428,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
     return ax
 
 
-@ds.with_indent(8)
+@ds.with_indent(4)
 def plot(exp: Experiment, title=None,
          barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
          bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
@@ -502,12 +505,9 @@ def plot(exp: Experiment, title=None,
         a list of databases to access or add annotation
         ``None`` (default) to use the default field based on the experiment.
 
-    Other parameters
-    ----------------
-    **heatmap_kwargs : :func:`heatmap()` properties, optional.
-        Parameters include:
-
-        %(heatmap.heatmap.parameters)s
+    Keyword Arguments
+    -----------------
+    %(heatmap.heatmap.parameters)s
 
     Returns
     -------

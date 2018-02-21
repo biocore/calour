@@ -18,7 +18,6 @@ logger = getLogger(__name__)
 
 
 @ds.get_sectionsf('PlotGUI')
-@ds.dedent
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
