@@ -83,8 +83,8 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
 def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
     '''Add a field to the feature metadata, with most common term for each feature
 
-    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
-    Note : Adds annotations in-place.
+    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment.
+    It adds annotations in-place.
 
     Parameters
     ----------
@@ -98,9 +98,11 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         None to get default type
     ignore_exp : list of int or None, optional
         list of experiments to ignore when adding the terms
+
     Returns
     -------
-    exp : :class:`.Experiment` with feature_metadata field containing the most common database term for each feature
+    Experiment
+        with feature_metadata field containing the most common database term for each feature
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
@@ -367,7 +369,7 @@ class Database(ABC):
         ----------
         term : str
             The term to get the details for
-        exp : :class:`.Experiment`
+        exp : Experiment
             The calour experiment for showing the term details in
         features: list of str
             The features in the experiment for which to show the term details

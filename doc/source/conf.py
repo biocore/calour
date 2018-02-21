@@ -88,7 +88,7 @@ needs_sphinx = '1.5'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx_autodoc_typehints',
+    # 'sphinx_autodoc_typehints',   # something wrong with the latest version 1.2.5
     'sphinx.ext.mathjax',
     # 'numpydoc',
     'sphinx.ext.napoleon',

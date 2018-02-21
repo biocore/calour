@@ -66,11 +66,16 @@ class PlotGUI(ABC):
         >0 : scroll than constant number of columns/rows per keypress
     figure : matplotlib.figure.Figure
         The figure where the heatmap and other axes will be plotted into.
-    ax_hm : the :class:`matplotlib.axes.Axes` of the heatmap.
-    ax_sbar : the :class:`matplotlib.axes.Axes` of the sample colorbar
-    ax_fbar : the :class:`matplotlib.axes.Axes` of the feature colorbar
-    ax_tre : the :class:`matplotlib.axes.Axes` of the dendrogram/tree
-    ax_legend : the :class:`matplotlib.axes.Axes` of the color legend
+    ax_hm : matplotlib.axes.Axes
+        Axes for the heatmap.
+    ax_sbar : matplotlib.axes.Axes
+        Axes for the sample colorbar
+    ax_fbar : matplotlib.axes.Axes
+        Axes for the feature colorbar
+    ax_tre : matplotlib.axes.Axes
+        Axes for the dendrogram/tree
+    ax_legend : matplotlib.axes.Axes
+        Axes for the color legend
     databases : list
         the databases to interact with
 

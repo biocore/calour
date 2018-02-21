@@ -432,7 +432,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     if rows_are_samples:

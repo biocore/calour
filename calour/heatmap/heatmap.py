@@ -94,7 +94,7 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
 
     Parameters
     ----------
-    ax : :class:`matplotlib.axes.Axes`
+    ax : matplotlib.axes.Axes
         The axes to plot into
     Parameters mean axes, x or y axis, list of tick labels, max number
     of ticks, the upper bound of xlim/ylim, dict passing as text
