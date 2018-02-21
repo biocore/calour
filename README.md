@@ -13,3 +13,7 @@ exploratory and interactive microbiome analysis based on heatmaps
 
 [Documentation](http://biocore.github.io/calour)
 ================================================
+
+
+[Mouse & Keyboard Operation](http://biocore.github.io/calour/calour.heatmap.plot.html#calour.heatmap.plot)
+==========================================================================================================
