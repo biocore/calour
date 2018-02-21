@@ -48,6 +48,7 @@ class NewAuto(autosummary.Autosummary):
                 '__contains__': fmt('x in %s'),
                 '__bool__': fmt('bool(%s)'),
                 '__str__': fmt('str(%s)'),
+                '__repr__': fmt('repr(%s)'),
                 '__reversed__': fmt('reversed(%s)'),
                 '__len__': fmt('len(%s)'),
                 '__copy__': fmt('copy.copy(%s)'),
@@ -131,7 +132,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'calour'
-copyright = '2016--, calour development team'
+copyright = '2016-2018, calour development team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

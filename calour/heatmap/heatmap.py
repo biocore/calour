@@ -59,7 +59,7 @@ def _create_plot_gui(exp, gui='cli', databases=('dbbact',), tree_size=0):
     gui_module_name = 'calour.heatmap.' + gui.lower()
     gui_module = importlib.import_module(gui_module_name)
     GUIClass = getattr(gui_module, gui)
-    gui_obj = GUIClass(exp, tree_size=tree_size)
+    gui_obj = GUIClass(exp=exp, tree_size=tree_size)
 
     # link gui with the databases requested
     for cdatabase in databases:
@@ -177,7 +177,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         The maximal length for the tick labels on x axis and y axis (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no shortening
-    xticks_max, yticks_max : int or None
+    xticks_max : int or None
+    yticks_max : int or None
         max number of ticks to render on the heatmap. If ``None``,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
@@ -482,16 +483,21 @@ def plot(exp: Experiment, title=None,
     ----------
     title : str, optional
         The title of the figure.
-    barx_fields, bary_fields : str or list of str, optional
+    barx_fields : str or list of str, optional
+    bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
         for each column. It doesn't plot color bars by default (None)
-    barx_width, bary_width : float, optional
+    barx_width : float, optional
+    bary_width : float, optional
         The width of the bars
-    barx_colors, bary_colors : dict, matplotlib.colors.ListedColormap, optional
+    barx_colors : dict, matplotlib.colors.ListedColormap, optional
+    bary_colors : dict, matplotlib.colors.ListedColormap, optional
         The colors for each unique values in the column of sample/feature metadata
-    barx_label, bary_label : bool, optional
+    barx_label : bool, optional
+    bary_label : bool, optional
         whether to show the labels on the bars.
-    barx_label_kwargs, bary_label_kwargs : dict, optional
+    barx_label_kwargs : dict, optional
+    bary_label_kwargs : dict, optional
         keyword arguments passing to :meth:`matplotlib.axes.Axes.annotate` for labels on the bars
     tree : skbio.TreeNode or None, optional
         None (default) to not plot a tree
