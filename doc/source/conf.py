@@ -209,6 +209,9 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # further. For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
+    # disable the sidebar
+    'nosidebar': True,
+
     # Navigation bar title. (Default: ``project`` value)
     'navbar_title': 'calour docs',
 
@@ -223,7 +226,10 @@ html_theme_options = {
 
     # Location of link to source.
     # Options are "nav" (default), "footer" or anything else to exclude.
-    'source_link_position': False
+    'source_link_position': False,
+
+    # Choose Bootstrap version.
+    'bootstrap_version': "3"
 }
 
 # The name for this set of Sphinx documents.  If None, it defaults to
