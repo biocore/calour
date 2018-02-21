@@ -287,7 +287,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=False,
     if feature_field is False:
         feature_field = exp.heatmap_feature_field
 
-
     # plot the heatmap
     vmin, vmax = clim
     # logNorm requires positive values. set it to default None if vmin is zero
