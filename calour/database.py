@@ -44,7 +44,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
             'dbbact' : the amplicon sequence manual annotation database
             'spongeworld' : the sponge microbiome database
             'redbiome' : the qiita automatic amplicon sequence database
-    config_file_name: str or None (optional)
+    config_file_name: str or None, optional
         None (default) to use the default calour condig file.
         str to use the file names str as the conig file
 
@@ -83,24 +83,26 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
 def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
     '''Add a field to the feature metadata, with most common term for each feature
 
-    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment
-    Note : Adds annotations in-place.
+    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment.
+    It adds annotations in-place.
 
     Parameters
     ----------
-    use_term_list : list of str or None (optional)
+    use_term_list : list of str or None, optional
         Use only terms appearing in this list
         None (default) to use all terms
-    field_name : str (optional)
+    field_name : str, optional
         Name of feature_metadata field to store the annotatiosn.
-    term_type : str or None (optional)
+    term_type : str or None, optional
         type of the annotation summary to get from the database (db specific)
         None to get default type
-    ignore_exp : list of int or None (optional)
+    ignore_exp : list of int or None, optional
         list of experiments to ignore when adding the terms
+
     Returns
     -------
-    exp : :class:`.Experiment` with feature_metadata field containing the most common database term for each feature
+    Experiment
+        with feature_metadata field containing the most common database term for each feature
     '''
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
@@ -137,26 +139,37 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
         The features to test for enrichment (compared to all other features in exp)
     dbname : str
         the database to use for the annotation terms and enrichment analysis
-    *args, **kwargs
+    *args : tuple
+    **kwargs : dict
         Additional database specific parameters
 
     Returns
     -------
     pandas.DataFrame
-    with info about significantly enriched terms.
-        columns:
-            feature : str the feature
-            pval : the p-value for the enrichment (float)
-            odif : the effect size (float)
-            group : str
-                The value group where the tern in enriched
-            observed : the number of observations of this term in group1 (int)
-            expected : the expected (based on all features) number of observations of this term in group1 (float)
-            frac_group1 : fraction of total terms in group 1 which are the specific term (float)
-            frac_group2 : fraction of total terms in group 2 which are the specific term (float)
-            num_group1 : number of total terms in group 1 which are the specific term (float)
-            num_group2 : number of total terms in group 2 which are the specific term (float)
-            description : the term (str)
+
+        The dataframe contains info about significantly enriched terms. The columns include:
+
+        feature : str the feature
+
+        pval : the p-value for the enrichment (float)
+
+        odif : the effect size (float)
+
+        group : str The value group where the tern in enriched
+
+        observed : the number of observations of this term in group1 (int)
+
+        expected : the expected (based on all features) number of observations of this term in group1 (float)
+
+        frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+
+        frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+
+        num_group1 : number of total terms in group 1 which are the specific term (float)
+
+        num_group2 : number of total terms in group 2 which are the specific term (float)
+
+        description : str. the term
     '''
     db = _get_database_class(dbname, exp=exp)
     if not db.can_do_enrichment:
@@ -170,11 +183,11 @@ class Database(ABC):
 
         Parameters
         ----------
-        exp : :class:`.Experiment` or None (optional)
+        exp : Experiment or None, optional
             The experiment link for the database (if needed)
-        database_name : str (optional)
+        database_name : str, optional
             name of the database
-        methods : list of str (optional)
+        methods : list of str, optional
             'get' if database interface supports get_seq_annotation_strings()
             'annotate' if database interface supports add_annotation()
             'enrichment' if database interface supports get_feature_terms()
@@ -237,7 +250,7 @@ class Database(ABC):
         ----------
         features : list of str
             the features to add to the database
-        exp : :class:`.Experiment`
+        exp : Experiment
             the experiment where the features are coming from
 
         Returns
@@ -255,7 +268,7 @@ class Database(ABC):
         ----------
         annotation : dict
             The annotation to update (keys/values are database specific)
-        exp : :class:`.Experiment` (optional)
+        exp : Experiment, optional
             The calour experiment from which the annotation is coming from
         Returns
         -------
@@ -308,7 +321,7 @@ class Database(ABC):
         ----------
         features : list of str
             the features to get the terms for
-        exp : :class:`.Experiment` (optional)
+        exp : Experiment, optional
             not None to store results inthe exp (to save time for multiple queries)
 
         Returns
@@ -324,24 +337,26 @@ class Database(ABC):
 
         Parameters
         ----------
-        exp : :class:`.Experiment`
+        exp : Experiment
             The experiment to compare the features to
         features : list of str
-            The features (from exp) to test for enrichmnt
-        *args, **kwargs : additional dtabase specific parameters
+            The features (from exp) to test for enrichment
+        *args : tuple
+        **kwargs : dict
+            Additional database specific parameters
 
         Returns
         -------
-        pandas.DataFrame with  info about significantly enriched terms.
-            columns:
-                feature : str
-                    the feature
-                pval : float
-                    the p-value for the enrichment
-                odif : float
-                    the effect size for the enrichment
-                term : str
-                    the enriched term
+        pandas.DataFrame
+            Its columns include:
+
+            feature : str. the feature
+
+            pval : float. the p-value for the enrichment
+
+            odif : float. the effect size for the enrichment
+
+            term : str. the enriched term
         '''
         logger.debug('Generic function for enrichment')
         return None
@@ -354,7 +369,7 @@ class Database(ABC):
         ----------
         term : str
             The term to get the details for
-        exp : :class:`.Experiment`
+        exp : Experiment
             The calour experiment for showing the term details in
         features: list of str
             The features in the experiment for which to show the term details

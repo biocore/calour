@@ -411,9 +411,9 @@ def _plot_dendrogram(ax_dendrogram, table, edges):
     """ Plots the actual dendrogram.
     Parameters
     ----------
-    ax_dendrogram : :class:`matplotlib.axes.Axes`
+    ax_dendrogram : matplotlib.axes.Axes
         Contains the matplotlib axes in which the dendrogram will be plotted.
-    table : :class:`pandas.DataFrame`
+    table : pandas.DataFrame
         Contain sample/feature labels along with table of values.
         Rows correspond to samples, and columns correspond to features.
     edges : pd.DataFrame
@@ -434,15 +434,15 @@ def plot_tree(exp, tree, ax):
 
     Parameters
     ----------
-    exp: :class:`.Experiment`
+    exp: Experiment
     tree: skbio.TreeNode
         The tree to plot
-    ax: :class:`matplotlib.axes.Axes`
+    ax: matplotlib.axes.Axes
         The axes where to plot the tree to
 
     Returns
     -------
-    :class:`.Experiment`, :class:`skbio.TreeNode`
+    Experiment`, :class:`skbio.TreeNode
         both filtered to have common nodes and Experiment reordered to match the tree
     '''
     # reorder the tree and exp to match (exp features are sorted according to tree)
