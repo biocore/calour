@@ -1,5 +1,5 @@
-calour\.sorting\.sort\_samples
-==============================
+calour.sorting.sort\_samples
+============================
 
 .. currentmodule:: calour.sorting
 

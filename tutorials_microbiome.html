@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Microbiome tutorials &#8212; calour 1.0-dev documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Micribiome experiment step-by-step analysis" href="notebooks/microbiome_step_by_step.html" />
+    <link rel="prev" title="General Calour concepts" href="getting_started.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Microbiome tutorials</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="microbiome-tutorials">
+<h1>Microbiome tutorials<a class="headerlink" href="#microbiome-tutorials" title="Permalink to this headline">¶</a></h1>
+<p>Example jupyter notebooks explaining various Calour commands for microbiome analysis.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/microbiome_step_by_step.html">Micribiome experiment step-by-step analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Setup">Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Import-the-calour-module">Import the calour module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#(optional)-Set-the-level-of-feedback-messages-from-calour">(optional) Set the level of feedback messages from calour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Also-enable-interactive-plots-inside-the-jupyter-notebook">Also enable interactive plots inside the jupyter notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Loading-the-data">Loading the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Process-the-data">Process the data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Get-rid-of-the-features-(bacteria)-with-small-amount-of-reads">Get rid of the features (bacteria) with small amount of reads</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Cluster-(reorder)-the-features-so-similarly-behaving-bacteria-are-close-to-each-other">Cluster (reorder) the features so similarly behaving bacteria are close to each other</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Sort-the-samples-according-to-physical-functioning-and-Disease-state">Sort the samples according to physical functioning and Disease state</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Plotting-the-data">Plotting the data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Adding-a-field-to-the-top-bar">Adding a field to the top bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Differential-abundance-testing">Differential abundance testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#Plotting-the-differentially-abundant-features">Plotting the differentially abundant features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_step_by_step.html#dbBact-term-enrichment">dbBact term enrichment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/microbiome_manipulation.html">Micribiome data manipulation tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#Setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#Load-the-data">Load the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#sorting-the-samples-based-on-a-metadata-field-(sort_samples)">sorting the samples based on a metadata field (<code class="docutils literal notranslate"><span class="pre">sort_samples</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_manipulation.html#consecutive-sorting-using-different-fields">consecutive sorting using different fields</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#filter-samples-based-on-metadata-field-(filter_samples)">filter samples based on metadata field (<code class="docutils literal notranslate"><span class="pre">filter_samples</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_manipulation.html#we-can-supply-a-list-of-values-instead-of-only-one-value">we can supply a list of values instead of only one value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_manipulation.html#we-can-also-reverse-the-filtering-(removing-samples-with-the-supplied-values)">we can also reverse the filtering (removing samples with the supplied values)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#filter-low-abundance-features-(filter_abundance)">filter low abundance features (<code class="docutils literal notranslate"><span class="pre">filter_abundance</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_manipulation.html#Keeping-the-low-abundance-bacteria-instead">Keeping the low abundance bacteria instead</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#filter-non-common-bacteria-(filter_prevalence)">filter non-common bacteria (<code class="docutils literal notranslate"><span class="pre">filter_prevalence</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_manipulation.html#Filter-bacteria-based-on-the-mean-frequency-over-all-samples-(filter_mean)">Filter bacteria based on the mean frequency over all samples (<code class="docutils literal notranslate"><span class="pre">filter_mean</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html">Micribiome differential abundance tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Load-the-data">Load the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Looking-at-the-data">Looking at the data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#remove-non-interesting-bacteria">remove non-interesting bacteria</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#cluster-the-bacteria">cluster the bacteria</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#sort-the-samples-according-to-sick/healthy">sort the samples according to sick/healthy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#plot-the-original-data">plot the original data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Differential-abundance-(diff_abundance)">Differential abundance (<code class="docutils literal notranslate"><span class="pre">diff_abundance</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Default-options">Default options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Random-nature-of-diff_abundance">Random nature of <code class="docutils literal notranslate"><span class="pre">diff_abundance</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Using-a-different-FDR-threshold">Using a different FDR threshold</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Using-different-FDR-control-methods">Using different FDR control methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_diff_abundance.html#Using-different-data-normalization-before-the-test">Using different data normalization before the test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/microbiome_internal_structure.html">Calour Experiment class tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Load-the-data">Load the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#The-Experiment-class">The <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#The-__repr__-of-the-Experiment-Contains-the-class-(in-our-case---ca.AmpliconExperiment---which-is-derived-from-ca.Experiment),">The __repr__ of the Experiment Contains the class (in our case - ca.AmpliconExperiment - which is derived from ca.Experiment),</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#The-per-sample-metadata-(Experiment.sample_metadata)">The per-sample metadata (<code class="docutils literal notranslate"><span class="pre">Experiment.sample_metadata</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#The-per-feature-metadata-(Experiment.feature_metadata)">The per-feature metadata (<code class="docutils literal notranslate"><span class="pre">Experiment.feature_metadata</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Reads-table-(Experiment.data)">Reads table (<code class="docutils literal notranslate"><span class="pre">Experiment.data</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Choosing-sparse/dense-representation-of-the-data">Choosing sparse/dense representation of the data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Getting-the-data">Getting the data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Saving-an-Experiment">Saving an Experiment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_internal_structure.html#Save-everything-(biom-table+sample/feature-mapping-files)">Save everything (biom table+sample/feature mapping files)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/microbiome_normalization.html">Micribiome data normalization tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_normalization.html#Setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_normalization.html#Load-the-data">Load the data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_normalization.html#Standard-load-with-TSS-normalization">Standard load with TSS normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_normalization.html#load-with-no-normalization">load with no normalization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_normalization.html#TSS-normalization-(normalize)">TSS normalization (<code class="docutils literal notranslate"><span class="pre">normalize</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_normalization.html#Compositional-normalization-(normalize_compositional)">Compositional normalization (<code class="docutils literal notranslate"><span class="pre">normalize_compositional</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_normalization.html#Effect-of-a-high-frequency-artificial-bacteria">Effect of a high frequency artificial bacteria</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_normalization.html#Let's-fix-by-doing-the-compositional-normalization">Let’s fix by doing the compositional normalization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_normalization.html#Normalization-on-part-of-the-features-(normalize_by_subset_features)">Normalization on part of the features (<code class="docutils literal notranslate"><span class="pre">normalize_by_subset_features</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/microbiome_databases.html">Calour microbiome databases interface tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Load-the-data">Load the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#preprocess">preprocess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Viewing-database-annotations">Viewing database annotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#dbBact-enrichment-of-selected-bacteria">dbBact enrichment of selected bacteria</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Adding-dbBact-annotations">Adding dbBact annotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Differential-abundance">Differential abundance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_databases.html#Plot-the-significant-bacteria">Plot the significant bacteria</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#dbBact-term-enrichment-(diff_abundance_enrichment)">dbBact term enrichment (<code class="docutils literal notranslate"><span class="pre">diff_abundance_enrichment</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_databases.html#Default-parameters">Default parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_databases.html#getting-enriched-annotations-instead-of-terms">getting enriched annotations instead of terms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_databases.html#Getting-both-enriched-terms-and-annotations">Getting both enriched terms and annotations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/microbiome_databases.html#Ignoring-selected-experiments-already-in-dbBact">Ignoring selected experiments already in dbBact</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Adding-common-dbBact-terms-to-features-(add_terms_to_features)">Adding common dbBact terms to features (<code class="docutils literal notranslate"><span class="pre">add_terms_to_features</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/microbiome_databases.html#Get-enriched-terms-using-all-bacteria">Get enriched terms using all bacteria</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

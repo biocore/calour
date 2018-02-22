@@ -1,0 +1,6 @@
+calour.sorting.sort\_centroid
+=============================
+
+.. currentmodule:: calour.sorting
+
+.. autofunction:: sort_centroid

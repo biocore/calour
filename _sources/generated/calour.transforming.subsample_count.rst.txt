@@ -1,5 +1,5 @@
-calour\.transforming\.subsample\_count
-======================================
+calour.transforming.subsample\_count
+====================================
 
 .. currentmodule:: calour.transforming
 

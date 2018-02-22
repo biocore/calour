@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>General Calour concepts &#8212; calour 1.0-dev documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Microbiome tutorials" href="tutorials_microbiome.html" />
+    <link rel="prev" title="Welcome to Calour" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General Calour concepts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">General Calour concepts</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#main-data-structures">Main data structures</a></li>
+<li><a class="reference internal" href="#heatmap-gui">Heatmap GUI</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="general-calour-concepts">
+<h1>General Calour concepts<a class="headerlink" href="#general-calour-concepts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Calour is a python/jupyter notebook module for analysis of tabular (sample X feature) data and associated metadata. Initially desgined for microbiome amplicon experiment analysis (where features are bacteria and the table contains the amount of reads for each features in each sample), Calour has been extended to also facilitate analysis of metabolomics data (where features are unique MS1 or MS2 ids).</p>
+<p>Calour synchronizes the 2D data table (feature by sample) with the associated sample metadata (i.e. the sample mapping file) and feature metadata (i.e. per feature data such as taxonomy, MZ/RT etc.) and enables various data manipulation functions (such as sorting, clustering, filtering, etc.)</p>
+<p>An important feature of calour is an interactive heatmap for exploration of the data. Since typical experiments may contain hundreds of samples and thousands of features, it is difficult to look at all the features/samples in a single static heatmap. The Calour heatmap allows easy zooming/panning, and displays information selected features/samples. This information can also include data from external databases (such as dbBact.org for amplicon experiments or GNPS for metabolomics experiments), which can display additional information about the selected feature.</p>
+</div>
+<div class="section" id="main-data-structures">
+<h2>Main data structures<a class="headerlink" href="#main-data-structures" title="Permalink to this headline">¶</a></h2>
+<p>Calour mostly handles <strong>Experiment</strong> data. An Experiment is made of <strong>Samples</strong>, each containing counts of <strong>Features</strong>. For example, in a typical microbiome amplicon Experiment, each Sample is a swab from an individual, and Features are the unique bacteria present in the Samples.</p>
+<p>Calour stores an Experiment as a synchronized set of: per-Sample metadata table (i.e. age, material, name, etc.), per-Feature metadata table (i.e. taxonomy, etc.) and a (sparse or dense) data matrix where position (i,j) stores the number of times (or frequency) feature i was observed in sample j.</p>
+<p>Calour contains severl functions for loading (or generating) such an Experiment. Additionally, Calour contains functions for filtering/reordering and statistical analysis of the Samples and Features. Finally, Calour can plot interactive heatmaps for exploring the Experiment and interfacing external databases.</p>
+</div>
+<div class="section" id="heatmap-gui">
+<h2>Heatmap GUI<a class="headerlink" href="#heatmap-gui" title="Permalink to this headline">¶</a></h2>
+<p>Calour can display the interactive heatmap either as a stand alone Qt5 window, or as an integrated jupyter notebook figure. The choice of the GUI is made in the <cite>Experiment.plot()</cite> function using the <cite>gui=’qt5’</cite> or <cite>gui=’jupyter’</cite> options. Additionaly, heatmaps can be generated as a non-interactive figure using the <cite>gui=’cli’</cite> option.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,5 +1,5 @@
-calour\.plotting\.plot\_abund\_prevalence
-=========================================
+calour.plotting.plot\_abund\_prevalence
+=======================================
 
 .. currentmodule:: calour.plotting
 

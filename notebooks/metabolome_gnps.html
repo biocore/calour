@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>metabolome analysis with GNPS &#8212; calour 1.0-dev documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using Calour functions via the module and the Experiment class" href="../api.html" />
+    <link rel="prev" title="Metabolome tutorials" href="../tutorials_metabolome.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">metabolome analysis with GNPS</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="metabolome-analysis-with-GNPS">
+<h1>metabolome analysis with GNPS<a class="headerlink" href="#metabolome-analysis-with-GNPS" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="k">as</span> <span class="nn">ca</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ca</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># dat=ca.io.read_gnps_ms(&#39;test/bucket_x_xB_test2.csv&#39;,&#39;test/map_x_xB.txt&#39;,&#39;test/bucket_x_xB_test2_gnps_file.tsv&#39;,normalize=None)</span>
+<span class="n">dat</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_gnps_ms</span><span class="p">(</span><span class="s1">&#39;./bucket-gnps.tsv&#39;</span><span class="p">,</span><span class="s1">&#39;test/map_x_xB.txt&#39;</span><span class="p">,</span><span class="s1">&#39;gnps-output.tsv&#39;</span><span class="p">,</span><span class="n">normalize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-10-16 15:37:50 INFO loaded 511 observations, 71  samples
+2017-10-16 15:37:50 WARNING the samples are dropped because they have metadata but do not have data: {&#39;cli_4977_2xB_BA2_01_1660&#39;, &#39;cli_4977_32xB_BB4_01_1670&#39;, &#39;cli_4977_14xB_BA6_01_1664&#39;, &#39;cli_4977_17xB_BA7_01_1665&#39;, &#39;cli_4977_5xB_BA3_01_1661&#39;, &#39;cli_4977_26xB_BB2_01_1668&#39;, &#39;cli_4977_29xB_BB3_01_1669&#39;, &#39;cli_4977_8xB_BA4_01_1662&#39;, &#39;cli_4977_11xB_BA5_01_1663&#39;, &#39;cli_4977_20xB_BA8_01_1666&#39;, &#39;cli_4977_23xB_BB1_01_1667&#39;}
+2017-10-16 15:37:50 WARNING the samples have data but do not have metadata: {&#39;cli_4977_11z_BD3_01_1601&#39;, &#39;cli_4977_18x_RA1_01_1616&#39;, &#39;cli_4977_8y_BB7_01_1588&#39;, &#39;cli_4977_21y_RB5_01_1629&#39;, &#39;cli_4977_20z_BD6_01_1604&#39;, &#39;cli_4977_11y_BB8_01_1589&#39;, &#39;cli_4977_26z_BD8_01_1606&#39;, &#39;cli_4977_9z_RC4_01_1637&#39;, &#39;cli_4977_27y_RB7_01_1631&#39;, &#39;cli_4977_23z_BD7_01_1605&#39;, &#39;cli_4977_18z_RC7_01_1640&#39;, &#39;cli_4977_20y_BC3_01_1592&#39;, &#39;cli_4977_27z_RD2_01_1643&#39;, &#39;cli_4977_29z_BE1_01_1607&#39;, &#39;cli_4977_14y_BC1_01_1590&#39;, &#39;cli_4977_33z_RD4_01_1645&#39;, &#39;cli_4977_32y_BC7_01_1596&#39;, &#39;cli_4977_24z_RD1_01_1642&#39;, &#39;cli_4977_21z_RC8_01_1641&#39;, &#39;cli_4977_17y_BC2_01_1591&#39;, &#39;cli_4977_9y_RB1_01_1625&#39;, &#39;cli_4977_3y_RA7_01_1623&#39;, &#39;cli_4977_30z_RD3_01_1644&#39;, &#39;cli_4977_2z_BC8_01_1598&#39;, &#39;cli_4977_23y_BC4_01_1593&#39;, &#39;cli_4977_6y_RA8_01_1624&#39;, &#39;cli_4977_30y_RB8_01_1632&#39;, &#39;cli_4977_14x_BA6_01_1578&#39;, &#39;cli_4977_15z_RC6_01_1639&#39;, &#39;cli_4977_32z_BE2_01_1608&#39;, &#39;cli_4977_8z_BD2_01_1600&#39;, &#39;cli_4977_2y_BB5_01_1586&#39;, &#39;cli_4977_3z_RC2_01_1635&#39;, &#39;cli_4977_24y_RB6_01_1630&#39;, &#39;cli_4977_29y_BC6_01_1595&#39;, &#39;cli_4977_12y_RB2_01_1626&#39;, &#39;cli_4977_xyz empty4_BE3_01_1609&#39;, &#39;cli_4977_6z_RC3_01_1636&#39;, &#39;cli_4977_5y_BB6_01_1587&#39;, &#39;cli_4977_12z_RC5_01_1638&#39;, &#39;cli_4977_5z_BD1_01_1599&#39;, &#39;cli_4977_17z_BD5_01_1603&#39;, &#39;cli_4977_14z_BD4_01_1602&#39;, &#39;cli_4977_33y_RC1_01_1633&#39;, &#39;cli_4977_18y_RB4_01_1628&#39;, &#39;cli_4977_26y_BC5_01_1594&#39;, &#39;cli_4977_15y_RB3_01_1627&#39;}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># dat=ca.io.read_gnps_ms(&#39;./bucket-gnps.tsv&#39;,&#39;map.txt&#39;,normalize=None)</span>
+<span class="n">dat</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_gnps_ms</span><span class="p">(</span><span class="s1">&#39;./bucket-gnps.tsv&#39;</span><span class="p">,</span><span class="s1">&#39;map.txt&#39;</span><span class="p">,</span><span class="s1">&#39;./gnps-output.tsv&#39;</span><span class="p">,</span><span class="n">normalize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="c1"># dat=ca.read_open_ms(&#39;table2.csv&#39;,&#39;map.txt&#39;,rows_are_samples=True,normalize=None)</span>
+<span class="c1"># dat=ca.read_open_ms(&#39;table2.csv&#39;,&#39;map.txt&#39;,&#39;./gnps-output.tsv&#39;,rows_are_samples=True,normalize=None)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-10-16 15:24:57 INFO loaded 511 observations, 71  samples
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">datc</span><span class="o">=</span><span class="n">dat</span><span class="o">.</span><span class="n">cluster_features</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-10-16 15:50:43 INFO 511 remaining
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">datc</span><span class="o">=</span><span class="n">datc</span><span class="o">.</span><span class="n">sort_samples</span><span class="p">(</span><span class="s1">&#39;time_days&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">datc</span><span class="o">=</span><span class="n">datc</span><span class="o">.</span><span class="n">sort_samples</span><span class="p">(</span><span class="s1">&#39;batch&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">datc</span><span class="o">.</span><span class="n">plot_sort</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span><span class="n">gui</span><span class="o">=</span><span class="s1">&#39;qt5&#39;</span><span class="p">,</span><span class="n">sample_color_bars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;batch&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[11]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;calour.heatmap.plotgui_qt5.PlotGUI_QT5 at 0x118202e10&gt;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dd</span><span class="o">=</span><span class="n">datc</span><span class="o">.</span><span class="n">diff_abundance</span><span class="p">(</span><span class="s1">&#39;batch&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-09-27 12:50:23 INFO 68 samples with both values
+2017-09-27 12:50:23 INFO 507 remaining
+2017-09-27 12:50:23 INFO 33 samples with value 1 ([1])
+2017-09-27 12:50:23 INFO method meandiff. number of higher in [1] : 4. number of higher in [2] : 1. total 5
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dd</span><span class="o">.</span><span class="n">plot_sort</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span><span class="n">gui</span><span class="o">=</span><span class="s1">&#39;qt5&#39;</span><span class="p">,</span><span class="n">sample_color_bars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;batch&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-09-27 12:50:32 WARNING Cannot initialize GNPS database since gnps info file was not supplied. Please supply when loading
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;calour.heatmap.plotgui_qt5.PlotGUI_QT5 at 0x11d767ef0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dd</span><span class="o">=</span><span class="n">datc</span><span class="o">.</span><span class="n">diff_abundance</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-09-27 12:34:28 INFO 44 samples with both values
+2017-09-27 12:34:28 INFO 453 remaining
+2017-09-27 12:34:28 INFO 23 samples with value 1 ([&#39;x&#39;])
+2017-09-27 12:34:28 INFO method meandiff. number of higher in [&#39;x&#39;] : 26. number of higher in [&#39;z&#39;] : 18. total 44
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dd</span><span class="o">.</span><span class="n">plot_sort</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span><span class="n">gui</span><span class="o">=</span><span class="s1">&#39;qt5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-09-27 12:34:34 WARNING Cannot initialize GNPS database since gnps info file was not supplied. Please supply when loading
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[17]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;calour.heatmap.plotgui_qt5.PlotGUI_QT5 at 0x111053eb8&gt;
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tt</span><span class="o">=</span><span class="n">datc</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="s1">&#39;time_days&#39;</span><span class="p">,[</span><span class="mi">16</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">30</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dd</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">diff_abundance</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-09-27 12:40:12 INFO 16 samples with both values
+2017-09-27 12:40:12 INFO 315 remaining
+2017-09-27 12:40:12 INFO 8 samples with value 1 ([&#39;x&#39;])
+2017-09-27 12:40:12 INFO method meandiff. number of higher in [&#39;x&#39;] : 18. number of higher in [&#39;z&#39;] : 7. total 25
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">zz</span><span class="o">=</span><span class="n">datc</span><span class="o">.</span><span class="n">filter_ids</span><span class="p">(</span><span class="n">dd</span><span class="o">.</span><span class="n">feature_metadata</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">zz</span><span class="o">.</span><span class="n">plot_sort</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span><span class="n">gui</span><span class="o">=</span><span class="s1">&#39;qt5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2017-09-27 12:40:34 WARNING Cannot initialize GNPS database since gnps info file was not supplied. Please supply when loading
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[21]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;calour.heatmap.plotgui_qt5.PlotGUI_QT5 at 0x1201f7160&gt;
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

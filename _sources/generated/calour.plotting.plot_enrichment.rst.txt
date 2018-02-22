@@ -1,5 +1,5 @@
-calour\.plotting\.plot\_enrichment
-==================================
+calour.plotting.plot\_enrichment
+================================
 
 .. currentmodule:: calour.plotting
 

@@ -1,5 +1,5 @@
-calour\.training\.onehot\_encode\_features
-==========================================
+calour.training.onehot\_encode\_features
+========================================
 
 .. currentmodule:: calour.training
 

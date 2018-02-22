@@ -1,148 +1,156 @@
-calour\.experiment\.Experiment
-==============================
-
+calour.experiment.Experiment
+============================
 .. currentmodule:: calour.experiment
-
 .. autoclass:: Experiment
+   :show-inheritance:
 
-   
 
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
+
+
+
+   .. rubric:: Methods
+   .. autosummary::
+      :toctree:
       
          
-         Experiment.__deepcopy__
+            ~Experiment.__deepcopy__
          
          
-         Experiment.__eq__
+            ~Experiment.__eq__
          
-         Experiment.__format__
          
-         Experiment.__getitem__
+            ~Experiment.__getitem__
          
          
-         Experiment.__ne__
+            ~Experiment.__ne__
          
          
          
          
+            ~Experiment.__repr__
          
          
          
          
-         Experiment.aggregate_by_metadata
+            ~Experiment.add_terms_to_features
          
-         Experiment.binarize
+            ~Experiment.aggregate_by_metadata
          
-         Experiment.center_log
+            ~Experiment.binarize
          
-         Experiment.cluster_data
+            ~Experiment.center_log
          
-         Experiment.cluster_features
+            ~Experiment.cluster_data
          
-         Experiment.copy
+            ~Experiment.cluster_features
          
-         Experiment.correlation
+            ~Experiment.copy
          
-         Experiment.diff_abundance
+            ~Experiment.correlation
          
-         Experiment.diff_abundance_kw
+            ~Experiment.diff_abundance
          
-         Experiment.downsample
+            ~Experiment.diff_abundance_kw
          
-         Experiment.filter_abundance
+            ~Experiment.downsample
          
-         Experiment.filter_by_data
+            ~Experiment.enrichment
          
-         Experiment.filter_by_metadata
+            ~Experiment.filter_abundance
          
-         Experiment.filter_ids
+            ~Experiment.filter_by_data
          
-         Experiment.filter_mean
+            ~Experiment.filter_by_metadata
          
-         Experiment.filter_prevalence
+            ~Experiment.filter_ids
          
-         Experiment.filter_sample_categories
+            ~Experiment.filter_mean
          
-         Experiment.filter_samples
+            ~Experiment.filter_prevalence
          
-         Experiment.from_pandas
+            ~Experiment.filter_sample_categories
          
-         Experiment.get_data
+            ~Experiment.filter_samples
          
-         Experiment.heatmap
+            ~Experiment.from_pandas
          
-         Experiment.join_experiments
+            ~Experiment.get_data
          
-         Experiment.join_metadata_fields
+            ~Experiment.heatmap
          
-         Experiment.log_n
+            ~Experiment.join_experiments
          
-         Experiment.normalize
+            ~Experiment.join_metadata_fields
          
-         Experiment.normalize_by_subset_features
+            ~Experiment.log_n
          
-         Experiment.normalize_compositional
+            ~Experiment.normalize
          
-         Experiment.onehot_encode_features
+            ~Experiment.normalize_by_subset_features
          
-         Experiment.plot
+            ~Experiment.normalize_compositional
          
-         Experiment.plot_abund_prevalence
+            ~Experiment.onehot_encode_features
          
-         Experiment.plot_diff_abundance_enrichment
+            ~Experiment.plot
          
-         Experiment.plot_enrichment
+            ~Experiment.plot_abund_prevalence
          
-         Experiment.plot_hist
+            ~Experiment.plot_diff_abundance_enrichment
          
-         Experiment.plot_shareness
+            ~Experiment.plot_enrichment
          
-         Experiment.plot_stacked_bar
+            ~Experiment.plot_hist
          
-         Experiment.random_permute_data
+            ~Experiment.plot_scatter_matrix
          
-         Experiment.reorder
+            ~Experiment.plot_shareness
          
-         Experiment.rescale
+            ~Experiment.plot_stacked_bar
          
-         Experiment.save
+            ~Experiment.random_permute_data
          
-         Experiment.save_biom
+            ~Experiment.reorder
          
-         Experiment.save_fasta
+            ~Experiment.rescale
          
-         Experiment.save_metadata
+            ~Experiment.save
          
-         Experiment.scale
+            ~Experiment.save_biom
          
-         Experiment.sort_abundance
+            ~Experiment.save_fasta
          
-         Experiment.sort_by_data
+            ~Experiment.save_metadata
          
-         Experiment.sort_by_metadata
+            ~Experiment.scale
          
-         Experiment.sort_centroid
+            ~Experiment.sort_abundance
          
-         Experiment.sort_ids
+            ~Experiment.sort_by_data
          
-         Experiment.sort_samples
+            ~Experiment.sort_by_metadata
          
-         Experiment.subsample_count
+            ~Experiment.sort_centroid
          
-         Experiment.to_pandas
+            ~Experiment.sort_ids
          
-         Experiment.transform
+            ~Experiment.sort_samples
+         
+            ~Experiment.subsample_count
+         
+            ~Experiment.to_pandas
+         
+            ~Experiment.transform
 
 
 
-   
 
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
+
+
+   .. rubric:: Attributes
+   .. autosummary::
+      :toctree:
       
-         Experiment.shape
-         Experiment.sparse
+         ~Experiment.shape
+         ~Experiment.sparse
 

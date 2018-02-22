@@ -1,5 +1,5 @@
-calour\.transforming\.transform
-===============================
+calour.transforming.transform
+=============================
 
 .. currentmodule:: calour.transforming
 

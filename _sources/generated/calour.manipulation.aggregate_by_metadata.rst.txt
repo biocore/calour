@@ -1,5 +1,5 @@
-calour\.manipulation\.aggregate\_by\_metadata
-=============================================
+calour.manipulation.aggregate\_by\_metadata
+===========================================
 
 .. currentmodule:: calour.manipulation
 

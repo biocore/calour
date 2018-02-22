@@ -1,5 +1,5 @@
-calour\.plotting\.plot\_diff\_abundance\_enrichment
-===================================================
+calour.plotting.plot\_diff\_abundance\_enrichment
+=================================================
 
 .. currentmodule:: calour.plotting
 

@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>calour.amplicon_experiment.AmpliconExperiment.plot_shareness &#8212; calour 0.99-beta documentation</title>
-    
+    <title>calour.amplicon_experiment.AmpliconExperiment.plot_shareness &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.99-beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="calour.amplicon_experiment.AmpliconExperiment.plot_stacked_bar" href="calour.amplicon_experiment.AmpliconExperiment.plot_stacked_bar.html" />
+    <link rel="prev" title="calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix" href="calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body role="document">
+  </head><body>
   
   <a href="https://github.com/biocore/calour"
      class="visible-desktop hidden-xs"><img
@@ -65,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -81,20 +70,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
 </ul>
 </li>
@@ -142,47 +127,38 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.plot_shareness<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-plot-shareness" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.plot_shareness">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">plot_shareness</code><span class="sig-paren">(</span><em>field=None</em>, <em>steps=None</em>, <em>iterations=10</em>, <em>alpha=0.5</em>, <em>linewidth=0.7</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/0.99-beta/calour/util.py#L122"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot_shareness" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the number of shared features against the number of samples subsampled.</p>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">plot_shareness</code><span class="sig-paren">(</span><em>field=None</em>, <em>steps=None</em>, <em>iterations=10</em>, <em>alpha=0.5</em>, <em>linewidth=0.7</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.plot_shareness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the number of shared features against the number of samples.</p>
 <p>To see if there is a core feature set shared across most of the samples.</p>
 <p>As an example of this type of plot, please see Fig 2C in Muegge,
 B. D. et al. Diet drives convergence in gut microbiome functions
 across mammalian phylogeny and within humans. Science 332, 970–974
 (2011).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The samples should be normalized by rarefaction
+instead of other normalization methods. Otherwise, the samples
+with higher sequencing depth will artificially share more OTUs
+with each other.</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>field</strong> : str</p>
-<blockquote>
-<div><p>sample metadata field to group samples</p>
-</div></blockquote>
-<p><strong>steps</strong> : iterable of int</p>
-<blockquote>
-<div><p>the sizes of subsamples to compute the shareness.</p>
-</div></blockquote>
-<p><strong>iterations</strong> : int</p>
-<blockquote>
-<div><p>repeat the subsampling multiple times and plot all the iterations</p>
-</div></blockquote>
-<p><strong>alpha</strong> : float</p>
-<blockquote>
-<div><p>the transparency (1 is most opaque and 0 is most transparent) to plot for each iteration.</p>
-</div></blockquote>
-<p><strong>linewidth</strong> : float</p>
-<blockquote>
-<div><p>the linewidth of the plotting lines for each iteration</p>
-</div></blockquote>
-<p><strong>ax</strong> : <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a>, optional</p>
-<blockquote>
-<div><p>Axes object to draw the plot onto, otherwise uses the current Axes.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – sample metadata field to group samples</li>
+<li><strong>steps</strong> (<em>iterable of int</em>) – the sizes of subsamples to compute the shareness.</li>
+<li><strong>iterations</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – repeat the subsampling multiple times and plot all the iterations</li>
+<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the transparency (1 is most opaque and 0 is most transparent) to plot for each iteration.</li>
+<li><strong>linewidth</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the linewidth of the plotting lines for each iteration</li>
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><em>matplotlib.axes.Axes</em></a><em>, </em><em>optional</em>) – Axes object to draw the plot onto, otherwise uses the current Axes.</li>
+</ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ax</strong> : <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a></p>
-<blockquote class="last">
-<div><p>The Axes object containing the plot.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The Axes object containing the plot.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)">matplotlib.axes.Axes</a></p>
 </td>
 </tr>
 </tbody>
@@ -203,8 +179,8 @@ across mammalian phylogeny and within humans. Science 332, 970–974
       
     </p>
     <p>
-        &copy; Copyright 2016--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
     </p>
   </div>
 </footer>

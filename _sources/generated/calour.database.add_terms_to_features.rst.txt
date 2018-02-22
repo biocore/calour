@@ -1,0 +1,6 @@
+calour.database.add\_terms\_to\_features
+========================================
+
+.. currentmodule:: calour.database
+
+.. autofunction:: add_terms_to_features

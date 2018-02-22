@@ -1,0 +1,6 @@
+calour.database.enrichment
+==========================
+
+.. currentmodule:: calour.database
+
+.. autofunction:: enrichment

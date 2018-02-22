@@ -1,5 +1,5 @@
-calour\.transforming\.center\_log
-=================================
+calour.transforming.center\_log
+===============================
 
 .. currentmodule:: calour.transforming
 

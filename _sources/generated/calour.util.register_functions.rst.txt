@@ -1,5 +1,5 @@
-calour\.util\.register\_functions
-=================================
+calour.util.register\_functions
+===============================
 
 .. currentmodule:: calour.util
 

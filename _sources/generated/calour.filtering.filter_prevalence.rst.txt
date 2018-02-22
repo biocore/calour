@@ -1,5 +1,5 @@
-calour\.filtering\.filter\_prevalence
-=====================================
+calour.filtering.filter\_prevalence
+===================================
 
 .. currentmodule:: calour.filtering
 

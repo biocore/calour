@@ -1,5 +1,5 @@
-calour\.filtering\.filter\_mean
-===============================
+calour.filtering.filter\_mean
+=============================
 
 .. currentmodule:: calour.filtering
 

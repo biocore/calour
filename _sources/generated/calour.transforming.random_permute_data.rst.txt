@@ -1,5 +1,5 @@
-calour\.transforming\.random\_permute\_data
-===========================================
+calour.transforming.random\_permute\_data
+=========================================
 
 .. currentmodule:: calour.transforming
 

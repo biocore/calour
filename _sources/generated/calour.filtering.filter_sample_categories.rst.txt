@@ -1,5 +1,5 @@
-calour\.filtering\.filter\_sample\_categories
-=============================================
+calour.filtering.filter\_sample\_categories
+===========================================
 
 .. currentmodule:: calour.filtering
 

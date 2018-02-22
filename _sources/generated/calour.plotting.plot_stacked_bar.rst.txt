@@ -1,5 +1,5 @@
-calour\.plotting\.plot\_stacked\_bar
-====================================
+calour.plotting.plot\_stacked\_bar
+==================================
 
 .. currentmodule:: calour.plotting
 

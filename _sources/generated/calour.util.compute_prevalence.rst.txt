@@ -1,5 +1,5 @@
-calour\.util\.compute\_prevalence
-=================================
+calour.util.compute\_prevalence
+===============================
 
 .. currentmodule:: calour.util
 

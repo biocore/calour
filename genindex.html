@@ -1,31 +1,19 @@
 
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Index &#8212; calour 0.99-beta documentation</title>
-    
+    <title>Index &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.99-beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
@@ -37,8 +25,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body role="document">
+  </head><body>
   
   <a href="https://github.com/biocore/calour"
      class="visible-desktop hidden-xs"><img
@@ -66,7 +53,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -82,20 +69,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">General Calour concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
 </ul>
 </li>
@@ -174,24 +157,24 @@
         <li><a href="generated/calour.experiment.Experiment.__eq__.html#calour.experiment.Experiment.__eq__">(calour.experiment.Experiment method)</a>
 </li>
       </ul></li>
-      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.__format__.html#calour.amplicon_experiment.AmpliconExperiment.__format__">__format__() (calour.amplicon_experiment.AmpliconExperiment method)</a>
-
-      <ul>
-        <li><a href="generated/calour.experiment.Experiment.__format__.html#calour.experiment.Experiment.__format__">(calour.experiment.Experiment method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.__getitem__.html#calour.amplicon_experiment.AmpliconExperiment.__getitem__">__getitem__() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 
       <ul>
         <li><a href="generated/calour.experiment.Experiment.__getitem__.html#calour.experiment.Experiment.__getitem__">(calour.experiment.Experiment method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.__ne__.html#calour.amplicon_experiment.AmpliconExperiment.__ne__">__ne__() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 
       <ul>
         <li><a href="generated/calour.experiment.Experiment.__ne__.html#calour.experiment.Experiment.__ne__">(calour.experiment.Experiment method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.__repr__.html#calour.amplicon_experiment.AmpliconExperiment.__repr__">__repr__() (calour.amplicon_experiment.AmpliconExperiment method)</a>
+
+      <ul>
+        <li><a href="generated/calour.experiment.Experiment.__repr__.html#calour.experiment.Experiment.__repr__">(calour.experiment.Experiment method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -199,6 +182,16 @@
 
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features.html#calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features">add_terms_to_features() (calour.amplicon_experiment.AmpliconExperiment method)</a>
+
+      <ul>
+        <li><a href="generated/calour.experiment.Experiment.add_terms_to_features.html#calour.experiment.Experiment.add_terms_to_features">(calour.experiment.Experiment method)</a>
+</li>
+        <li><a href="generated/calour.database.add_terms_to_features.html#calour.database.add_terms_to_features">(in module calour.database)</a>
+</li>
+      </ul></li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata">aggregate_by_metadata() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 
@@ -208,8 +201,6 @@
         <li><a href="generated/calour.manipulation.aggregate_by_metadata.html#calour.manipulation.aggregate_by_metadata">(in module calour.manipulation)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.html#calour.amplicon_experiment.AmpliconExperiment">AmpliconExperiment (class in calour.amplicon_experiment)</a>
 </li>
   </ul></td>
@@ -235,6 +226,8 @@
       <li><a href="amplicon_experiment.html#module-calour.amplicon_experiment">calour.amplicon_experiment (module)</a>
 </li>
       <li><a href="analysis.html#module-calour.analysis">calour.analysis (module)</a>
+</li>
+      <li><a href="database.html#module-calour.database">calour.database (module)</a>
 </li>
       <li><a href="experiment.html#module-calour.experiment">calour.experiment (module)</a>
 </li>
@@ -336,6 +329,16 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.enrichment.html#calour.amplicon_experiment.AmpliconExperiment.enrichment">enrichment() (calour.amplicon_experiment.AmpliconExperiment method)</a>
+
+      <ul>
+        <li><a href="generated/calour.experiment.Experiment.enrichment.html#calour.experiment.Experiment.enrichment">(calour.experiment.Experiment method)</a>
+</li>
+        <li><a href="generated/calour.database.enrichment.html#calour.database.enrichment">(in module calour.database)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.experiment.Experiment.html#calour.experiment.Experiment">Experiment (class in calour.experiment)</a>
 </li>
   </ul></td>
@@ -416,7 +419,7 @@
       </ul></li>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.filter_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.filter_taxonomy">filter_taxonomy() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 </li>
-      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.from_pandas.html#calour.amplicon_experiment.AmpliconExperiment.from_pandas">from_pandas() (calour.amplicon_experiment.AmpliconExperiment method)</a>
+      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.from_pandas.html#calour.amplicon_experiment.AmpliconExperiment.from_pandas">from_pandas() (calour.amplicon_experiment.AmpliconExperiment class method)</a>
 
       <ul>
         <li><a href="generated/calour.experiment.Experiment.from_pandas.html#calour.experiment.Experiment.from_pandas">(calour.experiment.Experiment class method)</a>
@@ -580,6 +583,12 @@
         <li><a href="generated/calour.plotting.plot_hist.html#calour.plotting.plot_hist">(in module calour.plotting)</a>
 </li>
       </ul></li>
+      <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix.html#calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix">plot_scatter_matrix() (calour.amplicon_experiment.AmpliconExperiment method)</a>
+
+      <ul>
+        <li><a href="generated/calour.experiment.Experiment.plot_scatter_matrix.html#calour.experiment.Experiment.plot_scatter_matrix">(calour.experiment.Experiment method)</a>
+</li>
+      </ul></li>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.plot_shareness.html#calour.amplicon_experiment.AmpliconExperiment.plot_shareness">plot_shareness() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 
       <ul>
@@ -692,8 +701,6 @@
         <li><a href="generated/calour.sorting.sort_abundance.html#calour.sorting.sort_abundance">(in module calour.sorting)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.sort_by_data.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_data">sort_by_data() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 
       <ul>
@@ -702,6 +709,8 @@
         <li><a href="generated/calour.sorting.sort_by_data.html#calour.sorting.sort_by_data">(in module calour.sorting)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.sort_by_metadata">sort_by_metadata() (calour.amplicon_experiment.AmpliconExperiment method)</a>
 
       <ul>
@@ -714,6 +723,8 @@
 
       <ul>
         <li><a href="generated/calour.experiment.Experiment.sort_centroid.html#calour.experiment.Experiment.sort_centroid">(calour.experiment.Experiment method)</a>
+</li>
+        <li><a href="generated/calour.sorting.sort_centroid.html#calour.sorting.sort_centroid">(in module calour.sorting)</a>
 </li>
       </ul></li>
       <li><a href="generated/calour.amplicon_experiment.AmpliconExperiment.sort_ids.html#calour.amplicon_experiment.AmpliconExperiment.sort_ids">sort_ids() (calour.amplicon_experiment.AmpliconExperiment method)</a>
@@ -788,8 +799,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2016--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
     </p>
   </div>
 </footer>

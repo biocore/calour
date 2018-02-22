@@ -1,5 +1,5 @@
-calour\.io\.read\_open\_ms
-==========================
+calour.io.read\_open\_ms
+========================
 
 .. currentmodule:: calour.io
 

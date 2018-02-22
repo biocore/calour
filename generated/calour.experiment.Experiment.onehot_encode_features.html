@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>calour.experiment.Experiment.onehot_encode_features &#8212; calour 0.99-beta documentation</title>
-    
+    <title>calour.experiment.Experiment.onehot_encode_features &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.99-beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="calour.experiment.Experiment.plot" href="calour.experiment.Experiment.plot.html" />
+    <link rel="prev" title="calour.experiment.Experiment.normalize_compositional" href="calour.experiment.Experiment.normalize_compositional.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body role="document">
+  </head><body>
   
   <a href="https://github.com/biocore/calour"
      class="visible-desktop hidden-xs"><img
@@ -65,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -81,20 +70,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
 </ul>
 </li>
@@ -142,62 +127,24 @@
 <h1>calour.experiment.Experiment.onehot_encode_features<a class="headerlink" href="#calour-experiment-experiment-onehot-encode-features" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.onehot_encode_features">
-<code class="descclassname">Experiment.</code><code class="descname">onehot_encode_features</code><span class="sig-paren">(</span><em>fields</em>, <em>sparse=None</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/0.99-beta/calour/util.py#L122"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.onehot_encode_features" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">onehot_encode_features</code><span class="sig-paren">(</span><em>fields</em>, <em>sparse=None</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.onehot_encode_features" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add covariates from sample metadata to the data table as features for machine learning.</p>
 <p>This will convert the columns of categorical strings using one-hot encoding scheme and add them
 into the data table as new features.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fields</strong> : list of str</p>
-<blockquote>
-<div><p>the column names in the sample metadata. These columns will be
-converted to one-hot numeric code and then concatenated to the
-data table</p>
-</div></blockquote>
-<p><strong>sparse</strong> : bool or <code class="docutils literal"><span class="pre">None</span></code> (optional)</p>
-<blockquote>
-<div><p>use sparse or dense data matrix. When it is <code class="docutils literal"><span class="pre">None</span></code>, it will follow
-the same sparsity of the current data table in the <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal"><span class="pre">Experiment</span></code></a> object</p>
-</div></blockquote>
-<p><strong>inplace</strong> : bool</p>
-<blockquote>
-<div><p>change the <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal"><span class="pre">Experiment</span></code></a> object in place or return a copy of changed.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal"><span class="pre">Experiment</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-class docutils literal"><span class="pre">sklearn.preprocessing.OneHotEncoder</span></code></p>
-</div>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]),</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]),</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">sample_metadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span>
 <span class="gp">... </span>                                               <span class="s1">&#39;ph&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">6.6</span><span class="p">,</span> <span class="mf">7.7</span><span class="p">]},</span>
 <span class="gp">... </span>                                              <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;s1&#39;</span><span class="p">,</span> <span class="s1">&#39;s2&#39;</span><span class="p">]),</span>
 <span class="gp">... </span>                 <span class="n">feature_metadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;motile&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">]},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;otu1&#39;</span><span class="p">,</span> <span class="s1">&#39;otu2&#39;</span><span class="p">]))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span>
-<span class="go">Experiment</span>
-<span class="go">----------</span>
-<span class="go">data dimension: 2 samples, 2 features</span>
-<span class="go">sample IDs: Index([&#39;s1&#39;, &#39;s2&#39;], dtype=&#39;object&#39;)</span>
-<span class="go">feature IDs: Index([&#39;otu1&#39;, &#39;otu2&#39;], dtype=&#39;object&#39;)</span>
+<span class="go">Experiment with 2 samples, 2 features</span>
 </pre></div>
 </div>
-<p>Let&#8217;s add the columns of <cite>category</cite> and <cite>ph</cite> as features into data table:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">onehot_encode_features</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;ph&#39;</span><span class="p">])</span>
+<p>Let’s add the columns of <cite>category</cite> and <cite>ph</cite> as features into data table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">onehot_encode_features</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;ph&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new</span>
-<span class="go">Experiment</span>
-<span class="go">----------</span>
-<span class="go">data dimension: 2 samples, 5 features</span>
-<span class="go">sample IDs: Index([&#39;s1&#39;, &#39;s2&#39;], dtype=&#39;object&#39;)</span>
-<span class="go">feature IDs: Index([&#39;category=A&#39;, &#39;category=B&#39;, &#39;ph&#39;, &#39;otu1&#39;, &#39;otu2&#39;], dtype=&#39;object&#39;)</span>
+<span class="go">Experiment with 2 samples, 5 features</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">feature_metadata</span>
 <span class="go">           motile</span>
 <span class="go">category=A    NaN</span>
@@ -206,9 +153,35 @@ the same sparsity of the current data table in the <a class="reference internal"
 <span class="go">otu1            y</span>
 <span class="go">otu2            n</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">data</span>
-<span class="go">array([[ 1. ,  0. ,  6.6,  1. ,  2. ],</span>
-<span class="go">       [ 0. ,  1. ,  7.7,  3. ,  4. ]])</span>
+<span class="go">array([[1. , 0. , 6.6, 1. , 2. ],</span>
+<span class="go">       [0. , 1. , 7.7, 3. , 4. ]])</span>
 </pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fields</strong> (<em>list of str</em>) – the column names in the sample metadata. These columns will be
+converted to one-hot numeric code and then concatenated to the
+data table</li>
+<li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – use sparse or dense data matrix. When it is <code class="docutils literal notranslate"><span class="pre">None</span></code>, it will follow
+the same sparsity of the current data table in the <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> object</li>
+<li><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – change the <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> object in place or return a copy of changed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment">Experiment</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sklearn.preprocessing.OneHotEncoder()</span></code></p>
 </div>
 </dd></dl>
 
@@ -226,8 +199,8 @@ the same sparsity of the current data table in the <a class="reference internal"
       
     </p>
     <p>
-        &copy; Copyright 2016--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
     </p>
   </div>
 </footer>

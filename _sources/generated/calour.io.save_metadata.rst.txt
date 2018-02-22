@@ -1,5 +1,5 @@
-calour\.io\.save\_metadata
-==========================
+calour.io.save\_metadata
+========================
 
 .. currentmodule:: calour.io
 

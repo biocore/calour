@@ -1,5 +1,5 @@
-calour\.filtering\.filter\_by\_data
-===================================
+calour.filtering.filter\_by\_data
+=================================
 
 .. currentmodule:: calour.filtering
 

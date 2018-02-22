@@ -1,30 +1,18 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>transforming (calour.transforming) &#8212; calour 0.99-beta documentation</title>
-    
+    <title>transforming (calour.transforming) &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.99-beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
@@ -32,14 +20,13 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="calour.transforming.normalize" href="generated/calour.transforming.normalize.html" />
-    <link rel="prev" title="calour.sorting.cluster_features" href="generated/calour.sorting.cluster_features.html" />
+    <link rel="prev" title="calour.sorting.sort_centroid" href="generated/calour.sorting.sort_centroid.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body role="document">
+  </head><body>
   
   <a href="https://github.com/biocore/calour"
      class="visible-desktop hidden-xs"><img
@@ -67,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -83,20 +70,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_metabolome.html">Metabolome tutorials</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
 </ul>
 </li>
@@ -110,7 +93,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a><ul>
+<li><a class="reference internal" href="#">transforming (<code class="docutils literal notranslate"><span class="pre">calour.transforming</span></code>)</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 </ul>
 </li>
@@ -144,7 +127,7 @@
     <div class="col-md-12 content">
       
   <span class="target" id="module-calour.transforming"></span><div class="section" id="transforming-calour-transforming">
-<h1>transforming (<a class="reference internal" href="#module-calour.transforming" title="calour.transforming"><code class="xref py py-mod docutils literal"><span class="pre">calour.transforming</span></code></a>)<a class="headerlink" href="#transforming-calour-transforming" title="Permalink to this headline">¶</a></h1>
+<h1>transforming (<a class="reference internal" href="#module-calour.transforming" title="calour.transforming"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calour.transforming</span></code></a>)<a class="headerlink" href="#transforming-calour-transforming" title="Permalink to this headline">¶</a></h1>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">Some of the functions require dense matrix and thus will change the sparse matrix to dense matrix.</p>
@@ -157,34 +140,34 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.normalize.html#calour.transforming.normalize" title="calour.transforming.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.normalize.html#calour.transforming.normalize" title="calour.transforming.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>(exp[,&nbsp;total,&nbsp;axis,&nbsp;inplace])</td>
 <td>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.normalize_by_subset_features.html#calour.transforming.normalize_by_subset_features" title="calour.transforming.normalize_by_subset_features"><code class="xref py py-obj docutils literal"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.normalize_by_subset_features.html#calour.transforming.normalize_by_subset_features" title="calour.transforming.normalize_by_subset_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_by_subset_features</span></code></a>(exp,&nbsp;features)</td>
 <td>Normalize each sample by their total sums without a list of features</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.normalize_compositional.html#calour.transforming.normalize_compositional" title="calour.transforming.normalize_compositional"><code class="xref py py-obj docutils literal"><span class="pre">normalize_compositional</span></code></a>(exp[,&nbsp;min_frac,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.normalize_compositional.html#calour.transforming.normalize_compositional" title="calour.transforming.normalize_compositional"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_compositional</span></code></a>(exp[,&nbsp;min_frac,&nbsp;…])</td>
 <td>Normalize each sample by ignoring the features with mean&gt;=min_frac in all the experiment</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.scale.html#calour.transforming.scale" title="calour.transforming.scale"><code class="xref py py-obj docutils literal"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.scale.html#calour.transforming.scale" title="calour.transforming.scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code></a>(exp[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Standardize a dataset along an axis</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.random_permute_data.html#calour.transforming.random_permute_data" title="calour.transforming.random_permute_data"><code class="xref py py-obj docutils literal"><span class="pre">random_permute_data</span></code></a>(exp[,&nbsp;normalize])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.random_permute_data.html#calour.transforming.random_permute_data" title="calour.transforming.random_permute_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_permute_data</span></code></a>(exp[,&nbsp;normalize])</td>
 <td>Shuffle independently the reads of each feature</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.binarize.html#calour.transforming.binarize" title="calour.transforming.binarize"><code class="xref py py-obj docutils literal"><span class="pre">binarize</span></code></a>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.binarize.html#calour.transforming.binarize" title="calour.transforming.binarize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binarize</span></code></a>(exp[,&nbsp;threshold,&nbsp;inplace])</td>
 <td>Binarize the data with a threshold.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.log_n.html#calour.transforming.log_n" title="calour.transforming.log_n"><code class="xref py py-obj docutils literal"><span class="pre">log_n</span></code></a>(exp[,&nbsp;n,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.log_n.html#calour.transforming.log_n" title="calour.transforming.log_n"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_n</span></code></a>(exp[,&nbsp;n,&nbsp;inplace])</td>
 <td>Log transform the data</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.transform.html#calour.transforming.transform" title="calour.transforming.transform"><code class="xref py py-obj docutils literal"><span class="pre">transform</span></code></a>(exp[,&nbsp;steps,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.transform.html#calour.transforming.transform" title="calour.transforming.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(exp[,&nbsp;steps,&nbsp;inplace])</td>
 <td>Chain transformations together.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.center_log.html#calour.transforming.center_log" title="calour.transforming.center_log"><code class="xref py py-obj docutils literal"><span class="pre">center_log</span></code></a>(exp[,&nbsp;delta,&nbsp;method,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.transforming.center_log.html#calour.transforming.center_log" title="calour.transforming.center_log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center_log</span></code></a>(exp[,&nbsp;method,&nbsp;centralize,&nbsp;inplace])</td>
 <td>Performs a clr transform to normalize each sample.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.subsample_count.html#calour.transforming.subsample_count" title="calour.transforming.subsample_count"><code class="xref py py-obj docutils literal"><span class="pre">subsample_count</span></code></a>(exp,&nbsp;total[,&nbsp;replace,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/calour.transforming.subsample_count.html#calour.transforming.subsample_count" title="calour.transforming.subsample_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsample_count</span></code></a>(exp,&nbsp;total[,&nbsp;replace,&nbsp;inplace])</td>
 <td>Randomly subsample each sample to the same number of counts.</td>
 </tr>
 </tbody>
@@ -204,8 +187,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2016--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
     </p>
   </div>
 </footer>

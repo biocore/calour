@@ -1,5 +1,5 @@
-calour\.analysis\.correlation
-=============================
+calour.analysis.correlation
+===========================
 
 .. currentmodule:: calour.analysis
 

@@ -1,5 +1,5 @@
-calour\.manipulation\.join\_experiments
-=======================================
+calour.manipulation.join\_experiments
+=====================================
 
 .. currentmodule:: calour.manipulation
 

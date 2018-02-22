@@ -1,5 +1,5 @@
-calour\.io\.read
-================
+calour.io.read
+==============
 
 .. currentmodule:: calour.io
 

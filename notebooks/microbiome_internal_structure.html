@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Calour Experiment class tutorial &#8212; calour 1.0-dev documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Micribiome data normalization tutorial" href="microbiome_normalization.html" />
+    <link rel="prev" title="Micribiome differential abundance tutorial" href="microbiome_diff_abundance.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Calour Experiment class tutorial</a><ul>
+<li><a class="reference internal" href="#Setup">Setup</a></li>
+<li><a class="reference internal" href="#Load-the-data">Load the data</a></li>
+<li><a class="reference internal" href="#The-Experiment-class">The <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class</a></li>
+<li><a class="reference internal" href="#The-__repr__-of-the-Experiment-Contains-the-class-(in-our-case---ca.AmpliconExperiment---which-is-derived-from-ca.Experiment),">The __repr__ of the Experiment Contains the class (in our case - ca.AmpliconExperiment - which is derived from ca.Experiment),</a></li>
+<li><a class="reference internal" href="#The-per-sample-metadata-(Experiment.sample_metadata)">The per-sample metadata (<code class="docutils literal notranslate"><span class="pre">Experiment.sample_metadata</span></code>)</a></li>
+<li><a class="reference internal" href="#The-per-feature-metadata-(Experiment.feature_metadata)">The per-feature metadata (<code class="docutils literal notranslate"><span class="pre">Experiment.feature_metadata</span></code>)</a></li>
+<li><a class="reference internal" href="#Reads-table-(Experiment.data)">Reads table (<code class="docutils literal notranslate"><span class="pre">Experiment.data</span></code>)</a><ul>
+<li><a class="reference internal" href="#Choosing-sparse/dense-representation-of-the-data">Choosing sparse/dense representation of the data</a><ul>
+<li><a class="reference internal" href="#Convert-to-dense">Convert to dense</a></li>
+<li><a class="reference internal" href="#convert-to-sparse">convert to sparse</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Getting-the-data">Getting the data</a><ul>
+<li><a class="reference internal" href="#sparse=None-means-keep-the-original-format">sparse=None means keep the original format</a></li>
+<li><a class="reference internal" href="#sparse=True-returns-a-sparse-representation-of-the-data-(copies-if-needed)">sparse=True returns a sparse representation of the data (copies if needed)</a></li>
+<li><a class="reference internal" href="#sparse=False-returns-a-dense-representation-of-the-data-(copies-if-needed)">sparse=False returns a dense representation of the data (copies if needed)</a></li>
+<li><a class="reference internal" href="#we-can-also-force-copying-the-data-using-copy=True">we can also force copying the data using <code class="docutils literal notranslate"><span class="pre">copy=True</span></code></a></li>
+<li><a class="reference internal" href="#getting-a-single-entry-based-on-feature-and-sample-values">getting a single entry based on feature and sample values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Saving-an-Experiment">Saving an Experiment</a><ul>
+<li><a class="reference internal" href="#Save-everything-(biom-table+sample/feature-mapping-files)">Save everything (biom table+sample/feature mapping files)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="Calour-Experiment-class-tutorial">
+<h1>Calour Experiment class tutorial<a class="headerlink" href="#Calour-Experiment-class-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>Learn about how calour stores the data of an experiment</p>
+<div class="section" id="Setup">
+<h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="k">as</span> <span class="nn">ca</span>
+<span class="n">ca</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> notebook
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/Users/amnon/miniconda3/envs/calour/lib/python3.5/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Load-the-data">
+<h2>Load the data<a class="headerlink" href="#Load-the-data" title="Permalink to this headline">¶</a></h2>
+<p>we use the chronic fatigue syndrome data from XXXX</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">read_amplicon</span><span class="p">(</span><span class="s1">&#39;data/chronic-fatigue-syndrome.biom&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;data/chronic-fatigue-syndrome.sample.txt&#39;</span><span class="p">,</span>
+                     <span class="n">normalize</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span><span class="n">min_reads</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2018-02-20 10:52:59 INFO loaded 87 samples, 2129 features
+2018-02-20 10:52:59 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
+2018-02-20 10:52:59 INFO After filtering, 87 remaining
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="The-Experiment-class">
+<h2>The <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class<a class="headerlink" href="#The-Experiment-class" title="Permalink to this headline">¶</a></h2>
+<p>Calour stores the experiment as two Pandas.DataFrame (for
+sample_metadata and feature_metadata) and a (sparse or dense) data
+matrix.</p>
+<p>The order in the dataframes and the table is synchronized, so entry
+number X in the sample_metadata dataframe always corresponds to row X
+in the data matrix (and similarily entry Y in the feature_metadata
+always corresponds to column Y in the data matrix).</p>
+</div>
+<div class="section" id="The-__repr__-of-the-Experiment-Contains-the-class-(in-our-case---ca.AmpliconExperiment---which-is-derived-from-ca.Experiment),">
+<h2>The __repr__ of the Experiment Contains the class (in our case - ca.AmpliconExperiment - which is derived from ca.Experiment),<a class="headerlink" href="#The-__repr__-of-the-Experiment-Contains-the-class-(in-our-case---ca.AmpliconExperiment---which-is-derived-from-ca.Experiment)," title="Permalink to this headline">¶</a></h2>
+<p>the original biom table filename,</p>
+<p>and how many samples and features does it have.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 2129 features
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="The-per-sample-metadata-(Experiment.sample_metadata)">
+<h2>The per-sample metadata (<code class="docutils literal notranslate"><span class="pre">Experiment.sample_metadata</span></code>)<a class="headerlink" href="#The-per-sample-metadata-(Experiment.sample_metadata)" title="Permalink to this headline">¶</a></h2>
+<p>This is a Pandas.DataFrame, with the index being the SampleID, and
+columns for the sample metadata fields (loaded from the mapping file).</p>
+<p>Note that Calour also added the “_calour_original_abundance” field</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sample_metadata</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BioSample_s</th>
+      <th>Experiment_s</th>
+      <th>MBases_l</th>
+      <th>MBytes_l</th>
+      <th>Run_s</th>
+      <th>SRA_Sample_s</th>
+      <th>Sample_Name_s</th>
+      <th>Assay_Type_s</th>
+      <th>AssemblyName_s</th>
+      <th>BioProject_s</th>
+      <th>...</th>
+      <th>Description</th>
+      <th>Subject</th>
+      <th>Emotional_well_being</th>
+      <th>Role_physical</th>
+      <th>Bell</th>
+      <th>Physical_functioning</th>
+      <th>Pain</th>
+      <th>Age</th>
+      <th>BMI</th>
+      <th>_calour_original_abundance</th>
+    </tr>
+    <tr>
+      <th>#SampleID</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ERR1331798</th>
+      <td>SAMEA3904128</td>
+      <td>ERX1403418</td>
+      <td>43</td>
+      <td>29</td>
+      <td>ERR1331798</td>
+      <td>ERS1091262</td>
+      <td>LR16</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>72.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>75.0</td>
+      <td>23.0</td>
+      <td>50</td>
+      <td>37.59</td>
+      <td>62629.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331812</th>
+      <td>SAMEA3904142</td>
+      <td>ERX1403432</td>
+      <td>77</td>
+      <td>54</td>
+      <td>ERR1331812</td>
+      <td>ERS1091276</td>
+      <td>LR72</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>56.0</td>
+      <td>NaN</td>
+      <td>30.0</td>
+      <td>60.0</td>
+      <td>68.0</td>
+      <td>64</td>
+      <td>22.85</td>
+      <td>96404.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331836</th>
+      <td>SAMEA3904166</td>
+      <td>ERX1403456</td>
+      <td>83</td>
+      <td>56</td>
+      <td>ERR1331836</td>
+      <td>ERS1091300</td>
+      <td>LR42</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>35</td>
+      <td>30.66</td>
+      <td>105470.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331831</th>
+      <td>SAMEA3904161</td>
+      <td>ERX1403451</td>
+      <td>38</td>
+      <td>26</td>
+      <td>ERR1331831</td>
+      <td>ERS1091295</td>
+      <td>IC10</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>45</td>
+      <td>22.24</td>
+      <td>50560.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331815</th>
+      <td>SAMEA3904145</td>
+      <td>ERX1403435</td>
+      <td>49</td>
+      <td>33</td>
+      <td>ERR1331815</td>
+      <td>ERS1091279</td>
+      <td>LR75</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>41</td>
+      <td>32.30</td>
+      <td>66414.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331870</th>
+      <td>SAMEA3904200</td>
+      <td>ERX1403490</td>
+      <td>61</td>
+      <td>42</td>
+      <td>ERR1331870</td>
+      <td>ERS1091334</td>
+      <td>LR31</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>72.0</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>50</td>
+      <td>21.96</td>
+      <td>97011.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331791</th>
+      <td>SAMEA3904121</td>
+      <td>ERX1403411</td>
+      <td>52</td>
+      <td>35</td>
+      <td>ERR1331791</td>
+      <td>ERS1091255</td>
+      <td>LR08</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>10.0</td>
+      <td>45.0</td>
+      <td>10.0</td>
+      <td>45</td>
+      <td>25.23</td>
+      <td>77673.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331854</th>
+      <td>SAMEA3904184</td>
+      <td>ERX1403474</td>
+      <td>46</td>
+      <td>31</td>
+      <td>ERR1331854</td>
+      <td>ERS1091318</td>
+      <td>LR51</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>46</td>
+      <td>28.34</td>
+      <td>59655.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331853</th>
+      <td>SAMEA3904183</td>
+      <td>ERX1403473</td>
+      <td>73</td>
+      <td>48</td>
+      <td>ERR1331853</td>
+      <td>ERS1091317</td>
+      <td>IC21</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>56.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>40.0</td>
+      <td>33.0</td>
+      <td>34</td>
+      <td>25.70</td>
+      <td>100206.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331838</th>
+      <td>SAMEA3904168</td>
+      <td>ERX1403458</td>
+      <td>24</td>
+      <td>16</td>
+      <td>ERR1331838</td>
+      <td>ERS1091302</td>
+      <td>LR40</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>8.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>50.0</td>
+      <td>23.0</td>
+      <td>27</td>
+      <td>26.47</td>
+      <td>34044.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331796</th>
+      <td>SAMEA3904126</td>
+      <td>ERX1403416</td>
+      <td>55</td>
+      <td>38</td>
+      <td>ERR1331796</td>
+      <td>ERS1091260</td>
+      <td>LR15</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>68.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>35.0</td>
+      <td>58.0</td>
+      <td>43</td>
+      <td>23.49</td>
+      <td>74744.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331820</th>
+      <td>SAMEA3904150</td>
+      <td>ERX1403440</td>
+      <td>66</td>
+      <td>44</td>
+      <td>ERR1331820</td>
+      <td>ERS1091284</td>
+      <td>IC06</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>47</td>
+      <td>24.36</td>
+      <td>106959.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331804</th>
+      <td>SAMEA3904134</td>
+      <td>ERX1403424</td>
+      <td>53</td>
+      <td>35</td>
+      <td>ERR1331804</td>
+      <td>ERS1091268</td>
+      <td>LR69</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>48.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>25.0</td>
+      <td>33.0</td>
+      <td>50</td>
+      <td>17.70</td>
+      <td>75014.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331868</th>
+      <td>SAMEA3904198</td>
+      <td>ERX1403488</td>
+      <td>41</td>
+      <td>27</td>
+      <td>ERR1331868</td>
+      <td>ERS1091332</td>
+      <td>LR33</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>88.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>5.0</td>
+      <td>10.0</td>
+      <td>64</td>
+      <td>16.30</td>
+      <td>64515.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331789</th>
+      <td>SAMEA3904119</td>
+      <td>ERX1403409</td>
+      <td>36</td>
+      <td>24</td>
+      <td>ERR1331789</td>
+      <td>ERS1091253</td>
+      <td>LR04</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>64.0</td>
+      <td>25.0</td>
+      <td>50.0</td>
+      <td>75.0</td>
+      <td>45.0</td>
+      <td>53</td>
+      <td>24.03</td>
+      <td>52549.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331803</th>
+      <td>SAMEA3904133</td>
+      <td>ERX1403423</td>
+      <td>35</td>
+      <td>23</td>
+      <td>ERR1331803</td>
+      <td>ERS1091267</td>
+      <td>LR80</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>12.0</td>
+      <td>0.0</td>
+      <td>30.0</td>
+      <td>35.0</td>
+      <td>35.0</td>
+      <td>52</td>
+      <td>23.80</td>
+      <td>54079.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331827</th>
+      <td>SAMEA3904157</td>
+      <td>ERX1403447</td>
+      <td>28</td>
+      <td>19</td>
+      <td>ERR1331827</td>
+      <td>ERS1091291</td>
+      <td>IC15</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>48</td>
+      <td>25.92</td>
+      <td>41310.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331842</th>
+      <td>SAMEA3904172</td>
+      <td>ERX1403462</td>
+      <td>44</td>
+      <td>29</td>
+      <td>ERR1331842</td>
+      <td>ERS1091306</td>
+      <td>LR24</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>54</td>
+      <td>27.19</td>
+      <td>66931.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331829</th>
+      <td>SAMEA3904159</td>
+      <td>ERX1403449</td>
+      <td>46</td>
+      <td>31</td>
+      <td>ERR1331829</td>
+      <td>ERS1091293</td>
+      <td>IC12</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>24</td>
+      <td>21.52</td>
+      <td>69574.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331787</th>
+      <td>SAMEA3904117</td>
+      <td>ERX1403407</td>
+      <td>52</td>
+      <td>36</td>
+      <td>ERR1331787</td>
+      <td>ERS1091251</td>
+      <td>LR01</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>32.0</td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>25.0</td>
+      <td>0.0</td>
+      <td>50</td>
+      <td>24.89</td>
+      <td>70387.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331866</th>
+      <td>SAMEA3904196</td>
+      <td>ERX1403486</td>
+      <td>67</td>
+      <td>45</td>
+      <td>ERR1331866</td>
+      <td>ERS1091330</td>
+      <td>LR35</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>56.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>15.0</td>
+      <td>0.0</td>
+      <td>19</td>
+      <td>27.44</td>
+      <td>93480.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331861</th>
+      <td>SAMEA3904191</td>
+      <td>ERX1403481</td>
+      <td>63</td>
+      <td>43</td>
+      <td>ERR1331861</td>
+      <td>ERS1091325</td>
+      <td>LR56</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>68.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>40.0</td>
+      <td>33.0</td>
+      <td>60</td>
+      <td>23.57</td>
+      <td>84020.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331845</th>
+      <td>SAMEA3904175</td>
+      <td>ERX1403465</td>
+      <td>25</td>
+      <td>17</td>
+      <td>ERR1331845</td>
+      <td>ERS1091309</td>
+      <td>LR27</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>64.0</td>
+      <td>75.0</td>
+      <td>90.0</td>
+      <td>95.0</td>
+      <td>90.0</td>
+      <td>48</td>
+      <td>21.45</td>
+      <td>40701.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331797</th>
+      <td>SAMEA3904127</td>
+      <td>ERX1403417</td>
+      <td>52</td>
+      <td>36</td>
+      <td>ERR1331797</td>
+      <td>ERS1091261</td>
+      <td>LR17</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>52.0</td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+      <td>23.0</td>
+      <td>67</td>
+      <td>32.89</td>
+      <td>61849.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331839</th>
+      <td>SAMEA3904169</td>
+      <td>ERX1403459</td>
+      <td>91</td>
+      <td>62</td>
+      <td>ERR1331839</td>
+      <td>ERS1091303</td>
+      <td>LR41</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>16.0</td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>55.0</td>
+      <td>68.0</td>
+      <td>50</td>
+      <td>25.18</td>
+      <td>119409.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331852</th>
+      <td>SAMEA3904182</td>
+      <td>ERX1403472</td>
+      <td>37</td>
+      <td>25</td>
+      <td>ERR1331852</td>
+      <td>ERS1091316</td>
+      <td>IC20</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>92.0</td>
+      <td>100.0</td>
+      <td>NaN</td>
+      <td>100.0</td>
+      <td>90.0</td>
+      <td>34</td>
+      <td>25.20</td>
+      <td>51815.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331855</th>
+      <td>SAMEA3904185</td>
+      <td>ERX1403475</td>
+      <td>42</td>
+      <td>28</td>
+      <td>ERR1331855</td>
+      <td>ERS1091319</td>
+      <td>LR50</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>42</td>
+      <td>17.41</td>
+      <td>59722.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331871</th>
+      <td>SAMEA3904201</td>
+      <td>ERX1403491</td>
+      <td>32</td>
+      <td>22</td>
+      <td>ERR1331871</td>
+      <td>ERS1091335</td>
+      <td>LR30</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>80.0</td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>35.0</td>
+      <td>45.0</td>
+      <td>59</td>
+      <td>21.61</td>
+      <td>47760.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331790</th>
+      <td>SAMEA3904120</td>
+      <td>ERX1403410</td>
+      <td>67</td>
+      <td>44</td>
+      <td>ERR1331790</td>
+      <td>ERS1091254</td>
+      <td>LR05</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>32.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>20.0</td>
+      <td>23.0</td>
+      <td>51</td>
+      <td>20.98</td>
+      <td>101434.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331830</th>
+      <td>SAMEA3904160</td>
+      <td>ERX1403450</td>
+      <td>67</td>
+      <td>47</td>
+      <td>ERR1331830</td>
+      <td>ERS1091294</td>
+      <td>IC11</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>36</td>
+      <td>30.13</td>
+      <td>85726.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>ERR1331851</th>
+      <td>SAMEA3904181</td>
+      <td>ERX1403471</td>
+      <td>73</td>
+      <td>50</td>
+      <td>ERR1331851</td>
+      <td>ERS1091315</td>
+      <td>LR29</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>48.0</td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>35.0</td>
+      <td>45.0</td>
+      <td>62</td>
+      <td>26.62</td>
+      <td>92925.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331856</th>
+      <td>SAMEA3904186</td>
+      <td>ERX1403476</td>
+      <td>18</td>
+      <td>12</td>
+      <td>ERR1331856</td>
+      <td>ERS1091320</td>
+      <td>LR53</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>92.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>65.0</td>
+      <td>90.0</td>
+      <td>63</td>
+      <td>30.54</td>
+      <td>22203.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331872</th>
+      <td>SAMEA3904202</td>
+      <td>ERX1403492</td>
+      <td>45</td>
+      <td>31</td>
+      <td>ERR1331872</td>
+      <td>ERS1091336</td>
+      <td>LR38</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>50</td>
+      <td>24.89</td>
+      <td>63500.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331793</th>
+      <td>SAMEA3904123</td>
+      <td>ERX1403413</td>
+      <td>44</td>
+      <td>29</td>
+      <td>ERR1331793</td>
+      <td>ERS1091257</td>
+      <td>LR52</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>88.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>65.0</td>
+      <td>68.0</td>
+      <td>33</td>
+      <td>22.86</td>
+      <td>64368.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331819</th>
+      <td>SAMEA3904149</td>
+      <td>ERX1403439</td>
+      <td>55</td>
+      <td>37</td>
+      <td>ERR1331819</td>
+      <td>ERS1091283</td>
+      <td>IC05</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>33</td>
+      <td>21.77</td>
+      <td>73568.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331817</th>
+      <td>SAMEA3904147</td>
+      <td>ERX1403437</td>
+      <td>47</td>
+      <td>32</td>
+      <td>ERR1331817</td>
+      <td>ERS1091281</td>
+      <td>IC09</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>55</td>
+      <td>46.86</td>
+      <td>69072.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331858</th>
+      <td>SAMEA3904188</td>
+      <td>ERX1403478</td>
+      <td>63</td>
+      <td>43</td>
+      <td>ERR1331858</td>
+      <td>ERS1091322</td>
+      <td>LR55</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>48</td>
+      <td>25.06</td>
+      <td>89176.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331833</th>
+      <td>SAMEA3904163</td>
+      <td>ERX1403453</td>
+      <td>48</td>
+      <td>32</td>
+      <td>ERR1331833</td>
+      <td>ERS1091297</td>
+      <td>LR47</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>54</td>
+      <td>28.19</td>
+      <td>64426.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331834</th>
+      <td>SAMEA3904164</td>
+      <td>ERX1403454</td>
+      <td>43</td>
+      <td>30</td>
+      <td>ERR1331834</td>
+      <td>ERS1091298</td>
+      <td>LR44</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>49</td>
+      <td>41.40</td>
+      <td>59181.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331810</th>
+      <td>SAMEA3904140</td>
+      <td>ERX1403430</td>
+      <td>74</td>
+      <td>51</td>
+      <td>ERR1331810</td>
+      <td>ERS1091274</td>
+      <td>LR78</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>84.0</td>
+      <td>88.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+      <td>0.0</td>
+      <td>63</td>
+      <td>24.53</td>
+      <td>100251.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331823</th>
+      <td>SAMEA3904153</td>
+      <td>ERX1403443</td>
+      <td>54</td>
+      <td>37</td>
+      <td>ERR1331823</td>
+      <td>ERS1091287</td>
+      <td>IC19</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>43</td>
+      <td>26.15</td>
+      <td>76190.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331848</th>
+      <td>SAMEA3904178</td>
+      <td>ERX1403468</td>
+      <td>58</td>
+      <td>39</td>
+      <td>ERR1331848</td>
+      <td>ERS1091312</td>
+      <td>LR22</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>56.0</td>
+      <td>100.0</td>
+      <td>50.0</td>
+      <td>70.0</td>
+      <td>65.0</td>
+      <td>56</td>
+      <td>22.24</td>
+      <td>84987.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331807</th>
+      <td>SAMEA3904137</td>
+      <td>ERX1403427</td>
+      <td>50</td>
+      <td>34</td>
+      <td>ERR1331807</td>
+      <td>ERS1091271</td>
+      <td>LR65</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>88.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>25.0</td>
+      <td>10.0</td>
+      <td>54</td>
+      <td>29.95</td>
+      <td>68514.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331800</th>
+      <td>SAMEA3904130</td>
+      <td>ERX1403420</td>
+      <td>65</td>
+      <td>44</td>
+      <td>ERR1331800</td>
+      <td>ERS1091264</td>
+      <td>LR10</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>76.0</td>
+      <td>25.0</td>
+      <td>20.0</td>
+      <td>40.0</td>
+      <td>60.0</td>
+      <td>61</td>
+      <td>25.06</td>
+      <td>84449.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331824</th>
+      <td>SAMEA3904154</td>
+      <td>ERX1403444</td>
+      <td>59</td>
+      <td>40</td>
+      <td>ERR1331824</td>
+      <td>ERS1091288</td>
+      <td>IC18</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>48</td>
+      <td>34.15</td>
+      <td>80196.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331841</th>
+      <td>SAMEA3904171</td>
+      <td>ERX1403461</td>
+      <td>38</td>
+      <td>27</td>
+      <td>ERR1331841</td>
+      <td>ERS1091305</td>
+      <td>LR49</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>60</td>
+      <td>30.89</td>
+      <td>48256.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331865</th>
+      <td>SAMEA3904195</td>
+      <td>ERX1403485</td>
+      <td>36</td>
+      <td>24</td>
+      <td>ERR1331865</td>
+      <td>ERS1091329</td>
+      <td>LR36</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>20</td>
+      <td>20.80</td>
+      <td>47898.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331809</th>
+      <td>SAMEA3904139</td>
+      <td>ERX1403429</td>
+      <td>41</td>
+      <td>28</td>
+      <td>ERR1331809</td>
+      <td>ERS1091273</td>
+      <td>LR79</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>56.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>6.0</td>
+      <td>45.0</td>
+      <td>53</td>
+      <td>28.34</td>
+      <td>55874.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331862</th>
+      <td>SAMEA3904192</td>
+      <td>ERX1403482</td>
+      <td>74</td>
+      <td>51</td>
+      <td>ERR1331862</td>
+      <td>ERS1091326</td>
+      <td>IC3</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>52</td>
+      <td>21.79</td>
+      <td>107258.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331846</th>
+      <td>SAMEA3904176</td>
+      <td>ERX1403466</td>
+      <td>84</td>
+      <td>57</td>
+      <td>ERR1331846</td>
+      <td>ERS1091310</td>
+      <td>LR20</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>92.0</td>
+      <td>50.0</td>
+      <td>60.0</td>
+      <td>40.0</td>
+      <td>45.0</td>
+      <td>71</td>
+      <td>20.94</td>
+      <td>110218.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331811</th>
+      <td>SAMEA3904141</td>
+      <td>ERX1403431</td>
+      <td>43</td>
+      <td>29</td>
+      <td>ERR1331811</td>
+      <td>ERS1091275</td>
+      <td>LR73</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>36.0</td>
+      <td>25.0</td>
+      <td>50.0</td>
+      <td>50.0</td>
+      <td>33.0</td>
+      <td>39</td>
+      <td>28.66</td>
+      <td>63968.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331835</th>
+      <td>SAMEA3904165</td>
+      <td>ERX1403455</td>
+      <td>76</td>
+      <td>52</td>
+      <td>ERR1331835</td>
+      <td>ERS1091299</td>
+      <td>LR45</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>50</td>
+      <td>23.43</td>
+      <td>94907.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331832</th>
+      <td>SAMEA3904162</td>
+      <td>ERX1403452</td>
+      <td>37</td>
+      <td>25</td>
+      <td>ERR1331832</td>
+      <td>ERS1091296</td>
+      <td>LR46</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>72.0</td>
+      <td>0.0</td>
+      <td>30.0</td>
+      <td>56.0</td>
+      <td>23.0</td>
+      <td>65</td>
+      <td>37.20</td>
+      <td>49032.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331859</th>
+      <td>SAMEA3904189</td>
+      <td>ERX1403479</td>
+      <td>53</td>
+      <td>36</td>
+      <td>ERR1331859</td>
+      <td>ERS1091323</td>
+      <td>LR54</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>76.0</td>
+      <td>0.0</td>
+      <td>30.0</td>
+      <td>15.0</td>
+      <td>10.0</td>
+      <td>63</td>
+      <td>25.79</td>
+      <td>77150.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331816</th>
+      <td>SAMEA3904146</td>
+      <td>ERX1403436</td>
+      <td>59</td>
+      <td>40</td>
+      <td>ERR1331816</td>
+      <td>ERS1091280</td>
+      <td>LR74</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>64.0</td>
+      <td>25.0</td>
+      <td>30.0</td>
+      <td>50.0</td>
+      <td>NaN</td>
+      <td>51</td>
+      <td>24.39</td>
+      <td>89870.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331818</th>
+      <td>SAMEA3904148</td>
+      <td>ERX1403438</td>
+      <td>54</td>
+      <td>38</td>
+      <td>ERR1331818</td>
+      <td>ERS1091282</td>
+      <td>IC04</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>32</td>
+      <td>32.98</td>
+      <td>71017.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331792</th>
+      <td>SAMEA3904122</td>
+      <td>ERX1403412</td>
+      <td>32</td>
+      <td>22</td>
+      <td>ERR1331792</td>
+      <td>ERS1091256</td>
+      <td>LR09</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>24.0</td>
+      <td>100.0</td>
+      <td>90.0</td>
+      <td>80.0</td>
+      <td>65.0</td>
+      <td>43</td>
+      <td>22.14</td>
+      <td>41598.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331857</th>
+      <td>SAMEA3904187</td>
+      <td>ERX1403477</td>
+      <td>61</td>
+      <td>42</td>
+      <td>ERR1331857</td>
+      <td>ERS1091321</td>
+      <td>IC8</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>53</td>
+      <td>29.02</td>
+      <td>89919.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331850</th>
+      <td>SAMEA3904180</td>
+      <td>ERX1403470</td>
+      <td>54</td>
+      <td>36</td>
+      <td>ERR1331850</td>
+      <td>ERS1091314</td>
+      <td>LR28</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Control</td>
+      <td>60.0</td>
+      <td>75.0</td>
+      <td>NaN</td>
+      <td>80.0</td>
+      <td>90.0</td>
+      <td>50</td>
+      <td>29.65</td>
+      <td>72977.0</td>
+    </tr>
+    <tr>
+      <th>ERR1331795</th>
+      <td>SAMEA3904125</td>
+      <td>ERX1403415</td>
+      <td>56</td>
+      <td>38</td>
+      <td>ERR1331795</td>
+      <td>ERS1091259</td>
+      <td>LR18</td>
+      <td>AMPLICON</td>
+      <td>&lt;not provided&gt;</td>
+      <td>PRJEB13092</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>Patient</td>
+      <td>88.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>55.0</td>
+      <td>55.0</td>
+      <td>62</td>
+      <td>24.39</td>
+      <td>80308.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>87 rows × 59 columns</p>
+</div></div>
+</div>
+</div>
+<div class="section" id="The-per-feature-metadata-(Experiment.feature_metadata)">
+<h2>The per-feature metadata (<code class="docutils literal notranslate"><span class="pre">Experiment.feature_metadata</span></code>)<a class="headerlink" href="#The-per-feature-metadata-(Experiment.feature_metadata)" title="Permalink to this headline">¶</a></h2>
+<p>This is a Pandas.DataFrame, with the index being the featureID (usually
+the sequence), and columns for the feature metadata (usually “taxonomy”,
+and also additional fields added by calour following differential
+abundance testing)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">feature_metadata</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>taxonomy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGCTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGGTGTCTTGAGTACAGTAGAGGCAGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGGTTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGCGACCTTGAGTGCAACAGAGGTAGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGCAGGCGGTGCGGCAAGTCTGATGTGAAAGCCCGGGGCTCAACCCCGGGACTGCATTGGAAACTGTCGTACTTGAGTATCGGAGAGGTAAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGATGGATGTTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGATATCTTGAGTGCAGTTGAGGCAGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGCAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGATGGATGTTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGATGTCTTGAGTGCAGTTGAGGCAGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTTGTTAAGTCAGATGTGAAATCCCCGGGCTCAACCTGGGAACTGCATCTGATACTGGCAAGCTTGAGTCTCGTAGAGGGGGGTAGAATTCCAGG</th>
+      <td>k__Bacteria;p__Proteobacteria;c__Gammaproteoba...</td>
+    </tr>
+    <tr>
+      <th>AACGTAGGGTGCAAGCGTTGTCCGGAATTACTGGGTGTAAAGGGAGCGCAGGCGGACCGGCAAGTTGGAAGTGAAAACTATGGGCTCAACCCATAAATTGCTTTCAAAACTGCTGGCCTTGAGTAGTGCAGAGGTAGGTGGAATTCCCGG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>AACGTAGGGTGCAAGCGTTGTCCGGAATTACTGGGTGTAAAGGGAGCGCAGGCGGGAAGACAAGTTGGAAGTGAAAACCATGGGCTCAACCCATGAATTGCTTTCAAAACTGTTTTTCTTGAGTAGTGCAGAGGTAGATGGAATTCCCGG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGCAGTCTTGAGTGCAGTAGAGGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>AACGTAGGTCACAAGCGTTGTCCGGAATTACTGGGTGTAAAGGGAGCGCAGGCGGGAAGACAAGTTGGAAGTGAAATCTATGGGCTCAACCCATAAACTGCTTTCAAAACTGTTTTTCTTGAGTAGTGCAGAGGTAGGCGGAATTCCCGG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCGAGCGTTGTCCGGAATGATTGGGCGTAAAGGGCGTGTAGGCGGCTTTATAAGTCTGGAGTGAAAGTCCTGTTTTCAAGATGGGAATTGCTTTGGATACTGTAGGGCTTGAGTGCAGGAGAGGTTATCGGAATTCCCGG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGCGCAGCAAGTCTGATGTGAAAGGCAGGGGCTTAACCCCTGGACTGCATTGGAAACTGCTGTGCTTGAGTGCCGGAGGGGTAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATGCAAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGTAGGCGGCACGCCAAGTCAGCGGTGAAATTTCCGGGCTCAACCCGGAGTGTGCCGTTGAAACTGGCGAGCTAGAGTACACAAGAGGCAGGCGGAATGCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGCAGGCGGCATGATAAGTCTGATGTGAAAACCCAAGGCTCAACCATGGGACTGCATTGGAAACTGTCGTGCTGGAGTGTCGGAGAGGTGAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGCAGGCGGCATGATAAGTCTGATGTGAAAACCCAAGGCTCAACCATGGGACTGCATTGGAAACTGTCGTGCTGGAGTGTCGGAGAGGTAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTGTCCGGATTTACTGGGTGTAAAGGGCGTGTAGGCGGAGCTGCAAGTCAGATGTGAAATCTCTGGGCTCAACCCAGAAACTGCATTTGAAACTGTAGCCCTTGAGTATCGGAGAGGCAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTCCCGAGCGTTGTCCGGATTTATTGGGCGTAAAGCGAGCGCAGGCGGTTTGATAAGTCTGAAGTTAAAGGCTGTGGCTCAACCATAGTTCGCTTTGGAAACTGTCAAACTTGAGTGCAGAAGGGGAGAGTGGAATTCCATGT</th>
+      <td>k__Bacteria;p__Firmicutes;c__Bacilli;o__Lactob...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGAGCGAGCGTTGTCCGGAATTACTGGGTGTAAAGGGAGCGTAGGCGGGATAGCAAGTCAGATGTGAAAACTATGGGCTCAACCTGTAGATTGCATTTGAAACTGTTGTTCTTGAGTGAAGTAGAGGTAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGACTGGCAAGTCTGATGTGAAAGGCGGGGGCTCAACCCCTGGACTGCATTGGAAACTGTTAGTCTTGAGTGCCGGAGAGGTAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAAGATGCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGGCTTTTAAGTCAGCGGTCAAATGTCACGGCTCAACCGTGGCCAGCCGTTGAAACTGTAAGCCTTGAGTCTGCACAGGGCACATGGAATTCGTGGT</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGTGTGGCAAGTCTGATGTGAAAGGCATGGGCTCAACCTGTGGACTGCATTGGAAACTGTCATACTTGAGTGCCGGAGGGGTAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATGCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGTAGGCGGCACGCCAAGTCAGCGGTGAAATTTCCGGGCTCAACCCGGAGTGTGCCGTTGAAACTGGCGAGCTAGAGTACACAAGAGGCAGGCGGAATGCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGCGTGTAGGCGGGAGTGCAAGTCAGATGTGAAAACTATGGGCTCAACCCATAGCCTGCATTTGAAACTGTACTTCTTGAGTGATGGAGAGGCAGGCGGAATTCCCTG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATGCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGTAGGTGGTGATTTAAGTCAGCGGTGAAAGTTTGTGGCTCAACCATAAAATTGCCGTTGAAACTGGGTTACTTGAGTGTGTTTGAGGTAGGCGGAATGCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGGAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTGTCCGGATTTACTGGGTGTAAAGGGCGTGCAGCCGGGCATGCAAGTCAGATGTGAAATCTCAGGGCTTAACCCTGAAACTGCATTTGAAACTGTATGTCTTGAGTGCCGGAGAGGTAATCGGAATTCCTTG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGAGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGCGCGCAGGCGGGCCGGTAAGTTGGAAGTGAAATCTATGGGCTTAACCCATAAACTGCTTTCAAAACTGCTGGTCTTGAGTGATGGAGAGGCAGGCGGAATTCCGTG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGCACGGCAAGCCAGATGTGAAAGCCCGGGGCTCAACCCCGGGACTGCATTTGGAACTGCTGAGCTAGAGTGTCGGAGAGGCAAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTATGGTGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGATGGGCAAGTCTGATGTGAAAACCCGGGGCTCAACCCCGGGACTGCATTGGAAACTGTTCATCTAGAGTGCTGGAGAGGTAAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>TACGGAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGCAGGCGGACCTTTAAGTCAGCTGTGAAATACGGCGGCTCAACCGTCGAACTGCAGTTGATACTGGAGGTCTTGAGTGCACACAGGGATACTGGAATTCATGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTGTCCGGAATTATTGGGCGTAAAGAGCATGTAGGCGGGCTTTTAAGTCCGACGTGAAAATGCGGGGCTTAACCCCGTATGGCGTTGGATACTGGAAGTCTTGAGTGCAGGAGAGGAAAGGGGAATTCCCAGT</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCGAGCGTTATCCGGAATCATTGGGCGTAAAGAGGGAGCAGGCGGCCGCAAGGGTCTGTGGTGAAAGACCGAAGCTAAACTTCGGTGAGCCATGGAAACCGGGCGGCTAGAGTGCGGAAGAGGATCGTGGAATTCCATGT</th>
+      <td>k__Bacteria;p__Firmicutes;c__Erysipelotrichi;o...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCGAGCGTTATCCGGAATGATTGGGCGTAAAGGGTACGTAGGCGGCATGATAAGTCTGGAGTGAAAGGCTACAGCTCAACTGTAGTATGCTCTGGAAACTGTCAAGCTAGAGTGCAGAAGAGGGCAATGGAACTCCATGT</th>
+      <td>k__Bacteria;p__Firmicutes;c__Erysipelotrichi;o...</td>
+    </tr>
+    <tr>
+      <th>TACGGAAGGTCCGGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGCGGGTTAAGCGTGTTGTGAAATGTAGGGGCTCAACCTCTGCACTGCAGCGCGAACTGGCTTGCTTGAGTACGCACAACGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAAGGTCCAGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGCAGGCGGACCTTTAAGTCAGCTGTGAAATACGGCGGCTCAACCGTCGAACTGCAGTTGATACTGGAGGTCTTGAGTGCACACAGGGGTACTGGAATTCATGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTATGGAGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGTGTAGGTGGCCATGCAAGTCAGAAGTGAAAATCCGGGGCTCAACCTCGGAACTGCTTTTGAAACTGTAAGGCTGGAGTGCAGGAGGGGTGAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAAGGTCCGGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTGAGGTAAGCGTGTTGTGAAATGTAGGCGCCCAACGTCTGCACTGCAGCGCGAACTGCCCCACTTGAGTGTGCGCAACGCCGGCGGAACTCGTCG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGGAAGGTCCGGGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCCGTCTGTTAAGCGTGTTGTGAAATGTCGGGGCTCAACCTGGGCATTGCAGCGCGAACTGGCAGACTTGAGTGCACGGGAAGTAGGCGGAATTCGTCG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCGAGCGTTATCCGGATTTACTGGGTGTAAAGGGCGCGTAGGCGGGAATGCAAGTCAGATGTGAAATCCAAGGGCTCAACCCTTGAACTGCATTTGAAACTGCATTTCTTGAGTGTCGGAGAGGTTGACGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTGTCCGGATTTACTGGGTGTAAAGGGCGTGTAGCCGGGTCGGCAAGTCAGATGTGAAATCTATGGGCTCAACTCATAAACTGCATTTGAAACTGTTGATCTTGAGTATCGGAGAGGCAATCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGACTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATCGCAGTTGATACTGGCAGTCTTGAGTACAGCAGAGGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTATGGGGCGAGCGTTATCCGGATTCATTGGGCGTAAAGCGCGCGTAGGCGGCCTGGCAGGCCGGGAGTCAAATCCGGGGGCTCAACCCCCGCCCGCTCCCGGAACCTTTAGGCTTGAGTCTGGCAGGGGAGGGTGGAATACCCGGT</th>
+      <td>k__Bacteria;p__Actinobacteria;c__Coriobacterii...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGAGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGCGCGCAGGTGGGCCGGTAAGTTGGAAGTGAAATCTATGGGCTTAACCCATAAACTGCTTTCAAAACTGCTGGTCTTGAGTGATGGAGAGGCAGGCGGAATTCCGTG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTGTCCGGAATTATTGGGCGTAAAGCGCGCGCAGGCGGCCGTGCAAGTCCATCTTAAAAGCGTGGGGCTTAACCCCATGAGGGGATGGAAACTGCATGGCTGGAGTGTCGGAGGGGAAAGTGGAATTCCTAGT</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTTAACCGTAAAATTGCAGTTGATACTGGCAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGACAAGCGTTGTCCGGATTTACTGGGTGTAAAGGGCGCGTAGGCGGACTATCAAGTCAGTCGTGAAATACCGGGGCTTAACCCCGGGGCTGCGATTGAAACTGACAGCCTTGAGTATCGGAGAGGAAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGGTGTAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTTGTTAAGTCAGATGTGAAATCCCCGGGCTCAACCTGGGAACTGCATCTGATACTGGCAAGCTTGAGTCTCGTAGAGGGGGGTAGAATTCCAGG</th>
+      <td>k__Bacteria;p__Proteobacteria;c__Gammaproteoba...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGCAATCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGG</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTGTCCGGAATTACTGGGTGTAAAGGGAGCGCAGGCGGAGAAGCAAGTCAGTGGTGAAAGGTATGGGCTTAACCCATAGACTGCCATTGAAACTGTTTTCCTTGAGTGAAGTAGAGGCAGGCGGAATTCCGAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTATGGAGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGGCGGTGCTGCAAGTCTGATGTGAAAACCCGGGGCTCAACCCCGGGACTGCATTGGAAACTGTAGGACTAGAGTGTCGGAGGGGTAAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGAGCAGCAAGTCTGATGTGAAAGGCGGGGGCTCAACCCCCCGGACTGCATTGGAAACTGTTGATCTTGAGTACCGGAGAGGTAAGCGGAATTCCTA</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTATGGAGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGTGTAGGTGGTCATGCAAGTCAGAAGTGAAAATCTGGGGCTCAACCCCGGAACTGCTTTTGAAACTGTAAGGCTGGAGTGCAGGAGGGGTGAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTATGGAGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGTGTAGGTGGCCAGGCAAGTCAGAAGTGAAAGCCCAGGGCTCAACCCCGGGACTGCTTTTGAAACTGCAGGGCTAGAGTGCAGGAGGGGCAAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>CACGGGGGATGCGAGCGTTATCCGGATTCATTGGGTTTAAAGGGAGCGTAGGCGGCCCGACAAGTCAGCGGTAAAAGACTGCAGCTAAACTGTAGCGCGCCGTTGAAACTGCCGGGCTCGAGTGCAGACGAGGTTGGCGGAACAGGTGAA</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGAGCAAGCGTTGTCCGGATTTACTGGGTGTAAAGGGTGCGTAGGCGGATTGGCAAGTCAGAAGTGAAATCCATGGGCTTAACCCATGAACTGCTTTTGAAACTGTTAGTCTTGAGTGAAGCAGAGGTAGGCGGAATTCCCGG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGTGGCAAGCGTTGTCCGGAATTATTGGGCGTAAAGCGCATGTAGGCGGTTCCCTAAGTCGGTCGTGAAAATGCGGTGCTTAACGCCGTATGGCGATCGAAACTGGGGGACTTGAGTGCAGGAGAGGAAAGGGGAACTCCCAGT</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGGAGGATGCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGTAGGCGGTTAATTAAGTTAGTGGTCAAATCCGGAGGCTTCACTTCCGATCGCCATTAAAACTGATTAGCTAGAGAATGGACGAGGTAGGCGGAATAAGTTAA</th>
+      <td>k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o_...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAAAGGGAGCGTAGACGGCTGTGTAAGTCTGAAGTGAAAGCCCGGGGCTCAACCCCGGGACTGCTTTGGAAACTGTATAGCTAGAGTGCTGGAGAGGTAAGTGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+    <tr>
+      <th>TACGTAGGGGGCAAGCGTTATCCGGAATTACTGGGTGTAAAGGGTGCGTAGGTGGTATGGCAAGTCAGAAGTGAAAACCCAGGGCTTAACTCTGGGACTGCTTTTGAAACTGTCAGACTAGAGTGTAGGAGAGGTAAGCGGAATTCCTAG</th>
+      <td>k__Bacteria;p__Firmicutes;c__Clostridia;o__Clo...</td>
+    </tr>
+  </tbody>
+</table>
+<p>2129 rows × 1 columns</p>
+</div></div>
+</div>
+</div>
+<div class="section" id="Reads-table-(Experiment.data)">
+<h2>Reads table (<code class="docutils literal notranslate"><span class="pre">Experiment.data</span></code>)<a class="headerlink" href="#Reads-table-(Experiment.data)" title="Permalink to this headline">¶</a></h2>
+<p>This is a numpy 2D array or a scipy.Sparse matrix containing the feature
+X sample reads.</p>
+<p>Rows are samples, columns are features.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[6]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;87x2129 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+    with 21995 stored elements in Compressed Sparse Row format&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="Choosing-sparse/dense-representation-of-the-data">
+<h3>Choosing sparse/dense representation of the data<a class="headerlink" href="#Choosing-sparse/dense-representation-of-the-data" title="Permalink to this headline">¶</a></h3>
+<p>When loading the data, it is by default loaded as a scipy.Sparse.CSR
+matrix (which is more memory efficient for sparse data).</p>
+<p>We can force Calour to load the data as a dense numpy 2D array using the
+<code class="docutils literal notranslate"><span class="pre">sparse=False</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">read_amplicon()</span></code> function.</p>
+<p>We can also convert between sparse and dense using the <code class="docutils literal notranslate"><span class="pre">sparse</span></code>
+attribute of the experiment</p>
+<div class="section" id="Convert-to-dense">
+<h4>Convert to dense<a class="headerlink" href="#Convert-to-dense" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[7]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([[3.17744176e+03, 9.53232528e+02, 7.34643695e+02, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [2.59231982e+03, 3.83801502e+00, 3.63055475e+00, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [1.12373187e+03, 4.78524699e+02, 0.00000000e+00, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       ...,
+       [3.01104327e+03, 0.00000000e+00, 2.22422402e-01, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [3.40518245e+02, 1.77466873e+03, 0.00000000e+00, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [5.02440604e+02, 0.00000000e+00, 0.00000000e+00, ...,
+        3.39941226e+01, 5.10534442e+00, 1.36972655e+00]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="convert-to-sparse">
+<h4>convert to sparse<a class="headerlink" href="#convert-to-sparse" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;87x2129 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+    with 21995 stored elements in Compressed Sparse Row format&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Getting-the-data">
+<h3>Getting the data<a class="headerlink" href="#Getting-the-data" title="Permalink to this headline">¶</a></h3>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">Experiment.get_data()</span></code> function to obtain a copy of
+the data, either as sparse or dense.</p>
+<div class="section" id="sparse=None-means-keep-the-original-format">
+<h4>sparse=None means keep the original format<a class="headerlink" href="#sparse=None-means-keep-the-original-format" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">dat</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;87x2129 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+    with 21995 stored elements in Compressed Sparse Row format&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sparse=True-returns-a-sparse-representation-of-the-data-(copies-if-needed)">
+<h4>sparse=True returns a sparse representation of the data (copies if needed)<a class="headerlink" href="#sparse=True-returns-a-sparse-representation-of-the-data-(copies-if-needed)" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">dat</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[10]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;87x2129 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+    with 21995 stored elements in Compressed Sparse Row format&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sparse=False-returns-a-dense-representation-of-the-data-(copies-if-needed)">
+<h4>sparse=False returns a dense representation of the data (copies if needed)<a class="headerlink" href="#sparse=False-returns-a-dense-representation-of-the-data-(copies-if-needed)" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">dat</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[11]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([[3.17744176e+03, 9.53232528e+02, 7.34643695e+02, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [2.59231982e+03, 3.83801502e+00, 3.63055475e+00, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [1.12373187e+03, 4.78524699e+02, 0.00000000e+00, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       ...,
+       [3.01104327e+03, 0.00000000e+00, 2.22422402e-01, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [3.40518245e+02, 1.77466873e+03, 0.00000000e+00, ...,
+        0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [5.02440604e+02, 0.00000000e+00, 0.00000000e+00, ...,
+        3.39941226e+01, 5.10534442e+00, 1.36972655e+00]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="we-can-also-force-copying-the-data-using-copy=True">
+<h4>we can also force copying the data using <code class="docutils literal notranslate"><span class="pre">copy=True</span></code><a class="headerlink" href="#we-can-also-force-copying-the-data-using-copy=True" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">dat</span> <span class="ow">is</span> <span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[12]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>True
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">dat</span> <span class="ow">is</span> <span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="getting-a-single-entry-based-on-feature-and-sample-values">
+<h4>getting a single entry based on feature and sample values<a class="headerlink" href="#getting-a-single-entry-based-on-feature-and-sample-values" title="Permalink to this headline">¶</a></h4>
+<p>We can use the _<em>getitem(sampleid, featureid)_</em> attribute.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="p">[</span><span class="s1">&#39;ERR1331815&#39;</span><span class="p">,</span><span class="s1">&#39;TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACGCTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGGTGTCTTGAGTACAGTAGAGGCAGGCGGAATTCGTGG&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[14]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>1407.0828439786792
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Saving-an-Experiment">
+<h2>Saving an Experiment<a class="headerlink" href="#Saving-an-Experiment" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Save-everything-(biom-table+sample/feature-mapping-files)">
+<h3>Save everything (biom table+sample/feature mapping files)<a class="headerlink" href="#Save-everything-(biom-table+sample/feature-mapping-files)" title="Permalink to this headline">¶</a></h3>
+<p>By default saves as an HDF5 biom table. We can save as a text biom table
+insteadusing <code class="docutils literal notranslate"><span class="pre">fmt=&quot;txt&quot;</span></code> parameter</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;cfs&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">!</span>ls cfs*
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cfs.biom        cfs_feature.txt cfs_sample.txt
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

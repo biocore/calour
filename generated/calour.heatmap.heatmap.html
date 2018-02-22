@@ -1,30 +1,18 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>calour.heatmap.heatmap &#8212; calour 0.99-beta documentation</title>
-    
+    <title>calour.heatmap.heatmap &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.99-beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
@@ -38,8 +26,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body role="document">
+  </head><body>
   
   <a href="https://github.com/biocore/calour"
      class="visible-desktop hidden-xs"><img
@@ -67,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -83,20 +70,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
 </ul>
 </li>
@@ -144,7 +127,7 @@
 <h1>calour.heatmap.heatmap<a class="headerlink" href="#calour-heatmap-heatmap" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.heatmap.heatmap">
-<code class="descclassname">calour.heatmap.</code><code class="descname">heatmap</code><span class="sig-paren">(</span><em>exp</em>, <em>sample_field=None</em>, <em>feature_field=None</em>, <em>xticklabel_kwargs=None</em>, <em>yticklabel_kwargs=None</em>, <em>xticklabel_len=16</em>, <em>yticklabel_len=16</em>, <em>max_yticks=100</em>, <em>clim=(None</em>, <em>None)</em>, <em>cmap='viridis'</em>, <em>norm=&lt;matplotlib.colors.LogNorm object&gt;</em>, <em>title=None</em>, <em>rect=None</em>, <em>cax=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/0.99-beta/calour/heatmap/heatmap.py#L89"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.heatmap" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.heatmap.</code><code class="descname">heatmap</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>sample_field=None</em>, <em>feature_field=None</em>, <em>xticklabel_kwargs=None</em>, <em>yticklabel_kwargs=None</em>, <em>xticklabel_len=16</em>, <em>yticklabel_len=16</em>, <em>xticks_max=10</em>, <em>yticks_max=30</em>, <em>clim=(None</em>, <em>None)</em>, <em>cmap='viridis'</em>, <em>norm=&lt;matplotlib.colors.LogNorm object&gt;</em>, <em>title=None</em>, <em>rect=None</em>, <em>cax=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/heatmap/heatmap.py#L148"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.heatmap.heatmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a heatmap for the experiment.</p>
 <p>Plot either a simple heatmap for the experiment with features in row
 and samples in column.</p>
@@ -153,80 +136,56 @@ and samples in column.</p>
 <p class="last">By default it log transforms the abundance values and then plot heatmap.
 The original object is not modified.</p>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is also available as a class method <a class="reference internal" href="calour.experiment.Experiment.heatmap.html#calour.experiment.Experiment.heatmap" title="calour.experiment.Experiment.heatmap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Experiment.heatmap()</span></code></a></p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exp</strong> : <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal"><span class="pre">Experiment</span></code></a></p>
-<p><strong>sample_field</strong> : str or <code class="docutils literal"><span class="pre">None</span></code> (optional)</p>
-<blockquote>
-<div><p>The field of sample metadata to display on the x-axis or None (default) to not show x axis.</p>
-</div></blockquote>
-<p><strong>feature_field</strong> : str or <code class="docutils literal"><span class="pre">None</span></code> (optional)</p>
-<blockquote>
-<div><p>The field of feature meadata to display on the y-axis or None (default) to not show y axis.</p>
-</div></blockquote>
-<p><strong>xticklabel_kwargs, yticklabel_kwargs</strong> : dict or None (optional)</p>
-<blockquote>
-<div><p>keyword arguments passing as properties to <a class="reference external" href="http://matplotlib.org/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.text.Text</span></code></a> for
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exp</strong> (<a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><em>Experiment</em></a>) – Input experiment object.</li>
+<li><strong>sample_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The field of sample metadata to display on the x-axis or None (default) to not show x axis.</li>
+<li><strong>feature_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The field of feature meadata to display on the y-axis or None (default) to not show y axis.</li>
+<li><strong>xticklabel_kwargs</strong> – </li>
+<li><strong>yticklabel_kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – keyword arguments passing as properties to <a class="reference external" href="https://matplotlib.org/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v2.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.text.Text</span></code></a> for
 tick labels on x axis and y axis. As an example,
-<code class="docutils literal"><span class="pre">xticklabel_kwargs={'color':</span> <span class="pre">'r',</span> <span class="pre">'ha':</span> <span class="pre">'center',</span> <span class="pre">'rotation':</span> <span class="pre">90,</span>
-<span class="pre">'family':</span> <span class="pre">'serif',</span> <span class="pre">'size'=7}</span></code></p>
-</div></blockquote>
-<p><strong>xticklabel_len, yticklabel_len</strong> : int or <code class="docutils literal"><span class="pre">None</span></code></p>
-<blockquote>
-<div><p>The maximal length for the tick labels on x axis and y axis (will be cut to
+<code class="docutils literal notranslate"><span class="pre">xticklabel_kwargs={'color':</span> <span class="pre">'r',</span> <span class="pre">'ha':</span> <span class="pre">'center',</span> <span class="pre">'rotation':</span> <span class="pre">90,</span>
+<span class="pre">'family':</span> <span class="pre">'serif',</span> <span class="pre">'size'=7}</span></code></li>
+<li><strong>xticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </li>
+<li><strong>yticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The maximal length for the tick labels on x axis and y axis (will be cut to
 this length if longer). Used to prevent long labels from
-taking too much space. None indicates no shortening</p>
-</div></blockquote>
-<p><strong>max_yticks</strong> : int or <code class="docutils literal"><span class="pre">None</span></code></p>
-<blockquote>
-<div><p>max number of y ticks to render on the heatmap. If <code class="docutils literal"><span class="pre">None</span></code>,
-allow all ticks for each feature in the table, which can be
-very slow if there are a large number of features.</p>
-</div></blockquote>
-<p><strong>clim</strong> : tuple of (float, float), optional</p>
-<blockquote>
-<div><p>the min and max values for the heatmap color limits. It uses the min
-and max values in the input <code class="xref py py-attr docutils literal"><span class="pre">Experiment.data</span></code> array by default.</p>
-</div></blockquote>
-<p><strong>cmap</strong> : str or <a class="reference external" href="http://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.colors.ListedColormap</span></code></a></p>
-<blockquote>
-<div><p>str to indicate the colormap name. Default is &#8220;viridis&#8221; colormap.
-For all available colormaps in matplotlib: <a class="reference external" href="https://matplotlib.org/users/colormaps.html">https://matplotlib.org/users/colormaps.html</a></p>
-</div></blockquote>
-<p><strong>norm</strong> : <a class="reference external" href="http://matplotlib.org/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.colors.Normalize</span></code></a> or <code class="docutils literal"><span class="pre">None</span></code></p>
-<blockquote>
-<div><p>passed to <code class="docutils literal"><span class="pre">norm</span></code> parameter of <a class="reference external" href="http://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html#matplotlib.pyplot.imshow" title="(in Matplotlib v2.1.0)"><code class="xref py py-func docutils literal"><span class="pre">matplotlib.pyplot.imshow()</span></code></a>. Default is log scale.</p>
-</div></blockquote>
-<p><strong>title</strong> : None or str (optional)</p>
-<blockquote>
-<div><p>None (default) to not show title. str to set title to str.</p>
-</div></blockquote>
-<p><strong>rect</strong> : tuple of (int, int, int, int) or None (optional)</p>
-<blockquote>
-<div><p>None (default) to set initial zoom window to the whole experiment.
-[x_min, x_max, y_min, y_max] to set initial zoom window</p>
-</div></blockquote>
-<p><strong>cax</strong> : <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a>, optional</p>
-<blockquote>
-<div><p>plot a legend colorbar for the heatmap in the cax; no legend if <code class="docutils literal"><span class="pre">None</span></code></p>
-</div></blockquote>
-<p><strong>ax</strong> : <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a> or <code class="docutils literal"><span class="pre">None</span></code> (default), optional</p>
-<blockquote>
-<div><p>The axes where the heatmap is plotted. None (default) to create a new figure and
-axes to plot heatmap into the axes</p>
-</div></blockquote>
+taking too much space. None indicates no shortening</li>
+<li><strong>xticks_max</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </li>
+<li><strong>yticks_max</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – max number of ticks to render on the heatmap. If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
+which can be very slow if there are a large number of samples or features.</li>
+<li><strong>clim</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><em>optional</em>) – the min and max values for the heatmap color limits. It uses the min
+and max values in the input <code class="xref py py-attr docutils literal notranslate"><span class="pre">Experiment.data</span></code> array by default.</li>
+<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.1.2)"><em>matplotlib.colors.ListedColormap</em></a>) – str to indicate the colormap name. Default is “viridis” colormap.
+For all available colormaps in matplotlib: <a class="reference external" href="https://matplotlib.org/users/colormaps.html">https://matplotlib.org/users/colormaps.html</a></li>
+<li><strong>norm</strong> (<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="(in Matplotlib v2.1.2)"><em>matplotlib.colors.Normalize</em></a><em> or </em><em>None</em>) – passed to <code class="docutils literal notranslate"><span class="pre">norm</span></code> parameter of matplotlib.pyplot.imshow. Default is log scale.</li>
+<li><strong>title</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to not show title. str to set title to str.</li>
+<li><strong>rect</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em><em>, </em><em>optional</em>) – None (default) to set initial zoom window to the whole experiment.
+[x_min, x_max, y_min, y_max] to set initial zoom window</li>
+<li><strong>cax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><em>matplotlib.axes.Axes</em></a><em>, </em><em>optional</em>) – The axes where a legend colorbar for the heatmap is plotted.</li>
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where the heatmap is plotted. None (default) to create a new figure and
+axes to plot the heatmap</li>
+</ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.0)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a> of the heatmap</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The axes for the heatmap</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)">matplotlib.axes.Axes</a></p>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<p>Let&#8217;s create a very simple data set:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calour</span> <span class="k">import</span> <span class="n">Experiment</span>
+<p>Let’s create a very simple data set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calour</span> <span class="k">import</span> <span class="n">Experiment</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -237,31 +196,31 @@ axes to plot heatmap into the axes</p>
 <span class="gp">... </span>                 <span class="n">feature_metadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;motile&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">]},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;otu1&#39;</span><span class="p">,</span> <span class="s1">&#39;otu2&#39;</span><span class="p">]))</span>
 </pre></div>
 </div>
-<p>Let&#8217;s then plot the heatmap:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<p>Let’s then plot the heatmap:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">sample_field</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">feature_field</span><span class="o">=</span><span class="s1">&#39;motile&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Fig 1 log scale&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>   
 </pre></div>
 </div>
-<p>By default, the color is plot in log scale. Let&#8217;s say we would like to plot heatmap in normal scale instead of log scale:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<p>By default, the color is plot in log scale. Let’s say we would like to plot heatmap in normal scale instead of log scale:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">norm</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">sample_field</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">feature_field</span><span class="o">=</span><span class="s1">&#39;motile&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Fig 2 normal scale&#39;</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>             
 </pre></div>
 </div>
-<p>Let&#8217;s say we would like to show the presence/absence of each
+<p>Let’s say we would like to show the presence/absence of each
 OTUs across samples in heatmap. And we define presence as
 abundance larger than 4:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">expbin</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">expbin</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">expbin</span><span class="o">.</span><span class="n">data</span>
 <span class="go">array([[0, 1],</span>
 <span class="go">       [1, 0]])</span>
 </pre></div>
 </div>
 <p>Now we have converted the abundance table to the binary
-table. Let&#8217;s define a binary color map and use it to plot the
+table. Let’s define a binary color map and use it to plot the
 heatmap:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the colors</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define the colors</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">([</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># create a normalize object the describes the limits of each color</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">norm</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
@@ -283,10 +242,6 @@ heatmap:</p>
 <img alt="../_images/calour-heatmap-heatmap-1_02.png" src="../_images/calour-heatmap-heatmap-1_02.png" />
 <p class="caption"><span class="caption-text">(<a class="reference external" href="../generated/calour-heatmap-heatmap-1_02.png">png</a>)</span></p>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This function is also available as a class method <a class="reference internal" href="calour.experiment.Experiment.heatmap.html#calour.experiment.Experiment.heatmap" title="calour.experiment.Experiment.heatmap"><code class="xref py py-meth docutils literal"><span class="pre">Experiment.heatmap()</span></code></a></p>
-</div>
 </dd></dl>
 
 </div>
@@ -303,8 +258,8 @@ heatmap:</p>
       
     </p>
     <p>
-        &copy; Copyright 2016--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
     </p>
   </div>
 </footer>

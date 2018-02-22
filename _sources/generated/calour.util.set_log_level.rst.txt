@@ -1,5 +1,5 @@
-calour\.util\.set\_log\_level
-=============================
+calour.util.set\_log\_level
+===========================
 
 .. currentmodule:: calour.util
 

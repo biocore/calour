@@ -1,160 +1,168 @@
-calour\.amplicon\_experiment\.AmpliconExperiment
-================================================
-
+calour.amplicon_experiment.AmpliconExperiment
+=============================================
 .. currentmodule:: calour.amplicon_experiment
-
 .. autoclass:: AmpliconExperiment
+   :show-inheritance:
 
-   
 
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
+
+
+
+   .. rubric:: Methods
+   .. autosummary::
+      :toctree:
       
          
-         AmpliconExperiment.__deepcopy__
+            ~AmpliconExperiment.__deepcopy__
          
          
-         AmpliconExperiment.__eq__
+            ~AmpliconExperiment.__eq__
          
-         AmpliconExperiment.__format__
          
-         AmpliconExperiment.__getitem__
+            ~AmpliconExperiment.__getitem__
          
          
-         AmpliconExperiment.__ne__
+            ~AmpliconExperiment.__ne__
          
          
          
          
+            ~AmpliconExperiment.__repr__
          
          
          
          
-         AmpliconExperiment.aggregate_by_metadata
+            ~AmpliconExperiment.add_terms_to_features
          
-         AmpliconExperiment.binarize
+            ~AmpliconExperiment.aggregate_by_metadata
          
-         AmpliconExperiment.center_log
+            ~AmpliconExperiment.binarize
          
-         AmpliconExperiment.cluster_data
+            ~AmpliconExperiment.center_log
          
-         AmpliconExperiment.cluster_features
+            ~AmpliconExperiment.cluster_data
          
-         AmpliconExperiment.collapse_taxonomy
+            ~AmpliconExperiment.cluster_features
          
-         AmpliconExperiment.copy
+            ~AmpliconExperiment.collapse_taxonomy
          
-         AmpliconExperiment.correlation
+            ~AmpliconExperiment.copy
          
-         AmpliconExperiment.diff_abundance
+            ~AmpliconExperiment.correlation
          
-         AmpliconExperiment.diff_abundance_kw
+            ~AmpliconExperiment.diff_abundance
          
-         AmpliconExperiment.downsample
+            ~AmpliconExperiment.diff_abundance_kw
          
-         AmpliconExperiment.filter_abundance
+            ~AmpliconExperiment.downsample
          
-         AmpliconExperiment.filter_by_data
+            ~AmpliconExperiment.enrichment
          
-         AmpliconExperiment.filter_by_metadata
+            ~AmpliconExperiment.filter_abundance
          
-         AmpliconExperiment.filter_fasta
+            ~AmpliconExperiment.filter_by_data
          
-         AmpliconExperiment.filter_ids
+            ~AmpliconExperiment.filter_by_metadata
          
-         AmpliconExperiment.filter_mean
+            ~AmpliconExperiment.filter_fasta
          
-         AmpliconExperiment.filter_orig_reads
+            ~AmpliconExperiment.filter_ids
          
-         AmpliconExperiment.filter_prevalence
+            ~AmpliconExperiment.filter_mean
          
-         AmpliconExperiment.filter_sample_categories
+            ~AmpliconExperiment.filter_orig_reads
          
-         AmpliconExperiment.filter_samples
+            ~AmpliconExperiment.filter_prevalence
          
-         AmpliconExperiment.filter_taxonomy
+            ~AmpliconExperiment.filter_sample_categories
          
-         AmpliconExperiment.from_pandas
+            ~AmpliconExperiment.filter_samples
          
-         AmpliconExperiment.get_data
+            ~AmpliconExperiment.filter_taxonomy
          
-         AmpliconExperiment.heatmap
+            ~AmpliconExperiment.from_pandas
          
-         AmpliconExperiment.join_experiments
+            ~AmpliconExperiment.get_data
          
-         AmpliconExperiment.join_metadata_fields
+            ~AmpliconExperiment.heatmap
          
-         AmpliconExperiment.log_n
+            ~AmpliconExperiment.join_experiments
          
-         AmpliconExperiment.normalize
+            ~AmpliconExperiment.join_metadata_fields
          
-         AmpliconExperiment.normalize_by_subset_features
+            ~AmpliconExperiment.log_n
          
-         AmpliconExperiment.normalize_compositional
+            ~AmpliconExperiment.normalize
          
-         AmpliconExperiment.onehot_encode_features
+            ~AmpliconExperiment.normalize_by_subset_features
          
-         AmpliconExperiment.plot
+            ~AmpliconExperiment.normalize_compositional
          
-         AmpliconExperiment.plot_abund_prevalence
+            ~AmpliconExperiment.onehot_encode_features
          
-         AmpliconExperiment.plot_diff_abundance_enrichment
+            ~AmpliconExperiment.plot
          
-         AmpliconExperiment.plot_enrichment
+            ~AmpliconExperiment.plot_abund_prevalence
          
-         AmpliconExperiment.plot_hist
+            ~AmpliconExperiment.plot_diff_abundance_enrichment
          
-         AmpliconExperiment.plot_shareness
+            ~AmpliconExperiment.plot_enrichment
          
-         AmpliconExperiment.plot_stacked_bar
+            ~AmpliconExperiment.plot_hist
          
-         AmpliconExperiment.random_permute_data
+            ~AmpliconExperiment.plot_scatter_matrix
          
-         AmpliconExperiment.reorder
+            ~AmpliconExperiment.plot_shareness
          
-         AmpliconExperiment.rescale
+            ~AmpliconExperiment.plot_stacked_bar
          
-         AmpliconExperiment.save
+            ~AmpliconExperiment.random_permute_data
          
-         AmpliconExperiment.save_biom
+            ~AmpliconExperiment.reorder
          
-         AmpliconExperiment.save_fasta
+            ~AmpliconExperiment.rescale
          
-         AmpliconExperiment.save_metadata
+            ~AmpliconExperiment.save
          
-         AmpliconExperiment.scale
+            ~AmpliconExperiment.save_biom
          
-         AmpliconExperiment.sort_abundance
+            ~AmpliconExperiment.save_fasta
          
-         AmpliconExperiment.sort_by_data
+            ~AmpliconExperiment.save_metadata
          
-         AmpliconExperiment.sort_by_metadata
+            ~AmpliconExperiment.scale
          
-         AmpliconExperiment.sort_centroid
+            ~AmpliconExperiment.sort_abundance
          
-         AmpliconExperiment.sort_ids
+            ~AmpliconExperiment.sort_by_data
          
-         AmpliconExperiment.sort_samples
+            ~AmpliconExperiment.sort_by_metadata
          
-         AmpliconExperiment.sort_taxonomy
+            ~AmpliconExperiment.sort_centroid
          
-         AmpliconExperiment.split_taxonomy
+            ~AmpliconExperiment.sort_ids
          
-         AmpliconExperiment.subsample_count
+            ~AmpliconExperiment.sort_samples
          
-         AmpliconExperiment.to_pandas
+            ~AmpliconExperiment.sort_taxonomy
          
-         AmpliconExperiment.transform
+            ~AmpliconExperiment.split_taxonomy
+         
+            ~AmpliconExperiment.subsample_count
+         
+            ~AmpliconExperiment.to_pandas
+         
+            ~AmpliconExperiment.transform
 
 
 
-   
 
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
+
+
+   .. rubric:: Attributes
+   .. autosummary::
+      :toctree:
       
-         AmpliconExperiment.shape
-         AmpliconExperiment.sparse
+         ~AmpliconExperiment.shape
+         ~AmpliconExperiment.sparse
 

@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>calour.experiment.Experiment.correlation &#8212; calour 0.99-beta documentation</title>
-    
+    <title>calour.experiment.Experiment.correlation &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.99-beta',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/copybutton.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="calour.experiment.Experiment.diff_abundance" href="calour.experiment.Experiment.diff_abundance.html" />
+    <link rel="prev" title="calour.experiment.Experiment.copy" href="calour.experiment.Experiment.copy.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body role="document">
+  </head><body>
   
   <a href="https://github.com/biocore/calour"
      class="visible-desktop hidden-xs"><img
@@ -65,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.99-beta</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -81,20 +70,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="../experiment.html">experiment (<code class="docutils literal"><span class="pre">calour.experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../amplicon_experiment.html">amplicon experiment (<code class="docutils literal"><span class="pre">calour.amplicon_experiment</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../io.html">read &amp; write (<code class="docutils literal"><span class="pre">calour.io</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../util.html">utilities (<code class="docutils literal"><span class="pre">calour.util</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../heatmap.html">heatmap (<code class="docutils literal"><span class="pre">calour.heatmap</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plotting.html">other plotting functions (<code class="docutils literal"><span class="pre">calour.plotting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../filtering.html">filtering (<code class="docutils literal"><span class="pre">calour.filtering</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sorting.html">sorting (<code class="docutils literal"><span class="pre">calour.sorting</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforming.html">transforming (<code class="docutils literal"><span class="pre">calour.transforming</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis (<code class="docutils literal"><span class="pre">calour.analysis</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manipulation.html">manipulation (<code class="docutils literal"><span class="pre">calour.manipulation</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../training.html">machine learning (<code class="docutils literal"><span class="pre">calour.training</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
 </ul>
 </li>
@@ -142,57 +127,40 @@
 <h1>calour.experiment.Experiment.correlation<a class="headerlink" href="#calour-experiment-experiment-correlation" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.correlation">
-<code class="descclassname">Experiment.</code><code class="descname">correlation</code><span class="sig-paren">(</span><em>field</em>, <em>method='spearman'</em>, <em>nonzero=False</em>, <em>transform=None</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/amnona/calour/blob/0.99-beta/calour/util.py#L122"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.correlation" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">correlation</code><span class="sig-paren">(</span><em>field</em>, <em>method='spearman'</em>, <em>nonzero=False</em>, <em>transform=None</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em>, <em>random_seed=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find features with correlation to a numeric metadata field</p>
 <p>With permutation based p-values and multiple hypothesis correction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>field: str</strong></p>
-<blockquote>
-<div><p>The field to test by. Values are converted to numeric.</p>
-</div></blockquote>
-<p><strong>method</strong> : str or function</p>
-<blockquote>
-<div><p>the method to use for the t-statistic test. options:
-&#8216;spearman&#8217; : spearman correlation (numeric)
-&#8216;pearson&#8217; : pearson correlation (numeric)
-function : use this function to calculate the t-statistic (input is data,labels, output is array of float)</p>
-</div></blockquote>
-<p><strong>nonzero</strong> : bool (optional)</p>
-<blockquote>
-<div><p>True to calculate the correlation only for samples where the feature is present (&gt;0).
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The field to test by. Values are converted to numeric.</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>function</em>) – the method to use for the t-statistic test. options:
+‘spearman’ : spearman correlation (numeric)
+‘pearson’ : pearson correlation (numeric)
+function : use this function to calculate the t-statistic (input is data,labels, output is array of float)</li>
+<li><strong>nonzero</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – True to calculate the correlation only for samples where the feature is present (&gt;0).
 False (default) to calculate the correlation over all samples
 Note: setting nonzero to True slows down the calculation
-Note: can be set to True only using &#8216;spearman&#8217; or &#8216;pearson&#8217;, not using a custom function</p>
-</div></blockquote>
-<p><strong>transform</strong> : str or None</p>
-<blockquote>
-<div><p>transformation to apply to the data before caluculating the statistic
-&#8216;rankdata&#8217; : rank transfrom each OTU reads
-&#8216;log2data&#8217; : calculate log2 for each OTU using minimal cutoff of 2
-&#8216;normdata&#8217; : normalize the data to constant sum per samples
-&#8216;binarydata&#8217; : convert to binary absence/presence</p>
-</div></blockquote>
-<p><strong>alpha</strong> : float</p>
-<blockquote>
-<div><p>the desired FDR control level</p>
-</div></blockquote>
-<p><strong>numperm</strong> : int</p>
-<blockquote>
-<div><p>number of permutations to perform</p>
-</div></blockquote>
-<p><strong>fdr_method</strong> : str</p>
-<blockquote>
-<div><p>method to compute FDR. Allowed method include &#8220;&#8221;, &#8220;&#8221;</p>
-</div></blockquote>
+Note: can be set to True only using ‘spearman’ or ‘pearson’, not using a custom function</li>
+<li><strong>transform</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – transformation to apply to the data before caluculating the statistic.
+‘rankdata’ : rank transfrom each OTU reads
+‘log2data’ : calculate log2 for each OTU using minimal cutoff of 2
+‘normdata’ : normalize the data to constant sum per samples
+‘binarydata’ : convert to binary absence/presence</li>
+<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the desired FDR control level</li>
+<li><strong>numperm</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of permutations to perform</li>
+<li><strong>fdr_method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – method to compute FDR. Allowed method include “”, “”</li>
+<li><strong>random_seed</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – int to set the numpy random seed to this number before running the random permutation test.
+None to not set the numpy random seed</li>
+</ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal"><span class="pre">Experiment</span></code></a></p>
-<blockquote class="last">
-<div><p>The experiment with only correlated features, sorted according to correlation coefficient</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The experiment with only correlated features, sorted according to correlation coefficient</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment">Experiment</a></p>
 </td>
 </tr>
 </tbody>
@@ -213,8 +181,8 @@ Note: can be set to True only using &#8216;spearman&#8217; or &#8216;pearson&#82
       
     </p>
     <p>
-        &copy; Copyright 2016--, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
     </p>
   </div>
 </footer>

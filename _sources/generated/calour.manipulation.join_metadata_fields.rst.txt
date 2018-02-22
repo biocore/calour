@@ -1,5 +1,5 @@
-calour\.manipulation\.join\_metadata\_fields
-============================================
+calour.manipulation.join\_metadata\_fields
+==========================================
 
 .. currentmodule:: calour.manipulation
 
