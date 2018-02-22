@@ -36,12 +36,12 @@ class MS1Experiment(Experiment):
 
     Parameters
     ----------
-    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+    data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : :class:`pandas.DataFrame`
+    sample_metadata : pandas.DataFrame
         The metadata on the samples
-    feature_metadata : :class:`pandas.DataFrame`
+    feature_metadata : pandas.DataFrame
         The metadata on the features
     description : str
         name of experiment
@@ -51,12 +51,12 @@ class MS1Experiment(Experiment):
 
     Attributes
     ----------
-    data : :class:`numpy.ndarray` or :class:`scipy.sparse.csr_matrix`
+    data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : :class:`pandas.DataFrame`
+    sample_metadata : pandas.DataFrame
         The metadata on the samples
-    feature_metadata : :class:`pandas.DataFrame`
+    feature_metadata : pandas.DataFrame
         The metadata on the features
     exp_metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
@@ -69,7 +69,7 @@ class MS1Experiment(Experiment):
 
     See Also
     --------
-    :class:`.Experiment`
+    Experiment
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

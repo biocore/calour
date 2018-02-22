@@ -4,12 +4,7 @@
 import glob
 import sys
 import os
-import types
 import re
-
-if sys.version_info.major != 3:
-    raise RuntimeError("calour can only be used with Python 3. You are "
-                       "currently running Python %d." % sys.version_info.major)
 
 # Force matplotlib to not use any Xwindows backend.
 import matplotlib
@@ -25,8 +20,7 @@ class NewAuto(autosummary.Autosummary):
         all_cap_re = re.compile('([a-z0-9])([A-Z])')
         def fix_item(display_name, sig, summary, real_name):
             class_names = {
-                'TreeNode': 'tree',
-                'TabularMSA': 'msa'
+                'Experiment': 'exp'
             }
 
             class_name = real_name.split('.')[-2]
@@ -48,11 +42,13 @@ class NewAuto(autosummary.Autosummary):
                 '__lt__': fmt('%s1 < %s2'),
                 '__ge__': fmt('%s1 >= %s2'),
                 '__le__': fmt('%s1 <= %s2'),
-                '__getitem__': fmt('%s[x]'),
+                '__getitem__': fmt('%s[k]'),
+                '__setitem__': fmt('%s[k] = v'),
                 '__iter__': fmt('iter(%s)'),
                 '__contains__': fmt('x in %s'),
                 '__bool__': fmt('bool(%s)'),
                 '__str__': fmt('str(%s)'),
+                '__repr__': fmt('repr(%s)'),
                 '__reversed__': fmt('reversed(%s)'),
                 '__len__': fmt('len(%s)'),
                 '__copy__': fmt('copy.copy(%s)'),
@@ -70,40 +66,6 @@ class NewAuto(autosummary.Autosummary):
 autosummary.Autosummary = NewAuto
 
 import sphinx_bootstrap_theme
-
-# We currently rely on the latest version of numpydoc available on GitHub:
-#   git+git://github.com/numpy/numpydoc.git
-#
-# There isn't a way to specify this in setup.py as a dependency since this
-# feature is being removed from pip. We also can't check the version of
-# numpydoc installed because there isn't a numpydoc.__version__ defined.
-try:
-    import numpydoc
-except ImportError:
-    raise RuntimeError(
-        "numpydoc v0.6 or later required. Install it with:\n"
-        "  pip install git+git://github.com/numpy/numpydoc.git@1a848331c2cf53"
-        "d4fe356f4607799524bcc577ed")
-
-@property
-def _extras(self):
-    # This will be accessed in a for-loop, so memoize to prevent quadratic
-    # behavior.
-    if not hasattr(self, '__memoized_extras'):
-        # We want every dunder that has a function type (not class slot),
-        # meaning we created the dunder, not Python.
-        # We don't ever care about __init__ and the user will see plenty of
-        # __repr__ calls, so why waste space.
-        self.__memoized_extras = [
-            a for a, v in inspect.getmembers(self._cls)
-            if type(v) == types.FunctionType and a.startswith('__')
-            and a not in ['__init__', '__repr__']
-        ]
-    return self.__memoized_extras
-
-# The extra_public_methods depends on what class we are looking at.
-numpydoc.docscrape.ClassDoc.extra_public_methods = _extras
-
 
 import calour
 
@@ -127,9 +89,10 @@ needs_sphinx = '1.5'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    # 'sphinx_autodoc_typehints',
+    # 'sphinx_autodoc_typehints',   # something wrong with the latest version 1.2.5
     'sphinx.ext.mathjax',
-    'numpydoc',
+    # 'numpydoc',
+    'sphinx.ext.napoleon',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.autosummary',
@@ -168,8 +131,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'calour'
-copyright = u'2016--, calour development team'
+project = 'calour'
+copyright = '2016-2018, calour development team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -222,6 +185,18 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+# -- Options for napoleon -------------------------------------------------
+
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = True
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = True
+napoleon_use_param = True
+napoleon_use_rtype = True
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -234,6 +209,9 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # further. For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
+    # disable the sidebar
+    'nosidebar': True,
+
     # Navigation bar title. (Default: ``project`` value)
     'navbar_title': 'calour docs',
 
@@ -244,11 +222,14 @@ html_theme_options = {
     #
     # Options are nothing with "" (default) or the name of a valid theme
     # such as "amelia" or "cosmo".
-    'bootswatch_theme': 'sandstone',
+    'bootswatch_theme': 'united',
 
     # Location of link to source.
     # Options are "nav" (default), "footer" or anything else to exclude.
-    'source_link_position': False
+    'source_link_position': False,
+
+    # Choose Bootstrap version.
+    'bootstrap_version': "3"
 }
 
 # The name for this set of Sphinx documents.  If None, it defaults to
@@ -341,8 +322,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'calour.tex', u'calour Documentation',
-   u'calour development team', 'manual'),
+  ('index', 'calour.tex', 'calour Documentation',
+   'calour development team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -371,8 +352,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'calour', u'calour Documentation',
-     [u'calour development team'], 1)
+    ('index', 'calour', 'calour Documentation',
+     ['calour development team'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -385,8 +366,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'calour', u'calour Documentation',
-   u'calour development team', 'calour',
+  ('index', 'calour', 'calour Documentation',
+   'calour development team', 'calour',
    'Data structures, algorithms, and educational resources for working with '
    'biological data in Python.', 'Miscellaneous'),
 ]
@@ -404,24 +385,12 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 # -- Options for autosummary ----------------------------------------------
-autosummary_generate = glob.glob('*.rst')
-
-# -- Options for numpydoc -------------------------------------------------
-# Generate plots for example sections
-numpydoc_use_plots = True
-# If we don't turn numpydoc's toctree generation off, Sphinx will warn about
-# the toctree referencing missing document(s). This appears to be related to
-# generating docs for classes with a __call__ method.
-numpydoc_class_members_toctree = False
+autosummary_generate = True
 
 #------------------------------------------------------------------------------
 # Plot
 #------------------------------------------------------------------------------
-plot_pre_code = """
-import numpy as np
-import scipy as sp
-np.random.seed(123)
-"""
+
 plot_include_source = True
 plot_formats = [('png', 96), ]
 #plot_html_show_formats = False
@@ -528,10 +497,10 @@ def linkcode_resolve(domain, info):
     fn = relpath(fn, start=dirname(calour.__file__))
 
     if 'dev' in calour.__version__:
-        return "http://github.com/amnona/calour/blob/master/calour/%s%s" % (
+        return "http://github.com/biocore/calour/blob/master/calour/%s%s" % (
            fn, linespec)
     else:
-        return "http://github.com/amnona/calour/blob/%s/calour/%s%s" % (
+        return "http://github.com/biocore/calour/blob/%s/calour/%s%s" % (
            calour.__version__, fn, linespec)
 
 #------------------------------------------------------------------------------

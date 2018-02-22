@@ -58,17 +58,17 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
         should has categorical values
     axis : 0, 1, 's', or 'f'
         0 or 's' (default) to filter samples; 1 or 'f' to filter features
-    num_keep : int or None (optional)
+    num_keep : int or None, optional
         None (default) to downsample to minimal group size.
         int : downsample to num_keep samples/features per group, drop values
         with < num_keep
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to do the filtering on a copy.
         True to do the filtering on the original :class:`.Experiment`
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     '''
     logger.debug('downsample on field %s' % field)
     if axis == 0:
@@ -116,15 +116,15 @@ def filter_sample_categories(exp: Experiment, field, min_samples=5, inplace=Fals
     field : str
         The name of the column in samples metadata table. This column
         should has categorical values
-    min_samples : int (optional)
+    min_samples : int, optional
         Filter away the samples with a value in the given column if its sample count is
         less than min_samples.
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy of the experiment, True to filter inplace
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
 
     '''
     exp = exp.reorder(exp.sample_metadata[field].notnull(), inplace=inplace)
@@ -160,7 +160,7 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
     '''
     if axis == 0:
@@ -190,10 +190,15 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     predicate : str or callable
         The callable accepts a list of numeric and return a bool. Alternatively
         it also accepts the following strings:
+
         * 'sum_abundance': calls ``_sum_abundance``,
+
         * 'freq_ratio': calls ``_freq_ratio``,
+
         * 'unique_cut': calls ``_unique_cut``,
+
         * 'mean_abundance': calls ``_mean_abundance``,
+
         * 'prevalence': calls ``_prevalence``
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
@@ -204,7 +209,7 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
     '''
     # test for functions that can be applied to full matrix
@@ -260,7 +265,7 @@ def _sum_abundance(data, axis, cutoff=10, strict=False):
         0 to sum each feature, 1 to sum each sample
     cutoff : float
         keep features with sum>=cutoff
-    strict : bool (optional)
+    strict : bool, optional
         False (default) to use sum >=cutoff
         True to use sum>cutoff (for removing 0 reads)
 
@@ -303,7 +308,7 @@ def _mean_abundance(data, axis, cutoff=0.01, strict=False):
         0 to sum each feature, 1 to sum each sample
     cutoff : float
         keep features with mean>=cutoff
-    strict : bool (optional)
+    strict : bool, optional
         False (default) to use mean >=cutoff
         True to use mean>cutoff
 
@@ -401,7 +406,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
 
     '''
@@ -410,7 +415,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
                               negate=negate, inplace=inplace)
 
 
-@ds.with_indent(8)
+@ds.with_indent(4)
 @Experiment._record_sig
 def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     '''Filter keeping only features with >= min_abundance total over all samples
@@ -421,24 +426,25 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     min_abundance : numeric
         The minimal total abundance for each feature over all samples
 
-    Other Parameters
-    ----------------
-    **kwargs : :func:`filter_by_data()` properties, optional.
-        Parameters include:
-
-        %(filtering.filter_by_data.parameters)s
+    Keyword Arguments
+    -----------------
+    %(filtering.filter_by_data.parameters)s
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         the filtered object
+
+    See Also
+    --------
+    filter_by_data
 
     '''
     newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=min_abundance, **kwargs)
     return newexp
 
 
-@ds.with_indent(8)
+@ds.with_indent(4)
 @Experiment._record_sig
 def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     '''Filter features keeping only ones present in at least fraction fraction of the samples.
@@ -448,26 +454,28 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
     ----------
     fraction : float
         Keep features present at least in fraction of samples
-    cutoff : float (optional)
+    cutoff : float, optional
         The minimal fraction of reads for the otu to be called present in a sample
 
-    Other Parameters
-    ----------------
-    **kwargs : :func:`filter_by_data()` properties, optional.
-        Parameters include:
-
-        %(filtering.filter_by_data.parameters)s
+    Keyword Arguments
+    -----------------
+    %(filtering.filter_by_data.parameters)s
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         with only features present in at least fraction of samples
+
+    See Also
+    --------
+    filter_by_data
+
     '''
     newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
     return newexp
 
 
-@ds.with_indent(8)
+@ds.with_indent(4)
 @Experiment._record_sig
 def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
@@ -476,20 +484,22 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
 
     Parameters
     ----------
-    cutoff : float (optional)
+    cutoff : float, optional
         The minimal mean abundance fraction (out of the mean of total abundance per sample) for a feature in order
         to keep it. Default is 0.01 - keep features with mean abundance >=1% of mean total abundance per sample
 
-    Other Parameters
-    ----------------
-    **kwargs : :func:`filter_by_data()` properties, optional.
-        Parameters include:
-
-        %(filtering.filter_by_data.parameters)s
+    Keyword Arguments
+    -----------------
+    %(filtering.filter_by_data.parameters)s
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
+
+    See Also
+    --------
+    filter_by_data
+
     '''
     factor = np.mean(exp.data.sum(axis=1))
     newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
@@ -506,14 +516,14 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
         the feature/sample ids to filter (index values)
     axis : 0, 1, 's', or 'f', optional
         1 or 'f' (default) to filter features; 0 or 's' to filter samples
-    negate : bool (optional)
+    negate : bool, optional
         negate the filtering
-    inplace : bool (optional)
+    inplace : bool, optional
         False (default) to create a copy of the experiment, True to filter inplace
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         filtered so contains only features/samples present in exp and in ids
     '''
     if axis == 0:

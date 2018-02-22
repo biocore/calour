@@ -21,18 +21,18 @@ class PlotGUI_Jupyter(PlotGUI):
     ----------
     '''
 
-    @ds.with_indent(4)
-    def __init__(self, *kargs, **kwargs):
+    @ds.with_indent(8)
+    def __init__(self, **kwargs):
         '''Init the GUI using the interactive Jupyter Notebook framework.
 
         .. note:: in order to use the interactive features, you need to first use
         the ``%matplotlib notebook`` directive inside the notebook
 
-        Other Parameters
-        ----------------
-            %(PlotGUI.parameters)s
+        Keyword Arguments
+        -----------------
+        %(PlotGUI.parameters)s
         '''
-        super().__init__(*kargs, **kwargs)
+        super().__init__(**kwargs)
         # create the figure to plot the heatmap into
         self._set_figure(None, kwargs['tree_size'])
         if matplotlib.get_backend() != 'nbAgg':

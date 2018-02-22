@@ -18,7 +18,6 @@ logger = getLogger(__name__)
 
 
 @ds.get_sectionsf('PlotGUI')
-@ds.dedent
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 
@@ -48,7 +47,7 @@ class PlotGUI(ABC):
 
     Attributes
     ----------
-    exp : :class:`.Experiment`
+    exp : Experiment
         the experiment associated with this gui
     selected_features : dict of matplotlib.lines.Line2D
         used to track the selected features and plot horizontal lines for each selectiom
@@ -60,27 +59,36 @@ class PlotGUI(ABC):
         current selected point
     zoom_scale : numeric
         the scaling factor for zooming
-    scroll_offset : numeric (optional)
+    scroll_offset : numeric, optional
         The amount of columns/rows to scroll when arrow key pressed
         0 (default) to scroll one full screen every keypress
         >0 : scroll than constant number of columns/rows per keypress
-    figure : :class:`matplotlib.figure.Figure`
+    figure : matplotlib.figure.Figure
         The figure where the heatmap and other axes will be plotted into.
-    ax_hm : the :class:`matplotlib.axes.Axes` of the heatmap.
-    ax_sbar : the :class:`matplotlib.axes.Axes` of the sample colorbar
-    ax_fbar : the :class:`matplotlib.axes.Axes` of the feature colorbar
-    ax_tre : the :class:`matplotlib.axes.Axes` of the dendrogram/tree
-    ax_legend : the :class:`matplotlib.axes.Axes` of the color legend
+    ax_hm : matplotlib.axes.Axes
+        Axes for the heatmap.
+    ax_sbar : matplotlib.axes.Axes
+        Axes for the sample colorbar
+    ax_fbar : matplotlib.axes.Axes
+        Axes for the feature colorbar
+    ax_tre : matplotlib.axes.Axes
+        Axes for the dendrogram/tree
+    ax_legend : matplotlib.axes.Axes
+        Axes for the color legend
     databases : list
         the databases to interact with
 
     Parameters
     ----------
-    exp : the :class:`.Experiment` object associated with this GUI
-    zoom_scale : the scaling factor for zooming
-    scroll_offset : The amount of columns/rows to scroll when arrow key pressed
+    exp : Experiment
+        object associated with this GUI
+    zoom_scale : float or int
+        the scaling factor for zooming
+    scroll_offset : float
+        The amount of columns/rows to scroll when arrow key pressed
     databases : the databases to interact with
-    tree_size : int (>= 0). the width of the axes to plot a tree. 7 is a good value to start.
+    tree_size : int (>= 0)
+        the width of the axes to plot a tree. 7 is a good value to start.
 
     '''
     def __init__(self, exp, zoom_scale=2, scroll_offset=0, databases=None, tree_size=0):
@@ -385,11 +393,11 @@ class PlotGUI(ABC):
 
         Parameters
         ----------
-        samplepos : iterable of int (optional)
+        samplepos : iterable of int, optional
             positions of samples to be added
-        featurepos : iterable of int (optional)
+        featurepos : iterable of int, optional
             positions of features to be added
-        toggle: bool (optional)
+        toggle: bool, optional
             True (default) to remove lines in the lists that are already selected.
             False to ignore
         '''
