@@ -50,13 +50,13 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         'spearman' : spearman correlation (numeric)
         'pearson' : pearson correlation (numeric)
         function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
-    nonzero : bool (optional)
+    nonzero : bool, optional
         True to calculate the correlation only for samples where the feature is present (>0).
         False (default) to calculate the correlation over all samples
         Note: setting nonzero to True slows down the calculation
         Note: can be set to True only using 'spearman' or 'pearson', not using a custom function
     transform : str or None
-        transformation to apply to the data before caluculating the statistic
+        transformation to apply to the data before caluculating the statistic.
         'rankdata' : rank transfrom each OTU reads
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
@@ -73,7 +73,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
         The experiment with only correlated features, sorted according to correlation coefficient
     '''
     # if random seed is supplied, set the numpy random.seed
@@ -109,14 +109,12 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 @Experiment._record_sig
 def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
-    '''
-    test the differential expression between 2 groups (val1 and val2 in field field)
+    '''test the differential expression between 2 groups (val1 and val2 in field field)
     using permutation based fdr (dsfdr)
     for bacteria that have a significant difference.
 
     Parameters
     ----------
-    exp: :class:`.Experiment`
     field: str
         The field to test by
     val1: str or list of str
@@ -131,7 +129,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
         function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
     transform : str or None
-        transformation to apply to the data before caluculating the statistic
+        transformation to apply to the data before caluculating the statistic.
         'rankdata' : rank transfrom each OTU reads
         'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
@@ -142,21 +140,28 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         number of permutations to perform
     fdr_method : str (optional)
         The method used to control the False Discovery Rate. options are:
-            'dsfdr' : the discrete FDR control method
-            'bhfdr' : Benjamini-Hochberg FDR method
-            'byfdr' : Benjamini-Yekutielli FDR method
-            'filterBH' : Benjamini-Hochberg FDR method following removal of all features
-                         with minimal possible p-value less than alpha (e.g. a feature
-                         that appears in only 1 sample can obtain a minimal p-value of 0.5
-                         and will therefore be removed when say alpha=0.1)
+
+        'dsfdr' : the discrete FDR control method
+
+        'bhfdr' : Benjamini-Hochberg FDR method
+
+        'byfdr' : Benjamini-Yekutielli FDR method
+
+        'filterBH' : Benjamini-Hochberg FDR method following
+        removal of all features with minimal possible p-value less
+        than alpha (e.g. a feature that appears in only 1 sample
+        can obtain a minimal p-value of 0.5 and will therefore be
+        removed when say alpha=0.1)
+
     random_seed : int or None (optional)
         int to set the numpy random seed to this number before running the random permutation test.
         None to not set the numpy random seed
 
     Returns
     -------
-    newexp : :class:`.Experiment`
-        The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
+    Experiment
+        A new experiment with only significant (FDR <= maxfval) difference, sorted according to difference
+
     '''
     # if random seed is supplied, set the numpy random.seed
     # (if random seed is None, we don't change the numpy seed)
@@ -198,7 +203,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     Parameters
     ----------
-    exp: :class:`.Experiment`
+    exp: Experiment
     field: str
         The field to test by
     transform : str or None
@@ -217,7 +222,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     Returns
     -------
-    newexp : :class:`.Experiment`
+    newexp : Experiment
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
     # if random seed is supplied, set the numpy random.seed
@@ -248,9 +253,9 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
 
     Parameters
     ----------
-    cexp : :class:`.Experiment`
+    cexp : Experiment
         The experiment used for the actual diff. abundance (filtered for relevant samples/non-zero features)
-    exp : :class:`.Experiment`
+    exp : Experiment
         The original experiment being analysed (with all samples/features)
     keep : np.array of bool
         One entry per exp feature. True for the features which are significant (following FDR correction)
@@ -261,7 +266,7 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
 
     Returns
     -------
-    :class:`.Experiment`
+    Experiment
     Containing only significant features, sorted by effect size.
     Each feature contains 2 new metadata fields: _calour_diff_abundance_pval, _calour_diff_abundance_effect
     '''

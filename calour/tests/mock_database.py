@@ -15,9 +15,9 @@ class MockDatabase(Database):
 
         Parameters
         ----------
-        database_name : str (optional)
+        database_name : str, optional
             name of the database
-        methods : list of str (optional)
+        methods : list of str, optional
             'get' if database interface supports get_seq_annotation_strings()
             'annotate' if database interface supports add_annotation()
             'enrichment' if database interface supports get_feature_terms()
@@ -63,7 +63,7 @@ class MockDatabase(Database):
         ----------
         features : list of str
             the features to get the terms for
-        exp : :class:`.Experiment` (optional)
+        exp : Experiment, optional
             not None to store results inthe exp (to save time for multiple queries)
 
         Returns

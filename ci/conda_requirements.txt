@@ -11,7 +11,5 @@ scikit-bio>=0.5.1
 biom-format
 statsmodels
 ipywidgets
-numpydoc
 sphinx
 sphinx_bootstrap_theme
-pandoc

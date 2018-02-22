@@ -144,12 +144,12 @@ def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     ----------
     exp : Experiment
         with the taxonomy entry in the feature_metadata
-    sep : str (optional)
+    sep : str, optional
         the output separator to use between the taxonomic levels
-    remove_underscore : bool (optional)
+    remove_underscore : bool, optional
         True (default) to remove the 'g__' entries and missing values
         False to keep them
-    to_lower : bool (optional)
+    to_lower : bool, optional
         False (default) to keep case
         True to convert to lowercase
 
@@ -195,7 +195,7 @@ def get_file_md5(f, encoding='utf-8'):
     ----------
     f : str
         name of the file to calculate md5 on
-    encoding : str or None (optional)
+    encoding : str or None, optional
         encoding of the text file (see python str.encode() ). None to use 'utf-8'
 
     Returns
@@ -269,9 +269,9 @@ def set_config_value(key, value, section='DEFAULT', config_file_name=None):
         the key to get the value for
     value : str
         the value to store
-    section : str (optional)
+    section : str, optional
         the section to get the value from
-    config_file_name : str (optional)
+    config_file_name : str, optional
         the full path to the config file or None to use default config file
     '''
     if config_file_name is None:
@@ -292,7 +292,7 @@ def get_config_sections(config_file_name=None):
 
     Parameters
     ----------
-     config_file_name : str (optional)
+     config_file_name : str, optional
         the full path to the config file or None to use default config file
 
     Returns
@@ -315,11 +315,11 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
     ----------
     key : str
         the key to get the value for
-    fallback : str (optional)
+    fallback : str, optional
         the fallback value if the key/section/file does not exist
-    section : str (optional)
+    section : str, optional
         the section to get the value from
-    config_file_name : str (optional)
+    config_file_name : str, optional
         the full path to the config file or None to use default config file
 
     Returns
@@ -436,7 +436,7 @@ def register_functions(cls, modules=None):
     ----------
     cls : ``class`` object
         The class that the functions will be added to
-    modules : iterable of str (optional)
+    modules : iterable of str, optional
         The module names where the functions are defined. ``None`` means all public
         modules in `calour`.
     '''
@@ -464,6 +464,7 @@ def register_functions(cls, modules=None):
                         setattr(cls, fn, _clone_function(f))
                         updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
                                    '\\1'
-                                   '\n    exp : :class:`.{0}`')
+                                   '\n    exp : {0}'
+                                   '\n        Input experiment object.')
 
                         f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)

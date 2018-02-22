@@ -41,7 +41,7 @@ Equivalently, we can filter in this way:
    True
 
 Main classes and utility functions
-=================================
+==================================
 
 .. toctree::
    :maxdepth: 1

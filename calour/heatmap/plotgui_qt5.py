@@ -29,15 +29,15 @@ class PlotGUI_QT5(PlotGUI):
     databases :
     '''
 
-    @ds.dedent
-    def __init__(self, *kargs, **kwargs):
+    @ds.with_indent(8)
+    def __init__(self, **kwargs):
         '''Init the GUI using the Qt5 framework.
 
-        Other Parameters
-        ----------------
-            %(PlotGUI.parameters)s
+        Keyword Arguments
+        -----------------
+        %(PlotGUI.parameters)s
         '''
-        super().__init__(*kargs, **kwargs)
+        super().__init__(**kwargs)
         # create qt app
         app = QtCore.QCoreApplication.instance()
         if app is None:
@@ -455,9 +455,9 @@ class SListWindow(QtWidgets.QDialog):
 
         Parameters
         ----------
-        listdata: list of str (optional)
+        listdata: list of str, optional
             the data to show in the list
-        listname: str (optional)
+        listname: str, optional
             name to display above the list
         '''
         super().__init__()
@@ -489,7 +489,7 @@ class SListWindow(QtWidgets.QDialog):
         ----------
         text : str
             the string to add
-        color : str (optional)
+        color : str, optional
             the color of the text to add
         dblclick_function : function or None
             the function to call when this item is double clicked (or None to ignore)
