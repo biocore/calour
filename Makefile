@@ -14,7 +14,9 @@ else
 	TEST_COMMAND = nosetests --with-doctest
 endif
 
-MSG ?= update html doc
+
+MSG ?= 
+
 
 help:
 	@echo 'Use "make test" to run all the unit tests and docstring tests.'
@@ -28,12 +30,19 @@ pep8:
 	flake8 calour setup.py
 html:
 	make -C doc clean html
-# only run publish cmd in local if you need to update online doc manually
 publish:
+# force to specify a nonempty git commit msg
+ifeq ($(MSG), )
+	@echo 'You need to specify a git commit msg to update and publish doc! For example:'
+	@echo 'MSG="update doc to version 1.0" make publish'
+else
 	make -C doc clean
 	git clone -b gh-pages --single-branch git@github.com:biocore/calour.git doc/build/html
 	make -C doc html
 	cd doc/build/html && git add * && git commit -m "$(MSG)" && git push origin gh-pages
+endif
+
+
 
 all: test pep8 html
 

@@ -364,7 +364,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     Returns
     -------
-    .AmpliconExperiment
+    AmpliconExperiment
         after removing low read sampls and normalizing
 
     See Also
