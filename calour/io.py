@@ -496,7 +496,7 @@ def read_gnps_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
         None (default) to not load metadata per sample
         str to specify name of sample mapping file (tsv)
     gnps_file : str or None, optional
-        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file
+        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattri  butes/XXX.tsv file
         for use with the 'gnps' database in plot
     feature_metadata_file : str or None, optional
         Name of table containing additional metadata about each feature
@@ -510,9 +510,17 @@ def read_gnps_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
     normalize : int or None
         normalize each sample to the specified reads. None to not normalize
 
+    Keyword Arguments
+    -----------------
+    %(io.read.parameters)s
+
     Returns
     -------
     exp : ``calour.MS1Experiment``
+
+    See Also
+    --------
+    read
     '''
     logger.debug('Reading GnpsMS data (GnpsMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
     data_file_type = 'gnps_ms'
