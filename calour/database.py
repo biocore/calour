@@ -231,7 +231,7 @@ class Database(ABC):
         return []
 
     def get_annotation_website(self, annotation):
-        '''Get the databasewebsite address of information about the annotation.
+        '''Get the database website address of information about the annotation.
 
         Parameters
         ----------

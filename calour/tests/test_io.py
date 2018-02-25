@@ -177,6 +177,26 @@ class IOTests(Tests):
         exp = ca.read_open_ms(self.openms_csv, sparse=True, normalize=None)
         self.assertEqual(exp.sparse, True)
 
+    def test_read_gnps_ms(self):
+        # load the gnps exported table with associated sample metadata and cluster info
+        exp = ca.read_gnps_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
+                              gnps_file=self.gnps_cluster_info, normalize=None)
+        # verify the load extracts required fields to metadata
+        self.assertIn('MZ', exp.feature_metadata)
+        self.assertIn('RT', exp.feature_metadata)
+        self.assertIn('__calour_gnps_ids', exp.feature_metadata)
+        # test we get the MZ and RT correct
+        self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 899.54)
+        self.assertEqual(exp.feature_metadata['RT'].iloc[2], 181.8248)
+        # # test normalizing
+        exp = ca.read_gnps_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
+                              gnps_file=self.gnps_cluster_info, normalize=10000)
+        assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
+        # # test load sparse
+        exp = ca.read_gnps_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
+                              gnps_file=self.gnps_cluster_info, normalize=None, sparse=True)
+        self.assertEqual(exp.sparse, True)
+
     def test_read_open_ms_samples_rows(self):
         exp = ca.read_open_ms(self.openms_samples_rows_csv, normalize=None, rows_are_samples=True)
         # test we get the MZ and RT correct

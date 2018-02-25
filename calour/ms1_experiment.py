@@ -109,5 +109,8 @@ class MS1Experiment(Experiment):
             self.feature_metadata['gnps'] = 'NA'
             return
         logger.debug('Adding gnps terms as "gnps" column in feature metadta')
-        self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
-        logger.debug('Added terms')
+        try:
+            self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
+            logger.debug('Added terms')
+        except:
+            logger.warning('GNPS database not found. GNPS terms not added.')
