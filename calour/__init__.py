@@ -13,20 +13,22 @@ from pkg_resources import resource_filename
 
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
-from .io import read, read_amplicon, read_open_ms
+from .ms1_experiment import MS1Experiment
+from .io import read, read_amplicon, read_open_ms, read_gnps_ms
 from .util import set_log_level, _convert_axis_name, register_functions
 
 
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
 __version__ = "1.0-dev"
 
-__all__ = ['read', 'read_amplicon', 'read_open_ms',
-           'Experiment', 'AmpliconExperiment',
+__all__ = ['read', 'read_amplicon', 'read_open_ms', 'read_gnps_ms',
+           'Experiment', 'AmpliconExperiment', 'MS1Experiment',
            'set_log_level']
 
 # add member functions to the class
 register_functions(Experiment)
 register_functions(AmpliconExperiment)
+register_functions(MS1Experiment)
 
 # decorate all the class functions to convert axis
 for fn, f in inspect.getmembers(Experiment, predicate=inspect.isfunction):
