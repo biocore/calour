@@ -93,7 +93,8 @@ class MS1Experiment(Experiment):
                 cids = gnps_class._find_close_annotation(self.feature_metadata['MZ'][cmet], self.feature_metadata['RT'][cmet], mzerr=mzerr, rterr=rterr)
                 gnps_ids[cmet] = cids
             self.feature_metadata['gnps'] = pd.Series(gnps_ids)
-        except:
+        # if the gnps-calour module is not installed
+        except ValueError:
             self.feature_metadata['gnps'] = None
             logger.warning('gnps-calour module not installed. cannot add gnps ids')
 
@@ -106,5 +107,6 @@ class MS1Experiment(Experiment):
         try:
             self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
             logger.debug('Added terms')
-        except:
+        # if the gnps-calour module is not installed
+        except ValueError:
             logger.warning('GNPS database not found. GNPS terms not added.')
