@@ -43,7 +43,7 @@ def _list_to_string(l):
     return cstr
 
 
-def export_html(exp: Experiment, sample_field=None, feature_field=False, title=None,
+def export_html(exp: Experiment, sample_field=None, feature_field=None, title=None,
                 xticklabel_len=50, cmap=None, clim=None, transform=log_n,
                 output_file='out', html_template=None, **kwargs):
     '''Export an interactive html heatmap for the experiment.
@@ -58,7 +58,6 @@ def export_html(exp: Experiment, sample_field=None, feature_field=False, title=N
         str to display field values for this field
     feature_field : str or None or False(optional)
         Name of the field to display on the y-axis (features) or None not to display names
-        False (default) to use the experiment subclass default field
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
     xticklabel_len : int, optional or None
@@ -86,9 +85,6 @@ def export_html(exp: Experiment, sample_field=None, feature_field=False, title=N
 
     logger.debug('export_html heatmap')
 
-    # get the default feature field if not specified (i.e. False)
-    if feature_field is False:
-        feature_field = exp.heatmap_feature_field
     numrows, numcols = exp.shape
     # step 1. transform data
     if transform is None:
