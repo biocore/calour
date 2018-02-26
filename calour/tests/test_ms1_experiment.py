@@ -20,5 +20,6 @@ class Ms1ExperimentTests(Tests):
     def test_prepare_gnps(self):
         self.assertIn('gnps', self.ms1.feature_metadata)
 
+
 if __name__ == "__main__":
     main()
