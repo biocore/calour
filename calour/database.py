@@ -230,6 +230,25 @@ class Database(ABC):
         logger.debug('Generic function for get_annotation_strings')
         return []
 
+    def get_annotation_website(self, annotation):
+        '''Get the database website address of information about the annotation.
+
+        Parameters
+        ----------
+        annotation : dict
+            keys/values are database specific.
+            E.g. See dbBact REST API /annotations/get_annotation for keys / values
+
+
+        Returns
+        -------
+        str or None
+            The webaddress of the html page with details about the annotation,
+            or None if not available
+        '''
+        logger.debug('Generic function for get_annotation_website')
+        return None
+
     def show_annotation_info(self, annotation):
         '''Show details about the annotation
 

@@ -1,0 +1,7 @@
+#SampleID	name	field2
+s1	sample1	f
+s2	sample2	f
+s3	sample3	f
+s4	sample4	g
+s5	sample5	g
+s6	sample6	g

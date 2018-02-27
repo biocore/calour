@@ -22,7 +22,10 @@ Classes
 
 from logging import getLogger
 
+import pandas as pd
+
 from .experiment import Experiment
+from .database import _get_database_class
 
 
 logger = getLogger(__name__)
@@ -77,15 +80,23 @@ class MS1Experiment(Experiment):
         return 'MS1Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
-    @property
-    def heatmap_feature_field(self):
-        if 'gnps' in self.feature_metadata.columns:
-            return 'gnps'
-        return 'id'
-
-    @heatmap_feature_field.setter
-    def heatmap_feature_field(self, val):
-        pass
+    def _prepare_gnps_ids(self, mzerr=0.1, rterr=30):
+        logger.debug('Locating GNPS ids for metabolites based on MS1 MZ/RT')
+        if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
+            logger.warn('No GNPS data file supplied - labels will be NA')
+            self.feature_metadata['gnps'] = None
+            return
+        try:
+            gnps_class = _get_database_class('gnps', exp=self)
+            gnps_ids = {}
+            for cmet in self.feature_metadata.index.values:
+                cids = gnps_class._find_close_annotation(self.feature_metadata['MZ'][cmet], self.feature_metadata['RT'][cmet], mzerr=mzerr, rterr=rterr)
+                gnps_ids[cmet] = cids
+            self.feature_metadata['gnps'] = pd.Series(gnps_ids)
+        # if the gnps-calour module is not installed
+        except ValueError:
+            self.feature_metadata['gnps'] = None
+            logger.warning('gnps-calour module not installed. cannot add gnps ids')
 
     def _prepare_gnps(self):
         if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
@@ -93,5 +104,9 @@ class MS1Experiment(Experiment):
             self.feature_metadata['gnps'] = 'NA'
             return
         logger.debug('Adding gnps terms as "gnps" column in feature metadta')
-        self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
-        logger.debug('Added terms')
+        try:
+            self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
+            logger.debug('Added terms')
+        # if the gnps-calour module is not installed
+        except ValueError:
+            logger.warning('GNPS database not found. GNPS terms not added.')

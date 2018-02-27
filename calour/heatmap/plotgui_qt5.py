@@ -81,10 +81,10 @@ class PlotGUI_QT5(PlotGUI):
         self.app_window.w_sid.setText(str(sid))
         sample_field = str(self.app_window.w_sfield.currentText())
         self.app_window.w_sfield_val.setText(
-            str(self.exp.sample_metadata[sample_field][self.current_select[0]]))
+            str(self.exp.sample_metadata[sample_field].iloc[self.current_select[0]]))
         feature_field = str(self.app_window.w_ffield.currentText())
         self.app_window.w_ffield_val.setText(
-            str(self.exp.feature_metadata[feature_field][self.current_select[1]]))
+            str(self.exp.feature_metadata[feature_field].iloc[self.current_select[1]]))
 
     def _display_annotation_in_qlistwidget(self, annt):
         '''Add a line to the annotation list

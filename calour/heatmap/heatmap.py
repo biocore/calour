@@ -164,8 +164,9 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     ----------
     sample_field : str or None, optional
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
-    feature_field : str or None, optional
-        The field of feature meadata to display on the y-axis or None (default) to not show y axis.
+    feature_field : str or None (optional)
+        The field of feature meadata to display on the y-axis.
+        None (default) to not show y axis.
     xticklabel_kwargs :
     yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for

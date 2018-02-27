@@ -40,6 +40,12 @@ class Tests(TestCase):
         self.openms_samples_rows_csv = join(test_data_dir, 'openms_bucket_table_samples_rows.csv')
         # a simple gnps data file for ms1 test data
         self.ms1_gnps = join(test_data_dir, 'ms1.gnps.txt')
+        # the gnps exported data table
+        self.gnps_table = join(test_data_dir, 'gnps_table.txt')
+        # the gnps exported mapping file
+        self.gnps_map = join(test_data_dir, 'gnps_map.txt')
+        # the gnps per-metabolite info table (from clusterinfosummarygroup_attributes_withIDs_arbitraryattri  butes/XXX.tsv)
+        self.gnps_cluster_info = join(test_data_dir, 'gnps_clusterinfosummarygroup.txt')
         # a fasta file for testing the AmpliconExperiment
         self.seqs1_fasta = join(test_data_dir, 'seqs1.fasta')
         # a qiime2 biom table artifact
