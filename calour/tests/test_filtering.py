@@ -193,6 +193,15 @@ class FilteringTests(Tests):
         assert_experiment_equal(test.filter_sample_categories('group', 10),
                                 test.filter_samples('group', '1'))
 
+    def test_dropna(self):
+        test = self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
+                                    normalize=None, feature_metadata_kwargs={'na_values': 'B'})
+        test_drop = test.dropna('level1', axis='f')
+        self.assertEqual(self.test2.sample_metadata.index.tolist(),
+                         test_drop.sample_metadata.index.tolist())
+        self.assertEqual(['AT', 'AG', 'AC', 'TA', 'TT', 'TC'],
+                         test_drop.feature_metadata.index.tolist())
+
 
 if __name__ == '__main__':
     main()

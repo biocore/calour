@@ -17,6 +17,8 @@ Functions
    filter_prevalence
    filter_abundance
    filter_sample_categories
+   dropna
+   downsample
 '''
 
 # ----------------------------------------------------------------------------
@@ -251,6 +253,27 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
+@Experiment._record_sig
+def dropna(exp: Experiment, field, axis=0, negate=False, inplace=False):
+    '''Drop samples or features that are NA in the field.
+
+    Parameters
+    ----------
+    axis : 0, 1, 's', or 'f', optional
+        drop row ("samples" or 0) or column ("features" or 1)
+    negate : bool
+        negate the predicate for selection
+    inplace : bool
+        whether dropping inplace or note
+
+    Returns
+    -------
+    Experiment
+        the object without NA in the given field
+    '''
+    return exp.filter_by_metadata(field, lambda i: i.notnull(), axis=axis, negate=negate, inplace=inplace)
+
+
 def _sum_abundance(data, axis, cutoff=10, strict=False):
     '''Check if the sum abundance larger than cutoff.
 
@@ -398,7 +421,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
     field : str
         the column name of the sample metadata tables
     values :
-        keep the samples with the values included in the ``select``
+        keep the samples with the values in the given field
     negate : bool, optional
         discard instead of keep the samples if set to ``True``
     inplace : bool, optional
