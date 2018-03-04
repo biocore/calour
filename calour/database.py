@@ -104,9 +104,12 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     Experiment
         with feature_metadata field containing the most common database term for each feature
     '''
+    logger.debug('Adding terms to features for database %s' % dbname)
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
+    logger.debug('found %d features' % len(features))
     term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
+    logger.debug('got %d terms from database' % len(term_list))
     feature_terms = []
     for cfeature in features:
         term_count = defaultdict(int)

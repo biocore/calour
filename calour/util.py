@@ -327,7 +327,6 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
     value : str
         value of the key or fallback if file/section/key does not exist
     '''
-    logger.debug('get_config_value for key %s' % key)
     if config_file_name is None:
         config_file_name = get_config_file()
 
@@ -343,7 +342,6 @@ def get_config_value(key, fallback=None, section='DEFAULT', config_file_name=Non
         return fallback
 
     value = config[section][key]
-    logger.debug('found value %s for key %s' % (value, key))
     return value
 
 

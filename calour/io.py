@@ -535,6 +535,7 @@ def read_gnps_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     if gnps_file:
         # load the gnps table
+        logger.debug('loading gnps file %s' % gnps_file)
         gnps_data = pd.read_table(gnps_file, sep='\t', index_col='cluster index')
         exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
         # add gnps names to the features
@@ -551,11 +552,12 @@ def read_gnps_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
         gnps_ids = {}
         for cmet in exp.feature_metadata.index.values:
             gnps_ids[cmet] = [gnps_data.index.get_loc(cmet)]
-        exp.feature_metadata['__calour_gnps_ids'] = pd.Series(gnps_ids)
+        exp.feature_metadata['_gnps_ids'] = pd.Series(gnps_ids)
     else:
+        logger.debug('No GNPS file supplied - skipping gnps data')
         exp.feature_metadata['MZ'] = 'NA'
         exp.feature_metadata['RT'] = 'NA'
-        exp.feature_metadata['__calour_gnps_ids'] = 'NA'
+        exp.feature_metadata['gnps'] = 'NA'
     # Set the gnps id for each feature so gnps_calour will use it
     exp._prepare_gnps()
     return exp

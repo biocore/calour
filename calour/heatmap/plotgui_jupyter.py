@@ -158,6 +158,7 @@ class PlotGUI_Jupyter(PlotGUI):
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
         self._ipyw_sid.value = str(sid)
+        self._ipyw_sid.value = str(annt)
         self._ipyw_fid.value = str(fid)
         self._ipyw_abund.value = abd
         self._ipyw_selected.value = '%d features are selected' % len(self.selected_features)
@@ -178,7 +179,9 @@ class PlotGUI_Jupyter(PlotGUI):
                 annt_type = details.get('annotationtype', 'None')
                 # annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
+                self._ipyw_sid.value = 'pootaasdsdfg'
                 link_address = details['_db_interface'].get_annotation_website(details)
+                self._ipyw_sid.value = 'pootasdfgdfgdf'
                 cline = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
                          'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
                          '<p style="color:%s;white-space:nowrap;">'

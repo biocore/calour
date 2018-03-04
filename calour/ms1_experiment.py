@@ -92,10 +92,10 @@ class MS1Experiment(Experiment):
             for cmet in self.feature_metadata.index.values:
                 cids = gnps_class._find_close_annotation(self.feature_metadata['MZ'][cmet], self.feature_metadata['RT'][cmet], mzerr=mzerr, rterr=rterr)
                 gnps_ids[cmet] = cids
-            self.feature_metadata['gnps'] = pd.Series(gnps_ids)
+            self.feature_metadata['_gnps_ids'] = pd.Series(gnps_ids)
         # if the gnps-calour module is not installed
         except ValueError:
-            self.feature_metadata['gnps'] = None
+            self.feature_metadata['_gnps_ids'] = None
             logger.warning('gnps-calour module not installed. cannot add gnps ids')
 
     def _prepare_gnps(self):
