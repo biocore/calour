@@ -480,7 +480,7 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
         # link each feature to the gnps ids based on MZ/RT
         exp._prepare_gnps_ids()
         # add gnps names to the features
-        exp._prepare_gnps()
+        exp._prepare_gnps_name()
 
     return exp
 
