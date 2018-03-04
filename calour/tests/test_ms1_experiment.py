@@ -18,7 +18,7 @@ class Ms1ExperimentTests(Tests):
         self.ms1 = ca.read_open_ms(self.openms_csv, None, gnps_file=self.ms1_gnps, normalize=None)
 
     def test_prepare_gnps(self):
-        self.assertIn('gnps', self.ms1.feature_metadata)
+        self.assertIn('_gnps_ids', self.ms1.feature_metadata)
 
 
 if __name__ == "__main__":
