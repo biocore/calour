@@ -559,7 +559,7 @@ def read_gnps_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
         exp.feature_metadata['RT'] = 'NA'
         exp.feature_metadata['gnps'] = 'NA'
     # Set the gnps id for each feature so gnps_calour will use it
-    exp._prepare_gnps()
+    exp._prepare_gnps_name()
     return exp
 
 
