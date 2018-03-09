@@ -15,6 +15,7 @@ Functions
    plot_stacked_bar
    plot_shareness
    plot_abund_prevalence
+   plot_scatter_matrix
 '''
 
 # ----------------------------------------------------------------------------
@@ -265,6 +266,7 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
         y_sum = np.zeros(len(steps))
         for i in range(iterations):
             x, y = _compute_frac_nonzero(data, steps)
+            y = y * 100
             y_sum += y
             if i == 0:
                 line, = ax.plot(x, y, alpha=alpha, linewidth=linewidth)
@@ -286,7 +288,7 @@ def plot_shareness(exp: Experiment, field=None, steps=None, iterations=10, alpha
     # because the shareness drops quickly, we plot it in log scale
     ax.set_xscale('log')
     ax.set_xlabel('sample number')
-    ax.set_ylabel('fraction of shared features')
+    ax.set_ylabel('percentage of shared features')
     return ax
 
 
