@@ -30,7 +30,7 @@ import configparser
 from types import FunctionType
 from functools import wraps, update_wrapper
 from importlib import import_module
-from collections import Sequence
+from collections.abc import Container
 from logging import getLogger
 from numbers import Real
 from pkg_resources import resource_filename
@@ -368,7 +368,7 @@ def _to_list(x):
     '''if x is non iterable or string, convert to iterable '''
     if isinstance(x, str):
         return [x]
-    if isinstance(x, Sequence):
+    if isinstance(x, Container):
         return x
     return [x]
 

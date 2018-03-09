@@ -98,6 +98,15 @@ class FilteringTests(Tests):
             else:
                 self.assertIsNot(obs, test2)
 
+    def test_filter_by_metadata_na(self):
+        test = self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat,
+                                    normalize=None, feature_metadata_kwargs={'na_values': 'B'})
+        test_drop = test.filter_by_metadata('level1', select=None, axis='f')
+        self.assertEqual(self.test2.sample_metadata.index.tolist(),
+                         test_drop.sample_metadata.index.tolist())
+        self.assertEqual(['AT', 'AG', 'AC', 'TA', 'TT', 'TC'],
+                         test_drop.feature_metadata.index.tolist())
+
     def test_filter_by_data_sample_edge_cases(self):
         # all samples are filtered out
         obs = self.test2.filter_by_data('sum_abundance', cutoff=100000)
