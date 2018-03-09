@@ -17,7 +17,6 @@ Functions
    filter_prevalence
    filter_abundance
    filter_sample_categories
-   dropna
    downsample
 '''
 
@@ -147,12 +146,12 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
     ----------
     field : str
         the column name of the sample or feature metadata tables
-    select : list, tuple, or Callable
+    select : None, Callable, or list/set/tuple-like
         select what to keep based on the value in the specified field.
-        if it is a callable, it accepts a 1d array and return a
-        boolean array of the same length; if it is a list-like object,
+        if it is a callable, it accepts a 1D array and return a
+        boolean array of the same length; if it is a list/set/tuple-like object,
         keep the samples with the values in the ``field`` column included
-        in the ``select``.
+        in the ``select``; if it is None, filter out the NA.
     axis : 0, 1, 's', or 'f', optional
         the field is on samples (0 or 's') or features (1 or 'f') metadata
     negate : bool, optional
@@ -174,6 +173,8 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
 
     if isinstance(select, Callable):
         select = select(x[field])
+    elif select is None:
+        select = x[field].notnull()
     else:
         select = x[field].isin(select).values
 
@@ -253,25 +254,7 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-@Experiment._record_sig
-def dropna(exp: Experiment, field, axis=0, negate=False, inplace=False):
-    '''Drop samples or features that are NA in the field.
-
-    Parameters
-    ----------
-    axis : 0, 1, 's', or 'f', optional
-        drop row ("samples" or 0) or column ("features" or 1)
-    negate : bool
-        negate the predicate for selection
-    inplace : bool
-        whether dropping inplace or note
-
-    Returns
-    -------
-    Experiment
-        the object without NA in the given field
-    '''
-    return exp.filter_by_metadata(field, lambda i: i.notnull(), axis=axis, negate=negate, inplace=inplace)
+ds.keep_params('filtering.filter_by_data.parameters', 'negate')
 
 
 def _sum_abundance(data, axis, cutoff=10, strict=False):
@@ -451,7 +434,7 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
 
     Keyword Arguments
     -----------------
-    %(filtering.filter_by_data.parameters)s
+    %(filtering.filter_by_data.parameters.negate)s
 
     Returns
     -------
@@ -482,7 +465,7 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
 
     Keyword Arguments
     -----------------
-    %(filtering.filter_by_data.parameters)s
+    %(filtering.filter_by_data.parameters.negate)s
 
     Returns
     -------
@@ -513,7 +496,7 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
 
     Keyword Arguments
     -----------------
-    %(filtering.filter_by_data.parameters)s
+    %(filtering.filter_by_data.parameters.negate)s
 
     Returns
     -------
