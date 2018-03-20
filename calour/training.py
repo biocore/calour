@@ -17,11 +17,8 @@ Functions
 
 from logging import getLogger
 
-from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection._split import check_cv
 from sklearn.model_selection import train_test_split
-from sklearn.base import is_classifier
 from scipy.sparse import hstack
 import pandas as pd
 import numpy as np
@@ -129,17 +126,19 @@ def collect_cv_prediction(exp: Experiment, field, estimator, cv, scoring, inplac
     '''Do the CV
 
     '''
-    logger.debug('')
-    if inplace:
-        new = exp
-    else:
-        new = exp.copy()
-    cv = check_cv(cv, y, classifier=is_classifier(estimator))
-    for params in paramgrid:
-        for train_x, train_y in cv:
-            estimator.fit(train_x, train_y)
+    # from sklearn.model_selection._split import check_cv
+    # from sklearn.base import is_classifier
+    # logger.debug('')
+    # if inplace:
+    #     new = exp
+    # else:
+    #     new = exp.copy()
+    # cv = check_cv(cv, y, classifier=is_classifier(estimator))
+    # for params in paramgrid:
+    #     for train_x, train_y in cv:
+    #         estimator.fit(train_x, train_y)
 
-    return yobs, yhat, model
+    # return yobs, yhat, model
 
 
 @Experiment._record_sig
@@ -148,7 +147,4 @@ def learning_curve_depths(exp: AmpliconExperiment, field, groups=None,
                           cv=None, scoring=None, exploit_incremental_learning=False,
                           n_jobs=1, pre_dispatch='all', verbose=0, shuffle=False,
                           random_state=None):
-
     '''Compute the learning curve with regarding to sequencing depths.'''
-    X = exp.data
-    y = exp.sample_metadata[field]

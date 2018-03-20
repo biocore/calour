@@ -32,12 +32,9 @@ import os.path
 import pandas as pd
 import biom
 
-from .experiment import Experiment
-from .amplicon_experiment import AmpliconExperiment
-from .ms1_experiment import MS1Experiment
+from . import Experiment, AmpliconExperiment, MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
-
-from .doc_init import ds
+from ._doc import ds
 
 
 logger = getLogger(__name__)

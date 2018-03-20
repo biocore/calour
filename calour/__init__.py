@@ -34,7 +34,5 @@ register_functions(MS1Experiment)
 for fn, f in inspect.getmembers(Experiment, predicate=inspect.isfunction):
     setattr(Experiment, fn, _convert_axis_name(f))
 
-log = resource_filename(__package__, 'log.cfg')
-
 # setting False allows other logger to print log.
-fileConfig(log, disable_existing_loggers=False)
+fileConfig(resource_filename(__package__, 'log.cfg'), disable_existing_loggers=False)

@@ -37,7 +37,7 @@ from scipy import cluster, spatial
 from . import Experiment
 from .transforming import log_n, transform, scale
 from .util import _argsort
-from .doc_init import ds
+from ._doc import ds
 
 
 logger = getLogger(__name__)

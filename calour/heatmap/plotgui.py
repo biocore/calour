@@ -12,7 +12,7 @@ from abc import ABC
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
-from ..doc_init import ds
+from .._doc import ds
 
 logger = getLogger(__name__)
 

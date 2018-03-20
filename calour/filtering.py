@@ -36,9 +36,9 @@ import reprlib
 import numpy as np
 from scipy.sparse import issparse
 
-from .experiment import Experiment
+from . import Experiment
+from ._doc import ds
 from .util import _to_list
-from .doc_init import ds
 
 
 logger = getLogger(__name__)

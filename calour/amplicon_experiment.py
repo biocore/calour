@@ -264,4 +264,3 @@ class AmpliconExperiment(Experiment):
             return np.array(l)[b][-1]
         self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_highest)
         return self
-

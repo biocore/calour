@@ -16,9 +16,9 @@ import numpy as np
 
 from .. import Experiment
 from ..database import _get_database_class
-from .._dendrogram import plot_tree
 from ..util import _to_list, _transition_index
-from ..doc_init import ds
+from .._doc import ds
+from .._dendrogram import plot_tree
 
 
 logger = getLogger(__name__)
