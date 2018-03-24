@@ -10,9 +10,9 @@ from unittest import main
 from copy import deepcopy
 
 import numpy as np
+import pandas as pd
 
 import calour as ca
-
 from calour._testing import Tests, assert_experiment_equal
 
 
@@ -49,6 +49,29 @@ class MTests(Tests):
         self.assertEqual(len(newexp.sample_metadata), len(self.test1.sample_metadata)*2)
         fexp = newexp.filter_samples('experiments', ['t2'])
         assert_experiment_equal(fexp, texp, ignore_md_fields=['experiments'])
+
+    def test_join_experiments_featurewise(self):
+        otu1 = ca.Experiment(np.array([[0, 9], [7, 4]]), sparse=False,
+                             sample_metadata=pd.DataFrame({'category': ['B', 'A'],
+                                                           'ph': [7.7, 6.6]},
+                                                          index=['s2', 's1']),
+                             feature_metadata=pd.DataFrame({'motile': ['y', 'n']}, index=['16S1', '16S2']))
+        otu2 = ca.Experiment(np.array([[6], [8], [10]]), sparse=False,
+                             sample_metadata=pd.DataFrame({'category': ['A', 'B', 'C'],
+                                                           'ph': [6.6, 7.7, 8.8]},
+                                                          index=['s1', 's2', 's3']),
+                             feature_metadata=pd.DataFrame({'motile': [None]}, index=['ITS1']))
+        combined_obs = otu1.join_experiments_featurewise(otu2, 'origin', ('16S', 'ITS'))
+        combined_exp = ca.Experiment(np.array([[7, 4, 6], [0, 9, 8]]), sparse=False,
+                                     sample_metadata=pd.DataFrame({'category': ['A', 'B'],
+                                                                   'ph': [6.6, 7.7]},
+                                                                  index=['s1', 's2']),
+                                     feature_metadata=pd.DataFrame({'motile': ['y', 'n', None],
+                                                                    'origin': ['16S', '16S', 'ITS']},
+                                                                   index=['16S1', '16S2', 'ITS1']))
+        # reorder the samples
+        combined_obs = combined_obs.filter_ids(combined_exp.sample_metadata.index, axis=0)
+        assert_experiment_equal(combined_obs, combined_exp)
 
     def test_agg_by_metadata(self):
         # test default conditions - on samples, not inplace, mean method

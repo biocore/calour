@@ -36,9 +36,9 @@ import reprlib
 import numpy as np
 from scipy.sparse import issparse
 
-from .experiment import Experiment
+from . import Experiment
+from ._doc import ds
 from .util import _to_list
-from .doc_init import ds
 
 
 logger = getLogger(__name__)
@@ -514,7 +514,9 @@ def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
 
 @Experiment._record_sig
 def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
-    '''Filter samples or features based on a list index values
+    '''Filter samples or features based on a list IDs.
+
+    .. note:: the order of samples or features is updated as the order given in ``ids``.
 
     Parameters
     ----------

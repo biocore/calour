@@ -7,7 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from .plotgui import PlotGUI
-from ..doc_init import ds
+from .._doc import ds
 
 
 class PlotGUI_CLI(PlotGUI):

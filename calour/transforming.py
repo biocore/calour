@@ -40,8 +40,8 @@ from sklearn import preprocessing
 from skbio.stats.composition import clr, centralize as skbio_centralize
 from skbio.stats import subsample_counts
 
-from .experiment import Experiment
-from .doc_init import ds
+from . import Experiment
+from ._doc import ds
 
 
 logger = getLogger(__name__)
@@ -305,6 +305,7 @@ def random_permute_data(exp: Experiment, normalize=True):
     -------
     Experiment
         With each feature shuffled independently
+
     '''
     newexp = exp.copy()
     newexp.sparse = False
