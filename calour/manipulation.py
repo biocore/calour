@@ -267,3 +267,50 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
     newexp.data = all_data
 
     return newexp
+
+
+@Experiment._record_sig
+def join_experiments_featurewise(exp: Experiment, other,
+                                 field_name='_feature_origin_', origin_labels=('exp1', 'exp2')):
+    '''Combine two :class:`.Experiment` objects into one.
+
+    An example of user cases is to combine the 16S and ITS amplicon data together.
+
+    .. warning:: If a sample has only features in one Experiment
+    object and not the other, the sample will be dropped from joining.
+
+    Parameters
+    ----------
+    other : :class:`.Experiment`
+        The ``Experiment`` object to combine with the current one.  If
+        both experiments contain the same feature metadata column and
+        there is a conflict between the two, the value will be taken
+        from exp and not from other.
+    field_name : ``None`` or str (optional)
+        Name of the new ``feature_metdata`` field containing the experiment each feature is coming from.
+        If it is None, don't add such column.
+    labels : tuple of (str, str) (optional)
+        The text to label which experiment the feature is originated from.
+
+    Returns
+    -------
+    :class:`.Experiment`
+        A new experiment with samples from both experiments concatenated, features from both
+        experiments merged.
+
+    '''
+    logger.debug('Join 2 experiments featurewise:\n{!r}\n{!r}'.format(exp, other))
+    # create an empty object
+    newexp = exp.__class__(np.empty(shape=[0, 0]), pd.DataFrame(),
+                           description='join %s & %s' % (exp.description, other.description))
+    sid = exp.sample_metadata.index.intersection(other.sample_metadata.index)
+    exp = exp.filter_ids(sid, axis=0)
+    other = other.filter_ids(sid, axis=0)
+    fmd = pd.concat([exp.feature_metadata, other.feature_metadata], join='outer')
+    fmd[field_name] = [origin_labels[0]] * exp.shape[1] + [origin_labels[1]] * other.shape[1]
+    newexp.sample_metadata = exp.sample_metadata
+    newexp.feature_metadata = fmd
+    # merge data table
+    newexp.data = np.c_[exp.data, other.data]
+
+    return newexp

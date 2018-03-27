@@ -227,7 +227,8 @@ class Experiment:
                 logger.debug('Run func {}'.format(fn))
                 new_exp = func(*args, **kwargs)
                 if exp._log is True:
-                    param = ['%r' % i for i in args[1:]] + ['%s=%r' % (k, v) for k, v in kwargs.items()]
+                    # do not use `'%r' % i` because it causes error when i is a tuple
+                    param = ['{!r}'.format(i) for i in args[1:]] + ['{0!s}={1!r}'.format(k, v) for k, v in kwargs.items()]
                     param = ', '.join(param)
                     new_exp._call_history.append('{0}({1})'.format(fn, param))
                     exp._log = False

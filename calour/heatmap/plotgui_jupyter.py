@@ -5,12 +5,13 @@ from IPython.display import display, clear_output
 import matplotlib
 
 from .plotgui import PlotGUI
-from ..doc_init import ds
+from .._doc import ds
 
 
 logger = getLogger(__name__)
 
 
+@ds.with_indent(4)
 class PlotGUI_Jupyter(PlotGUI):
     '''Jupyter GUI of plotting.
 
@@ -19,6 +20,7 @@ class PlotGUI_Jupyter(PlotGUI):
 
     Parameters
     ----------
+    %(PlotGUI.parameters)s
     '''
 
     @ds.with_indent(8)

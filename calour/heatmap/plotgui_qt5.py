@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QMainWindow, QHBoxLayout, QVBoxLayout,
 from PyQt5.QtCore import Qt
 
 from .plotgui import PlotGUI
-from ..doc_init import ds
+from .._doc import ds
 
 logger = getLogger(__name__)
 
