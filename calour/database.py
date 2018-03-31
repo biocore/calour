@@ -186,8 +186,9 @@ class Database(ABC):
         exp : Experiment or None, optional
             The experiment link for the database (if needed)
         database_name : str, optional
-            name of the database
+            name of the database (for showing errors, etc.)
         methods : list of str, optional
+            The integration level this database interface supports.
             'get' if database interface supports get_seq_annotation_strings()
             'annotate' if database interface supports add_annotation()
             'enrichment' if database interface supports get_feature_terms()
@@ -208,24 +209,25 @@ class Database(ABC):
         '''
         return 'enrichment' in self._methods
 
-    def get_seq_annotation_strings(self, sequence):
+    def get_seq_annotation_strings(self, feature):
         '''Get nice string summaries of annotations for a given sequence
 
         Parameters
         ----------
-        sequence : str
-            the DNA sequence to query the annotation strings about
+        feature : str
+            the feature ID to query the database about
 
         Returns
         -------
-        shortdesc : list of (dict,str) (annotationdetails,annotationsummary)
+        list of [(dict,str)] (annotationdetails,annotationsummary)
             a list of:
                 annotationdetails : dict
                     'annotationid' : int, the annotation id in the database
                     'annotationtype : str
                     ...
                 annotationsummary : str
-                    a short summary of the annotation
+                    a short user readble summary of the annotation.
+                    This will be displayed for the user
         '''
         logger.debug('Generic function for get_annotation_strings')
         return []

@@ -59,6 +59,13 @@ API Documentation
 
    api
 
+Extending Calour
+----------------
+.. toctree::
+   :maxdepth: 2
+
+   database_interface
+
 Indices and tables
 ==================
 
