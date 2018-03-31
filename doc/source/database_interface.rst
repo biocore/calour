@@ -33,7 +33,7 @@ A database interface declared what integration levels it supports. All database 
 
 Writing a Calour database interface
 -----------------------------------
-In order to create a new database interface, you need to write a python module containing a child class for the calour.database.Database class. In this class, overwrite the relevant functions for the integration level you are supporting. At least (for L1), overwrite the Database.__init__() and the Database.get_seq_annotation_strings() functions.
+In order to create a new database interface, you need to write a python module containing a child class for the calour.database.Database class. In this class, overwrite the relevant functions for the integration level you are supporting. For a minimal implementation (level L1), overwrite the Database.__init__() and the Database.get_seq_annotation_strings() functions.
 
 Additionally, you'll need to add your database to the calour.config file (located in the calour module directory). You need to add a section (named as the desired database name in calour) for your database, containing the module name and the class name for your database. 
 
@@ -47,7 +47,7 @@ In the fish_database.py:
 
    from calour.database import Database
 
-   class FushDatabase(Database):
+   class FishDatabase(Database):
       def __init__(self, exp=None):
          # we provide methods=['get'] since this database only supports L1 integration
          super().__init__(exp=exp, database_name='fishdb', methods=['get'])
