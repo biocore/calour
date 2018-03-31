@@ -179,9 +179,7 @@ class PlotGUI_Jupyter(PlotGUI):
                 annt_type = details.get('annotationtype', 'None')
                 # annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
-                self._ipyw_sid.value = 'pootaasdsdfg'
                 link_address = details['_db_interface'].get_annotation_website(details)
-                self._ipyw_sid.value = 'pootasdfgdfgdf'
                 cline = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
                          'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
                          '<p style="color:%s;white-space:nowrap;">'
