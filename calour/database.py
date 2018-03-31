@@ -44,6 +44,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
             'dbbact' : the amplicon sequence manual annotation database
             'spongeworld' : the sponge microbiome database
             'redbiome' : the qiita automatic amplicon sequence database
+        Names are listed in the calour.config file as section names
     config_file_name: str or None, optional
         None (default) to use the default calour condig file.
         str to use the file names str as the conig file
@@ -234,13 +235,14 @@ class Database(ABC):
 
     def get_annotation_website(self, annotation):
         '''Get the database website address of information about the annotation.
+        Used for the Jupyter GUI when clicking on an annotation in the list
+        (to open in a new browser tab)
 
         Parameters
         ----------
         annotation : dict
-            keys/values are database specific.
-            E.g. See dbBact REST API /annotations/get_annotation for keys / values
-
+            keys/values are database specific (supplied by the database interface when calling get_annotation_strings() ).
+            These keys/values can be used by the database interface here to determine which website address to return.
 
         Returns
         -------
@@ -252,20 +254,26 @@ class Database(ABC):
         return None
 
     def show_annotation_info(self, annotation):
-        '''Show details about the annotation
+        '''Show details about the annotation.
+        This should use a database interface created GUI to show more details about the annotation.
+        Called from the qt5 heatmap GUI when double clicking on a database annotation.
+        A common GUI can be a new browser window with details about the annotation.
 
         Parameters
         ----------
         annotation : dict
-            keys/values are database specific.
-            E.g. See dbBact REST API /annotations/get_annotation for keys / values
+            keys/values are database specific (supplied by the database interface when calling get_annotation_strings() ).
+            These keys/values can be used by the database interface here to determine which website address to return.
         '''
-        # open in a new tab, if possible
         logger.debug('Generic function for show annotation info')
         return
 
     def add_annotation(self, features, exp):
-        '''Add an entry to the database about a set of features
+        '''Add an entry to the database about a set of features.
+        This is an optional function for databases that support manual annotations (level L4).
+        supporting this option is indicated by the "annotate" method in __init__()
+        It is called from the qt5 heatmap GUI when pressing the "Annotate" button.
+        All GUI should be supplied by the database interface.
 
         Parameters
         ----------
@@ -284,6 +292,10 @@ class Database(ABC):
 
     def upadte_annotation(self, annotation, exp=None):
         '''Update an existing annotation
+        This is an optional function for databases that support manual annotations (level L4).
+        supporting this option is indicated by the "annotate" method in __init__().
+        It is called when right clicking on an annotation in the qt5 GUI and selecting "update".
+        All GUI should be supplied by the database interface.
 
         Parameters
         ----------
@@ -301,6 +313,9 @@ class Database(ABC):
 
     def delete_annotation(self, annotation_details):
         '''Delete an annotation from the database (if allowed)
+        This is an optional function for databases that support manual annotations (level L4).
+        supporting this option is indicated by the "annotate" method in __init__()
+        It is called when right clicking on an annotation in the qt5 GUI and selecting "delete".
 
         Parameters
         ----------
@@ -318,6 +333,9 @@ class Database(ABC):
 
     def remove_feature_from_annotation(self, features, annotation_details):
         '''remove a feature from the annotation in the database (if allowed)
+        This is an optional function for databases that support manual annotations (level L4).
+        supporting this option is indicated by the "annotate" method in __init__()
+        It is called when right clicking on an annotation in the qt5 GUI and selecting "remove feature".
 
         Parameters
         ----------
@@ -355,6 +373,7 @@ class Database(ABC):
 
     def enrichment(self, exp, features, *args, **kwargs):
         '''Get the list of enriched terms in features compared to all features in exp.
+        This is an optional function for databases that support enrichment analysis (level L3).
 
         Parameters
         ----------
@@ -385,6 +404,7 @@ class Database(ABC):
     def show_term_details(self, term, exp, features, *args, **kwargs):
         '''
         Show details about the specific term in the database and in what features it appears
+        This is an optional function for databases that support enrichment analysis (level L3).
 
         Parameters
         ----------
