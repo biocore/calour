@@ -81,6 +81,19 @@ class MS1Experiment(Experiment):
             self.description, self.data.shape[0], self.data.shape[1])
 
     def _prepare_gnps_ids(self, mzerr=0.1, rterr=30):
+        '''Add GNPS IDs based on the MZ and RT data of the features
+
+        A list of GNPS IDs (based on the gnps table supplied) is created for each feature (metabolite).
+        The list contains all the matching GNPS IDs (within the MZ and RT windows) for the feature.
+        The list is added in the feature metadata as '_gnps_ids'.
+
+        Parameters
+        ----------
+        mzerr : float, optional
+            The maximal difference in the M/Z for a match
+        rterr : float, optional
+            The maximal difference in the retention time (RT) for a match
+        '''
         logger.debug('Locating GNPS ids for metabolites based on MS1 MZ/RT')
         if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
             logger.warn('No GNPS data file supplied - labels will be NA')
@@ -92,20 +105,25 @@ class MS1Experiment(Experiment):
             for cmet in self.feature_metadata.index.values:
                 cids = gnps_class._find_close_annotation(self.feature_metadata['MZ'][cmet], self.feature_metadata['RT'][cmet], mzerr=mzerr, rterr=rterr)
                 gnps_ids[cmet] = cids
-            self.feature_metadata['gnps'] = pd.Series(gnps_ids)
+            self.feature_metadata['_gnps_ids'] = pd.Series(gnps_ids)
         # if the gnps-calour module is not installed
         except ValueError:
-            self.feature_metadata['gnps'] = None
+            self.feature_metadata['_gnps_ids'] = None
             logger.warning('gnps-calour module not installed. cannot add gnps ids')
 
-    def _prepare_gnps(self):
+    def _prepare_gnps_name(self):
+        '''Add the GNPS database name to each metabolite (if known) or 'na' if unknown.
+
+        This requires the gnpscalour module to be installed.
+        the metabolite name will be added in the "gnps_name" field of the feature_metadata
+        '''
         if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
             logger.warn('No GNPS data file supplied - labels will be NA')
-            self.feature_metadata['gnps'] = 'NA'
+            self.feature_metadata['gnps_name'] = 'NA'
             return
         logger.debug('Adding gnps terms as "gnps" column in feature metadta')
         try:
-            self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps')
+            self.add_terms_to_features('gnps', use_term_list=None, field_name='gnps_name')
             logger.debug('Added terms')
         # if the gnps-calour module is not installed
         except ValueError:

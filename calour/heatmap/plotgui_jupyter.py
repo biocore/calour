@@ -160,6 +160,7 @@ class PlotGUI_Jupyter(PlotGUI):
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
         self._ipyw_sid.value = str(sid)
+        self._ipyw_sid.value = str(annt)
         self._ipyw_fid.value = str(fid)
         self._ipyw_abund.value = abd
         self._ipyw_selected.value = '%d features are selected' % len(self.selected_features)
