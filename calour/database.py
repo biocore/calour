@@ -312,7 +312,8 @@ class Database(ABC):
         raise NotImplementedError
 
     def delete_annotation(self, annotation_details):
-        '''Delete an annotation from the database (if allowed)
+        '''Delete an annotation from the database (if allowed). All features associated with this annotation
+        lose this annotation.
         This is an optional function for databases that support manual annotations (level L4).
         supporting this option is indicated by the "annotate" method in __init__()
         It is called when right clicking on an annotation in the qt5 GUI and selecting "delete".
@@ -332,7 +333,8 @@ class Database(ABC):
         return 'Not implemented'
 
     def remove_feature_from_annotation(self, features, annotation_details):
-        '''remove a feature from the annotation in the database (if allowed)
+        '''remove a feature from the annotation in the database (if allowed). If after the removal the annotation contains no features,
+        it will be removed from the database. Otherwise, the annotation remains for the features not removed from it.
         This is an optional function for databases that support manual annotations (level L4).
         supporting this option is indicated by the "annotate" method in __init__()
         It is called when right clicking on an annotation in the qt5 GUI and selecting "remove feature".
@@ -403,8 +405,10 @@ class Database(ABC):
 
     def show_term_details(self, term, exp, features, *args, **kwargs):
         '''
-        Show details about the specific term in the database and in what features it appears
-        This is an optional function for databases that support enrichment analysis (level L3).
+        Show details about the specific term in the database and in what features it appears.
+        This is an optional function, and is called when a user double clicks
+        an enriched term in the qt5 enrichment analysis (for an integration level L3 database).
+        It shows details why this term was denoted as enriched. This is a database specific implementation.
 
         Parameters
         ----------

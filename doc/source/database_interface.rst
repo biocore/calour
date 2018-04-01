@@ -1,7 +1,7 @@
 Creating database interfaces for Calour
 =======================================
 
-Calour is designed with an extendible database interface support. In this document we will describe the steps required to integrate your database into Calour.
+Calour is designed with an extensible database interface support. In this document we will describe the steps required to integrate your database into Calour.
 
 Terminology
 -----------
