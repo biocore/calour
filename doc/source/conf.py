@@ -97,7 +97,11 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'nbsphinx'
+    'nbsphinx',
+    # this extenstion is needed to avoid the
+    # "WARNING: Pygments lexer name 'ipython3' is not known" error for the notebooks.
+    # fix based on: https://github.com/spatialaudio/nbsphinx/issues/24
+    'IPython.sphinxext.ipython_console_highlighting'
 ]
 
 # Determine if the matplotlib has a recent enough version of the

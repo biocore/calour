@@ -184,7 +184,7 @@ class IOTests(Tests):
         # verify the load extracts required fields to metadata
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
-        self.assertIn('__calour_gnps_ids', exp.feature_metadata)
+        self.assertIn('_gnps_ids', exp.feature_metadata)
         # test we get the MZ and RT correct
         self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 899.54)
         self.assertEqual(exp.feature_metadata['RT'].iloc[2], 181.8248)
