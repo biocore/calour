@@ -41,9 +41,9 @@ pip install biom-format
 > ```
 
 
-Install scikit-bio dependency:
+Install scikit-bio and docrep dependency:
 ```
-pip install scikit-bio
+pip install scikit-bio docrep
 ```
 
 Install calour
