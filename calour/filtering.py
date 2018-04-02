@@ -57,7 +57,7 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
     field : str
         The name of the column in samples metadata table. This column
         should has categorical values
-    axis : 0, 1, 's', or 'f'
+    axis : 0, 1, 's', or 'f', optional
         0 or 's' (default) to filter samples; 1 or 'f' to filter features
     num_keep : int or None, optional
         None (default) to downsample to minimal group size.

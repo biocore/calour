@@ -80,23 +80,59 @@ class MS1Experiment(Experiment):
         return 'MS1Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
-    def _prepare_gnps_ids(self, mzerr=0.1, rterr=30):
-        logger.debug('Locating GNPS ids for metabolites based on MS1 MZ/RT')
+    def _prepare_gnps_ids(self, direct_ids=False, mz_thresh=0.02, rt_thresh=15, use_gnps_id_from_AllFiles=True):
+        '''Link each feature to the corresponding gnps table id.
+
+        Parameters
+        ----------
+        direct_ids: bool, optional
+            True to link via the ids, False (default) to link via MZ/RT
+        mz_thresh, rt_thresh: float, optional
+            the threshold for linking to gnps if direct_ids is False
+        use_gnps_id_from_AllFiles: bool, optional
+            True (default) to link using the AllFiles column in GNPS, False to link using 'cluster index' column
+            (if direct_ids is True).
+        '''
+        logger.debug('Locating GNPS ids')
+        self.feature_metadata['gnps'] = None
+        # if we don't have the linked gnps table, all are NA
         if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
-            logger.warn('No GNPS data file supplied - labels will be NA')
-            self.feature_metadata['gnps'] = None
+            logger.info('No GNPS data file supplied - gnps labels will be NA')
             return
-        try:
-            gnps_class = _get_database_class('gnps', exp=self)
+        gnps_data = self.exp_metadata['_calour_metabolomics_gnps_table']
+        if direct_ids:
+            # get the gnps ids values from the gnps file
+            if use_gnps_id_from_AllFiles:
+                gnps_metabolite_ids = []
+                for cid in gnps_data['AllFiles']:
+                    cid = cid.split(':')[-1]
+                    cid = cid.split('###')[0]
+                    cid = int(cid)
+                    gnps_metabolite_ids.append(cid)
+            else:
+                gnps_metabolite_ids = gnps_data['cluster index']
+            gnps_metabolite_ids_pos = {}
+            for idx, cmet in enumerate(gnps_metabolite_ids):
+                gnps_metabolite_ids_pos[cmet] = idx
             gnps_ids = {}
             for cmet in self.feature_metadata.index.values:
-                cids = gnps_class._find_close_annotation(self.feature_metadata['MZ'][cmet], self.feature_metadata['RT'][cmet], mzerr=mzerr, rterr=rterr)
-                gnps_ids[cmet] = cids
-            self.feature_metadata['gnps'] = pd.Series(gnps_ids)
-        # if the gnps-calour module is not installed
-        except ValueError:
-            self.feature_metadata['gnps'] = None
-            logger.warning('gnps-calour module not installed. cannot add gnps ids')
+                if cmet in gnps_metabolite_ids_pos:
+                    gnps_ids[cmet] = gnps_metabolite_ids_pos[cmet]
+                else:
+                    raise ValueError('metabolite ID %s not found in gnps file. Are you using correct ids?' % cmet)
+        else:
+            # match using MZ/RT
+            logger.debug('linking using MZ (thresh %f) and RT (thresh %f)' % (mz_thresh, rt_thresh))
+            try:
+                gnps_class = _get_database_class('gnps', exp=self)
+                gnps_ids = {}
+                for cmet in self.feature_metadata.index.values:
+                    cids = gnps_class._find_close_annotation(self.feature_metadata['MZ'][cmet], self.feature_metadata['RT'][cmet], mzerr=mz_thresh, rterr=rt_thresh)
+                    gnps_ids[cmet] = cids
+            # if the gnps-calour module is not installed
+            except ValueError:
+                logger.warning('gnps-calour module not installed. cannot add gnps ids')
+        self.feature_metadata['gnps'] = pd.Series(gnps_ids)
 
     def _prepare_gnps(self):
         if '_calour_metabolomics_gnps_table' not in self.exp_metadata:
