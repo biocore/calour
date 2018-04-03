@@ -14,14 +14,14 @@ from pkg_resources import resource_filename
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
 from .ms1_experiment import MS1Experiment
-from .io import read, read_amplicon, read_open_ms, read_gnps_ms
+from .io import read, read_amplicon, read_ms
 from .util import set_log_level, _convert_axis_name, register_functions
 
 
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
 __version__ = "1.0-dev"
 
-__all__ = ['read', 'read_amplicon', 'read_open_ms', 'read_gnps_ms', 'read_ms',
+__all__ = ['read', 'read_amplicon', 'read_ms',
            'Experiment', 'AmpliconExperiment', 'MS1Experiment',
            'set_log_level']
 
