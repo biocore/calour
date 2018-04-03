@@ -180,7 +180,7 @@ class IOTests(Tests):
     def test_read_biom_ms(self):
         # load a biom table with MZ/RT in featureID, and associated gnps clusterinfo file
         exp = ca.read_ms(self.ms_biom_table, sample_metadata_file=self.gnps_map,
-                              gnps_file=self.gnps_cluster_info, file_type='biom', use_gnps_id_from_AllFiles=False, normalize=None)
+                         gnps_file=self.gnps_cluster_info, file_type='biom', use_gnps_id_from_AllFiles=False, normalize=None)
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
         self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 899.53)
@@ -189,7 +189,7 @@ class IOTests(Tests):
     def test_read_gnps_ms(self):
         # load the gnps exported table with associated sample metadata and cluster info
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
-                              gnps_file=self.gnps_cluster_info, file_type='gnps-ms2', use_gnps_id_from_AllFiles=False, normalize=None)
+                         gnps_file=self.gnps_cluster_info, file_type='gnps-ms2', use_gnps_id_from_AllFiles=False, normalize=None)
         # verify the load extracts required fields to metadata
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)

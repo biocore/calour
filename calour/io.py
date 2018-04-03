@@ -349,7 +349,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     # remove samples containing NaN in data table (can happen in _read_csv)
     nan_samples = np.where(np.isnan(exp.data.sum(axis=1)))[0]
-    if len(nan_samples)>0:
+    if len(nan_samples) > 0:
         logger.info('Some sample data contains NaN. Removing sample positions %s' % nan_samples)
         keep_samples = np.arange(len(exp.sample_metadata))
         keep_samples = np.delete(keep_samples, nan_samples)
@@ -471,7 +471,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
         None (default) to use the file_type defaults.
         False indicates columns are samples.
         True indicates rows are samples.
-    table_sep: str or None, optional    
+    table_sep: str or None, optional
         None (default) to use the file_type defaults.
         otherwise, the separator character between table file entries (usually ',' or '\t')
     mz_rt_sep: None or str, optional
@@ -529,7 +529,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
             table_sep = ','
         if direct_ids is None:
             direct_ids = True
-        data_file_type='csv'
+        data_file_type = 'csv'
     elif file_type == 'biom':
         if rows_are_samples is None:
             rows_are_samples = False
@@ -537,7 +537,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
             direct_ids = False
         if get_mz_rt_from_feature_id is None:
             get_mz_rt_from_feature_id = True
-        data_file_type='biom'
+        data_file_type = 'biom'
     elif file_type == 'openms':
         if rows_are_samples is None:
             rows_are_samples = False
@@ -547,13 +547,13 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
             get_mz_rt_from_feature_id = True
         if table_sep is None:
             table_sep = ','
-        data_file_type='csv'
+        data_file_type = 'csv'
     elif file_type == 'gnps-ms2':
         if rows_are_samples is None:
             rows_are_samples = False
         if direct_ids is None:
             direct_ids = True
-        data_file_type='biom'
+        data_file_type = 'biom'
     else:
         raise ValueError("ms file_type %s not supported. please use ['mzmine2','openms','gnps-ms2']")
     logger.debug('Reading MS data (data table %s, map file %s, file_type %s)' % (data_file, sample_metadata_file, file_type))
@@ -570,8 +570,8 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
             raise ValueError('Table file %s does not contain "row retention time" column. Is it an mzmine2 data table?' % data_file)
         rtpos = exp.sample_metadata.index.get_loc('row retention time')
         # get the MZ and RT
-        exp.feature_metadata['MZ'] = exp.data[mzpos,:]
-        exp.feature_metadata['RT'] = exp.data[rtpos,:]
+        exp.feature_metadata['MZ'] = exp.data[mzpos, :]
+        exp.feature_metadata['RT'] = exp.data[rtpos, :]
         # drop the two columns which are not samples
         sample_pos = np.arange(len(exp.sample_metadata))
         sample_pos = list(set(sample_pos).difference([mzpos, rtpos]))
