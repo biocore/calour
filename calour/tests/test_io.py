@@ -191,7 +191,7 @@ class IOTests(Tests):
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
                          file_type='gnps-ms2', normalize=None)
         # verify the load extracts required fields to metadata
-        self.assertEqual(exp.data[2,3], 139692)
+        self.assertEqual(exp.data[2, 3], 139692)
         # # test normalizing
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
                          file_type='gnps-ms2', normalize=10000)
