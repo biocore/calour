@@ -180,7 +180,7 @@ class IOTests(Tests):
     def test_read_biom_ms(self):
         # load a biom table with MZ/RT in featureID, and associated gnps clusterinfo file
         exp = ca.read_ms(self.ms_biom_table, sample_metadata_file=self.gnps_map,
-                         gnps_file=self.gnps_cluster_info, file_type='biom', use_gnps_id_from_AllFiles=False, normalize=None)
+                         file_type='biom', use_gnps_id_from_AllFiles=False, normalize=None)
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
         self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 899.53)
@@ -189,23 +189,16 @@ class IOTests(Tests):
     def test_read_gnps_ms(self):
         # load the gnps exported table with associated sample metadata and cluster info
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
-                         gnps_file=self.gnps_cluster_info, file_type='gnps-ms2', use_gnps_id_from_AllFiles=False, normalize=None)
+                         file_type='gnps-ms2', normalize=None)
         # verify the load extracts required fields to metadata
-        self.assertIn('MZ', exp.feature_metadata)
-        self.assertIn('RT', exp.feature_metadata)
-        self.assertIn('_gnps_ids', exp.feature_metadata)
-        # test we get the MZ and RT correct
-        self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 899.54)
-        self.assertEqual(exp.feature_metadata['RT'].iloc[2], 181.8248)
+        self.assertEqual(exp.data[2,3], 139692)
         # # test normalizing
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
-                         file_type='gnps-ms2', use_gnps_id_from_AllFiles=False,
-                         gnps_file=self.gnps_cluster_info, normalize=10000)
+                         file_type='gnps-ms2', normalize=10000)
         assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
         # # test load sparse
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
-                         file_type='gnps-ms2', use_gnps_id_from_AllFiles=False,
-                         gnps_file=self.gnps_cluster_info, normalize=None, sparse=True)
+                         file_type='gnps-ms2', normalize=None, sparse=True)
         self.assertEqual(exp.sparse, True)
 
     def test_read_open_ms_samples_rows(self):
