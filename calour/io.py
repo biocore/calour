@@ -139,7 +139,7 @@ def _get_md_from_biom(table):
     return md_df
 
 
-def _read_csv(fp, transpose=True, rows_are_samples=False, sep=','):
+def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     '''Read a csv file
 
     Parameters
@@ -150,7 +150,7 @@ def _read_csv(fp, transpose=True, rows_are_samples=False, sep=','):
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
-    rows_are_samples : bool, optional
+    sample_in_row : bool, optional
         True to csv datafile has samples as rows,
         False (default) if columns are samples (rows are features)
     sep : str, optional
@@ -172,7 +172,7 @@ def _read_csv(fp, transpose=True, rows_are_samples=False, sep=','):
     # a known bug in pandas (see #11166)
     table = pd.read_csv(fp, header=0, engine='python', sep=sep)
     table.set_index(table.columns[0], drop=True, inplace=True)
-    if rows_are_samples:
+    if sample_in_row:
         table = table.transpose()
     logger.info('loaded %d samples, %d features' % table.shape)
     sid = table.columns
@@ -236,7 +236,8 @@ def _read_metadata(ids, f, kwargs):
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True, data_file_type='biom',
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,
-         cls=Experiment, cut_sample_id_sep=None, rows_are_samples=False, *, normalize):
+         cls=Experiment, cut_sample_id_sep=None, data_table_sep=',',
+         sample_in_row=False, *, normalize):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -274,7 +275,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         what class object to read the data into (:class:`.Experiment` by default)
     cut_sample_id_sep: None or str, optional
         if not None, split each data file sampleID using this value (typically '_'), taking only the first part as the sampleID.
-    rows_are_samples: bool, optional
+    sample_in_row: bool, optional
         False if data table columns are sample, True if rows are samples
     normalize : int or None
         normalize each sample to the specified read count. ``None`` to not normalize
@@ -293,7 +294,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     if data_file_type == 'biom':
         sid, fid, data, fmd = _read_biom(data_file)
     elif data_file_type == 'csv':
-        sid, fid, data = _read_csv(data_file, rows_are_samples=rows_are_samples)
+        sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_table_sep)
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2(data_file)
     elif data_file_type == 'tsv':
@@ -347,13 +348,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     exp = cls(data, sample_metadata, feature_metadata,
               exp_metadata=exp_metadata, description=description, sparse=sparse)
 
-    # remove samples containing NaN in data table (can happen in _read_csv)
-    nan_samples = np.where(np.isnan(exp.data.sum(axis=1)))[0]
-    if len(nan_samples) > 0:
-        logger.info('Some sample data contains NaN. Removing sample positions %s' % nan_samples)
-        keep_samples = np.arange(len(exp.sample_metadata))
-        keep_samples = np.delete(keep_samples, nan_samples)
-        exp = exp.reorder(keep_samples, axis='s')
+    # remove nans in the data
+    exp.filter_data_na(axis='s', inplace=True)
 
     if normalize is not None:
         # record the original total read count into sample metadata
@@ -414,12 +410,12 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
 
 @ds.with_indent(4)
-def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
-            file_type='mzmine2', rows_are_samples=None, table_sep=None, mz_rt_sep='_', direct_ids=None,
+def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gnps_file=None,
+            data_file_type='mzmine2', sample_in_row=None, data_table_sep=None, mz_rt_sep='_', direct_ids=None,
             mz_thresh=0.02, rt_thresh=15, get_mz_rt_from_feature_id=None, use_gnps_id_from_AllFiles=True,
             cut_sample_id_sep=None, description=None, sparse=False, *, normalize, **kwargs):
     '''Read a mass-spec experiment.
-    Calour supports various ms table formats, with several preset formats (specified by the file_type='XXX' parameter,
+    Calour supports various ms table formats, with several preset formats (specified by the data_file_type='XXX' parameter,
     as well as able to read user specified formats.
     With the installation of the gnps-calour database interface, calour can integrate MS2 information from GNPS into the analysis.
     If the data table and the gnps file share the same IDs (preferred), GNPS annotations use the uniqueID of the features. Otherwise, calour
@@ -428,7 +424,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
     'mzmine2': using the csv output file of mzmine2. MZ and RT are obtained via the 2nd and 3rd column in the file.
     'biom': using a biom table for the metabolite table. featureIDs in the table (first column) can be either MZ_RT (concatenated with a separator),
     or a unique ID matching the gnps_file ids.
-    'openms': using a csv data table with MZ_RT or unqie ID as featureID (first column). samples can be columns (default) or rows (using the rows_are_samples=True parameter)
+    'openms': using a csv data table with MZ_RT or unqie ID as featureID (first column). samples can be columns (default) or rows (using the sample_in_row=True parameter)
     'gnps-ms2': a tsv file exported from gnps, with gnps ids as featureIDs.
 
     Parameters
@@ -449,7 +445,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
     feature_metadata_file : str or None (optional)
         Name of table containing additional metadata about each feature
         None (default) to not load
-    file_type: str, optional
+    data_file_type: str, optional
         the data file format. sets default values for the additional parameters in order to properly load the table (which can be overwritten). options include:
         'mzmine2': load the mzmine2 output csv file.
             MZ and RT are obtained from this file.
@@ -467,19 +463,19 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
             MZ and RT are obtained via the gnps_file if available, otherwise are NA
             GNPS linking is direct via the first column (featureID).
             table is a tsv/json/hdf5 biom table, columns are samples.
-    rows_are_samples: bool or None, optional
-        None (default) to use the file_type defaults.
+    sample_in_row: bool or None, optional
+        None (default) to use the data_file_type defaults.
         False indicates columns are samples.
         True indicates rows are samples.
-    table_sep: str or None, optional
-        None (default) to use the file_type defaults.
-        otherwise, the separator character between table file entries (usually ',' or '\t')
+    data_table_sep: str or None, optional
+        None (default) to use the data_file_type defaults.
+        otherwise, the separator character between data table file entries (usually ',' or '\t')
     mz_rt_sep: None or str, optional
         The separator character between the MZ and RT parts of the featureID (if it contains them) (usually '_').
         None to autodetect the separator.
         Note this is used only if direct_ids=False
     direct_ids: bool or None, optional
-        None (default) to use the file_type defaults.
+        None (default) to use the data_file_type defaults.
         True - Calour will link the featureIDs with the gnps_file feature IDs
         (either in the 'cluster index' or 'AllFiles' field - see use_gnps_id_from_AllFiles parameter)
         False - Calour will use the per-feature MZ/RT info with the threshold windows to link to the gnps_file
@@ -488,7 +484,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
     rt_thresh: float, optional
         The tolerance for retention time to match features to the gnps_file. Used only if parameter direct_ids=False.
     get_mz_rt_from_feature_id: bool or None, optional
-        None (default) to use the file_type defaults.
+        None (default) to use the data_file_type defaults.
         True indicates the FeatureID field contains the feature MZ and RT (assuming it is of the form MZ_RT).
         see also mz_rt_sep parameter.
         False indicates featureID field is just a unique feature identifier.
@@ -522,47 +518,47 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
     --------
     read
     '''
-    if file_type == 'mzmine2':
-        if rows_are_samples is None:
-            rows_are_samples = False
-        if table_sep is None:
-            table_sep = ','
+    if data_file_type == 'mzmine2':
+        if sample_in_row is None:
+            sample_in_row = False
+        if data_table_sep is None:
+            data_table_sep = ','
         if direct_ids is None:
             direct_ids = True
-        data_file_type = 'csv'
-    elif file_type == 'biom':
-        if rows_are_samples is None:
-            rows_are_samples = False
+        ctype = 'csv'
+    elif data_file_type == 'biom':
+        if sample_in_row is None:
+            sample_in_row = False
         if direct_ids is None:
             direct_ids = False
         if get_mz_rt_from_feature_id is None:
             get_mz_rt_from_feature_id = True
-        data_file_type = 'biom'
-    elif file_type == 'openms':
-        if rows_are_samples is None:
-            rows_are_samples = False
+        ctype = 'biom'
+    elif data_file_type == 'openms':
+        if sample_in_row is None:
+            sample_in_row = False
         if direct_ids is None:
             direct_ids = False
         if get_mz_rt_from_feature_id is None:
             get_mz_rt_from_feature_id = True
-        if table_sep is None:
-            table_sep = ','
-        data_file_type = 'csv'
-    elif file_type == 'gnps-ms2':
-        if rows_are_samples is None:
-            rows_are_samples = False
+        if data_table_sep is None:
+            data_table_sep = ','
+        ctype = 'csv'
+    elif data_file_type == 'gnps-ms2':
+        if sample_in_row is None:
+            sample_in_row = False
         if direct_ids is None:
             direct_ids = True
-        data_file_type = 'biom'
+        ctype = 'biom'
     else:
-        raise ValueError("ms file_type %s not supported. please use ['mzmine2','openms','gnps-ms2']")
-    logger.debug('Reading MS data (data table %s, map file %s, file_type %s)' % (data_file, sample_metadata_file, file_type))
+        raise ValueError("ms data_file_type %s not supported. please use ['mzmine2','openms','gnps-ms2']")
+    logger.debug('Reading MS data (data table %s, map file %s, data_file_type %s)' % (data_file, sample_metadata_file, data_file_type))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type=data_file_type, sparse=sparse,
-               normalize=normalize, cls=MS1Experiment, cut_sample_id_sep=cut_sample_id_sep, rows_are_samples=rows_are_samples, **kwargs)
+               data_file_type=ctype, sparse=sparse, data_table_sep=data_table_sep,
+               normalize=normalize, cls=MS1Experiment, cut_sample_id_sep=cut_sample_id_sep, sample_in_row=sample_in_row, **kwargs)
 
     # get the MZ/RT data
-    if file_type == 'mzmine2':
+    if data_file_type == 'mzmine2':
         if 'row m/z' not in exp.sample_metadata.index:
             raise ValueError('Table file %s does not contain "row m/z" column. Is it an mzmine2 data table?' % data_file)
         mzpos = exp.sample_metadata.index.get_loc('row m/z')
@@ -575,7 +571,7 @@ def read_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metada
         # drop the two columns which are not samples
         sample_pos = np.arange(len(exp.sample_metadata))
         sample_pos = list(set(sample_pos).difference([mzpos, rtpos]))
-        exp.reorder(sample_pos)
+        exp = exp.reorder(sample_pos)
     if get_mz_rt_from_feature_id:
         logger.debug('getting MZ and RT from featureIDs')
         if direct_ids:
