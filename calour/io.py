@@ -349,7 +349,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
               exp_metadata=exp_metadata, description=description, sparse=sparse)
 
     # remove nans in the data
-    exp.filter_data_na(axis='s', inplace=True)
+    if np.isnan(exp.data[:].sum()):
+        exp.filter_data_na(axis='s', inplace=True)
 
     if normalize is not None:
         # record the original total read count into sample metadata
