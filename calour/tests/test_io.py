@@ -172,7 +172,7 @@ class IOTests(Tests):
         self.assertEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
         # test normalizing
         exp = ca.read_ms(self.openms_csv, normalize=10000, data_file_type='openms')
-        assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
+        assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0]) * 10000)
         # test load sparse
         exp = ca.read_ms(self.openms_csv, sparse=True, normalize=None, data_file_type='openms')
         self.assertEqual(exp.sparse, True)
@@ -180,7 +180,7 @@ class IOTests(Tests):
     def test_read_biom_ms(self):
         # load a biom table with MZ/RT in featureID, and associated gnps clusterinfo file
         exp = ca.read_ms(self.ms_biom_table, sample_metadata_file=self.gnps_map,
-                         data_file_type='biom', use_gnps_id_from_AllFiles=False, normalize=None)
+                         data_file_type='biom', data_table_params={'use_gnps_id_from_AllFiles': False}, normalize=None)
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
         self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 899.53)
@@ -189,13 +189,22 @@ class IOTests(Tests):
     def test_read_mzmine2_ms(self):
         # load an mzmine2 metabolomics table, and associated gnps clusterinfo file
         exp = ca.read_ms(self.mzmine2_csv, sample_metadata_file=self.gnps_map,
-                         data_file_type='mzmine2', use_gnps_id_from_AllFiles=False, normalize=None)
-        print(exp)
+                         data_file_type='mzmine2', data_table_params={'use_gnps_id_from_AllFiles': False}, normalize=None)
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
         self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 200)
         self.assertEqual(exp.feature_metadata['RT'].iloc[0], 1)
         self.assertEqual(exp.data[2, 1], 35900)
+
+    def test_read_mzmine2_ms_with_idstr(self):
+        # load an mzmine2 metabolomics table with the sampleids inflated with additional info
+        exp = ca.read_ms(self.mzmine2_with_idstr_csv, sample_metadata_file=self.gnps_map,
+                         data_table_params={'use_gnps_id_from_AllFiles': False, 'cut_sample_id_sep': '_'}, normalize=None)
+        self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 200)
+        self.assertEqual(exp.feature_metadata['RT'].iloc[0], 1)
+        self.assertEqual(exp.sample_metadata['field2'][0], 'f')
+        self.assertEqual(exp.data[2, 1], 35900)
+        self.assertEqual(exp.data.shape, (6, 6))
 
     def test_read_gnps_ms(self):
         # load the gnps exported table with associated sample metadata and cluster info
@@ -206,14 +215,14 @@ class IOTests(Tests):
         # # test normalizing
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
                          data_file_type='gnps-ms2', normalize=10000)
-        assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0])*10000)
+        assert_array_almost_equal(exp.data.sum(axis=1), np.ones(exp.shape[0]) * 10000)
         # # test load sparse
         exp = ca.read_ms(self.gnps_table, sample_metadata_file=self.gnps_map,
                          data_file_type='gnps-ms2', normalize=None, sparse=True)
         self.assertEqual(exp.sparse, True)
 
     def test_read_open_ms_samples_rows(self):
-        exp = ca.read_ms(self.openms_samples_rows_csv, normalize=None, sample_in_row=True, data_file_type='openms')
+        exp = ca.read_ms(self.openms_samples_rows_csv, normalize=None, data_table_params={'sample_in_row': True}, data_file_type='openms')
         # test we get the MZ and RT correct
         self.assertIn('MZ', exp.feature_metadata)
         self.assertIn('RT', exp.feature_metadata)
