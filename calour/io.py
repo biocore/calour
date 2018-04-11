@@ -175,9 +175,8 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     # if the csv file has an additional sep at the end of each line, it cause
     # pandas to create an empty column at the end. This can cause bugs with the
     # normalization. so we remove it.
-    if np.all(np.isnan(table[table.columns[-1]])):
-        logger.debug('removing last column as it contains only NaNs')
-        table.drop(table.columns[-1], axis=1, inplace=True)
+    table.dropna(axis='columns', how='all', inplace=True)
+
     table.set_index(table.columns[0], drop=True, inplace=True)
     if sample_in_row:
         table = table.transpose()
@@ -281,7 +280,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         {'index_col': False}.
     cls : ``class``, optional
         what class object to read the data into (:class:`.Experiment` by default)
-    table_sample_id_proc, table_feature_id_proc: None or callable, optional
+    table_sample_id_proc: None or callable, optional
+    table_feature_id_proc: None or callable, optional
         if not None, modify each sample/feature id in the table using the callable function.
         The callable accepts a list of str and returns a list of str (sample/feature ids after processing).
         Useful in metabolomics experiments, where the sampleIDs in the data table contain additional information compared to the
@@ -423,27 +423,37 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
             data_file_type='mzmine2', data_table_params=None, mz_thresh=0.02, rt_thresh=15,
             description=None, sparse=False, *, normalize, **kwargs):
     '''Read a mass-spec experiment.
-    Calour supports various ms table formats, with several preset formats (specified by the data_file_type='XXX' parameter,
+
+    Calour supports various ms table formats, with several preset formats (specified by the data_file_type='XXX' parameter),
     as well as able to read user specified formats.
-    With the installation of the gnps-calour database interface, calour can integrate MS2 information from GNPS into the analysis.
+
+    With the installation of the gnps-calour database interface, Calour can integrate MS2 information from GNPS into the analysis:
+
     If the data table and the gnps file share the same IDs (preferred), GNPS annotations use the uniqueID of the features. Otherwise, calour
     matches the features to the gnps file using an MZ and RT threshold window (specified by the mz_thresh=XXX, rt_thresh=XXX parameters).
+
     Supported formats for ms analysis (as specified by the type='XXX' parameter) include:
-    'mzmine2': using the csv output file of mzmine2. MZ and RT are obtained via the 2nd and 3rd column in the file.
-    'biom': using a biom table for the metabolite table. featureIDs in the table (first column) can be either MZ_RT (concatenated with a separator),
-    or a unique ID matching the gnps_file ids.
-    'openms': using a csv data table with MZ_RT or unqie ID as featureID (first column). samples can be columns (default) or rows (using the sample_in_row=True parameter)
-    'gnps-ms2': a tsv file exported from gnps, with gnps ids as featureIDs.
+
+    * 'mzmine2': using the csv output file of mzmine2. MZ and RT are obtained via the 2nd and 3rd column in the file.
+
+    * 'biom': using a biom table for the metabolite table. featureIDs in the table (first column) can be either MZ_RT (concatenated with a separator),
+
+    * or a unique ID matching the gnps_file ids.
+
+    * 'openms': using a csv data table with MZ_RT or unqie ID as featureID (first column). samples can be columns (default) or rows (using the sample_in_row=True parameter)
+
+    * 'gnps-ms2': a tsv file exported from gnps, with gnps ids as featureIDs.
 
     Parameters
     ----------
     data_file : str
-        The name of the data table (mzmine2 output/bucket table/biom table) containing the per-metabolite frequencies.
+        The name of the data table (mzmine2 output/bucket table/biom table) containing the per-metabolite abundances.
     sample_metadata_file : str or None (optional)
         None (default) to not load metadata per sample
         str to specify name of sample mapping file (tsv).
+
         Note: sample names in the bucket table and sample_metadata file must match. In case bucket table sample names contains additional
-        information, you can split them at the separator character (usually '_'), keeping only the first part, using the cut_sample_id_sep='_' parameter
+        information, you can split them at the separator character (usually '_'), keeping only the first part, using the data_table_params={'cut_sample_id_sep': '_'} parameter
         (see below)
     gnps_file : str or None (optional)
         name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file, for use with the 'gnps' database.
@@ -454,7 +464,8 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         Name of table containing additional metadata about each feature
         None (default) to not load
     data_file_type: str, optional
-        the data file format. sets default values for the additional parameters in order to properly load the table (which can be overwritten). options include:
+        the data file format. options include:
+
         'mzmine2': load the mzmine2 output csv file.
             MZ and RT are obtained from this file.
             GNPS linking is direct via the unique id column.
@@ -471,9 +482,11 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
             MZ and RT are obtained via the gnps_file if available, otherwise are NA
             GNPS linking is direct via the first column (featureID).
             table is a tsv/json/hdf5 biom table, columns are samples.
+        Note: setting the data_file_type also sets the default values for the data_table_params. These values can be overwritten as needed (see below).
     data_table_params: dict, optional
         Additional parameters for how to parse the data_table. These parameters override the defaults set by the data_file_type.
         Format is: {parameter: value}. Parameters are:
+
         sample_in_row: bool
             False indicates columns are samples.
             True indicates rows are samples.
@@ -543,7 +556,11 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         raise ValueError("ms data_file_type %s not supported. please use ['mzmine2','openms','gnps-ms2']")
     param_defaults['use_gnps_id_from_AllFiles'] = True
     param_defaults['mz_rt_sep'] = '_'
-    # set the default param values if not supplied by the user
+
+    # Update the data_table_params using the default values appropriate to the data_file_type.
+    # Note: User supplied values for data_table_params override the default file type values.
+    # i.e., if file_type='openms' but when calling read_ms() the user supplies data_table_params={'sample_in_row': True},
+    # the data table will be treated as samples are in rows.
     for cparam, cval in param_defaults.items():
         data_table_params[cparam] = data_table_params.get(cparam, cval)
 

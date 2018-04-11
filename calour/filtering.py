@@ -17,7 +17,6 @@ Functions
    filter_prevalence
    filter_abundance
    filter_sample_categories
-   filter_data_na
    downsample
 '''
 
@@ -549,25 +548,3 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
         ids_pos = np.setdiff1d(np.arange(len(index)), ids_pos, assume_unique=True)
     newexp = exp.reorder(ids_pos, axis=axis, inplace=inplace)
     return newexp
-
-
-@Experiment._record_sig
-def filter_data_na(exp: Experiment, axis=0, negate=False, inplace=False):
-    '''Filter samples (or features) where data contains nan.
-
-    Parameters
-    ----------
-    axis : 0, 1, 's', or 'f', optional
-        0 or 's' (default) to remove samples where data contains nan, 1 or 'f' to remove features
-    negate : bool, optional
-        negate the filtering
-    inplace : bool, optional
-        False (default) to create a copy of the experiment, True to filter inplace
-    '''
-    nan_pos = np.where(np.isnan(exp.data.sum(axis=1-axis)))[0]
-    if len(nan_pos) > 0:
-        logger.info('Data contains NaN. Removing positions %s' % nan_pos)
-        keep_pos = np.arange(exp.data.shape[axis])
-        keep_pos = np.delete(keep_pos, nan_pos)
-        exp = exp.reorder(keep_pos, axis=axis, inplace=inplace)
-    return exp
