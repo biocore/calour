@@ -1,7 +1,7 @@
 from logging import getLogger
 
 import ipywidgets
-from IPython.display import display, clear_output
+from IPython.display import display, clear_output, Javascript
 import matplotlib
 
 from .plotgui import PlotGUI
@@ -9,6 +9,7 @@ from .._doc import ds
 
 
 logger = getLogger(__name__)
+
 
 @ds.with_indent(4)
 class PlotGUI_Jupyter(PlotGUI):
@@ -130,9 +131,8 @@ class PlotGUI_Jupyter(PlotGUI):
         ax = self.figure.gca()
         ylim_lower, ylim_upper = ax.get_ylim()
         xlim_lower, xlim_upper = ax.get_xlim()
-        ax.set_ylim(
-                ylim_lower,
-                ylim_lower + (ylim_upper - ylim_lower) * self.zoom_scale)
+        ax.set_ylim(ylim_lower,
+                    ylim_lower + (ylim_upper - ylim_lower) * self.zoom_scale)
         self.figure.canvas.draw()
         clear_output(wait=True)
         display(self.figure)
@@ -157,45 +157,58 @@ class PlotGUI_Jupyter(PlotGUI):
         # from calour.annotation import annotate_bacteria_gui
         self._annotation_db.add_annotation(seqs, self.exp)
 
+    def _popup(self, body, title="Calour"):
+        data = """
+                require(
+                ["base/js/dialog"],
+                function(dialog) {
+                    dialog.modal({
+                        title: '%s',
+                        body: '%s',
+                        buttons: {
+                            'OK': {}
+                        }
+                    });
+                });""" % (title, body)
+        display(Javascript(data))
 
-    def _save_seqs(self, seqs, name):
-        print(name)
-        self.exp.feature_metadata[name] = False
-        self.exp.feature_metadata.loc[seqs, name] = True
-
-
-    def _save(self, button):
-        '''Save feature collection to the experiment'''
-
-        def f(a):
-            print((a))
-
-        a = ipywidgets.Text()
-
-        name = ipywidgets.interactive_output(f, {'a': a})
-
-        ui = ipywidgets.HBox([a])
-
-        display(ui)
+    def _save_seqs(self, name, button):
+        # if no name entered, just warn
+        if name == '':
+            self._popup('No name supplied. Sequences not saved')
+            return
 
         # get the sequences of the selection
         seqs = []
         for cseqpos in self.selected_features.keys():
             seqs.append(self.exp.feature_metadata.index[cseqpos])
 
+        self.exp.feature_metadata[name] = False
+        self.exp.feature_metadata.loc[seqs, name] = True
+        button.description = 'Saved'
+        self._popup('Saved. Use newexp=exp.filter_by_metadata("%s", [True],axis="f") to obtain filtered experiment' % name)
+
+    def _save(self, button):
+        '''Save feature collection to the experiment
+
+        opens a textbox and save button. when save button is clicked, a column (with the name entered in the textbox)
+        is added to the experiment feature_metadata, containing True on selected features, false on others
+
+        In order to get a new experiment with only the saved features, you can use:
+
+        newexp = exp.filter_by_metadata(SAVE_NAME, [True], axis='f')
+         '''
+        a = ipywidgets.Text()
         b = ipywidgets.Button(
-            description='Save as:',
+            description='Save selection:',
             tooltip='Save the selection(s)')
-
-        b.on_click(self._save_seqs(seqs, name))
-
-        display(ipywidgets.HBox([b]))
-
+        b.on_click(lambda x: self._save_seqs(a.value, x))
+        ui = ipywidgets.HBox([a, b])
+        display(ui)
 
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
         self._ipyw_sid.value = str(sid)
-        self._ipyw_sid.value = str(annt)
         self._ipyw_fid.value = str(fid)
         self._ipyw_abund.value = abd
         self._ipyw_selected.value = '%d features are selected' % len(self.selected_features)
@@ -217,11 +230,7 @@ class PlotGUI_Jupyter(PlotGUI):
                 # annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
                 link_address = details['_db_interface'].get_annotation_website(details)
-                cline = ('<style> a:link {color:%s; background-color:transparent; text-decoration:none}'
-                         'a:visited {color:%s; background-color:transparent; text-decoration:none}</style>'
-                         '<p style="color:%s;white-space:nowrap;">'
-                         '<a href="%s"'
-                         '   target="_blank">%s</a></p>') % (ccolor, ccolor, ccolor, link_address, cstr)
+                cline = ('<p><a href="%s" target="_blank"><span style="color:%s;">%s</span></a></p>' % (link_address, ccolor, cstr))
                 idata.append(cline)
         except Exception as e:
             # use try/except to catch and show the error; otherwise the error goes unnoticed
