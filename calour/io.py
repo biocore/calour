@@ -11,7 +11,7 @@ Functions
 
    read
    read_amplicon
-   read_open_ms
+   read_ms
    save
    save_biom
    save_metadata
@@ -30,11 +30,13 @@ from logging import getLogger
 import os.path
 
 import pandas as pd
+import numpy as np
 import biom
 
 from . import Experiment, AmpliconExperiment, MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 from ._doc import ds
+from .database import _get_database_class
 
 
 logger = getLogger(__name__)
@@ -130,15 +132,15 @@ def _get_md_from_biom(table):
     ids = table.ids(axis='observation')
     metadata = table.metadata(axis='observation')
     if metadata is None:
-        logger.info('No metadata associated with features in biom table')
+        logger.debug('No metadata associated with features in biom table')
         md_df = None
     else:
         md_df = pd.DataFrame([dict(tmd) for tmd in metadata], index=ids)
     return md_df
 
 
-def _read_open_ms(fp, transpose=True, rows_are_samples=False, sep=','):
-    '''Read an OpenMS bucket table csv file
+def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
+    '''Read a csv file
 
     Parameters
     ----------
@@ -148,7 +150,7 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False, sep=','):
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
         row. So you should transpose the data table.
-    rows_are_samples : bool, optional
+    sample_in_row : bool, optional
         True to csv datafile has samples as rows,
         False (default) if columns are samples (rows are features)
     sep : str, optional
@@ -165,12 +167,18 @@ def _read_open_ms(fp, transpose=True, rows_are_samples=False, sep=','):
     feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
-    logger.debug('loading OpenMS bucket table %s' % fp)
+    logger.debug('loading csv table %s' % fp)
     # use the python engine as the default (c) engine throws an error
     # a known bug in pandas (see #11166)
     table = pd.read_csv(fp, header=0, engine='python', sep=sep)
+
+    # if the csv file has an additional sep at the end of each line, it cause
+    # pandas to create an empty column at the end. This can cause bugs with the
+    # normalization. so we remove it.
+    table.dropna(axis='columns', how='all', inplace=True)
+
     table.set_index(table.columns[0], drop=True, inplace=True)
-    if rows_are_samples:
+    if sample_in_row:
         table = table.transpose()
     logger.info('loaded %d samples, %d features' % table.shape)
     sid = table.columns
@@ -226,7 +234,8 @@ def _read_metadata(ids, f, kwargs):
         if diff:
             logger.warning('These have data but do not have metadata: %r' % diff)
         # reorder the id in metadata to align with biom
-        metadata = metadata.loc[ids, ]
+        # metadata = metadata.loc[ids, ]
+        metadata = metadata.reindex(ids)
     return metadata
 
 
@@ -234,7 +243,8 @@ def _read_metadata(ids, f, kwargs):
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True, data_file_type='biom',
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,
-         cls=Experiment, *, normalize):
+         cls=Experiment, table_sample_id_proc=None, table_feature_id_proc=None, data_table_sep=',',
+         sample_in_row=False, *, normalize):
     '''Read the files for the experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -270,6 +280,14 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         {'index_col': False}.
     cls : ``class``, optional
         what class object to read the data into (:class:`.Experiment` by default)
+    table_sample_id_proc: None or callable, optional
+    table_feature_id_proc: None or callable, optional
+        if not None, modify each sample/feature id in the table using the callable function.
+        The callable accepts a list of str and returns a list of str (sample/feature ids after processing).
+        Useful in metabolomics experiments, where the sampleIDs in the data table contain additional information compared to the
+        mapping file (using a '_' separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.
+    sample_in_row: bool, optional
+        False if data table columns are sample, True if rows are samples
     normalize : int or None
         normalize each sample to the specified read count. ``None`` to not normalize
 
@@ -286,12 +304,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     fmd = None
     if data_file_type == 'biom':
         sid, fid, data, fmd = _read_biom(data_file)
-    elif data_file_type == 'openms':
-        sid, fid, data = _read_open_ms(data_file, rows_are_samples=False)
-    elif data_file_type == 'openms_transpose':
-        sid, fid, data = _read_open_ms(data_file, rows_are_samples=True)
-    elif data_file_type == 'gnps_ms':
-        sid, fid, data = _read_open_ms(data_file, rows_are_samples=False, sep='\t')
+    elif data_file_type == 'csv':
+        sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_table_sep)
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2(data_file)
     elif data_file_type == 'tsv':
@@ -302,10 +316,22 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
 
+    sid = [str(x) for x in sid]
+
+    # if we need to process the table sample/feature IDs
+    if table_sample_id_proc is not None:
+        sid = table_sample_id_proc(sid)
+    if table_feature_id_proc is not None:
+        fid = table_feature_id_proc(fid)
+
     sample_metadata = _read_metadata(sid, sample_metadata_file, sample_metadata_kwargs)
     feature_metadata = _read_metadata(fid, feature_metadata_file, feature_metadata_kwargs)
 
-    # store the abund  per sample/feature before any procesing
+    # store the sample and feature ids also as a column (for sorting, etc.)
+    sample_metadata['_sample_id'] = sample_metadata.index.values
+    feature_metadata['_feature_id'] = feature_metadata.index.values
+
+    # store the abundance per sample/feature before any procesing
     sample_metadata['_calour_original_abundance'] = data.sum(axis=1)
     # self.feature_metadata['_calour_original_abundance'] = self.data.sum(axis=0)
 
@@ -314,7 +340,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         renames = {}
         for ccol in fmd.columns:
             if ccol in feature_metadata.columns:
-                renames[ccol] = ccol+'_biom'
+                renames[ccol] = ccol + '_biom'
             if renames:
                 fmd.rename(columns=renames, inplace=True)
         # combine it with the feature metadata
@@ -393,36 +419,102 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
 
 @ds.with_indent(4)
-def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
-                 description=None, sparse=False, rows_are_samples=False, mz_rt_sep=None, *, normalize, **kwargs):
-    '''Load an OpenMS metabolomics experiment.
+def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gnps_file=None,
+            data_file_type='mzmine2', sample_in_row=None, direct_ids=None, get_mz_rt_from_feature_id=None,
+            use_gnps_id_from_AllFiles=True, cut_sample_id_sep=None,
+            mz_rt_sep=None, mz_thresh=0.02, rt_thresh=15,
+            description=None, sparse=False, *, normalize, **kwargs):
+    '''Read a mass-spec experiment.
+
+    Calour supports various ms table formats, with several preset formats (specified by the data_file_type='XXX' parameter),
+    as well as able to read user specified formats.
+
+    With the installation of the gnps-calour database interface, Calour can integrate MS2 information from GNPS into the analysis:
+
+    If the data table and the gnps file share the same IDs (preferred), GNPS annotations use the uniqueID of the features. Otherwise, calour
+    matches the features to the gnps file using an MZ and RT threshold window (specified by the mz_thresh=XXX, rt_thresh=XXX parameters).
+
+    Supported formats for ms analysis (as specified by the data_file_type='XXX' parameter) include:
+
+    * 'mzmine2': using the csv output file of mzmine2. MZ and RT are obtained via the 2nd and 3rd column in the file.
+
+    * 'biom': using a biom table for the metabolite table. featureIDs in the table (first column) can be either MZ_RT (concatenated with a separator), or a unique ID matching the gnps_file ids.
+
+    * 'openms': using a csv data table with MZ_RT or unqie ID as featureID (first column). samples can be columns (default) or rows (using the sample_in_row=True parameter)
+
+    * 'gnps-ms2': a tsv file exported from gnps, with gnps ids as featureIDs.
 
     Parameters
     ----------
     data_file : str
-        name of the OpenMS bucket table CSV file.
+        The name of the data table (mzmine2 output/bucket table/biom table) containing the per-metabolite abundances.
     sample_metadata_file : str or None (optional)
         None (default) to not load metadata per sample
-        str to specify name of sample mapping file (tsv)
+        str to specify name of sample mapping file (tsv).
+
+        Note: sample names in the bucket table and sample_metadata file must match. In case bucket table sample names contains additional
+        information, you can split them at the separator character (usually '_'), keeping only the first part, using the cut_sample_id_sep='_' parameter
+        (see below)
     gnps_file : str or None (optional)
-        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file
-        for use with the 'gnps' database in plot
+        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file, for use with the 'gnps' database.
+        This enables identification of the metabolites with known MS2 (for the interactive heatmap and sorting/filtering etc), as well as linking
+        to the gnps page for each metabolite (from the interactive heatmap - by double clicking on the metabolite database information).
+        Note: requires gnps-calour database interface module (see Calour installation instructions for details).
     feature_metadata_file : str or None (optional)
         Name of table containing additional metadata about each feature
         None (default) to not load
+    data_file_type: str, optional
+        the data file format. options include:
+
+        'mzmine2': load the mzmine2 output csv file.
+            MZ and RT are obtained from this file.
+            GNPS linking is direct via the unique id column.
+            table is csv, columns are samples.
+        'biom': load a biom table for the features
+            MZ and RT are obtained via the featureID (first column), which is assumed to be MZ_RT.
+            GNPS linking is indirect via the mz and rt threshold windows.
+            table is a tsv/json/hdf5 biom table, columns are samples.
+        'openms': load an openms output table
+            MZ and RT are obtained via the featureID (first column), which is assumed to be MZ_RT.
+            GNPS linking is indirect via the mz and rt threshold windows.
+            table is a csv table, columns are samples.
+        'gnps-ms2': load a gnps exported biom table
+            MZ and RT are obtained via the gnps_file if available, otherwise are NA
+            GNPS linking is direct via the first column (featureID).
+            table is a tsv/json/hdf5 biom table, columns are samples.
+    sample_in_row: bool or None, optional
+        False indicates rows in the data table file are features, True indicates rows are samples.
+        None to use default value according to data_file_type
+    direct_ids: bool or None, optional
+        True indicates the feature ids in the data table file are the same ids used in the gnps_file.
+        False indicates feature ids are not the same as in the gnps_file (such as when the ids are the MZ_RT)
+        None to use default value according to data_file_type
+    get_mz_rt_from_feature_id: bool or None, optional
+        True indicates the data table file feature ids contain the MZ/RT of the feature.
+        False to not obtain MZ/RT from the feature id
+        None to use default value according to data_file_type
+    use_gnps_id_from_AllFiles: bool, optional
+        True (default) to link the data table file gnps ids to the AllFiles column in the gnps_file.
+        False to link the data table file gnps ids to the 'cluster index' column in the gnps_file.
+    cut_sample_id_sep: str or None, optional
+        str (typically '_') to split the sampleID in the data table file, keeping only the first part.
+        Useful when the sampleIDs in the data table contain additional information compared to the
+        mapping file (using a '_' separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.
+        None (default) to not change the data table file sampleID
+    mz_rt_sep: str or None, optional
+        The separator character between the MZ and RT parts of the featureID (if it contains them) (usually '_').
+        If not supplied, autodetect the separator.
+        Note this is used only if get_mz_rt_from_feature_id=True
+    mz_thresh: float, optional
+        The tolerance for M/Z to match features to the gnps_file. Used only if parameter direct_ids=False.
+    rt_thresh: float, optional
+        The tolerance for retention time to match features to the gnps_file. Used only if parameter direct_ids=False.
     description : str or None (optional)
         Name of the experiment (for display purposes).
         None (default) to assign file name
     sparse : bool (optional)
         False (default) to store data as dense matrix (faster but more memory)
         True to store as sparse (CSR)
-    rows_are_samples : bool (optional)
-        True to treat csv data file rows as samples,
-        False (default) to treat csv data files rows as features
-    mz_rt_sep: str or None (optional)
-        The separator for the mz/rt fields in the feature names in data_file.
-        None (default) for autodetect
-        '_' or ' ' are typical options
     normalize : int or None
         normalize each sample to the specified reads. ``None`` to not normalize
 
@@ -432,129 +524,90 @@ def read_open_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_m
 
     Returns
     -------
-    Experiment
+    MS1Experiment
 
     See Also
     --------
     read
     '''
-    logger.debug('Reading OpenMS data (OpenMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
-    if rows_are_samples:
-        data_file_type = 'openms_transpose'
-    else:
-        data_file_type = 'openms'
+
+    default_params = {'mzmine2': {'sample_in_row': False, 'direct_ids': True, 'get_mz_rt_from_feature_id': False, 'ctype': 'csv'},
+                      'biom': {'sample_in_row': False, 'direct_ids': False, 'get_mz_rt_from_feature_id': True, 'ctype': 'biom'},
+                      'openms': {'sample_in_row': False, 'direct_ids': False, 'get_mz_rt_from_feature_id': True, 'ctype': 'csv'},
+                      'gnps-ms2': {'sample_in_row': False, 'direct_ids': True, 'get_mz_rt_from_feature_id': False, 'ctype': 'biom'}}
+
+    if data_file_type not in default_params:
+        raise ValueError('data_file_type %s not recognized. valid options are: %s' % (data_file_type, default_params.keys()))
+
+    # set the default params according to file type, if not specified by user
+    if sample_in_row is None:
+        sample_in_row = default_params[data_file_type]['sample_in_row']
+    if direct_ids is None:
+        direct_ids = default_params[data_file_type]['direct_ids']
+    if get_mz_rt_from_feature_id is None:
+        get_mz_rt_from_feature_id = default_params[data_file_type]['get_mz_rt_from_feature_id']
+
+    logger.debug('Reading MS data (data table %s, map file %s, data_file_type %s)' % (data_file, sample_metadata_file, data_file_type))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type=data_file_type, sparse=sparse,
-               normalize=normalize, cls=MS1Experiment, **kwargs)
+               data_file_type=default_params[data_file_type]['ctype'], sparse=sparse,
+               normalize=normalize, cls=MS1Experiment,
+               table_sample_id_proc=lambda x: _split_sample_ids(x, split_char=cut_sample_id_sep),
+               sample_in_row=sample_in_row, **kwargs)
 
-    exp.sample_metadata['id'] = exp.sample_metadata.index.values
-
-    # generate nice M/Z (MZ) and retention time (RT) columns for each feature
-    exp.feature_metadata['id'] = exp.feature_metadata.index.values
-
-    if mz_rt_sep is None:
-        # autodetect the mz/rt separator
-        tmp = exp.feature_metadata['id'].iloc[0].split('_')
-        if len(tmp) == 2:
-            logger.debug('Autodetcted "_" as mz/rt separator')
-            mz_rt_sep = '_'
-        else:
-            tmp = exp.feature_metadata['id'].iloc[0].split()
+    # get the MZ/RT data
+    if data_file_type == 'mzmine2':
+        if 'row m/z' not in exp.sample_metadata.index:
+            raise ValueError('Table file %s does not contain "row m/z" column. Is it an mzmine2 data table?' % data_file)
+        mzpos = exp.sample_metadata.index.get_loc('row m/z')
+        if 'row retention time' not in exp.sample_metadata.index:
+            raise ValueError('Table file %s does not contain "row retention time" column. Is it an mzmine2 data table?' % data_file)
+        rtpos = exp.sample_metadata.index.get_loc('row retention time')
+        # get the MZ and RT
+        exp.feature_metadata['MZ'] = exp.data[mzpos, :]
+        exp.feature_metadata['RT'] = exp.data[rtpos, :]
+        # drop the two columns which are not samples
+        sample_pos = np.arange(len(exp.sample_metadata))
+        sample_pos = list(set(sample_pos).difference([mzpos, rtpos]))
+        exp = exp.reorder(sample_pos)
+    if get_mz_rt_from_feature_id:
+        logger.debug('getting MZ and RT from featureIDs')
+        if direct_ids:
+            raise ValueError('Cannot get mz/rt from feature ids if direct_ids=True.')
+        # if needed, autodetect the mz/rt separator
+        if mz_rt_sep is None:
+            logger.debug('autodetecting mz/rt separator')
+            tmp = exp.feature_metadata['_feature_id'].iloc[0].split('_')
             if len(tmp) == 2:
-                logger.debug('Autodetcted " " as mz/rt separator')
-                mz_rt_sep = None
+                logger.debug('Autodetcted "_" as mz/rt separator')
+                mz_rt_sep = '_'
             else:
-                raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
+                tmp = exp.feature_metadata['_feature_id'].iloc[0].split()
+                if len(tmp) == 2:
+                    logger.debug('Autodetcted " " as mz/rt separator')
+                    mz_rt_sep = None
+                else:
+                    raise ValueError('No separator detected for mz/rt separation in feature ids. please specify separator in mz_rt_sep parameter')
+        # get the MZ/RT
+        try:
+            exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['_feature_id'].str.split(mz_rt_sep, expand=True)
+        except ValueError:
+            raise ValueError('Failed to obtain MZ/RT from feature ids. Maybe use get_mz_rt_from_feature_id=False?')
 
-    exp.feature_metadata[['MZ', 'RT']] = exp.feature_metadata['id'].str.split(mz_rt_sep, expand=True)
-    # trim the whitespaces
-    exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].str.strip()
-    exp.feature_metadata['RT'] = exp.feature_metadata['RT'].str.strip()
+        # mz and rt are numbers
+        exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].astype(float)
+        exp.feature_metadata['RT'] = exp.feature_metadata['RT'].astype(float)
+
     if gnps_file:
         # load the gnps table
         gnps_data = pd.read_table(gnps_file, sep='\t')
         exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
-        # link each feature to the gnps ids based on MZ/RT
-        exp._prepare_gnps_ids()
-        # add gnps names to the features
-        exp._prepare_gnps()
+        # use the gnpscalour database interface to get metabolite info from the gnps file
+        gnps_db = _get_database_class('gnps', exp=exp)
+        # link each feature to the gnps ids based on MZ/RT or direct_id
+        gnps_db._prepare_gnps_ids(direct_ids=direct_ids, mz_thresh=mz_thresh, use_gnps_id_from_AllFiles=use_gnps_id_from_AllFiles)
+        # add gnps names and cluster to the features as feature_metadata fields (gnps_name and gnps_cluster)
+        gnps_db._prepare_gnps_names()
 
-    return exp
-
-
-def read_gnps_ms(data_file, sample_metadata_file=None, gnps_file=None, feature_metadata_file=None,
-                 description=None, sparse=False, *, normalize, **kwargs):
-    '''Load a GNPS metabolomics experiment (exported from GNPS).
-    Parameters
-    ----------
-    data_file : str
-        name of the OpenMS bucket table CSV file.
-    sample_metadata_file : str or None, optional
-        None (default) to not load metadata per sample
-        str to specify name of sample mapping file (tsv)
-    gnps_file : str or None, optional
-        name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattri  butes/XXX.tsv file
-        for use with the 'gnps' database in plot
-    feature_metadata_file : str or None, optional
-        Name of table containing additional metadata about each feature
-        None (default) to not load
-    description : str or None, optional
-        Name of the experiment (for display purposes).
-        None (default) to assign file name
-    sparse : bool, optional
-        False (default) to store data as dense matrix (faster but more memory)
-        True to store as sparse (CSR)
-    normalize : int or None
-        normalize each sample to the specified reads. None to not normalize
-
-    Keyword Arguments
-    -----------------
-    %(io.read.parameters)s
-
-    Returns
-    -------
-    exp : ``calour.MS1Experiment``
-
-    See Also
-    --------
-    read
-    '''
-    logger.debug('Reading GnpsMS data (GnpsMS bucket table %s, map file %s)' % (data_file, sample_metadata_file))
-    data_file_type = 'gnps_ms'
-    exp = read(data_file, sample_metadata_file, feature_metadata_file,
-               data_file_type=data_file_type, sparse=sparse,
-               normalize=normalize, cls=MS1Experiment, **kwargs)
-
-    exp.sample_metadata['id'] = exp.sample_metadata.index.values
-
-    # generate nice M/Z (MZ) and retention time (RT) columns for each feature
-    exp.feature_metadata['id'] = exp.feature_metadata.index.values
-
-    if gnps_file:
-        # load the gnps table
-        gnps_data = pd.read_table(gnps_file, sep='\t', index_col='cluster index')
-        exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
-        # add gnps names to the features
-        mz_dat = {}
-        rt_dat = {}
-        for cmet in exp.feature_metadata.index.values:
-            if cmet in gnps_data.index:
-                mz_dat[cmet] = gnps_data['parent mass'][cmet]
-                rt_dat[cmet] = gnps_data['RTMean'][cmet]
-            else:
-                logger.debug('metabolite id %s not in gnps data file' % cmet)
-        exp.feature_metadata['MZ'] = pd.Series(mz_dat)
-        exp.feature_metadata['RT'] = pd.Series(rt_dat)
-        gnps_ids = {}
-        for cmet in exp.feature_metadata.index.values:
-            gnps_ids[cmet] = [gnps_data.index.get_loc(cmet)]
-        exp.feature_metadata['__calour_gnps_ids'] = pd.Series(gnps_ids)
-    else:
-        exp.feature_metadata['MZ'] = 'NA'
-        exp.feature_metadata['RT'] = 'NA'
-        exp.feature_metadata['__calour_gnps_ids'] = 'NA'
-    # Set the gnps id for each feature so gnps_calour will use it
-    exp._prepare_gnps()
     return exp
 
 
@@ -699,3 +752,25 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
                 v[add_metadata] = v[add_metadata].split(';')
         table.add_metadata(md, axis='observation')
     return table
+
+
+def _split_sample_ids(sid, split_char=None):
+    '''Split the data table sample id using the split_char returning the first split str.
+    Used in the read_ms() function, as a callable for the read() function
+
+    Parameters
+    ----------
+    sid : list of str
+        the list of sample ids to process
+    split_char: str or None, optional
+        None to not split the sampleids
+        str to split sample id using this string
+
+    Returns
+    -------
+    list of str: the split sample ids
+    '''
+    if split_char is None:
+        return sid
+    logger.info('splitting table sample ids using separator %s. use "data_table_params={\'cut_sample_id_sep\'=None}" to disable cutting.' % split_char)
+    return [x.split(split_char)[0] for x in sid]

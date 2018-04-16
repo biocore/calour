@@ -36,12 +36,18 @@ class Tests(TestCase):
         self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
         # a simple openms bucket table csv file
         self.openms_csv = join(test_data_dir, 'openms_bucket_table.csv')
+        # a simple mzmine2 output table
+        self.mzmine2_csv = join(test_data_dir, 'mzmine2_table.csv')
+        # a simple mzmine2 output table with sampleids containing additional info separated by '_'
+        self.mzmine2_with_idstr_csv = join(test_data_dir, 'mzmine2_table_with_idstr.csv')
         # a simple openms bucket table csv file with samples as rows
         self.openms_samples_rows_csv = join(test_data_dir, 'openms_bucket_table_samples_rows.csv')
         # a simple gnps data file for ms1 test data
         self.ms1_gnps = join(test_data_dir, 'ms1.gnps.txt')
         # the gnps exported data table
         self.gnps_table = join(test_data_dir, 'gnps_table.txt')
+        # a metabolomics biom table with MZ_RT in feature id. linked to same gnps_clusterinfo file as the gnps_table
+        self.ms_biom_table = join(test_data_dir, 'ms_biom_table.txt')
         # the gnps exported mapping file
         self.gnps_map = join(test_data_dir, 'gnps_map.txt')
         # the gnps per-metabolite info table (from clusterinfosummarygroup_attributes_withIDs_arbitraryattri  butes/XXX.tsv)
