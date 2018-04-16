@@ -10,7 +10,6 @@ from .._doc import ds
 
 logger = getLogger(__name__)
 
-
 @ds.with_indent(4)
 class PlotGUI_Jupyter(PlotGUI):
     '''Jupyter GUI of plotting.
@@ -88,7 +87,8 @@ class PlotGUI_Jupyter(PlotGUI):
         save_selection = ipywidgets.Button(
             description='Save',
             tooltip='Save the selection(s)')
-        # save_selection.on_click(self._save)
+        save_selection.on_click(self._save)
+
         annotate_selection = ipywidgets.Button(description='Annotate')
         annotate_selection.on_click(self._annotate)
         display(ipywidgets.HBox([print_axes_lim, save_selection, annotate_selection]))
@@ -156,6 +156,41 @@ class PlotGUI_Jupyter(PlotGUI):
 
         # from calour.annotation import annotate_bacteria_gui
         self._annotation_db.add_annotation(seqs, self.exp)
+
+
+    def _save_seqs(self, seqs, name):
+        print(name)
+        self.exp.feature_metadata[name] = False
+        self.exp.feature_metadata.loc[seqs, name] = True
+
+
+    def _save(self, button):
+        '''Save feature collection to the experiment'''
+
+        def f(a):
+            print((a))
+
+        a = ipywidgets.Text()
+
+        name = ipywidgets.interactive_output(f, {'a': a})
+
+        ui = ipywidgets.HBox([a])
+
+        display(ui)
+
+        # get the sequences of the selection
+        seqs = []
+        for cseqpos in self.selected_features.keys():
+            seqs.append(self.exp.feature_metadata.index[cseqpos])
+
+        b = ipywidgets.Button(
+            description='Save as:',
+            tooltip='Save the selection(s)')
+
+        b.on_click(self._save_seqs(seqs, name))
+
+        display(ipywidgets.HBox([b]))
+
 
     def show_info(self):
         sid, fid, abd, annt = self.get_info()
