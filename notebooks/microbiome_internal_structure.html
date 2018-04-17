@@ -81,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -328,10 +331,10 @@ div.nboutput div.output_area.stderr {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="k">as</span> <span class="nn">ca</span>
+<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="kn">as</span> <span class="nn">ca</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> notebook
 </pre></div>
 </div>
@@ -348,7 +351,12 @@ div.nboutput div.output_area.stderr {
 </div>
 <div class="section" id="Load-the-data">
 <h2>Load the data<a class="headerlink" href="#Load-the-data" title="Permalink to this headline">¶</a></h2>
-<p>we use the chronic fatigue syndrome data from XXXX</p>
+<p>we use the chronic fatigue syndrome data from:</p>
+<p>Giloteaux, L., Goodrich, J.K., Walters, W.A., Levine, S.M., Ley, R.E.
+and Hanson, M.R., 2016.</p>
+<p>Reduced diversity and altered composition of the gut microbiome in
+individuals with myalgic encephalomyelitis/chronic fatigue syndrome.</p>
+<p>Microbiome, 4(1), p.30.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [2]:
@@ -366,9 +374,9 @@ div.nboutput div.output_area.stderr {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:52:59 INFO loaded 87 samples, 2129 features
-2018-02-20 10:52:59 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
-2018-02-20 10:52:59 INFO After filtering, 87 remaining
+2018-03-04 12:36:35 INFO loaded 87 samples, 2129 features
+2018-03-04 12:36:35 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
+2018-03-04 12:36:35 INFO After filtering, 87 remaining
 </pre></div></div>
 </div>
 </div>
@@ -392,7 +400,7 @@ always corresponds to column Y in the data matrix).</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2298,7 +2306,7 @@ attribute of the experiment</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span>
 <span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
 </pre></div>
 </div>
@@ -2334,7 +2342,7 @@ attribute of the experiment</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="kc">True</span>
+<span></span><span class="n">cfs</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="bp">True</span>
 <span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
 </pre></div>
 </div>
@@ -2364,7 +2372,7 @@ the data, either as sparse or dense.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 <span class="n">dat</span>
 </pre></div>
 </div>
@@ -2389,7 +2397,7 @@ the data, either as sparse or dense.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="n">dat</span>
 </pre></div>
 </div>
@@ -2414,7 +2422,7 @@ the data, either as sparse or dense.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="n">dat</span>
 </pre></div>
 </div>
@@ -2450,7 +2458,7 @@ the data, either as sparse or dense.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="n">dat</span> <span class="ow">is</span> <span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
 </pre></div>
 </div>
@@ -2471,7 +2479,7 @@ the data, either as sparse or dense.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span></span><span class="n">dat</span> <span class="o">=</span> <span class="n">cfs</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="n">dat</span> <span class="ow">is</span> <span class="n">cfs</span><span class="o">.</span><span class="n">data</span>
 </pre></div>
 </div>

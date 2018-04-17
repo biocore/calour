@@ -1,0 +1,6 @@
+calour.plotting.plot\_core\_features
+====================================
+
+.. currentmodule:: calour.plotting
+
+.. autofunction:: plot_core_features

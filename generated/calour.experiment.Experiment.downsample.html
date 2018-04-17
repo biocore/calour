@@ -81,6 +81,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -139,7 +142,7 @@ samples/features for each categorical value of the field in
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the column in samples metadata table. This column
 should has categorical values</li>
-<li><strong>axis</strong> (<em>0</em><em>, </em><em>1</em><em>, </em><em>'s'</em><em>, or </em><em>'f'</em>) – 0 or ‘s’ (default) to filter samples; 1 or ‘f’ to filter features</li>
+<li><strong>axis</strong> (<em>0</em><em>, </em><em>1</em><em>, </em><em>'s'</em><em>, or </em><em>'f'</em><em>, </em><em>optional</em>) – 0 or ‘s’ (default) to filter samples; 1 or ‘f’ to filter features</li>
 <li><strong>num_keep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – None (default) to downsample to minimal group size.
 int : downsample to num_keep samples/features per group, drop values
 with &lt; num_keep</li>

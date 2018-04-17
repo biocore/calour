@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.split_train_test
+=============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.split_train_test

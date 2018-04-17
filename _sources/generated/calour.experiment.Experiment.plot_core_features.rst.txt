@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.plot_core_features
+===============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.plot_core_features

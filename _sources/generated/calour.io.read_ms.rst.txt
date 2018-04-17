@@ -1,0 +1,6 @@
+calour.io.read\_ms
+==================
+
+.. currentmodule:: calour.io
+
+.. autofunction:: read_ms

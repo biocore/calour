@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Creating database interfaces for Calour &#8212; calour 1.0-dev documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="calour.database.enrichment" href="generated/calour.database.enrichment.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating database interfaces for Calour</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Creating database interfaces for Calour</a><ul>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#calour-database-integration-levels">Calour database integration levels</a></li>
+<li><a class="reference internal" href="#writing-a-calour-database-interface">Writing a Calour database interface</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="creating-database-interfaces-for-calour">
+<h1>Creating database interfaces for Calour<a class="headerlink" href="#creating-database-interfaces-for-calour" title="Permalink to this headline">¶</a></h1>
+<p>Calour is designed with an extensible database interface support. In this document we will describe the steps required to integrate your database into Calour.</p>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<p>Calour handles <em>Experiments</em>, which are comprised of a <em>Sample</em> X <em>Feature</em> table. For example, in a typical deblurred 16S amplicon microbiome experiment, each feature is a unique 16S sequence observed in the samples.</p>
+<p>A <em>Database</em> contains <em>annotations</em> about features, which are keyed by the feature ID, and contain information about the features. Examples of databases (integrated into Calour) include:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://dbbact.org">dbBact</a> - contains conclusions from experiments where the bacteria were observed (i.e. this bacteria is higher in feces of people with HIV compared to healthy controls). Annotations are manually added to the database.</li>
+<li><a class="reference external" href="http://msphere.asm.org/content/2/4/e00237-17">phenoDB</a> - Phenotypic (such as motility, spores, etc.) and environmental (such as temp. and pH preference) information about bacteria (based on Hiding in Plain Sight: Mining Bacterial Species Records for Phenotypic Trait Information, Albert Barberán, Hildamarie Caceres Velazquez, Stuart Jones, Noah Fierer, DOI: 10.1128/mSphere.00237-17)</li>
+<li><a class="reference external" href="http://www.spongeemp.com/main">SpongeEMP</a> - Information about marine sponge bacteria, including typical hosts and geographic locations where this bacteria was observed.</li>
+</ul>
+<p>The <em>database interface</em> is a python module that enables the integration of the database into calour. This can include displaying information about features when they are clicked in the interactive heatmap, performing statistical analysis on the annotations for a set of features and adding database annotations to a selected set of features.</p>
+</div>
+<div class="section" id="calour-database-integration-levels">
+<h2>Calour database integration levels<a class="headerlink" href="#calour-database-integration-levels" title="Permalink to this headline">¶</a></h2>
+<p>There are several levels of database integration into calour, depending on the actions the database supports:</p>
+<p>L1. Get information about a feature: The database interface gets a unique feature identifier (i.e. the 16S amplicon sequence for the bacteria), and returns a set of strings describing the annotation for the feature. This is used for example in the interactive heatmap - when clicking on a feature, a list of strings describing this feature is shown.</p>
+<p>L2. Additional information about a feature: If supported, when double clicking an information string in the interactve heatmap, the database interface handles the GUI to display additional information about this string for the feature. For example, dbBact opens a web browser page with details about the clicked annotation.</p>
+<p>L3. Enriched analysis: if supported, given two sets of features, find database annotations that are different between the two feature sets (in a statistically significant manner). This can be accessed both via the interactive heatmap (selecting a group of features and clicking “enrichment”) compares this set of features to the rest of the features in the Experiment, or via python commands (such as Experiment.enrichment() )</p>
+<p>L4. Add Annotations: if supported, add annotations about selected features to the database. This is used for user-generated annotation databases (such as dbBact). Note that all the GUI for adding the annotation is handled by the database interface. Calour just supplies the Experiment and set of selected features to the database interface.</p>
+<p>A database interface declared what integration levels it supports. All database interfaces must at least support level L1.</p>
+</div>
+<div class="section" id="writing-a-calour-database-interface">
+<h2>Writing a Calour database interface<a class="headerlink" href="#writing-a-calour-database-interface" title="Permalink to this headline">¶</a></h2>
+<p>In order to create a new database interface, you need to write a python module containing a child class for the calour.database.Database class. In this class, overwrite the relevant functions for the integration level you are supporting. For a minimal implementation (level L1), overwrite the Database.__init__() and the Database.get_seq_annotation_strings() functions.</p>
+<p>Additionally, you’ll need to add your database to the calour.config file (located in the calour module directory). You need to add a section (named as the desired database name in calour) for your database, containing the module name and the class name for your database.</p>
+<p>Example:</p>
+<p>Say we have a fish database we want to add. We create a new module named fish_database, that contains the FishDatabase class (derived from calour.Database). We want to access this database in calour using the name “fishdb”.</p>
+<p>In the fish_database.py:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">calour.database</span> <span class="kn">import</span> <span class="n">Database</span>
+
+<span class="k">class</span> <span class="nc">FishDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+      <span class="c1"># we provide methods=[&#39;get&#39;] since this database only supports L1 integration</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">exp</span><span class="o">=</span><span class="n">exp</span><span class="p">,</span> <span class="n">database_name</span><span class="o">=</span><span class="s1">&#39;fishdb&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;get&#39;</span><span class="p">])</span>
+
+      <span class="c1"># and do some database specific setup...</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">fish_database</span> <span class="o">=</span> <span class="n">READ_THE_DATABASE_TABLE</span><span class="p">()</span>
+
+   <span class="k">def</span> <span class="nf">get_seq_annotation_strings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">):</span>
+     <span class="sd">&#39;&#39;&#39;Get nice string summaries of annotations for a given sequence</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">     ----------</span>
+<span class="sd">     feature : str</span>
+<span class="sd">         the feature unique identifier</span>
+
+<span class="sd">     Returns</span>
+<span class="sd">     -------</span>
+<span class="sd">     shortdesc : list of (dict,str) (annotationdetails,annotationsummary)</span>
+<span class="sd">         a list of:</span>
+<span class="sd">             annotationdetails : dict</span>
+<span class="sd">                 &#39;seqid&#39; : str, the sequence annotated</span>
+<span class="sd">                 &#39;annotationtype : str</span>
+<span class="sd">                 ...(additional keys/values if needed for the database interface use)</span>
+<span class="sd">             annotationsummary : str</span>
+<span class="sd">                 a short summary of the annotation</span>
+<span class="sd">     &#39;&#39;&#39;</span>
+     <span class="n">shortdesc</span> <span class="o">=</span> <span class="p">[]</span>
+
+     <span class="c1"># get all annotations from the database and add to the description list</span>
+     <span class="k">for</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">GET_DATABASE_ANNOTATIONS</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+             <span class="n">shortdesc</span><span class="o">.</span><span class="n">append</span><span class="p">(({</span><span class="s1">&#39;annotationtype&#39;</span><span class="p">:</span> <span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">:</span> <span class="n">feature</span><span class="p">},</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">annotation</span><span class="p">))</span>
+
+     <span class="k">return</span> <span class="n">shortdesc</span>
+</pre></div>
+</div>
+<p>In the calour.config file we will add the following section:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fishdb</span><span class="p">]</span>
+<span class="n">module_name</span> <span class="o">=</span> <span class="n">fish_database</span>
+<span class="n">class_name</span> <span class="o">=</span> <span class="n">FishDatabase</span>
+</pre></div>
+</div>
+<p>and thats it.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

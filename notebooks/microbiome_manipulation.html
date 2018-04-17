@@ -81,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -320,7 +323,7 @@ sample metadata</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="k">as</span> <span class="nn">ca</span>
+<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="kn">as</span> <span class="nn">ca</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
 <span class="o">%</span><span class="k">matplotlib</span> notebook
 </pre></div>
@@ -339,7 +342,12 @@ sample metadata</p>
 <div class="section" id="Load-the-data">
 <h2>Load the data<a class="headerlink" href="#Load-the-data" title="Permalink to this headline">¶</a></h2>
 <p>we use two datasets:</p>
-<p>the Chronic faitigue syndrome data from XXXX</p>
+<p>the Chronic faitigue syndrome data from:</p>
+<p>Giloteaux, L., Goodrich, J.K., Walters, W.A., Levine, S.M., Ley, R.E.
+and Hanson, M.R., 2016.</p>
+<p>Reduced diversity and altered composition of the gut microbiome in
+individuals with myalgic encephalomyelitis/chronic fatigue syndrome.</p>
+<p>Microbiome, 4(1), p.30.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [2]:
@@ -357,9 +365,9 @@ sample metadata</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:54:54 INFO loaded 87 samples, 2129 features
-2018-02-20 10:54:54 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
-2018-02-20 10:54:54 INFO After filtering, 87 remaining
+2018-03-04 12:38:34 INFO loaded 87 samples, 2129 features
+2018-03-04 12:38:34 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
+2018-03-04 12:38:34 INFO After filtering, 87 remaining
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -368,7 +376,7 @@ sample metadata</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -380,7 +388,12 @@ sample metadata</p>
 AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 2129 features
 </pre></div></div>
 </div>
-<p>Moving pictures dataset (from XXXX)</p>
+<p>Moving pictures dataset. from:</p>
+<p>Caporaso, J.G., Lauber, C.L., Costello, E.K., Berg-Lyons, D., Gonzalez,
+A., Stombaugh, J., Knights, D., Gajer, P., Ravel, J., Fierer, N. and
+Gordon, J.I., 2011.</p>
+<p>Moving pictures of the human microbiome.</p>
+<p>Genome biology, 12(5), p.R50.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [4]:
@@ -398,8 +411,8 @@ AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 21
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:54:56 INFO loaded 1968 samples, 7056 features
-2018-02-20 10:54:56 INFO After filtering, 1967 remaining
+2018-03-04 12:38:36 INFO loaded 1968 samples, 7056 features
+2018-03-04 12:38:37 INFO After filtering, 1967 remaining
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -408,7 +421,7 @@ AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 21
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">movpic</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">movpic</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -432,7 +445,7 @@ field.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">cfs</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">cfs</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -461,7 +474,7 @@ False
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">cfs</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">cfs</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -496,7 +509,7 @@ individual, and within each individual to be sorted by timepoint</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">movpic</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;DAYS_SINCE_EXPERIMENT_START&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">movpic</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;DAYS_SINCE_EXPERIMENT_START&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -514,7 +527,7 @@ False
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">movpic</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;HOST_SUBJECT_ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">movpic</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;HOST_SUBJECT_ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -540,7 +553,7 @@ metadata field.</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">tt</span><span class="o">=</span><span class="n">movpic</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="s1">&#39;HOST_SUBJECT_ID&#39;</span><span class="p">,</span><span class="s1">&#39;F4&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">movpic</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">movpic</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -565,7 +578,7 @@ AmpliconExperiment (&#34;moving_pic.biom&#34;) with 534 samples, 7056 features
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">movpic</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;BODY_HABITAT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">movpic</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;BODY_HABITAT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -584,7 +597,7 @@ AmpliconExperiment (&#34;moving_pic.biom&#34;) with 534 samples, 7056 features
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">yy</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="s1">&#39;BODY_HABITAT&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;UBERON:skin&#39;</span><span class="p">,</span> <span class="s1">&#39;UBERON:feces&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -607,8 +620,8 @@ AmpliconExperiment (&#34;moving_pic.biom&#34;) with 399 samples, 7056 features
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">yy</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="s1">&#39;BODY_HABITAT&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;UBERON:skin&#39;</span><span class="p">,</span> <span class="s1">&#39;UBERON:feces&#39;</span><span class="p">],</span> <span class="n">negate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
+<span></span><span class="n">yy</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="s1">&#39;BODY_HABITAT&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;UBERON:skin&#39;</span><span class="p">,</span> <span class="s1">&#39;UBERON:feces&#39;</span><span class="p">],</span> <span class="n">negate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -638,7 +651,7 @@ high frequency.</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">tt</span><span class="o">=</span><span class="n">cfs</span><span class="o">.</span><span class="n">filter_abundance</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -647,7 +660,7 @@ high frequency.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:55:06 INFO After filtering, 766 remaining
+2018-03-04 12:38:44 INFO After filtering, 766 remaining
 * original:
 AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 2129 features
 
@@ -666,8 +679,8 @@ parameter)</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tt</span><span class="o">=</span><span class="n">cfs</span><span class="o">.</span><span class="n">filter_abundance</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span><span class="n">tt</span><span class="p">))</span>
+<span></span><span class="n">tt</span><span class="o">=</span><span class="n">cfs</span><span class="o">.</span><span class="n">filter_abundance</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span><span class="n">tt</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -676,7 +689,7 @@ parameter)</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:55:07 INFO After filtering, 1363 remaining
+2018-03-04 12:38:45 INFO After filtering, 1363 remaining
 * original:
 AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 2129 features
 
@@ -698,7 +711,7 @@ present.</p>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># remove bacteria present in less than half of the samples</span>
 <span class="n">tt</span><span class="o">=</span><span class="n">cfs</span><span class="o">.</span><span class="n">filter_prevalence</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -707,7 +720,7 @@ present.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:55:08 INFO After filtering, 128 remaining
+2018-03-04 12:38:46 INFO After filtering, 128 remaining
 * original:
 AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 2129 features
 
@@ -728,7 +741,7 @@ desired threshold.</p>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># keep only high frequency bacteria (mean over all samples &gt; 1%)</span>
 <span class="n">tt</span><span class="o">=</span><span class="n">cfs</span><span class="o">.</span><span class="n">filter_mean</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;* original:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">* filtered:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -737,7 +750,7 @@ desired threshold.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:55:09 INFO After filtering, 19 remaining
+2018-03-04 12:38:47 INFO After filtering, 19 remaining
 * original:
 AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 2129 features
 

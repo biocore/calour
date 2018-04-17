@@ -81,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -146,21 +149,7 @@ to keep it. Default is 0.01 - keep features with mean abundance &gt;=1% of mean 
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Keyword Arguments:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body"><ul class="first simple">
-<li><strong>predicate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#callable" title="(in Python v3.8)"><em>callable</em></a>) – <p>The callable accepts a list of numeric and return a bool. Alternatively
-it also accepts the following strings:</p>
-<ul>
-<li>’sum_abundance’: calls <code class="docutils literal notranslate"><span class="pre">_sum_abundance</span></code>,</li>
-<li>’freq_ratio’: calls <code class="docutils literal notranslate"><span class="pre">_freq_ratio</span></code>,</li>
-<li>’unique_cut’: calls <code class="docutils literal notranslate"><span class="pre">_unique_cut</span></code>,</li>
-<li>’mean_abundance’: calls <code class="docutils literal notranslate"><span class="pre">_mean_abundance</span></code>,</li>
-<li>’prevalence’: calls <code class="docutils literal notranslate"><span class="pre">_prevalence</span></code></li>
-</ul>
-</li>
-<li><strong>axis</strong> (<em>0</em><em>, </em><em>1</em><em>, </em><em>'s'</em><em>, or </em><em>'f'</em><em>, </em><em>optional</em>) – Apply predicate on each row (samples) (0) or each column (features) (1)</li>
-<li><strong>negate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – negate the predicate for selection</li>
-<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – keyword argument passing to predicate function</li>
-</ul>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first"><strong>negate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – negate the predicate for selection</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>

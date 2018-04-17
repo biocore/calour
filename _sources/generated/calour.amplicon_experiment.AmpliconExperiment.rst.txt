@@ -32,6 +32,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
          
          
+            ~AmpliconExperiment.add_sample_metadata_as_features
+         
             ~AmpliconExperiment.add_terms_to_features
          
             ~AmpliconExperiment.aggregate_by_metadata
@@ -45,6 +47,8 @@ calour.amplicon_experiment.AmpliconExperiment
             ~AmpliconExperiment.cluster_features
          
             ~AmpliconExperiment.collapse_taxonomy
+         
+            ~AmpliconExperiment.collect_cv_prediction
          
             ~AmpliconExperiment.copy
          
@@ -80,6 +84,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.filter_taxonomy
          
+            ~AmpliconExperiment.find_lowest_taxonomy
+         
             ~AmpliconExperiment.from_pandas
          
             ~AmpliconExperiment.get_data
@@ -88,7 +94,11 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.join_experiments
          
+            ~AmpliconExperiment.join_experiments_featurewise
+         
             ~AmpliconExperiment.join_metadata_fields
+         
+            ~AmpliconExperiment.learning_curve_depths
          
             ~AmpliconExperiment.log_n
          
@@ -98,11 +108,11 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.normalize_compositional
          
-            ~AmpliconExperiment.onehot_encode_features
-         
             ~AmpliconExperiment.plot
          
             ~AmpliconExperiment.plot_abund_prevalence
+         
+            ~AmpliconExperiment.plot_core_features
          
             ~AmpliconExperiment.plot_diff_abundance_enrichment
          
@@ -111,8 +121,6 @@ calour.amplicon_experiment.AmpliconExperiment
             ~AmpliconExperiment.plot_hist
          
             ~AmpliconExperiment.plot_scatter_matrix
-         
-            ~AmpliconExperiment.plot_shareness
          
             ~AmpliconExperiment.plot_stacked_bar
          
@@ -147,6 +155,8 @@ calour.amplicon_experiment.AmpliconExperiment
             ~AmpliconExperiment.sort_taxonomy
          
             ~AmpliconExperiment.split_taxonomy
+         
+            ~AmpliconExperiment.split_train_test
          
             ~AmpliconExperiment.subsample_count
          

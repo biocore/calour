@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.join_experiments_featurewise
+=========================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.join_experiments_featurewise

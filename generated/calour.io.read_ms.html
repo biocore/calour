@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>calour.io.read_ms &#8212; calour 1.0-dev documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="calour.io.save" href="calour.io.save.html" />
+    <link rel="prev" title="calour.io.read_amplicon" href="calour.io.read_amplicon.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+  
+  <a href="https://github.com/biocore/calour"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          calour docs</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">General Calour concepts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_microbiome.html">Microbiome tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_metabolome.html">Metabolome tutorials</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">calour.io.read_ms</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="calour-io-read-ms">
+<h1>calour.io.read_ms<a class="headerlink" href="#calour-io-read-ms" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="calour.io.read_ms">
+<code class="descclassname">calour.io.</code><code class="descname">read_ms</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>feature_metadata_file=None</em>, <em>gnps_file=None</em>, <em>data_file_type='mzmine2'</em>, <em>sample_in_row=None</em>, <em>direct_ids=None</em>, <em>get_mz_rt_from_feature_id=None</em>, <em>use_gnps_id_from_AllFiles=True</em>, <em>cut_sample_id_sep=None</em>, <em>mz_rt_sep=None</em>, <em>mz_thresh=0.02</em>, <em>rt_thresh=15</em>, <em>description=None</em>, <em>sparse=False</em>, <em>*</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/io.py#L421"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read_ms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a mass-spec experiment.</p>
+<p>Calour supports various ms table formats, with several preset formats (specified by the data_file_type=’XXX’ parameter),
+as well as able to read user specified formats.</p>
+<p>With the installation of the gnps-calour database interface, Calour can integrate MS2 information from GNPS into the analysis:</p>
+<p>If the data table and the gnps file share the same IDs (preferred), GNPS annotations use the uniqueID of the features. Otherwise, calour
+matches the features to the gnps file using an MZ and RT threshold window (specified by the mz_thresh=XXX, rt_thresh=XXX parameters).</p>
+<p>Supported formats for ms analysis (as specified by the data_file_type=’XXX’ parameter) include:</p>
+<ul class="simple">
+<li>‘mzmine2’: using the csv output file of mzmine2. MZ and RT are obtained via the 2nd and 3rd column in the file.</li>
+<li>‘biom’: using a biom table for the metabolite table. featureIDs in the table (first column) can be either MZ_RT (concatenated with a separator), or a unique ID matching the gnps_file ids.</li>
+<li>‘openms’: using a csv data table with MZ_RT or unqie ID as featureID (first column). samples can be columns (default) or rows (using the sample_in_row=True parameter)</li>
+<li>‘gnps-ms2’: a tsv file exported from gnps, with gnps ids as featureIDs.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the data table (mzmine2 output/bucket table/biom table) containing the per-metabolite abundances.</li>
+<li><strong>sample_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – <p>None (default) to not load metadata per sample
+str to specify name of sample mapping file (tsv).</p>
+<p>Note: sample names in the bucket table and sample_metadata file must match. In case bucket table sample names contains additional
+information, you can split them at the separator character (usually ‘_’), keeping only the first part, using the cut_sample_id_sep=’_’ parameter
+(see below)</p>
+</li>
+<li><strong>gnps_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file, for use with the ‘gnps’ database.
+This enables identification of the metabolites with known MS2 (for the interactive heatmap and sorting/filtering etc), as well as linking
+to the gnps page for each metabolite (from the interactive heatmap - by double clicking on the metabolite database information).
+Note: requires gnps-calour database interface module (see Calour installation instructions for details).</li>
+<li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – Name of table containing additional metadata about each feature
+None (default) to not load</li>
+<li><strong>data_file_type</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – <p>the data file format. options include:</p>
+<dl class="docutils">
+<dt>’mzmine2’: load the mzmine2 output csv file.</dt>
+<dd>MZ and RT are obtained from this file.
+GNPS linking is direct via the unique id column.
+table is csv, columns are samples.</dd>
+<dt>’biom’: load a biom table for the features</dt>
+<dd>MZ and RT are obtained via the featureID (first column), which is assumed to be MZ_RT.
+GNPS linking is indirect via the mz and rt threshold windows.
+table is a tsv/json/hdf5 biom table, columns are samples.</dd>
+<dt>’openms’: load an openms output table</dt>
+<dd>MZ and RT are obtained via the featureID (first column), which is assumed to be MZ_RT.
+GNPS linking is indirect via the mz and rt threshold windows.
+table is a csv table, columns are samples.</dd>
+<dt>’gnps-ms2’: load a gnps exported biom table</dt>
+<dd>MZ and RT are obtained via the gnps_file if available, otherwise are NA
+GNPS linking is direct via the first column (featureID).
+table is a tsv/json/hdf5 biom table, columns are samples.</dd>
+</dl>
+</li>
+<li><strong>sample_in_row</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – False indicates rows in the data table file are features, True indicates rows are samples.
+None to use default value according to data_file_type</li>
+<li><strong>direct_ids</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – True indicates the feature ids in the data table file are the same ids used in the gnps_file.
+False indicates feature ids are not the same as in the gnps_file (such as when the ids are the MZ_RT)
+None to use default value according to data_file_type</li>
+<li><strong>get_mz_rt_from_feature_id</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – True indicates the data table file feature ids contain the MZ/RT of the feature.
+False to not obtain MZ/RT from the feature id
+None to use default value according to data_file_type</li>
+<li><strong>use_gnps_id_from_AllFiles</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – True (default) to link the data table file gnps ids to the AllFiles column in the gnps_file.
+False to link the data table file gnps ids to the ‘cluster index’ column in the gnps_file.</li>
+<li><strong>cut_sample_id_sep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – str (typically ‘_’) to split the sampleID in the data table file, keeping only the first part.
+Useful when the sampleIDs in the data table contain additional information compared to the
+mapping file (using a ‘_’ separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.
+None (default) to not change the data table file sampleID</li>
+<li><strong>mz_rt_sep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The separator character between the MZ and RT parts of the featureID (if it contains them) (usually ‘_’).
+If not supplied, autodetect the separator.
+Note this is used only if get_mz_rt_from_feature_id=True</li>
+<li><strong>mz_thresh</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The tolerance for M/Z to match features to the gnps_file. Used only if parameter direct_ids=False.</li>
+<li><strong>rt_thresh</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The tolerance for retention time to match features to the gnps_file. Used only if parameter direct_ids=False.</li>
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – Name of the experiment (for display purposes).
+None (default) to assign file name</li>
+<li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> (</em><em>optional</em><em>)</em>) – False (default) to store data as dense matrix (faster but more memory)
+True to store as sparse (CSR)</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – normalize each sample to the specified reads. <code class="docutils literal notranslate"><span class="pre">None</span></code> to not normalize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Keyword Arguments:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><ul class="first simple">
+<li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – file path to the biom table.</li>
+<li><strong>sample_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to just use sample names (no additional metadata).
+if not None, file path to the sample metadata (aka mapping file in QIIME).</li>
+<li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – file path to the feature metadata.</li>
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – description of the experiment</li>
+<li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – read the biom table into sparse or dense array</li>
+<li><strong>data_file_type</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – the data_file format. options:
+‘biom’ : a biom table (biom-format.org) (default)
+‘tsv’: a tab-separated table with (samples in column and feature in row)
+‘openms’ : an OpenMS bucket table csv (rows are feature, columns are samples)
+‘openms_transpose’ an OpenMS bucket table csv (columns are feature, rows are samples)
+‘gnps_ms’ : an OpenMS bucket table tsv with samples as columns (exported from GNPS)
+‘qiime2’ : a qiime2 biom table artifact (need to have qiime2 installed)</li>
+<li><strong>feature_metadata_kwargs</strong> (<em>sample_metadata_kwargs</em><em>,</em>) – keyword arguments passing to <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_table.html#pandas.read_table" title="(in pandas v0.22.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.read_table()</span></code></a> when reading sample metadata
+or feature metadata. For example, you can set <code class="docutils literal notranslate"><span class="pre">sample_metadata_kwargs={'dtype':</span>
+<span class="pre">{'ph':</span> <span class="pre">int},</span> <span class="pre">'encoding':</span> <span class="pre">'latin-8'}</span></code> to read the column of ph in the sample metadata
+as int and parse the file as latin-8 instead of utf-8. By default, it assumes the first column in
+the metadata files is sample/feature IDs and is read in as row index. To avoid this, please provide
+{‘index_col’: False}.</li>
+<li><strong>cls</strong> (<code class="docutils literal notranslate"><span class="pre">class</span></code>, optional) – what class object to read the data into (<a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> by default)</li>
+<li><strong>table_sample_id_proc</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#callable" title="(in Python v3.8)"><em>callable</em></a><em>, </em><em>optional</em>) – </li>
+<li><strong>table_feature_id_proc</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#callable" title="(in Python v3.8)"><em>callable</em></a><em>, </em><em>optional</em>) – if not None, modify each sample/feature id in the table using the callable function.
+The callable accepts a list of str and returns a list of str (sample/feature ids after processing).
+Useful in metabolomics experiments, where the sampleIDs in the data table contain additional information compared to the
+mapping file (using a ‘_’ separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.</li>
+<li><strong>sample_in_row</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – False if data table columns are sample, True if rows are samples</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – normalize each sample to the specified read count. <code class="docutils literal notranslate"><span class="pre">None</span></code> to not normalize</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">MS1Experiment</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="calour.io.read.html#calour.io.read" title="calour.io.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2018, calour development team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

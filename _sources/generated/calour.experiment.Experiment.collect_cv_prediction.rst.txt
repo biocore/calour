@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.collect_cv_prediction
+==================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.collect_cv_prediction

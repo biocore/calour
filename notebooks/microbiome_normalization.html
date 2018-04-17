@@ -81,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -316,10 +319,10 @@ the reads (i.e. TSS, rarefaction, compositionality correction, etc).</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="k">as</span> <span class="nn">ca</span>
+<span></span><span class="kn">import</span> <span class="nn">calour</span> <span class="kn">as</span> <span class="nn">ca</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> notebook
 </pre></div>
 </div>
@@ -336,7 +339,12 @@ the reads (i.e. TSS, rarefaction, compositionality correction, etc).</p>
 </div>
 <div class="section" id="Load-the-data">
 <h2>Load the data<a class="headerlink" href="#Load-the-data" title="Permalink to this headline">¶</a></h2>
-<p>we use the chronic fatigue syndrome data from XXXX</p>
+<p>we use the chronic fatigue syndrome data from:</p>
+<p>Giloteaux, L., Goodrich, J.K., Walters, W.A., Levine, S.M., Ley, R.E.
+and Hanson, M.R., 2016.</p>
+<p>Reduced diversity and altered composition of the gut microbiome in
+individuals with myalgic encephalomyelitis/chronic fatigue syndrome.</p>
+<p>Microbiome, 4(1), p.30.</p>
 <div class="section" id="Standard-load-with-TSS-normalization">
 <h3>Standard load with TSS normalization<a class="headerlink" href="#Standard-load-with-TSS-normalization" title="Permalink to this headline">¶</a></h3>
 <p>for each sample we normalize to 10000 reads/sample.</p>
@@ -370,9 +378,9 @@ discretization effect in samples with low number of reads.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:56:05 INFO loaded 87 samples, 2129 features
-2018-02-20 10:56:05 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
-2018-02-20 10:56:05 INFO After filtering, 87 remaining
+2018-03-04 12:39:25 INFO loaded 87 samples, 2129 features
+2018-03-04 12:39:25 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
+2018-03-04 12:39:25 INFO After filtering, 87 remaining
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -381,7 +389,7 @@ discretization effect in samples with low number of reads.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">cfs_normalized</span><span class="p">)</span>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">cfs_normalized</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -400,7 +408,7 @@ AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 21
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cfs_normalized</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span></span><span class="n">cfs_normalized</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1251,7 +1259,7 @@ of bacteria in the sample.</p>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">cfs_not_normalized</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">read_amplicon</span><span class="p">(</span><span class="s1">&#39;data/chronic-fatigue-syndrome.biom&#39;</span><span class="p">,</span>
                                     <span class="s1">&#39;data/chronic-fatigue-syndrome.sample.txt&#39;</span><span class="p">,</span>
-                                     <span class="n">normalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">min_reads</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+                                     <span class="n">normalize</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">min_reads</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1260,9 +1268,9 @@ of bacteria in the sample.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:56:08 INFO loaded 87 samples, 2129 features
-2018-02-20 10:56:08 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
-2018-02-20 10:56:08 INFO After filtering, 87 remaining
+2018-03-04 12:39:29 INFO loaded 87 samples, 2129 features
+2018-03-04 12:39:29 WARNING These have metadata but do not have data - dropped: {&#39;ERR1331814&#39;}
+2018-03-04 12:39:29 INFO After filtering, 87 remaining
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1271,7 +1279,7 @@ of bacteria in the sample.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">cfs_not_normalized</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span></span><span class="n">cfs_not_normalized</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1319,7 +1327,7 @@ of bacteria in the sample.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tt</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span></span><span class="n">tt</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1371,10 +1379,10 @@ between healthy and sick</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:56:12 INFO 87 samples with both values
-2018-02-20 10:56:12 INFO After filtering, 2129 remaining
-2018-02-20 10:56:12 INFO 39 samples with value 1 ([&#39;Control&#39;])
-2018-02-20 10:56:13 INFO method meandiff. number of higher in [&#39;Control&#39;] : 34. number of higher in [&#39;Patient&#39;] : 18. total 52
+2018-03-04 12:39:36 INFO 87 samples with both values
+2018-03-04 12:39:36 INFO After filtering, 2129 remaining
+2018-03-04 12:39:36 INFO 39 samples with value 1 ([&#39;Control&#39;])
+2018-03-04 12:39:38 INFO method meandiff. number of higher in [&#39;Control&#39;] : 34. number of higher in [&#39;Patient&#39;] : 18. total 52
 </pre></div></div>
 </div>
 <div class="section" id="Effect-of-a-high-frequency-artificial-bacteria">
@@ -1389,7 +1397,7 @@ between healthy and sick</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">tt</span><span class="o">=</span><span class="n">cfs_normalized</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">tt</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">tt</span><span class="o">.</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span>
 
 <span class="n">tt</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">tt</span><span class="o">.</span><span class="n">sample_metadata</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;Control&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50000</span>
 <span class="n">tt</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
@@ -1411,10 +1419,10 @@ between healthy and sick</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:56:16 INFO 87 samples with both values
-2018-02-20 10:56:16 INFO After filtering, 2129 remaining
-2018-02-20 10:56:16 INFO 39 samples with value 1 ([&#39;Control&#39;])
-2018-02-20 10:56:17 INFO method meandiff. number of higher in [&#39;Control&#39;] : 27. number of higher in [&#39;Patient&#39;] : 68. total 95
+2018-03-04 12:39:38 INFO 87 samples with both values
+2018-03-04 12:39:38 INFO After filtering, 2129 remaining
+2018-03-04 12:39:38 INFO 39 samples with value 1 ([&#39;Control&#39;])
+2018-03-04 12:39:39 INFO method meandiff. number of higher in [&#39;Control&#39;] : 27. number of higher in [&#39;Patient&#39;] : 68. total 95
 </pre></div></div>
 </div>
 <p>We get more bacteria which are higher in ‘Patient’ since bacteria 0 is
@@ -1437,8 +1445,8 @@ now very high in controls, and data is TSS normalized</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:56:17 INFO After filtering, 2 remaining
-2018-02-20 10:56:17 INFO ignoring 2 features
+2018-03-04 12:39:39 INFO After filtering, 2 remaining
+2018-03-04 12:39:39 INFO ignoring 2 features
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1456,10 +1464,10 @@ now very high in controls, and data is TSS normalized</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2018-02-20 10:56:18 INFO 87 samples with both values
-2018-02-20 10:56:18 INFO After filtering, 2129 remaining
-2018-02-20 10:56:18 INFO 39 samples with value 1 ([&#39;Control&#39;])
-2018-02-20 10:56:19 INFO method meandiff. number of higher in [&#39;Control&#39;] : 35. number of higher in [&#39;Patient&#39;] : 19. total 54
+2018-03-04 12:39:39 INFO 87 samples with both values
+2018-03-04 12:39:39 INFO After filtering, 2129 remaining
+2018-03-04 12:39:39 INFO 39 samples with value 1 ([&#39;Control&#39;])
+2018-03-04 12:39:41 INFO method meandiff. number of higher in [&#39;Control&#39;] : 35. number of higher in [&#39;Patient&#39;] : 19. total 54
 </pre></div></div>
 </div>
 <p>so we reduced the inflation of false differentially abundant bacteria
@@ -1500,7 +1508,7 @@ also contain the ignored features).</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tt</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span></span><span class="n">tt</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

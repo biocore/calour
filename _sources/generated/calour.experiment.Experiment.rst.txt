@@ -32,6 +32,8 @@ calour.experiment.Experiment
          
          
          
+            ~Experiment.add_sample_metadata_as_features
+         
             ~Experiment.add_terms_to_features
          
             ~Experiment.aggregate_by_metadata
@@ -43,6 +45,8 @@ calour.experiment.Experiment
             ~Experiment.cluster_data
          
             ~Experiment.cluster_features
+         
+            ~Experiment.collect_cv_prediction
          
             ~Experiment.copy
          
@@ -80,6 +84,8 @@ calour.experiment.Experiment
          
             ~Experiment.join_experiments
          
+            ~Experiment.join_experiments_featurewise
+         
             ~Experiment.join_metadata_fields
          
             ~Experiment.log_n
@@ -90,11 +96,11 @@ calour.experiment.Experiment
          
             ~Experiment.normalize_compositional
          
-            ~Experiment.onehot_encode_features
-         
             ~Experiment.plot
          
             ~Experiment.plot_abund_prevalence
+         
+            ~Experiment.plot_core_features
          
             ~Experiment.plot_diff_abundance_enrichment
          
@@ -103,8 +109,6 @@ calour.experiment.Experiment
             ~Experiment.plot_hist
          
             ~Experiment.plot_scatter_matrix
-         
-            ~Experiment.plot_shareness
          
             ~Experiment.plot_stacked_bar
          
@@ -135,6 +139,8 @@ calour.experiment.Experiment
             ~Experiment.sort_ids
          
             ~Experiment.sort_samples
+         
+            ~Experiment.split_train_test
          
             ~Experiment.subsample_count
          

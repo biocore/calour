@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="calour.filtering.filter_by_data" href="generated/calour.filtering.filter_by_data.html" />
-    <link rel="prev" title="calour.plotting.plot_abund_prevalence" href="generated/calour.plotting.plot_abund_prevalence.html" />
+    <link rel="prev" title="calour.plotting.plot_scatter_matrix" href="generated/calour.plotting.plot_scatter_matrix.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -80,6 +80,9 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">Using Calour functions via the module and the Experiment class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="database_interface.html">Creating database interfaces for Calour</a></li>
 </ul>
 </ul>
 </li>
@@ -146,7 +149,7 @@
 <td>Shortcut for filtering samples.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/calour.filtering.filter_ids.html#calour.filtering.filter_ids" title="calour.filtering.filter_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_ids</span></code></a>(exp,&nbsp;ids[,&nbsp;axis,&nbsp;negate,&nbsp;inplace])</td>
-<td>Filter samples or features based on a list index values</td>
+<td>Filter samples or features based on a list IDs.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/calour.filtering.filter_mean.html#calour.filtering.filter_mean" title="calour.filtering.filter_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_mean</span></code></a>(exp[,&nbsp;cutoff])</td>
 <td>Filter features with a mean at least cutoff of the mean total abundance/sample</td>
@@ -159,6 +162,9 @@
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/calour.filtering.filter_sample_categories.html#calour.filtering.filter_sample_categories" title="calour.filtering.filter_sample_categories"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_sample_categories</span></code></a>(exp,&nbsp;field[,&nbsp;…])</td>
 <td>Filter sample categories that have too few samples.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/calour.filtering.downsample.html#calour.filtering.downsample" title="calour.filtering.downsample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">downsample</span></code></a>(exp,&nbsp;field[,&nbsp;axis,&nbsp;num_keep,&nbsp;inplace])</td>
+<td>Downsample the data set.</td>
 </tr>
 </tbody>
 </table>

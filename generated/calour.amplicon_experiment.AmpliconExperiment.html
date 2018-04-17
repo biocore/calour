@@ -81,6 +81,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -154,7 +157,7 @@ are in row and features in column</li>
 <li><strong>sample_metadata</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – The metadata on the samples</li>
 <li><strong>feature_metadata</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – The metadata on the features</li>
 <li><strong>exp_metadata</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – metadata about the experiment (data md5, filenames, etc.)</li>
-<li><a class="reference internal" href="calour.experiment.Experiment.shape.html#calour.experiment.Experiment.shape" title="calour.experiment.Experiment.shape"><strong>shape</strong></a> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the dimension of data</li>
+<li><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.shape.html#calour.amplicon_experiment.AmpliconExperiment.shape" title="calour.amplicon_experiment.AmpliconExperiment.shape"><strong>shape</strong></a> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the dimension of data</li>
 <li><a class="reference internal" href="calour.experiment.Experiment.sparse.html#calour.experiment.Experiment.sparse" title="calour.experiment.Experiment.sparse"><strong>sparse</strong></a> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – store the data as sparse matrix (scipy.sparse.csr_matrix) or dense numpy array.</li>
 <li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of the experiment</li>
 </ul>
@@ -184,26 +187,32 @@ are in row and features in column</li>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.__repr__.html#calour.amplicon_experiment.AmpliconExperiment.__repr__" title="calour.amplicon_experiment.AmpliconExperiment.__repr__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repr(ae)</span></code></a></td>
 <td>Return a string representation of this object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features.html#calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features" title="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_terms_to_features</span></code></a>(dbname[,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.add_sample_metadata_as_features.html#calour.amplicon_experiment.AmpliconExperiment.add_sample_metadata_as_features" title="calour.amplicon_experiment.AmpliconExperiment.add_sample_metadata_as_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_sample_metadata_as_features</span></code></a>(fields[,&nbsp;…])</td>
+<td>Add covariates from sample metadata to the data table as features for machine learning.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features.html#calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features" title="calour.amplicon_experiment.AmpliconExperiment.add_terms_to_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_terms_to_features</span></code></a>(dbname[,&nbsp;…])</td>
 <td>Add a field to the feature metadata, with most common term for each feature</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate_by_metadata</span></code></a>(field[,&nbsp;agg,&nbsp;axis,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata.html#calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata" title="calour.amplicon_experiment.AmpliconExperiment.aggregate_by_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate_by_metadata</span></code></a>(field[,&nbsp;agg,&nbsp;axis,&nbsp;…])</td>
 <td>aggregate all samples/features that have the same value in the given field.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.binarize.html#calour.amplicon_experiment.AmpliconExperiment.binarize" title="calour.amplicon_experiment.AmpliconExperiment.binarize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binarize</span></code></a>([threshold,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.binarize.html#calour.amplicon_experiment.AmpliconExperiment.binarize" title="calour.amplicon_experiment.AmpliconExperiment.binarize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binarize</span></code></a>([threshold,&nbsp;inplace])</td>
 <td>Binarize the data with a threshold.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.center_log.html#calour.amplicon_experiment.AmpliconExperiment.center_log" title="calour.amplicon_experiment.AmpliconExperiment.center_log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center_log</span></code></a>([method,&nbsp;centralize,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.center_log.html#calour.amplicon_experiment.AmpliconExperiment.center_log" title="calour.amplicon_experiment.AmpliconExperiment.center_log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center_log</span></code></a>([method,&nbsp;centralize,&nbsp;inplace])</td>
 <td>Performs a clr transform to normalize each sample.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_data.html#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="calour.amplicon_experiment.AmpliconExperiment.cluster_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_data</span></code></a>([transform,&nbsp;axis,&nbsp;metric,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_data.html#calour.amplicon_experiment.AmpliconExperiment.cluster_data" title="calour.amplicon_experiment.AmpliconExperiment.cluster_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_data</span></code></a>([transform,&nbsp;axis,&nbsp;metric,&nbsp;inplace])</td>
 <td>Cluster the samples/features.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_features.html#calour.amplicon_experiment.AmpliconExperiment.cluster_features" title="calour.amplicon_experiment.AmpliconExperiment.cluster_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_features</span></code></a>([min_abundance,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.cluster_features.html#calour.amplicon_experiment.AmpliconExperiment.cluster_features" title="calour.amplicon_experiment.AmpliconExperiment.cluster_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_features</span></code></a>([min_abundance,&nbsp;inplace])</td>
 <td>Cluster features.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collapse_taxonomy</span></code></a>([level,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.collapse_taxonomy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collapse_taxonomy</span></code></a>([level,&nbsp;inplace])</td>
 <td>Collapse all features sharing the same taxonomy up to level into a single feature</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.collect_cv_prediction.html#calour.amplicon_experiment.AmpliconExperiment.collect_cv_prediction" title="calour.amplicon_experiment.AmpliconExperiment.collect_cv_prediction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collect_cv_prediction</span></code></a>(field,&nbsp;estimator,&nbsp;cv,&nbsp;…)</td>
+<td>Do the CV</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.copy.html#calour.amplicon_experiment.AmpliconExperiment.copy" title="calour.amplicon_experiment.AmpliconExperiment.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</td>
 <td>Copy the object (deeply).</td>
@@ -236,7 +245,7 @@ are in row and features in column</li>
 <td>Filter features from experiment based on fasta file</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_ids.html#calour.amplicon_experiment.AmpliconExperiment.filter_ids" title="calour.amplicon_experiment.AmpliconExperiment.filter_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_ids</span></code></a>(ids[,&nbsp;axis,&nbsp;negate,&nbsp;inplace])</td>
-<td>Filter samples or features based on a list index values</td>
+<td>Filter samples or features based on a list IDs.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_mean.html#calour.amplicon_experiment.AmpliconExperiment.filter_mean" title="calour.amplicon_experiment.AmpliconExperiment.filter_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_mean</span></code></a>([cutoff])</td>
 <td>Filter features with a mean at least cutoff of the mean total abundance/sample</td>
@@ -256,35 +265,41 @@ are in row and features in column</li>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.filter_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.filter_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.filter_taxonomy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_taxonomy</span></code></a>(values[,&nbsp;negate,&nbsp;inplace,&nbsp;…])</td>
 <td>filter keeping only observations with taxonomy string matching taxonomy</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.from_pandas.html#calour.amplicon_experiment.AmpliconExperiment.from_pandas" title="calour.amplicon_experiment.AmpliconExperiment.from_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_pandas</span></code></a>(df[,&nbsp;exp])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.find_lowest_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.find_lowest_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.find_lowest_taxonomy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_lowest_taxonomy</span></code></a>([field,&nbsp;new_field])</td>
+<td>Create a new column that contains the taxonomy of lowest possible level.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.from_pandas.html#calour.amplicon_experiment.AmpliconExperiment.from_pandas" title="calour.amplicon_experiment.AmpliconExperiment.from_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_pandas</span></code></a>(df[,&nbsp;exp])</td>
 <td>Convert a Pandas DataFrame into an experiment.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.get_data.html#calour.amplicon_experiment.AmpliconExperiment.get_data" title="calour.amplicon_experiment.AmpliconExperiment.get_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data</span></code></a>([sparse,&nbsp;copy])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.get_data.html#calour.amplicon_experiment.AmpliconExperiment.get_data" title="calour.amplicon_experiment.AmpliconExperiment.get_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data</span></code></a>([sparse,&nbsp;copy])</td>
 <td>Get the data as a 2d array</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.heatmap.html#calour.amplicon_experiment.AmpliconExperiment.heatmap" title="calour.amplicon_experiment.AmpliconExperiment.heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heatmap</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.heatmap.html#calour.amplicon_experiment.AmpliconExperiment.heatmap" title="calour.amplicon_experiment.AmpliconExperiment.heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heatmap</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;…])</td>
 <td>Plot a heatmap for the experiment.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.join_experiments.html#calour.amplicon_experiment.AmpliconExperiment.join_experiments" title="calour.amplicon_experiment.AmpliconExperiment.join_experiments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_experiments</span></code></a>(other[,&nbsp;field_name,&nbsp;prefixes])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.join_experiments.html#calour.amplicon_experiment.AmpliconExperiment.join_experiments" title="calour.amplicon_experiment.AmpliconExperiment.join_experiments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_experiments</span></code></a>(other[,&nbsp;field_name,&nbsp;prefixes])</td>
+<td>Combine two <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> objects into one.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.join_experiments_featurewise.html#calour.amplicon_experiment.AmpliconExperiment.join_experiments_featurewise" title="calour.amplicon_experiment.AmpliconExperiment.join_experiments_featurewise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_experiments_featurewise</span></code></a>(other[,&nbsp;…])</td>
 <td>Combine two <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> objects into one.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.join_metadata_fields.html#calour.amplicon_experiment.AmpliconExperiment.join_metadata_fields" title="calour.amplicon_experiment.AmpliconExperiment.join_metadata_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_metadata_fields</span></code></a>(field1,&nbsp;field2[,&nbsp;…])</td>
 <td>Join two sample/feature metadata fields into a single new field</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.log_n.html#calour.amplicon_experiment.AmpliconExperiment.log_n" title="calour.amplicon_experiment.AmpliconExperiment.log_n"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_n</span></code></a>([n,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.learning_curve_depths.html#calour.amplicon_experiment.AmpliconExperiment.learning_curve_depths" title="calour.amplicon_experiment.AmpliconExperiment.learning_curve_depths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">learning_curve_depths</span></code></a>(field[,&nbsp;groups,&nbsp;…])</td>
+<td>Compute the learning curve with regarding to sequencing depths.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.log_n.html#calour.amplicon_experiment.AmpliconExperiment.log_n" title="calour.amplicon_experiment.AmpliconExperiment.log_n"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_n</span></code></a>([n,&nbsp;inplace])</td>
 <td>Log transform the data</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize.html#calour.amplicon_experiment.AmpliconExperiment.normalize" title="calour.amplicon_experiment.AmpliconExperiment.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>([total,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize.html#calour.amplicon_experiment.AmpliconExperiment.normalize" title="calour.amplicon_experiment.AmpliconExperiment.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>([total,&nbsp;axis,&nbsp;inplace])</td>
 <td>Normalize the sum of each sample (axis=0) or feature (axis=1) to sum total</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features.html#calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features" title="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_by_subset_features</span></code></a>(features[,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features.html#calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features" title="calour.amplicon_experiment.AmpliconExperiment.normalize_by_subset_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_by_subset_features</span></code></a>(features[,&nbsp;…])</td>
 <td>Normalize each sample by their total sums without a list of features</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_compositional.html#calour.amplicon_experiment.AmpliconExperiment.normalize_compositional" title="calour.amplicon_experiment.AmpliconExperiment.normalize_compositional"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_compositional</span></code></a>([min_frac,&nbsp;total,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.normalize_compositional.html#calour.amplicon_experiment.AmpliconExperiment.normalize_compositional" title="calour.amplicon_experiment.AmpliconExperiment.normalize_compositional"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_compositional</span></code></a>([min_frac,&nbsp;total,&nbsp;…])</td>
 <td>Normalize each sample by ignoring the features with mean&gt;=min_frac in all the experiment</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.onehot_encode_features.html#calour.amplicon_experiment.AmpliconExperiment.onehot_encode_features" title="calour.amplicon_experiment.AmpliconExperiment.onehot_encode_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">onehot_encode_features</span></code></a>(fields[,&nbsp;sparse,&nbsp;inplace])</td>
-<td>Add covariates from sample metadata to the data table as features for machine learning.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot.html#calour.amplicon_experiment.AmpliconExperiment.plot" title="calour.amplicon_experiment.AmpliconExperiment.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([title,&nbsp;barx_fields,&nbsp;barx_width,&nbsp;…])</td>
 <td>Plot the interactive heatmap and its associated axes.</td>
@@ -292,20 +307,20 @@ are in row and features in column</li>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_abund_prevalence.html#calour.amplicon_experiment.AmpliconExperiment.plot_abund_prevalence" title="calour.amplicon_experiment.AmpliconExperiment.plot_abund_prevalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_abund_prevalence</span></code></a>(field[,&nbsp;log,&nbsp;…])</td>
 <td>Plot abundance against prevalence.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment.html#calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment" title="calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_diff_abundance_enrichment</span></code></a>([term_type,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_core_features.html#calour.amplicon_experiment.AmpliconExperiment.plot_core_features" title="calour.amplicon_experiment.AmpliconExperiment.plot_core_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_core_features</span></code></a>([field,&nbsp;steps,&nbsp;cutoff,&nbsp;…])</td>
+<td>Plot the percentage of core features shared in increasing number of samples.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment.html#calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment" title="calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_diff_abundance_enrichment</span></code></a>([term_type,&nbsp;…])</td>
 <td>Plot the term enrichment of differentially abundant bacteria</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_enrichment.html#calour.amplicon_experiment.AmpliconExperiment.plot_enrichment" title="calour.amplicon_experiment.AmpliconExperiment.plot_enrichment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_enrichment</span></code></a>(enriched[,&nbsp;max_show,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_enrichment.html#calour.amplicon_experiment.AmpliconExperiment.plot_enrichment" title="calour.amplicon_experiment.AmpliconExperiment.plot_enrichment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_enrichment</span></code></a>(enriched[,&nbsp;max_show,&nbsp;…])</td>
 <td>Plot a horizontal bar plot for enriched terms</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_hist.html#calour.amplicon_experiment.AmpliconExperiment.plot_hist" title="calour.amplicon_experiment.AmpliconExperiment.plot_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hist</span></code></a>([ax])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_hist.html#calour.amplicon_experiment.AmpliconExperiment.plot_hist" title="calour.amplicon_experiment.AmpliconExperiment.plot_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hist</span></code></a>([ax])</td>
 <td>Plot histogram of all the values in data.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix.html#calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix" title="calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_scatter_matrix</span></code></a>(field,&nbsp;feature_ids[,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix.html#calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix" title="calour.amplicon_experiment.AmpliconExperiment.plot_scatter_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_scatter_matrix</span></code></a>(field,&nbsp;feature_ids[,&nbsp;…])</td>
 <td>This plots an array of scatter plots between each features against the specified sample metadata.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_shareness.html#calour.amplicon_experiment.AmpliconExperiment.plot_shareness" title="calour.amplicon_experiment.AmpliconExperiment.plot_shareness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_shareness</span></code></a>([field,&nbsp;steps,&nbsp;iterations,&nbsp;…])</td>
-<td>Plot the number of shared features against the number of samples.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.plot_stacked_bar.html#calour.amplicon_experiment.AmpliconExperiment.plot_stacked_bar" title="calour.amplicon_experiment.AmpliconExperiment.plot_stacked_bar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_stacked_bar</span></code></a>([field,&nbsp;sample_color_bars,&nbsp;…])</td>
 <td>Plot the stacked bar for feature abundances.</td>
@@ -358,13 +373,16 @@ are in row and features in column</li>
 <tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.split_taxonomy.html#calour.amplicon_experiment.AmpliconExperiment.split_taxonomy" title="calour.amplicon_experiment.AmpliconExperiment.split_taxonomy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_taxonomy</span></code></a>([field,&nbsp;sep,&nbsp;names])</td>
 <td>Split taxonomy column into individual column per level.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.subsample_count.html#calour.amplicon_experiment.AmpliconExperiment.subsample_count" title="calour.amplicon_experiment.AmpliconExperiment.subsample_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsample_count</span></code></a>(total[,&nbsp;replace,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.split_train_test.html#calour.amplicon_experiment.AmpliconExperiment.split_train_test" title="calour.amplicon_experiment.AmpliconExperiment.split_train_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_train_test</span></code></a>(field,&nbsp;test_size[,&nbsp;…])</td>
+<td>Split experiment data into train and test set.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.subsample_count.html#calour.amplicon_experiment.AmpliconExperiment.subsample_count" title="calour.amplicon_experiment.AmpliconExperiment.subsample_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsample_count</span></code></a>(total[,&nbsp;replace,&nbsp;inplace])</td>
 <td>Randomly subsample each sample to the same number of counts.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.to_pandas.html#calour.amplicon_experiment.AmpliconExperiment.to_pandas" title="calour.amplicon_experiment.AmpliconExperiment.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.to_pandas.html#calour.amplicon_experiment.AmpliconExperiment.to_pandas" title="calour.amplicon_experiment.AmpliconExperiment.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
 <td>Get a pandas dataframe of the abundances Samples are rows, features are columns.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.transform.html#calour.amplicon_experiment.AmpliconExperiment.transform" title="calour.amplicon_experiment.AmpliconExperiment.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>([steps,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.transform.html#calour.amplicon_experiment.AmpliconExperiment.transform" title="calour.amplicon_experiment.AmpliconExperiment.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>([steps,&nbsp;inplace])</td>
 <td>Chain transformations together.</td>
 </tr>
 </tbody>

@@ -1,0 +1,6 @@
+calour.training.add\_sample\_metadata\_as\_features
+===================================================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: add_sample_metadata_as_features

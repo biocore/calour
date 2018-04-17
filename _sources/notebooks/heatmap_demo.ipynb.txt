@@ -8,6 +8,13 @@
    ]
   },
   {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## General setup"
+   ]
+  },
+  {
    "cell_type": "code",
    "execution_count": 1,
    "metadata": {},
@@ -855,7 +862,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "9473ce4464cc44b29d52dda0104ce5e5"
+       "model_id": "ff8ac055793d4f3eb67c26a7b4422a97"
       }
      },
      "metadata": {},
@@ -864,7 +871,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "17ae98a1c7c644c48598af8e0fd313fd"
+       "model_id": "57b91c07a09e4595bcccbceb345c3733"
       }
      },
      "metadata": {},
@@ -873,7 +880,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "5a35c22a20b4485abae1bc5e8812fa0c"
+       "model_id": "ec775136f1cf4543872e99d1acb10c16"
       }
      },
      "metadata": {},
@@ -882,7 +889,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "de4aa27132334309b446ae21dd806567"
+       "model_id": "05e20784f4754dd09860682eff007917"
       }
      },
      "metadata": {},
@@ -891,7 +898,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "9b072b54ee67476a9756f8cf80cacd92"
+       "model_id": "525bd2f9e84347d997c8a6732cf3e998"
       }
      },
      "metadata": {},
@@ -900,7 +907,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "a29dedb8859a49348ffd87b5aa95c2a9"
+       "model_id": "df56b8256a5442de96c98d4f983619b1"
       }
      },
      "metadata": {},
@@ -1722,7 +1729,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "72f8508a9dc1460c856df9e75b34f40a"
+       "model_id": "03a109023479458989d33d25765c9231"
       }
      },
      "metadata": {},
@@ -1731,7 +1738,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "507f80dc8cc144169f27390df80d3a59"
+       "model_id": "a34c8665ec304622bac253a8d688a843"
       }
      },
      "metadata": {},
@@ -1740,7 +1747,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "43a732a7335d435abf08614d038a4909"
+       "model_id": "fb776bef593f4680b372665ff03b82fb"
       }
      },
      "metadata": {},
@@ -1749,7 +1756,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "ade4e39e7c9e4173b903a46338a03c4d"
+       "model_id": "559d602b659940d5891cbce569775c0f"
       }
      },
      "metadata": {},
@@ -1758,7 +1765,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "64c585ce983a475997df5c2e79d16b03"
+       "model_id": "111f0c391bf247868048e23292a20405"
       }
      },
      "metadata": {},
@@ -1767,7 +1774,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "f93693c753da4156ba8df15fb8ac8d29"
+       "model_id": "7fdb1039bf6a4bd58abfea4c6079e2d2"
       }
      },
      "metadata": {},
@@ -2591,7 +2598,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "750fe068ce934207a0df7a2c9e1fcefb"
+       "model_id": "b1887f21059d4e31acdd45d8f5a091ec"
       }
      },
      "metadata": {},
@@ -2600,7 +2607,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "eaca39dd41d7410b949bfd7ac2f0ec6b"
+       "model_id": "e2ccb1821d8547c98329b0dcefb05b08"
       }
      },
      "metadata": {},
@@ -2609,7 +2616,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "b76781853f1046b1b29b227ee7848d7a"
+       "model_id": "9778c1eeb8b942d6aee17c5ea3cd8e35"
       }
      },
      "metadata": {},
@@ -2618,7 +2625,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "a4f13174170b43aa9031967b216ddd01"
+       "model_id": "f556edfcc17d4411b81e0333ba93092f"
       }
      },
      "metadata": {},
@@ -2627,7 +2634,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "0c06dfe667e248b5af22bb77b53bf87a"
+       "model_id": "4cb69a07f9244b3d902b40717205863a"
       }
      },
      "metadata": {},
@@ -2636,7 +2643,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "5c87cf7c061b4a19ae03bdfa7106d697"
+       "model_id": "469ef830e01f4498aad09a3a3f39bb69"
       }
      },
      "metadata": {},
@@ -3461,7 +3468,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "ddc5dfbaf6cc48a693b668fbeb452324"
+       "model_id": "4b015c2158464d9ea2a1b10553b6f454"
       }
      },
      "metadata": {},
@@ -3470,7 +3477,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "5d6b3a2ecd8d4e49b97ec75825f8c884"
+       "model_id": "bbebf97aa7f04b4b9e6c31fe9fa70ef3"
       }
      },
      "metadata": {},
@@ -3479,7 +3486,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "d0fe42d9920a4f1dbd52a959b4d07ad4"
+       "model_id": "c49e5228edf54125ac8e1ae224790b53"
       }
      },
      "metadata": {},
@@ -3488,7 +3495,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "3980a9116169415892a1dd6216b76a20"
+       "model_id": "22931b89d5034cfabc0dcd4761d667a1"
       }
      },
      "metadata": {},
@@ -3497,7 +3504,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "6de4ba4cc9044e7181329f9f3a2a0172"
+       "model_id": "d88f219d51ff498b8ac018ad4fa3c6ec"
       }
      },
      "metadata": {},
@@ -3506,7 +3513,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "321522afc85d49c0968dc89f883e9986"
+       "model_id": "a01d04957dac4fc08b0d26d7e10f065c"
       }
      },
      "metadata": {},

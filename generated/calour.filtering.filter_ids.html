@@ -81,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -128,7 +131,11 @@
 <dl class="function">
 <dt id="calour.filtering.filter_ids">
 <code class="descclassname">calour.filtering.</code><code class="descname">filter_ids</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>ids</em>, <em>axis=1</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/experiment.py#L220"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.filter_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter samples or features based on a list index values</p>
+<dd><p>Filter samples or features based on a list IDs.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">the order of samples or features is updated as the order given in <code class="docutils literal notranslate"><span class="pre">ids</span></code>.</p>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This function is also available as a class method <a class="reference internal" href="calour.experiment.Experiment.filter_ids.html#calour.experiment.Experiment.filter_ids" title="calour.experiment.Experiment.filter_ids"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Experiment.filter_ids()</span></code></a></p>

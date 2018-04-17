@@ -19,6 +19,7 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Creating database interfaces for Calour" href="../database_interface.html" />
     <link rel="prev" title="calour.database.add_terms_to_features" href="calour.database.add_terms_to_features.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -80,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -126,7 +130,7 @@
 <h1>calour.database.enrichment<a class="headerlink" href="#calour-database-enrichment" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.database.enrichment">
-<code class="descclassname">calour.database.</code><code class="descname">enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>features</em>, <em>dbname</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/database.py#L131"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.database.enrichment" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.database.</code><code class="descname">enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>features</em>, <em>dbname</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/database.py#L135"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.database.enrichment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of enriched annotation terms in features compared to all features in exp.</p>
 <p>Uses the database specific enrichment analysis method.</p>
 <div class="admonition note">

@@ -1,0 +1,6 @@
+calour.filtering.downsample
+===========================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: downsample

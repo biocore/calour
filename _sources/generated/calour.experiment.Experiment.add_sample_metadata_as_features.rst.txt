@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.add_sample_metadata_as_features
+============================================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.add_sample_metadata_as_features

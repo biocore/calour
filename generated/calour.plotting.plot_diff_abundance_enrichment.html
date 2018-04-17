@@ -81,6 +81,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -127,7 +130,7 @@
 <h1>calour.plotting.plot_diff_abundance_enrichment<a class="headerlink" href="#calour-plotting-plot-diff-abundance-enrichment" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.plotting.plot_diff_abundance_enrichment">
-<code class="descclassname">calour.plotting.</code><code class="descname">plot_diff_abundance_enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>term_type='term'</em>, <em>max_show=10</em>, <em>max_len=40</em>, <em>ax=None</em>, <em>ignore_exp=None</em>, <em>score_method='all_mean'</em>, <em>colors=('green'</em>, <em>'red')</em>, <em>show_legend=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/plotting.py#L138"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.plotting.plot_diff_abundance_enrichment" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.plotting.</code><code class="descname">plot_diff_abundance_enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>term_type='term'</em>, <em>max_show=10</em>, <em>max_len=40</em>, <em>ax=None</em>, <em>ignore_exp=None</em>, <em>score_method='all_mean'</em>, <em>colors=('green'</em>, <em>'red')</em>, <em>show_legend=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/plotting.py#L139"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.plotting.plot_diff_abundance_enrichment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the term enrichment of differentially abundant bacteria</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -149,7 +152,7 @@ Options are:
 if None, show all terms
 if int, show at most the max_show maximal positive and negative terms
 if (int, int), show at most XXX maximal positive and YYY maximal negative terms</li>
-<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The axis to which to plot the figure
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The axis to which to plot the figure
 None (default) to create a new figure</li>
 <li><strong>ignore_exp</strong> (<em>list None</em><em>, </em><em>optional</em>) – list of experiment ids to ignore when doing the enrichment_analysis.
 Useful when you don’t want to get terms from your own experiment analysis.
@@ -170,7 +173,7 @@ with only one annotation
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li>tuple of <a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></a>, <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> with</li>
+<li>tuple of <a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></a>, <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> with</li>
 <li><em>terms as features, (original features) as samples, result of</em></li>
 <li><a class="reference internal" href="calour.database.enrichment.html#calour.database.enrichment" title="calour.database.enrichment"><code class="xref py py-func docutils literal notranslate"><span class="pre">database.enrichment()</span></code></a></li>
 </ul>

@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="calour.amplicon_experiment.AmpliconExperiment.plot_enrichment" href="calour.amplicon_experiment.AmpliconExperiment.plot_enrichment.html" />
-    <link rel="prev" title="calour.amplicon_experiment.AmpliconExperiment.plot_abund_prevalence" href="calour.amplicon_experiment.AmpliconExperiment.plot_abund_prevalence.html" />
+    <link rel="prev" title="calour.amplicon_experiment.AmpliconExperiment.plot_core_features" href="calour.amplicon_experiment.AmpliconExperiment.plot_core_features.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -80,6 +80,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Using Calour functions via the module and the Experiment class</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
 </ul>
 </ul>
 </li>
@@ -144,7 +147,7 @@ Options are:
 if None, show all terms
 if int, show at most the max_show maximal positive and negative terms
 if (int, int), show at most XXX maximal positive and YYY maximal negative terms</li>
-<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The axis to which to plot the figure
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The axis to which to plot the figure
 None (default) to create a new figure</li>
 <li><strong>ignore_exp</strong> (<em>list None</em><em>, </em><em>optional</em>) – list of experiment ids to ignore when doing the enrichment_analysis.
 Useful when you don’t want to get terms from your own experiment analysis.
@@ -165,7 +168,7 @@ with only one annotation
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li>tuple of <a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></a>, <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> with</li>
+<li>tuple of <a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></a>, <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> with</li>
 <li><em>terms as features, (original features) as samples, result of</em></li>
 <li><a class="reference internal" href="calour.database.enrichment.html#calour.database.enrichment" title="calour.database.enrichment"><code class="xref py py-func docutils literal notranslate"><span class="pre">database.enrichment()</span></code></a></li>
 </ul>

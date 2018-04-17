@@ -81,6 +81,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html#main-classes-and-utility-functions">Main classes and utility functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html#functions-operating-on-experiment-object">Functions operating on <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> object</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../database_interface.html">Creating database interfaces for Calour</a></li>
+</ul>
 </ul>
 </li>
               
@@ -135,11 +138,11 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the column name of the sample or feature metadata tables</li>
-<li><strong>select</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>, or </em><em>Callable</em>) – select what to keep based on the value in the specified field.
-if it is a callable, it accepts a 1d array and return a
-boolean array of the same length; if it is a list-like object,
+<li><strong>select</strong> (<em>None</em><em>, </em><em>Callable</em><em>, or </em><em>list/set/tuple-like</em>) – select what to keep based on the value in the specified field.
+if it is a callable, it accepts a 1D array and return a
+boolean array of the same length; if it is a list/set/tuple-like object,
 keep the samples with the values in the <code class="docutils literal notranslate"><span class="pre">field</span></code> column included
-in the <code class="docutils literal notranslate"><span class="pre">select</span></code>.</li>
+in the <code class="docutils literal notranslate"><span class="pre">select</span></code>; if it is None, filter out the NA.</li>
 <li><strong>axis</strong> (<em>0</em><em>, </em><em>1</em><em>, </em><em>'s'</em><em>, or </em><em>'f'</em><em>, </em><em>optional</em>) – the field is on samples (0 or ‘s’) or features (1 or ‘f’) metadata</li>
 <li><strong>negate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – discard instead of keep the select if set to <code class="docutils literal notranslate"><span class="pre">True</span></code></li>
 <li><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – do the filtering on the original <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> object or a copied one.</li>

@@ -42,7 +42,13 @@
    "metadata": {},
    "source": [
     "## Load the data\n",
-    "we use the chronic fatigue syndrome data from XXXX"
+    "we use the chronic fatigue syndrome data from:\n",
+    "\n",
+    "Giloteaux, L., Goodrich, J.K., Walters, W.A., Levine, S.M., Ley, R.E. and Hanson, M.R., 2016.\n",
+    "\n",
+    "Reduced diversity and altered composition of the gut microbiome in individuals with myalgic encephalomyelitis/chronic fatigue syndrome.\n",
+    "\n",
+    "Microbiome, 4(1), p.30."
    ]
   },
   {
@@ -70,9 +76,9 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "2018-02-20 10:56:05 INFO loaded 87 samples, 2129 features\n",
-      "2018-02-20 10:56:05 WARNING These have metadata but do not have data - dropped: {'ERR1331814'}\n",
-      "2018-02-20 10:56:05 INFO After filtering, 87 remaining\n"
+      "2018-03-04 12:39:25 INFO loaded 87 samples, 2129 features\n",
+      "2018-03-04 12:39:25 WARNING These have metadata but do not have data - dropped: {'ERR1331814'}\n",
+      "2018-03-04 12:39:25 INFO After filtering, 87 remaining\n"
      ]
     }
    ],
@@ -978,9 +984,9 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "2018-02-20 10:56:08 INFO loaded 87 samples, 2129 features\n",
-      "2018-02-20 10:56:08 WARNING These have metadata but do not have data - dropped: {'ERR1331814'}\n",
-      "2018-02-20 10:56:08 INFO After filtering, 87 remaining\n"
+      "2018-03-04 12:39:29 INFO loaded 87 samples, 2129 features\n",
+      "2018-03-04 12:39:29 WARNING These have metadata but do not have data - dropped: {'ERR1331814'}\n",
+      "2018-03-04 12:39:29 INFO After filtering, 87 remaining\n"
      ]
     }
    ],
@@ -1098,10 +1104,10 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "2018-02-20 10:56:12 INFO 87 samples with both values\n",
-      "2018-02-20 10:56:12 INFO After filtering, 2129 remaining\n",
-      "2018-02-20 10:56:12 INFO 39 samples with value 1 (['Control'])\n",
-      "2018-02-20 10:56:13 INFO method meandiff. number of higher in ['Control'] : 34. number of higher in ['Patient'] : 18. total 52\n"
+      "2018-03-04 12:39:36 INFO 87 samples with both values\n",
+      "2018-03-04 12:39:36 INFO After filtering, 2129 remaining\n",
+      "2018-03-04 12:39:36 INFO 39 samples with value 1 (['Control'])\n",
+      "2018-03-04 12:39:38 INFO method meandiff. number of higher in ['Control'] : 34. number of higher in ['Patient'] : 18. total 52\n"
      ]
     }
    ],
@@ -1143,10 +1149,10 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "2018-02-20 10:56:16 INFO 87 samples with both values\n",
-      "2018-02-20 10:56:16 INFO After filtering, 2129 remaining\n",
-      "2018-02-20 10:56:16 INFO 39 samples with value 1 (['Control'])\n",
-      "2018-02-20 10:56:17 INFO method meandiff. number of higher in ['Control'] : 27. number of higher in ['Patient'] : 68. total 95\n"
+      "2018-03-04 12:39:38 INFO 87 samples with both values\n",
+      "2018-03-04 12:39:38 INFO After filtering, 2129 remaining\n",
+      "2018-03-04 12:39:38 INFO 39 samples with value 1 (['Control'])\n",
+      "2018-03-04 12:39:39 INFO method meandiff. number of higher in ['Control'] : 27. number of higher in ['Patient'] : 68. total 95\n"
      ]
     }
    ],
@@ -1177,8 +1183,8 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "2018-02-20 10:56:17 INFO After filtering, 2 remaining\n",
-      "2018-02-20 10:56:17 INFO ignoring 2 features\n"
+      "2018-03-04 12:39:39 INFO After filtering, 2 remaining\n",
+      "2018-03-04 12:39:39 INFO ignoring 2 features\n"
      ]
     }
    ],
@@ -1195,10 +1201,10 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "2018-02-20 10:56:18 INFO 87 samples with both values\n",
-      "2018-02-20 10:56:18 INFO After filtering, 2129 remaining\n",
-      "2018-02-20 10:56:18 INFO 39 samples with value 1 (['Control'])\n",
-      "2018-02-20 10:56:19 INFO method meandiff. number of higher in ['Control'] : 35. number of higher in ['Patient'] : 19. total 54\n"
+      "2018-03-04 12:39:39 INFO 87 samples with both values\n",
+      "2018-03-04 12:39:39 INFO After filtering, 2129 remaining\n",
+      "2018-03-04 12:39:39 INFO 39 samples with value 1 (['Control'])\n",
+      "2018-03-04 12:39:41 INFO method meandiff. number of higher in ['Control'] : 35. number of higher in ['Patient'] : 19. total 54\n"
      ]
     }
    ],
