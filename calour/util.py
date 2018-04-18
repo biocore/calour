@@ -57,9 +57,9 @@ def compute_prevalence(abundance):
     --------
     >>> abund = [0, 0, 1, 2, 4, 1]
     >>> x, y = compute_prevalence(abund)
-    >>> x
+    >>> x   # doctest: +NORMALIZE_WHITESPACE
     array([0, 1, 2, 4])
-    >>> y
+    >>> y   # doctest: +NORMALIZE_WHITESPACE
     array([0.66666667, 0.33333333, 0.16666667, 0.        ])
 
     '''
