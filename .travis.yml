@@ -19,7 +19,6 @@ before_install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels https://conda.anaconda.org/biocore
   - conda config --add channels conda-forge
   - conda config --add channels bioconda
   # Update conda itself
@@ -46,4 +45,4 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - source publish.sh
+  - if [ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ] ; then MSG="commit $TRAVIS_COMMIT" make publish ; fi
