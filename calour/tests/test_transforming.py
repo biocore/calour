@@ -145,7 +145,7 @@ class TestTransforming(Tests):
                             sample_metadata=pd.DataFrame([['a', 'b', 'c'], ['d', 'e', 'f']]),
                             sparse=False)
         n = 6
-        obs = exp.subsample_count(n, random_state=9)
+        obs = exp.subsample_count(n, random_seed=9)
         assert_array_equal(obs.data.sum(axis=1), np.array([n, n]))
         self.assertTrue(np.all(obs.data <= n))
 
