@@ -7,8 +7,6 @@ pyqt>=5
 pandas
 matplotlib
 scikit-learn
-scikit-bio>=0.5.1
-biom-format
 statsmodels
 ipywidgets
 sphinx
