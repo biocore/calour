@@ -4,16 +4,17 @@ environment:
   matrix:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
-    - PYTHON: "C:\\Python35"
-      DISTUTILS_USE_SDK: "1"
-      CONDA_PY: "35"
-      CONDA_INSTALL_LOCN: C:\\Miniconda35
     - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5"
       CONDA_PY: "35"
       CONDA_INSTALL_LOCN: C:\\Miniconda35-x64
     - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6"
       CONDA_PY: "36"
       CONDA_INSTALL_LOCN: C:\\Miniconda36-x64
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %MINICONDA%"
 
 install:
   # We need wheel installed to build wheels
@@ -22,11 +23,14 @@ install:
   - conda config --set always_yes true
   - conda config --add channels conda-forge
   - conda config --add channels bioconda
+  - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
   - conda create --yes -n calour
   - activate calour
-  - conda install --yes --file ci/conda_requirements.txt
+  - conda install --verbose --yes --file ci/conda_requirements.txt
+  - conda install --verbose --yes cython
+  # - pip install --upgrade pip
   - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
 
@@ -40,4 +44,4 @@ test_script:
   # Note that you must use the environment variable %PYTHON% to refer to
   # the interpreter you're using - Appveyor does not do anything special
   # to put the Python version you want to use on PATH.
-  - WITH_COVERAGE=TRUE make all
+  - nosetests --with-doctest

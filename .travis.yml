@@ -45,4 +45,5 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - if [ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ] ; then MSG="commit $TRAVIS_COMMIT" make publish ; fi
+  # only publish the documentation for master branch and there is hint in the commit msg to trigger publish
+  - if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_COMMIT_MESSAGE == *"[publish doc]"* ]] ; then MSG="commit $TRAVIS_COMMIT" make publish ; fi
