@@ -74,8 +74,14 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
     logger.debug('downsample on field %s' % field)
     if axis == 0:
         x = exp.sample_metadata
+        error_axis_name = 'sample'
     elif axis == 1:
         x = exp.feature_metadata
+        error_axis_name = 'feature'
+
+    if field not in x:
+        raise ValueError('Field %s not in %s_metadata. (fields are: %s)' % (field, error_axis_name, x.columns))
+
     # convert to string type because nan values, if they exist in the column,
     # will fail `np.unique`
     values = x[field].astype(str).values
@@ -128,6 +134,8 @@ def filter_sample_categories(exp: Experiment, field, min_samples=5, inplace=Fals
     Experiment
 
     '''
+    if field not in exp.sample_metadata:
+        raise ValueError('field %s not in sample_metadata (fields are: %s)' % (field, exp.sample_metadata.columns))
     exp = exp.reorder(exp.sample_metadata[field].notnull(), inplace=inplace)
     unique, counts = np.unique(exp.sample_metadata[field].values, return_counts=True)
     drop_values = [i for i, j in zip(unique, counts) if j < min_samples]
@@ -166,10 +174,15 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
     '''
     if axis == 0:
         x = exp.sample_metadata
+        error_axis_name = 'sample'
     elif axis == 1:
         x = exp.feature_metadata
+        error_axis_name = 'feature'
     else:
         raise ValueError('unknown axis %s' % axis)
+
+    if field not in x:
+        raise ValueError('Field %s not in %s_metadata. (fields are: %s)' % (field, error_axis_name, x.columns))
 
     if isinstance(select, Callable):
         select = select(x[field])
