@@ -144,6 +144,9 @@ class TestTransforming(Tests):
                             sparse=False)
         n = 6
         obs = exp.subsample_count(n)
+        print(obs.data.shape)
+        print(obs.data.sum(axis=0))
+        print(obs.data.sum(axis=1))
         assert_array_equal(obs.data.sum(axis=1), np.array([n, n]))
         self.assertTrue(np.all(obs.data <= n))
 
