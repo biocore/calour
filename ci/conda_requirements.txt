@@ -6,6 +6,7 @@ scipy
 pyqt>=5
 pandas
 matplotlib
+h5py
 scikit-learn
 statsmodels
 ipywidgets

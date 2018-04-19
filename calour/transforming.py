@@ -353,7 +353,7 @@ def center_log(exp: Experiment, method=lambda matrix: matrix + 1, centralize=Fal
 
 
 @Experiment._record_sig
-def subsample_count(exp: Experiment, total, replace=False, inplace=False):
+def subsample_count(exp: Experiment, total, replace=False, inplace=False, random_seed=None):
     """Randomly subsample each sample to the same number of counts.
 
     .. warning:: This function will change the :attr:`Experiment.data`
@@ -361,6 +361,12 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
        should not have been normalized by total sum and its data
        should be discrete count. The samples that have few total count
        than ``total`` will be dropped.
+
+    .. note:: This function may not work on Windows OS. It relies on
+       the :func:`skbio.stats.subsample_counts` which have
+       `ValueError: Buffer dtype mismatch, expected 'int64_t' but got
+       'long'` in `_subsample_counts_without_replacement` function of
+       `skbio/stats/__subsample.pyx`
 
     Parameters
     ----------
@@ -370,6 +376,8 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
         If True, subsample with replacement. If False (the default), subsample without replacement
     inplace : bool, optional
         False (default) to create a new experiment, True to do it in place
+    random_seed : int or None, optional, default=None
+        passed to :func:`numpy.random.seed`
 
     Returns
     -------
@@ -391,13 +399,15 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False):
     # check if it is normalized: if so, raise error
     if exp.exp_metadata.get('normalized'):
         raise ValueError('Your `Experiment` object is normalized: subsample operates on integer raw data, not on normalized data.')
-    newexp.data = newexp.data.astype(int)
+
     drops = []
+    np.random.seed(random_seed)
     for row in range(newexp.data.shape[0]):
-        try:
-            newexp.data[row, :] = subsample_counts(newexp.data[row, :], n=total, replace=replace)
-        except ValueError:
-            # if the row sum is smaller than total in case replace is True, this row should be dropped
+        counts = newexp.data[row, :]
+        if total > counts.sum() and not replace:
             drops.append(row)
+        else:
+            newexp.data[row, :] = subsample_counts(counts, n=total, replace=replace)
+
     newexp.reorder([i not in drops for i in range(newexp.data.shape[0])], inplace=True)
     return newexp
