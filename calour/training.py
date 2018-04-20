@@ -64,7 +64,7 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     ph            NaN
     otu1            y
     otu2            n
-    >>> new.data
+    >>> new.data  # doctest: +SKIP
     array([[1. , 0. , 6.6, 1. , 2. ],
            [0. , 1. , 7.7, 3. , 4. ]])
 

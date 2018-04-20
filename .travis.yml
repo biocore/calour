@@ -19,7 +19,6 @@ before_install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels https://conda.anaconda.org/biocore
   - conda config --add channels conda-forge
   - conda config --add channels bioconda
   # Update conda itself
@@ -46,4 +45,5 @@ notifications:
     on_failure: always
 after_success:
   - coveralls
-  - source publish.sh
+  # only publish the documentation for master branch when you put "[publish doc]" in the PR merge msg to trigger publish
+  - if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_COMMIT_MESSAGE == *"[publish doc]"* ]] ; then MSG="commit $TRAVIS_COMMIT" make publish ; fi

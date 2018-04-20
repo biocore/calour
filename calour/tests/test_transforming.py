@@ -6,7 +6,8 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from unittest import main
+import sys
+from unittest import main, skipIf
 
 import numpy as np
 import pandas as pd
@@ -138,12 +139,13 @@ class TestTransforming(Tests):
         assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)
         self.assertTrue(np.all(newexp.data[:, bad_features] > exp.data[:, bad_features]))
 
+    @skipIf(sys.platform.startswith("win"), "skip this test for Windows")
     def test_subsample_count(self):
         exp = ca.Experiment(data=np.array([[1, 2, 3], [4, 5, 6]]),
                             sample_metadata=pd.DataFrame([['a', 'b', 'c'], ['d', 'e', 'f']]),
                             sparse=False)
         n = 6
-        obs = exp.subsample_count(n)
+        obs = exp.subsample_count(n, random_seed=9)
         assert_array_equal(obs.data.sum(axis=1), np.array([n, n]))
         self.assertTrue(np.all(obs.data <= n))
 

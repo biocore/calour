@@ -330,7 +330,6 @@ def _compute_frac_nonzero(data, steps, cutoff=2, frac=0.9, random_state=None):
         raise ValueError('You need to provide a value among (0, 1] for `frac`: %r' % frac)
     for n, i in enumerate(steps):
         data = data[rand.choice(n_samples, i, replace=False), :]
-        print(data)
         x = data >= cutoff
         # the count of samples that have the given feature
         counts = x.sum(axis=0)
