@@ -76,6 +76,9 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     Experiment
         The experiment with only correlated features, sorted according to correlation coefficient
     '''
+    if field not in exp.sample_metadata.columns:
+        raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
+
     # if random seed is supplied, set the numpy random.seed
     # (if random seed is None, we don't change the numpy seed)
     if random_seed is not None:
@@ -124,9 +127,11 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     method : str or function
         the method to use for the t-statistic test. options:
         'meandiff' : mean(A)-mean(B) (binary)
+
         'mannwhitney' : mann-whitneu u-test (binary)
-        'kruwallis' : kruskal-wallis test (multiple groups)
+
         'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
+
         function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
     transform : str or None
         transformation to apply to the data before caluculating the statistic.
@@ -160,9 +165,18 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     Returns
     -------
     Experiment
-        A new experiment with only significant (FDR <= maxfval) difference, sorted according to difference
+        A new experiment with only significant (FDR <= maxfval) difference, sorted according to the effect size.
 
+        The new experiment contains additional feature_metadata_fields that include:
+            '_calour_diff_abundance_pval' : the p-value for the feature
+
+            '_calour_diff_abundance_effect' : the effect size (t-statistic)
+
+            '__calour_diff_abundance_group' : the value (in field) where the statistic is higher
     '''
+    if field not in exp.sample_metadata.columns:
+        raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
+
     # if random seed is supplied, set the numpy random.seed
     # (if random seed is None, we don't change the numpy seed)
     if random_seed is not None:
@@ -225,6 +239,9 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     newexp : Experiment
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
     '''
+    if field not in exp.sample_metadata.columns:
+        raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
+
     # if random seed is supplied, set the numpy random.seed
     # (if random seed is None, we don't change the numpy seed)
     if random_seed is not None:
