@@ -30,7 +30,7 @@ import configparser
 from types import FunctionType
 from functools import wraps, update_wrapper
 from importlib import import_module
-from collections.abc import Container
+from collections.abc import Sequence
 from logging import getLogger
 from numbers import Real
 from pkg_resources import resource_filename
@@ -362,10 +362,24 @@ def set_log_level(level):
 
 
 def _to_list(x):
-    '''if x is non iterable or string, convert to iterable '''
+    '''if x is non iterable or string, convert to iterable.
+
+    See the expected behavior in the examples below.
+
+    Examples
+    --------
+    >>> _to_list('a')
+    ['a']
+    >>> _to_list({})
+    [{}]
+    >>> _to_list(['a'])
+    ['a']
+    >>> _to_list(set(['a']))
+    [{'a'}]
+    '''
     if isinstance(x, str):
         return [x]
-    if isinstance(x, Container):
+    if isinstance(x, Sequence):
         return x
     return [x]
 
