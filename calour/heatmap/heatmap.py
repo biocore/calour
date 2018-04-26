@@ -488,9 +488,9 @@ def plot(exp: Experiment, title=None,
     bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
         for each column. It doesn't plot color bars by default (None)
-    barx_width : float, optional
-    bary_width : float, optional
-        The width of the bars
+    barx_width : float or list of float, optional
+    bary_width : float or list of float, optional
+        The thickness of the each bar. The default thickness usually looks good enough.
     barx_colors : dict, matplotlib.colors.ListedColormap, optional
     bary_colors : dict, matplotlib.colors.ListedColormap, optional
         The colors for each unique values in the column of sample/feature metadata
