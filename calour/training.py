@@ -14,18 +14,15 @@ Functions
    add_sample_metadata_as_features
 '''
 
-from collections import defaultdict
 from logging import getLogger
 import itertools
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold
+from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold, ParameterGrid
 from sklearn.model_selection._split import check_cv
 from sklearn.base import is_classifier
 from sklearn.metrics import roc_curve, auc, confusion_matrix
-from sklearn.preprocessing import label_binarize
 from matplotlib import pyplot as plt
-import matplotlib as mpl
 from scipy import interp
 from scipy.sparse import hstack
 import pandas as pd
@@ -129,8 +126,8 @@ def split_train_test(exp: Experiment, field, test_size, train_size=None, stratif
     return train_X, test_X, train_y, test_y
 
 
-def classify_cv(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3),
-                predict='predict', param_grid=None):
+def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1),
+             predict='predict_proba', param_grid=None):
     '''Evaluate classification during cross validation.
 
     Parameters
@@ -141,13 +138,21 @@ def classify_cv(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3)
         scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestClassifer`
     cv : int, cross-validation generator or an iterable
         similar to the `cv` parameter in :class:`sklearn.model_selection.GridSearchCV`
-    param_grid :
-
-    pos_label : object
+    predict : {'predict', 'predict_proba'}
+        the method to predict the validation sets
+    param_grid : dict of string to sequence, or sequence of such
+        the parameter passing to :class:`sklearn.model_selection.ParameterGrid`
 
     Yields
     ------
-    tuple of model and figure
+    pandas.DataFrame
+        The result of prediction per sample for a given parameter set. It contains the
+        following columns:
+        - Y_TRUE: the true class for the samples
+        - SAMPLE: sample IDs
+        - CV: which split of the cross validation
+        - Y_PRED: the predicted class for the samples (if "predict")
+        - mutliple columns with each contain probabilities predicted as each class (if "predict_proba")
     '''
     X = exp.data
     y = exp.sample_metadata[field]
@@ -155,9 +160,9 @@ def classify_cv(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3)
 
     if param_grid is None:
         # use sklearn default param values for the given estimator
-        param_grid = [{}]
+        param_grid = {}
 
-    for param in param_grid:
+    for param in ParameterGrid(param_grid):
         logger.debug('run classification with parameters: %r' % param)
         dfs = []
         for i, (train, test) in enumerate(cv.split(X, y)):
@@ -172,7 +177,7 @@ def classify_cv(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3)
             df['SAMPLE'] = y[test].index.values
             df['CV'] = i
             dfs.append(df)
-        yield pd.concat(dfs, axis=0)
+        yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
 def plot_cm(result, normalize=False, title='confusion matrix', cmap=plt.cm.Blues, ax=None):
@@ -269,13 +274,19 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
     '''
     if ax is None:
         fig, ax = plt.subplots()
-    else:
-        fig = ax.get_figure()
-    fig, ax = plt.subplots()
+
     ax.axis('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
     classes = result['Y_TRUE'].unique()
+    # if this is a binary classification, we only need to set one class as positive
+    # and just plot ROC for the positive class
+    if len(classes) == 2:
+        if pos_label is None:
+            # by default use whatever the first class is as positive
+            classes = classes[:1]
+        else:
+            classes = [pos_label]
     col = dict(zip(classes, itertools.cycle(cmap.colors)))
 
     mean_fpr = np.linspace(0, 1, 100)
@@ -309,6 +320,8 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
         ax.set_ylabel('True Positive Rate')
         ax.set_title(title)
         ax.legend(loc="lower right")
+
+    return ax
 
 
 @Experiment._record_sig
