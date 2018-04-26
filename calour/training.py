@@ -139,9 +139,12 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
     cv : int, cross-validation generator or an iterable
         similar to the `cv` parameter in :class:`sklearn.model_selection.GridSearchCV`
     predict : {'predict', 'predict_proba'}
-        the method to predict the validation sets
+        the function used to predict the validation sets. Some estimators
+        have both functions to predict class or predict the probablity of each class
+        for a sample. For example, see :class:`sklearn.ensemble.RandomForestClassifier`
     param_grid : dict of string to sequence, or sequence of such
-        the parameter passing to :class:`sklearn.model_selection.ParameterGrid`
+        the parameter passing to :class:`sklearn.model_selection.ParameterGrid`. By default,
+        it uses whatever default parameter of the `estimator` set in `scikit-learn`
 
     Yields
     ------
@@ -188,7 +191,8 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=plt.cm.Blues
     result : pandas.DataFrame
         data frame containing predictions per sample (in row). It must have a column of
         true class named "Y_TRUE". It must have a column of predicted class named "Y_PRED"
-        or multiple columns of predicted probabilities for each class.
+        or multiple columns of predicted probabilities for each class. It typically takes
+        the output of :func:`classify`.
     normalize : bool
         normalize the confusion matrix or not
     title : str
@@ -257,6 +261,13 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
     result : pandas.DataFrame
         data frame containing predictions per sample (in row). It must have a column of
         true class named "Y_TRUE" and multiple columns of predicted probabilities for each class.
+        It typically takes the output of :func:`classify`.
+    pos_label : str, optional
+        the interested class if it is a binary classification. For
+        example, for "Health" vs. "IBD" classification, you would want
+        to set it to "IBD". This is ignored if it is not a binary
+        classification. This value is passed to
+        :func:`sklearn.metrics.roc_curve`
     title : str
         plot title
     cmap : str or matplotlib.colors.ListedColormap
