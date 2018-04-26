@@ -55,8 +55,11 @@ class TTests(Tests):
         d = dict(enumerate(iris.target_names))
         smd = pd.DataFrame({'plant': y}).replace(d)
         exp = ca.Experiment(X, smd)
-        a, b = next(exp.classify_cv('plant', RandomForestClassifier, StratifiedKFold(n_splits=3)))
+        a= next(exp.classify_cv('plant', RandomForestClassifier, StratifiedKFold(n_splits=3), predict='predict_proba'))
+        from calour.training import plot_cm, plot_roc
+        plot_roc(a)
         plt.show()
+        print(a)
 
 if __name__ == "__main__":
     main()

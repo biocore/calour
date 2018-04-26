@@ -19,10 +19,10 @@ from logging import getLogger
 import itertools
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold
 from sklearn.model_selection._split import check_cv
 from sklearn.base import is_classifier
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, confusion_matrix
 from sklearn.preprocessing import label_binarize
 from matplotlib import pyplot as plt
 import matplotlib as mpl
@@ -129,8 +129,21 @@ def split_train_test(exp: Experiment, field, test_size, train_size=None, stratif
     return train_X, test_X, train_y, test_y
 
 
-def classify_cv(exp: Experiment, field, estimator, cv, param_grid=None, pos_label=None):
-    '''Do the CV
+def classify_cv(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3),
+                predict='predict', param_grid=None):
+    '''Evaluate classification during cross validation.
+
+    Parameters
+    ----------
+    field : str
+        column name in the sample metadata, which contains the classes we want to predict.
+    estimator : object
+        scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestClassifer`
+    cv : int, cross-validation generator or an iterable
+        similar to the `cv` parameter in :class:`sklearn.model_selection.GridSearchCV`
+    param_grid :
+
+    pos_label : object
 
     Yields
     ------
@@ -140,59 +153,162 @@ def classify_cv(exp: Experiment, field, estimator, cv, param_grid=None, pos_labe
     y = exp.sample_metadata[field]
     cv = check_cv(cv, y, classifier=is_classifier(estimator))
 
-    cmap = mpl.cm.get_cmap('Dark2')
-    col = dict(zip(y.unique(), itertools.cycle(cmap.colors)))
-
     if param_grid is None:
         # use sklearn default param values for the given estimator
         param_grid = [{}]
-    mean_fpr = np.linspace(0, 1, 100)
-    pos_label_ = None
+
     for param in param_grid:
         logger.debug('run classification with parameters: %r' % param)
-        tprs = defaultdict(list)
-        aucs = defaultdict(list)
-        for train, test in cv.split(X, y):
+        dfs = []
+        for i, (train, test) in enumerate(cv.split(X, y)):
             model = estimator(**param)
             model.fit(X[train], y[train])
-            probas = model.predict_proba(X[test])
-            # binarize with model.classes_ to make sure it orders the classes in the same order
-            y_test = label_binarize(y[test], classes=model.classes_)
-            if len(model.classes_) == 2:
-                pos_label_ = np.where(model.classes_ == pos_label)[0][0]
-            for i in range(y_test.shape[1]):
-                cls = model.classes_[i]
-                fpr, tpr, thresholds = roc_curve(y_test[:, i], probas[:, i], pos_label=pos_label_)
-                mean_tpr = interp(mean_fpr, fpr, tpr)
-                tprs[cls].append(mean_tpr)
-                tprs[cls][-1][0] = 0.0
-                roc_auc = auc(mean_fpr, mean_tpr)
-                aucs[cls].append(roc_auc)
+            pred = getattr(model, predict)(X[test])
+            if pred.ndim > 1:
+                df = pd.DataFrame(pred, columns=model.classes_)
+            else:
+                df = pd.DataFrame(pred, columns=['Y_PRED'])
+            df['Y_TRUE'] = y[test].values
+            df['SAMPLE'] = y[test].index.values
+            df['CV'] = i
+            dfs.append(df)
+        yield pd.concat(dfs, axis=0)
 
+
+def plot_cm(result, normalize=False, title='confusion matrix', cmap=plt.cm.Blues, ax=None):
+    '''Plot confusion matrix
+
+    Parameters
+    ----------
+    result : pandas.DataFrame
+        data frame containing predictions per sample (in row). It must have a column of
+        true class named "Y_TRUE". It must have a column of predicted class named "Y_PRED"
+        or multiple columns of predicted probabilities for each class.
+    normalize : bool
+        normalize the confusion matrix or not
+    title : str
+        plot title
+    cmap : str or matplotlib.colors.ListedColormap
+        str to indicate the colormap name. Default is "Blues" colormap.
+        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    ax : matplotlib.axes.Axes or None (default), optional
+        The axes where the confusion matrix is plotted. None (default) to create a new figure and
+        axes to plot the confusion matrix
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The axes for the confusion matrix
+
+    '''
+    classes = result['Y_TRUE'].unique()
+    cm = _compute_cm(result, labels=classes)
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        logger.debug("Normalized confusion matrix")
+    else:
+        logger.debug('Confusion matrix, without normalization')
+    if ax is None:
         fig, ax = plt.subplots()
-        ax.axis('equal')
-        ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
-        for cls in tprs:
-            mean_tpr = np.mean(tprs[cls], axis=0)
-            mean_tpr[-1] = 1.0
-            mean_auc = np.mean(aucs[cls])
-            std_auc = np.std(aucs[cls])
-            ax.plot(mean_fpr, mean_tpr, color=col[cls],
-                    label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
-                    lw=2, alpha=.8)
+    else:
+        fig = ax.get_figure()
+    img = ax.imshow(cm, cmap=cmap)
+    ax.set_title(title)
+    fig.colorbar(img)
+    tick_marks = np.arange(len(classes))
+    ax.tick_params(rotation=45)
+    ax.set_xticks(tick_marks)
+    ax.set_xticklabels(classes)
+    ax.set_yticks(tick_marks)
+    ax.set_yticklabels(classes)
 
-            std_tpr = np.std(tprs[cls], axis=0)
-            tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
-            tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
-            ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        ax.text(j, i, format(cm[i, j], fmt),
+                horizontalalignment="center",
+                color="white" if cm[i, j] > thresh else "black")
+
+    ax.set_ylabel('Observation')
+    ax.set_xlabel('Prediction')
+    fig.tight_layout()
+    return ax
+
+
+def _compute_cm(result, labels, **kwargs):
+    if 'Y_PRED' not in result.columns:
+        idx = np.argmax(result[labels].values, axis=1)
+        y_pred = [labels[i] for i in idx]
+    else:
+        y_pred = result['Y_PRED']
+    return confusion_matrix(result['Y_TRUE'], y_pred, labels=labels, **kwargs)
+
+
+def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
+    '''Plot ROC curve.
+
+    Parameters
+    ----------
+    result : pandas.DataFrame
+        data frame containing predictions per sample (in row). It must have a column of
+        true class named "Y_TRUE" and multiple columns of predicted probabilities for each class.
+    title : str
+        plot title
+    cmap : str or matplotlib.colors.ListedColormap
+        str to indicate the colormap name. Default is "Blues" colormap.
+        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    ax : matplotlib.axes.Axes or None (default), optional
+        The axes where to plot. None (default) to create a new figure and
+        axes to plot
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The axes for the ROC
+
+    '''
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.get_figure()
+    fig, ax = plt.subplots()
+    ax.axis('equal')
+    ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
+
+    classes = result['Y_TRUE'].unique()
+    col = dict(zip(classes, itertools.cycle(cmap.colors)))
+
+    mean_fpr = np.linspace(0, 1, 100)
+    for cls in classes:
+        tprs = []
+        aucs = []
+        for grp, df in result.groupby('CV'):
+            y_true = df['Y_TRUE'].values == cls
+            fpr, tpr, thresholds = roc_curve(y_true, df[cls])
+            mean_tpr = interp(mean_fpr, fpr, tpr)
+            tprs.append(mean_tpr)
+            tprs[-1][0] = 0.0
+            roc_auc = auc(mean_fpr, mean_tpr)
+            aucs.append(roc_auc)
+
+        mean_tpr = np.mean(tprs, axis=0)
+        mean_tpr[-1] = 1.0
+        mean_auc = np.mean(aucs)
+        std_auc = np.std(aucs)
+        ax.plot(mean_fpr, mean_tpr, color=col[cls],
+                label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
+                lw=2, alpha=.8)
+
+        std_tpr = np.std(tprs, axis=0)
+        tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
+        tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
+        ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
         ax.set_xlim([-0.05, 1.05])
         ax.set_ylim([-0.05, 1.05])
         ax.set_xlabel('False Positive Rate')
         ax.set_ylabel('True Positive Rate')
-        ax.set_title(field)
+        ax.set_title(title)
         ax.legend(loc="lower right")
-
-        yield model, ax
 
 
 @Experiment._record_sig
