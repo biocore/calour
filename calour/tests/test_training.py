@@ -97,8 +97,8 @@ class TTests(Tests):
     def test_plot_cm(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
         ax = plot_cm(result)
-        from matplotlib import pyplot as plt
-        plt.show()
+        # from matplotlib import pyplot as plt
+        # plt.show()
         obs = [((0, 0), '11'), ((1, 0), '1'), ((2, 0), '0'),
                ((0, 1), '1'), ((1, 1), '11'), ((2, 1), '0'),
                ((0, 2), '1'), ((1, 2), '1'), ((2, 2), '10')]
