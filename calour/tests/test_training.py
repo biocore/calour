@@ -9,6 +9,7 @@
 from unittest import main
 
 from numpy.testing import assert_array_equal
+import pandas as pd
 
 import calour as ca
 from calour._testing import Tests
@@ -43,6 +44,19 @@ class TTests(Tests):
         self.assertListEqual(train_y.tolist(), [2, 1, 1, 1, 1, 1])
         self.assertListEqual(train_y.index.tolist(), ['S9', 'S6', 'S5', 'S2', 'S4', 'S7'])
 
+    def test_classify_cv(self):
+        from sklearn import datasets
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.model_selection import StratifiedKFold
+        from matplotlib import pyplot as plt
+        iris = datasets.load_iris()
+        X = iris.data
+        y = iris.target
+        d = dict(enumerate(iris.target_names))
+        smd = pd.DataFrame({'plant': y}).replace(d)
+        exp = ca.Experiment(X, smd)
+        a, b = next(exp.classify_cv('plant', RandomForestClassifier, StratifiedKFold(n_splits=3)))
+        plt.show()
 
 if __name__ == "__main__":
     main()

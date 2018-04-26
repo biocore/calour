@@ -14,11 +14,19 @@ Functions
    add_sample_metadata_as_features
 '''
 
-
+from collections import defaultdict
 from logging import getLogger
+import itertools
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection._split import check_cv
+from sklearn.base import is_classifier
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+from matplotlib import pyplot as plt
+import matplotlib as mpl
+from scipy import interp
 from scipy.sparse import hstack
 import pandas as pd
 import numpy as np
@@ -121,24 +129,70 @@ def split_train_test(exp: Experiment, field, test_size, train_size=None, stratif
     return train_X, test_X, train_y, test_y
 
 
-@Experiment._record_sig
-def collect_cv_prediction(exp: Experiment, field, estimator, cv, scoring, inplace=False):
+def classify_cv(exp: Experiment, field, estimator, cv, param_grid=None, pos_label=None):
     '''Do the CV
 
+    Yields
+    ------
+    tuple of model and figure
     '''
-    # from sklearn.model_selection._split import check_cv
-    # from sklearn.base import is_classifier
-    # logger.debug('')
-    # if inplace:
-    #     new = exp
-    # else:
-    #     new = exp.copy()
-    # cv = check_cv(cv, y, classifier=is_classifier(estimator))
-    # for params in paramgrid:
-    #     for train_x, train_y in cv:
-    #         estimator.fit(train_x, train_y)
+    X = exp.data
+    y = exp.sample_metadata[field]
+    cv = check_cv(cv, y, classifier=is_classifier(estimator))
 
-    # return yobs, yhat, model
+    cmap = mpl.cm.get_cmap('Dark2')
+    col = dict(zip(y.unique(), itertools.cycle(cmap.colors)))
+
+    if param_grid is None:
+        # use sklearn default param values for the given estimator
+        param_grid = [{}]
+    mean_fpr = np.linspace(0, 1, 100)
+    pos_label_ = None
+    for param in param_grid:
+        logger.debug('run classification with parameters: %r' % param)
+        tprs = defaultdict(list)
+        aucs = defaultdict(list)
+        for train, test in cv.split(X, y):
+            model = estimator(**param)
+            model.fit(X[train], y[train])
+            probas = model.predict_proba(X[test])
+            # binarize with model.classes_ to make sure it orders the classes in the same order
+            y_test = label_binarize(y[test], classes=model.classes_)
+            if len(model.classes_) == 2:
+                pos_label_ = np.where(model.classes_ == pos_label)[0][0]
+            for i in range(y_test.shape[1]):
+                cls = model.classes_[i]
+                fpr, tpr, thresholds = roc_curve(y_test[:, i], probas[:, i], pos_label=pos_label_)
+                mean_tpr = interp(mean_fpr, fpr, tpr)
+                tprs[cls].append(mean_tpr)
+                tprs[cls][-1][0] = 0.0
+                roc_auc = auc(mean_fpr, mean_tpr)
+                aucs[cls].append(roc_auc)
+
+        fig, ax = plt.subplots()
+        ax.axis('equal')
+        ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
+        for cls in tprs:
+            mean_tpr = np.mean(tprs[cls], axis=0)
+            mean_tpr[-1] = 1.0
+            mean_auc = np.mean(aucs[cls])
+            std_auc = np.std(aucs[cls])
+            ax.plot(mean_fpr, mean_tpr, color=col[cls],
+                    label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
+                    lw=2, alpha=.8)
+
+            std_tpr = np.std(tprs[cls], axis=0)
+            tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
+            tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
+            ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
+        ax.set_xlim([-0.05, 1.05])
+        ax.set_ylim([-0.05, 1.05])
+        ax.set_xlabel('False Positive Rate')
+        ax.set_ylabel('True Positive Rate')
+        ax.set_title(field)
+        ax.legend(loc="lower right")
+
+        yield model, ax
 
 
 @Experiment._record_sig
