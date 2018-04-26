@@ -22,7 +22,6 @@ from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold, P
 from sklearn.model_selection._split import check_cv
 from sklearn.base import is_classifier
 from sklearn.metrics import roc_curve, auc, confusion_matrix
-from matplotlib import pyplot as plt
 from scipy import interp
 from scipy.sparse import hstack
 import pandas as pd
@@ -183,7 +182,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_cm(result, normalize=False, title='confusion matrix', cmap=plt.cm.Blues, ax=None):
+def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None):
     '''Plot confusion matrix
 
     Parameters
@@ -210,6 +209,9 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=plt.cm.Blues
         The axes for the confusion matrix
 
     '''
+    from matplotlib import pyplot as plt
+    if cmap is None:
+        cmap = plt.cm.Blues
     classes = result['Y_TRUE'].unique()
     cm = _compute_cm(result, labels=classes)
     if normalize:
@@ -253,7 +255,7 @@ def _compute_cm(result, labels, **kwargs):
     return confusion_matrix(result['Y_TRUE'], y_pred, labels=labels, **kwargs)
 
 
-def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
+def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
     '''Plot ROC curve.
 
     Parameters
@@ -271,7 +273,7 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
     title : str
         plot title
     cmap : str or matplotlib.colors.ListedColormap
-        str to indicate the colormap name. Default is "Blues" colormap.
+        str to indicate the colormap name. Default is "Dark2" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where to plot. None (default) to create a new figure and
@@ -283,6 +285,9 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=plt.cm.Dark2, ax=None):
         The axes for the ROC
 
     '''
+    from matplotlib import pyplot as plt
+    if cmap is None:
+        cmap = plt.cm.Dark2
     if ax is None:
         fig, ax = plt.subplots()
 
