@@ -57,7 +57,7 @@ class TTests(Tests):
         d = dict(enumerate(iris.target_names))
         smd = pd.DataFrame({'plant': y}).replace(d)
         exp = ca.Experiment(X, smd, sparse=False)
-        run = exp.classify('plant', KNeighborsClassifier,
+        run = exp.classify('plant', KNeighborsClassifier(),
                            predict='predict_proba',
                            cv=StratifiedKFold(3, random_state=0))
         res = next(run)

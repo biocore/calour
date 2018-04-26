@@ -18,9 +18,9 @@ from logging import getLogger
 import itertools
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold, ParameterGrid
+from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold
 from sklearn.model_selection._split import check_cv
-from sklearn.base import is_classifier
+from sklearn.base import is_classifier, clone
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 from scipy import interp
 from scipy.sparse import hstack
@@ -126,14 +126,14 @@ def split_train_test(exp: Experiment, field, test_size, train_size=None, stratif
 
 
 def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1),
-             predict='predict_proba', param_grid=None):
+             predict='predict_proba', params=None):
     '''Evaluate classification during cross validation.
 
     Parameters
     ----------
     field : str
         column name in the sample metadata, which contains the classes we want to predict.
-    estimator : object
+    estimator : estimator object implementing `fit` and `predict`
         scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestClassifer`
     cv : int, cross-validation generator or an iterable
         similar to the `cv` parameter in :class:`sklearn.model_selection.GridSearchCV`
@@ -141,9 +141,12 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         the function used to predict the validation sets. Some estimators
         have both functions to predict class or predict the probablity of each class
         for a sample. For example, see :class:`sklearn.ensemble.RandomForestClassifier`
-    param_grid : dict of string to sequence, or sequence of such
-        the parameter passing to :class:`sklearn.model_selection.ParameterGrid`. By default,
-        it uses whatever default parameter of the `estimator` set in `scikit-learn`
+    params : dict of string to sequence, or sequence of such
+        For example, the output of
+        :class:`sklearn.model_selection.ParameterGrid` or
+        :class:`sklearn.model_selection.ParameterSampler`. By default,
+        it uses whatever default parameters of the `estimator` set in
+        `scikit-learn`
 
     Yields
     ------
@@ -155,20 +158,23 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         - CV: which split of the cross validation
         - Y_PRED: the predicted class for the samples (if "predict")
         - mutliple columns with each contain probabilities predicted as each class (if "predict_proba")
+
     '''
     X = exp.data
     y = exp.sample_metadata[field]
     cv = check_cv(cv, y, classifier=is_classifier(estimator))
 
-    if param_grid is None:
+    if params is None:
         # use sklearn default param values for the given estimator
-        param_grid = {}
+        params = [{}]
 
-    for param in ParameterGrid(param_grid):
+    for param in params:
         logger.debug('run classification with parameters: %r' % param)
         dfs = []
         for i, (train, test) in enumerate(cv.split(X, y)):
-            model = estimator(**param)
+            # deep copy the model by clone to avoid the impact from last iteration of fit.
+            model = clone(estimator)
+            model = model.set_params(**param)
             model.fit(X[train], y[train])
             pred = getattr(model, predict)(X[test])
             if pred.ndim > 1:
