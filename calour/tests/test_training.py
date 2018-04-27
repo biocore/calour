@@ -13,12 +13,12 @@ from numpy.testing import assert_array_equal
 import pandas as pd
 import pandas.util.testing as pdt
 from sklearn import datasets
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import StratifiedKFold
 
 import calour as ca
 from calour._testing import Tests
-from calour.training import plot_cm, plot_roc
+from calour.training import plot_cm, plot_roc, plot_scatter
 
 
 class TTests(Tests):
@@ -49,6 +49,36 @@ class TTests(Tests):
         self.assertListEqual(test_y.index.tolist(), ['S3', 'S8', 'S1'])
         self.assertListEqual(train_y.tolist(), [2, 1, 1, 1, 1, 1])
         self.assertListEqual(train_y.index.tolist(), ['S9', 'S6', 'S5', 'S2', 'S4', 'S7'])
+
+    def test_regress(self):
+        diabetes = datasets.load_diabetes()
+        X = diabetes.data
+        y = diabetes.target
+        smd = pd.DataFrame({'diabetes': y})
+        exp = ca.Experiment(X, smd, sparse=False)
+        run = exp.regress('diabetes', KNeighborsRegressor())
+        res = next(run)
+        plot_scatter(res)
+        from matplotlib import pyplot as plt
+        plt.show()
+
+        obs = pd.read_table(join(self.test_data_dir, 'iris_result.txt'), index_col=0)
+
+    def test_quantile_regress(self):
+        diabetes = datasets.load_diabetes()
+        X = diabetes.data
+        y = diabetes.target
+        smd = pd.DataFrame({'diabetes': y})
+        exp = ca.Experiment(X, smd, sparse=False)
+        run = exp.regress_quantile_random_forest('diabetes', params=[{'n_estimators':500}])
+        res = next(run)
+        print(res)
+        plot_scatter(res, interval=True)
+        from matplotlib import pyplot as plt
+        plt.show()
+
+        obs = pd.read_table(join(self.test_data_dir, 'iris_result.txt'), index_col=0)
+
 
     def test_classify(self):
         iris = datasets.load_iris()
