@@ -179,54 +179,7 @@ def regress(exp: Experiment, field, estimator, cv=RepeatedKFold(3, 1), params=No
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def _pred_intervals(model, X, percentile=95):
-    n = len(model.estimators_)
-    pred = np.empty((len(X), n))
-    q = (100 - percentile) / 2.
-    for i, estimator in enumerate(model.estimators_):
-        pred[:, i] = estimator.predict(X)
-    err_down = np.percentile(pred, q, axis=1)
-    err_up = np.percentile(pred, 100 - q, axis=1)
-    return err_down, err_up
-
-
-def regress_quantile_random_forest(exp: Experiment, field, cv=RepeatedKFold(3, 1), params=None):
-    '''
-    Inspired from http://blog.datadive.net/prediction-intervals-for-random-forests/
-    '''
-    estimator = RandomForestRegressor(min_samples_leaf=1)
-    X = exp.data
-    y = exp.sample_metadata[field]
-    cv = check_cv(cv, y, classifier=is_classifier(estimator))
-
-    if params is None:
-        # use sklearn default param values for the given estimator
-        params = [{}]
-
-    for param in params:
-        if 'min_sample_leaf' in param:
-            raise
-        logger.debug('run quantile random forest with parameters: %r' % param)
-        dfs = []
-        for i, (train, test) in enumerate(cv.split(X, y)):
-            # deep copy the model by clone to avoid the impact from last iteration of fit.
-            model = clone(estimator)
-            model = model.set_params(**param)
-            model.fit(X[train], y[train])
-            err_down, err_up = _pred_intervals(model, X[test], percentile=90)
-            y_pred = model.predict(X[test])
-            df = pd.DataFrame({'Y_PRED': y_pred,
-                               'Y_PRED_UPPER': err_up,
-                               'Y_PRED_LOWER': err_down,
-                               'Y_TRUE': y[test].values,
-                               'SAMPLE': y[test].index.values,
-                               'CV': i})
-
-            dfs.append(df)
-        yield pd.concat(dfs, axis=0).reset_index(drop=True)
-
-
-def plot_scatter(result, title='', cmap=None, interval=False, cor=stats.pearsonr, ax=None):
+def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     '''Plot prediction vs. observation for regression.
 
     Parameters
@@ -240,6 +193,10 @@ def plot_scatter(result, title='', cmap=None, interval=False, cor=stats.pearsonr
     cmap : str or matplotlib.colors.ListedColormap
         str to indicate the colormap name. Default is "Blues" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    cor : Callable or None
+        a correlation function that takes predicted y and observed y as inputs and returns
+        correlation coefficient and p-value. If None, don't compute and label correlation
+        on the plot.
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
@@ -257,16 +214,9 @@ def plot_scatter(result, title='', cmap=None, interval=False, cor=stats.pearsonr
         fig, ax = plt.subplots()
     # ax.axis('equal')
     for i, (grp, df) in enumerate(result.groupby('CV')):
-        if interval:
-            ax.errorbar(df['Y_TRUE'], df['Y_PRED'],
-                        yerr=df[['Y_PRED_LOWER', 'Y_PRED_UPPER']].values.T,
-                        fmt='.',
-                        color=cmap.colors[i],
-                        label='CV {}'.format(grp))
-        else:
-            ax.scatter(df['Y_TRUE'], df['Y_PRED'],
-                       color=cmap.colors[i],
-                       label='CV {}'.format(grp))
+        ax.scatter(df['Y_TRUE'], df['Y_PRED'],
+                   color=cmap.colors[i],
+                   label='CV {}'.format(grp))
 
     m1 = result[['Y_TRUE', 'Y_PRED']].min()
     m2 = result[['Y_TRUE', 'Y_PRED']].max()
@@ -275,8 +225,9 @@ def plot_scatter(result, title='', cmap=None, interval=False, cor=stats.pearsonr
     ax.set_ylabel('Prediction')
     ax.set_title(title)
     ax.legend(loc="lower right")
-    r, p = cor(result['Y_TRUE'], result['Y_PRED'])
-    ax.annotate("r={0:.2f} p-value={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
+    if cor is not None:
+        r, p = cor(result['Y_TRUE'], result['Y_PRED'])
+        ax.annotate("r={0:.2f} p-value={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
     return ax
 
 

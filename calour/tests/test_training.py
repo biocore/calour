@@ -10,11 +10,12 @@ from unittest import main
 from os.path import join
 
 from numpy.testing import assert_array_equal
+import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import KFold
 
 import calour as ca
 from calour._testing import Tests
@@ -52,33 +53,27 @@ class TTests(Tests):
 
     def test_regress(self):
         diabetes = datasets.load_diabetes()
-        X = diabetes.data
-        y = diabetes.target
+        X = diabetes.data[:9]
+        y = diabetes.target[:9]
         smd = pd.DataFrame({'diabetes': y})
         exp = ca.Experiment(X, smd, sparse=False)
-        run = exp.regress('diabetes', KNeighborsRegressor())
+        run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, random_state=0))
         res = next(run)
-        plot_scatter(res)
-        from matplotlib import pyplot as plt
-        plt.show()
+        obs = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
+        pdt.assert_frame_equal(res, obs)
 
-        obs = pd.read_table(join(self.test_data_dir, 'iris_result.txt'), index_col=0)
-
-    def test_quantile_regress(self):
-        diabetes = datasets.load_diabetes()
-        X = diabetes.data
-        y = diabetes.target
-        smd = pd.DataFrame({'diabetes': y})
-        exp = ca.Experiment(X, smd, sparse=False)
-        run = exp.regress_quantile_random_forest('diabetes', params=[{'n_estimators':500}])
-        res = next(run)
-        print(res)
-        plot_scatter(res, interval=True)
-        from matplotlib import pyplot as plt
-        plt.show()
-
-        obs = pd.read_table(join(self.test_data_dir, 'iris_result.txt'), index_col=0)
-
+    def test_plot_scatter(self):
+        res = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
+        title = 'foo'
+        ax = plot_scatter(res, title=title)
+        self.assertEqual(title, ax.get_title())
+        cor = 'r=-0.62 p-value=0.078'
+        self.assertEqual(cor, ax.texts[0].get_text())
+        dots = []
+        for collection in ax.collections:
+            dots.append(collection.get_offsets())
+        assert_array_equal(np.concatenate(dots, axis=0),
+                           res[['Y_TRUE', 'Y_PRED']].values)
 
     def test_classify(self):
         iris = datasets.load_iris()
@@ -89,7 +84,7 @@ class TTests(Tests):
         exp = ca.Experiment(X, smd, sparse=False)
         run = exp.classify('plant', KNeighborsClassifier(),
                            predict='predict_proba',
-                           cv=StratifiedKFold(3, random_state=0))
+                           cv=KFold(3, random_state=0))
         res = next(run)
         obs = pd.read_table(join(self.test_data_dir, 'iris_result.txt'), index_col=0)
         pdt.assert_frame_equal(res, obs)
