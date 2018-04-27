@@ -22,7 +22,6 @@ from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold, R
 from sklearn.model_selection._split import check_cv
 from sklearn.base import is_classifier, clone
 from sklearn.metrics import roc_curve, auc, confusion_matrix
-from sklearn.ensemble import RandomForestRegressor
 from scipy import interp, stats
 from scipy.sparse import hstack
 import pandas as pd

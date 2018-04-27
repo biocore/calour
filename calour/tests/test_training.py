@@ -77,8 +77,11 @@ class TTests(Tests):
 
     def test_classify(self):
         iris = datasets.load_iris()
-        X = iris.data
-        y = iris.target
+        n = len(iris.target)
+        np.random.seed(0)
+        i = np.random.randint(0, n, 36)
+        X = iris.data[i]
+        y = iris.target[i]
         d = dict(enumerate(iris.target_names))
         smd = pd.DataFrame({'plant': y}).replace(d)
         exp = ca.Experiment(X, smd, sparse=False)
@@ -86,7 +89,7 @@ class TTests(Tests):
                            predict='predict_proba',
                            cv=KFold(3, random_state=0))
         res = next(run)
-        obs = pd.read_table(join(self.test_data_dir, 'iris_result.txt'), index_col=0)
+        obs = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'), index_col=0)
         pdt.assert_frame_equal(res, obs)
         # plot_roc(res)
         # from matplotlib import pyplot as plt
@@ -96,37 +99,37 @@ class TTests(Tests):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
         ax = plot_roc(result)
         legend = ax.get_legend()
-        for exp, obs in zip(legend.get_texts(),
-                            ['Luck',
-                             'versicolor (0.95 $\\pm$ 0.06)',
-                             'virginica (0.96 $\\pm$ 0.04)',
-                             'setosa (0.98 $\pm$ 0.01)']):
-            self.assertEqual(exp.get_text(), obs)
+        exp = {'Luck',
+               'setosa (0.99 $\pm$ 0.00)',
+               'virginica (0.96 $\\pm$ 0.05)',
+               'versicolor (0.95 $\\pm$ 0.07)'}
+        obs = {i.get_text() for i in legend.get_texts()}
+        self.assertSetEqual(exp, obs)
         # from matplotlib import pyplot as plt
         # plt.show()
 
     def test_plot_roc_binary(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
-        result['Y_TRUE'] = ['setosa' if i == 'setosa' else 'not setosa'
+        result['Y_TRUE'] = ['virginica' if i == 'virginica' else 'not virginica'
                             for i in result['Y_TRUE']]
-        result['not setosa'] = 1 - result['setosa']
-        ax = plot_roc(result, pos_label='setosa')
+        result['not virginica'] = 1 - result['virginica']
+        ax = plot_roc(result, pos_label='virginica')
         # from matplotlib import pyplot as plt
         # plt.show()
         legend = ax.get_legend()
-        for exp, obs in zip(legend.get_texts(),
-                            ['Luck',
-                             'setosa (0.98 $\pm$ 0.01)']):
-            self.assertEqual(exp.get_text(), obs)
+        exp = {'Luck',
+               'virginica (0.96 $\pm$ 0.05)'}
+        obs = {i.get_text() for i in legend.get_texts()}
+        self.assertSetEqual(exp, obs)
 
     def test_plot_cm(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
         ax = plot_cm(result)
         # from matplotlib import pyplot as plt
         # plt.show()
-        obs = [((0, 0), '11'), ((1, 0), '1'), ((2, 0), '0'),
-               ((0, 1), '1'), ((1, 1), '11'), ((2, 1), '0'),
-               ((0, 2), '1'), ((1, 2), '1'), ((2, 2), '10')]
+        obs = [((0, 0), '13'), ((1, 0), '0'), ((2, 0), '0'),
+               ((0, 1), '0'), ((1, 1), '9'), ((2, 1), '1'),
+               ((0, 2), '0'), ((1, 2), '3'), ((2, 2), '10')]
         for exp, obs in zip(ax.get_children(), obs):
             self.assertEqual(exp.get_text(), obs[1])
             self.assertEqual(exp.get_position(), obs[0])
