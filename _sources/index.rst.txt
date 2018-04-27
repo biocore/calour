@@ -29,7 +29,7 @@ Installing Calour
 -----------------
 You can install Calour locally following the `instructions <https://github.com/biocore/calour/blob/master/INSTALL.md>`_.
 
-You can also try Calour (**without installing**) on an online `mybinder server <https://mybinder.org/v2/gh/amnona/calour/mybinder>`_.
+You can also try Calour (**without installing**) on an online `mybinder server <https://mybinder.org/v2/gh/biocore/calour/master?filepath=doc%2Fsource%2Fnotebooks>`_.
 
 
 Getting started

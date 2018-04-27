@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>calour.experiment.Experiment.plot &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
@@ -130,7 +130,7 @@
 <h1>calour.experiment.Experiment.plot<a class="headerlink" href="#calour-experiment-experiment-plot" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.plot">
-<code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>title=None</em>, <em>barx_fields=None</em>, <em>barx_width=0.3</em>, <em>barx_colors=None</em>, <em>barx_label=True</em>, <em>barx_label_kwargs=None</em>, <em>bary_fields=None</em>, <em>bary_width=0.3</em>, <em>bary_colors=None</em>, <em>bary_label=True</em>, <em>bary_label_kwargs=None</em>, <em>tree=None</em>, <em>tree_size=8</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>**heatmap_kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>title=None</em>, <em>barx_fields=None</em>, <em>barx_width=0.3</em>, <em>barx_colors=None</em>, <em>barx_label=True</em>, <em>barx_label_kwargs=None</em>, <em>bary_fields=None</em>, <em>bary_width=0.3</em>, <em>bary_colors=None</em>, <em>bary_label=True</em>, <em>bary_label_kwargs=None</em>, <em>tree=None</em>, <em>tree_size=8</em>, <em>gui='cli'</em>, <em>databases=False</em>, <em>**heatmap_kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/util.py#L120"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the interactive heatmap and its associated axes.</p>
 <p>The heatmap is interactive and can be dynamically updated with
 following key and mouse events:</p>
@@ -201,8 +201,8 @@ column</td>
 <li><strong>barx_fields</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em><em>, </em><em>optional</em>) – </li>
 <li><strong>bary_fields</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em><em>, </em><em>optional</em>) – column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
 for each column. It doesn’t plot color bars by default (None)</li>
-<li><strong>barx_width</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – </li>
-<li><strong>bary_width</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The width of the bars</li>
+<li><strong>barx_width</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>list of float</em><em>, </em><em>optional</em>) – </li>
+<li><strong>bary_width</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>list of float</em><em>, </em><em>optional</em>) – The thickness of the each bar. The default thickness usually looks good enough.</li>
 <li><strong>barx_colors</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.2.2)"><em>matplotlib.colors.ListedColormap</em></a><em>, </em><em>optional</em>) – </li>
 <li><strong>bary_colors</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.2.2)"><em>matplotlib.colors.ListedColormap</em></a><em>, </em><em>optional</em>) – The colors for each unique values in the column of sample/feature metadata</li>
 <li><strong>barx_label</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – </li>
@@ -280,7 +280,7 @@ axes to plot the heatmap</li>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
     </p>
   </div>
 </footer>

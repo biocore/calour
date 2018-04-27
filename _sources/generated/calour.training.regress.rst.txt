@@ -1,0 +1,6 @@
+calour.training.regress
+=======================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: regress

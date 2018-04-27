@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>calour.experiment.Experiment &#8212; calour 1.0-dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
@@ -159,8 +159,8 @@ are in row and features in column</li>
 <li><strong>sample_metadata</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – The metadata on the samples</li>
 <li><strong>feature_metadata</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – The metadata on the features</li>
 <li><strong>exp_metadata</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – metadata about the experiment (data md5, filenames, etc.)</li>
-<li><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.shape.html#calour.amplicon_experiment.AmpliconExperiment.shape" title="calour.amplicon_experiment.AmpliconExperiment.shape"><strong>shape</strong></a> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the dimension of data</li>
-<li><a class="reference internal" href="calour.experiment.Experiment.sparse.html#calour.experiment.Experiment.sparse" title="calour.experiment.Experiment.sparse"><strong>sparse</strong></a> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.</li>
+<li><a class="reference internal" href="calour.experiment.Experiment.shape.html#calour.experiment.Experiment.shape" title="calour.experiment.Experiment.shape"><strong>shape</strong></a> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the dimension of data</li>
+<li><a class="reference internal" href="calour.amplicon_experiment.AmpliconExperiment.sparse.html#calour.amplicon_experiment.AmpliconExperiment.sparse" title="calour.amplicon_experiment.AmpliconExperiment.sparse"><strong>sparse</strong></a> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.</li>
 <li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of the experiment</li>
 </ul>
 </td>
@@ -208,14 +208,14 @@ are in row and features in column</li>
 <tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.center_log.html#calour.experiment.Experiment.center_log" title="calour.experiment.Experiment.center_log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center_log</span></code></a>([method,&nbsp;centralize,&nbsp;inplace])</td>
 <td>Performs a clr transform to normalize each sample.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.cluster_data.html#calour.experiment.Experiment.cluster_data" title="calour.experiment.Experiment.cluster_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_data</span></code></a>([transform,&nbsp;axis,&nbsp;metric,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.classify.html#calour.experiment.Experiment.classify" title="calour.experiment.Experiment.classify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classify</span></code></a>(field,&nbsp;estimator[,&nbsp;cv,&nbsp;predict,&nbsp;params])</td>
+<td>Evaluate classification during cross validation.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.cluster_data.html#calour.experiment.Experiment.cluster_data" title="calour.experiment.Experiment.cluster_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_data</span></code></a>([transform,&nbsp;axis,&nbsp;metric,&nbsp;inplace])</td>
 <td>Cluster the samples/features.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.cluster_features.html#calour.experiment.Experiment.cluster_features" title="calour.experiment.Experiment.cluster_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_features</span></code></a>([min_abundance,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.cluster_features.html#calour.experiment.Experiment.cluster_features" title="calour.experiment.Experiment.cluster_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_features</span></code></a>([min_abundance,&nbsp;inplace])</td>
 <td>Cluster features.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.collect_cv_prediction.html#calour.experiment.Experiment.collect_cv_prediction" title="calour.experiment.Experiment.collect_cv_prediction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collect_cv_prediction</span></code></a>(field,&nbsp;estimator,&nbsp;cv,&nbsp;…)</td>
-<td>Do the CV</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.copy.html#calour.experiment.Experiment.copy" title="calour.experiment.Experiment.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</td>
 <td>Copy the object (deeply).</td>
@@ -224,7 +224,7 @@ are in row and features in column</li>
 <td>Find features with correlation to a numeric metadata field</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.diff_abundance.html#calour.experiment.Experiment.diff_abundance" title="calour.experiment.Experiment.diff_abundance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diff_abundance</span></code></a>(field,&nbsp;val1[,&nbsp;val2,&nbsp;method,&nbsp;…])</td>
-<td>test the differential expression between 2 groups (val1 and val2 in field field)</td>
+<td>test the differential expression between 2 groups (val1 and val2 in field field) using permutation based fdr (dsfdr) for bacteria that have a significant difference.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.diff_abundance_kw.html#calour.experiment.Experiment.diff_abundance_kw" title="calour.experiment.Experiment.diff_abundance_kw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diff_abundance_kw</span></code></a>(field[,&nbsp;transform,&nbsp;…])</td>
 <td>Test the differential expression between multiple sample groups using the Kruskal Wallis test.</td>
@@ -236,7 +236,7 @@ are in row and features in column</li>
 <td>Get the list of enriched annotation terms in features compared to all features in exp.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.filter_abundance.html#calour.experiment.Experiment.filter_abundance" title="calour.experiment.Experiment.filter_abundance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_abundance</span></code></a>(min_abundance,&nbsp;**kwargs)</td>
-<td>Filter keeping only features with &gt;= min_abundance total over all samples</td>
+<td>Filter keeping only features with &gt;= min_abundance total over all samples This is a convenience function wrapping filter_by_data()</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.filter_by_data.html#calour.experiment.Experiment.filter_by_data" title="calour.experiment.Experiment.filter_by_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_by_data</span></code></a>(predicate[,&nbsp;axis,&nbsp;negate,&nbsp;…])</td>
 <td>Filter samples or features by data.</td>
@@ -316,55 +316,58 @@ are in row and features in column</li>
 <tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.random_permute_data.html#calour.experiment.Experiment.random_permute_data" title="calour.experiment.Experiment.random_permute_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_permute_data</span></code></a>([normalize])</td>
 <td>Shuffle independently the reads of each feature</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.reorder.html#calour.experiment.Experiment.reorder" title="calour.experiment.Experiment.reorder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder</span></code></a>(new_order[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.regress.html#calour.experiment.Experiment.regress" title="calour.experiment.Experiment.regress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regress</span></code></a>(field,&nbsp;estimator[,&nbsp;cv,&nbsp;params])</td>
+<td>Evaluate regression during cross validation.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.reorder.html#calour.experiment.Experiment.reorder" title="calour.experiment.Experiment.reorder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder</span></code></a>(new_order[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Reorder according to indices in the new order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.rescale.html#calour.experiment.Experiment.rescale" title="calour.experiment.Experiment.rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rescale</span></code></a>([total,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.rescale.html#calour.experiment.Experiment.rescale" title="calour.experiment.Experiment.rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rescale</span></code></a>([total,&nbsp;axis,&nbsp;inplace])</td>
 <td>Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save.html#calour.experiment.Experiment.save" title="calour.experiment.Experiment.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(prefix[,&nbsp;fmt])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save.html#calour.experiment.Experiment.save" title="calour.experiment.Experiment.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(prefix[,&nbsp;fmt])</td>
 <td>Save the experiment data to disk.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save_biom.html#calour.experiment.Experiment.save_biom" title="calour.experiment.Experiment.save_biom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_biom</span></code></a>(f[,&nbsp;fmt,&nbsp;add_metadata])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save_biom.html#calour.experiment.Experiment.save_biom" title="calour.experiment.Experiment.save_biom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_biom</span></code></a>(f[,&nbsp;fmt,&nbsp;add_metadata])</td>
 <td>Save experiment to biom format</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save_fasta.html#calour.experiment.Experiment.save_fasta" title="calour.experiment.Experiment.save_fasta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fasta</span></code></a>(f[,&nbsp;seqs])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save_fasta.html#calour.experiment.Experiment.save_fasta" title="calour.experiment.Experiment.save_fasta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fasta</span></code></a>(f[,&nbsp;seqs])</td>
 <td>Save a list of sequences to fasta.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.save_metadata.html#calour.experiment.Experiment.save_metadata" title="calour.experiment.Experiment.save_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_metadata</span></code></a>(f[,&nbsp;axis])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.save_metadata.html#calour.experiment.Experiment.save_metadata" title="calour.experiment.Experiment.save_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_metadata</span></code></a>(f[,&nbsp;axis])</td>
 <td>Save sample/feature metadata to file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.scale.html#calour.experiment.Experiment.scale" title="calour.experiment.Experiment.scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code></a>([axis,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.scale.html#calour.experiment.Experiment.scale" title="calour.experiment.Experiment.scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code></a>([axis,&nbsp;inplace])</td>
 <td>Standardize a dataset along an axis</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_abundance.html#calour.experiment.Experiment.sort_abundance" title="calour.experiment.Experiment.sort_abundance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_abundance</span></code></a>([subgroup])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_abundance.html#calour.experiment.Experiment.sort_abundance" title="calour.experiment.Experiment.sort_abundance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_abundance</span></code></a>([subgroup])</td>
 <td>Sort features based on their abundance in a subset of the samples.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_by_data.html#calour.experiment.Experiment.sort_by_data" title="calour.experiment.Experiment.sort_by_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_by_data</span></code></a>([axis,&nbsp;subset,&nbsp;key,&nbsp;inplace,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_by_data.html#calour.experiment.Experiment.sort_by_data" title="calour.experiment.Experiment.sort_by_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_by_data</span></code></a>([axis,&nbsp;subset,&nbsp;key,&nbsp;inplace,&nbsp;…])</td>
 <td>Sort features based on their mean frequency.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_by_metadata.html#calour.experiment.Experiment.sort_by_metadata" title="calour.experiment.Experiment.sort_by_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_by_metadata</span></code></a>(field[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_by_metadata.html#calour.experiment.Experiment.sort_by_metadata" title="calour.experiment.Experiment.sort_by_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_by_metadata</span></code></a>(field[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Sort samples or features based on metadata values in the field.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_centroid.html#calour.experiment.Experiment.sort_centroid" title="calour.experiment.Experiment.sort_centroid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_centroid</span></code></a>([transform,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_centroid.html#calour.experiment.Experiment.sort_centroid" title="calour.experiment.Experiment.sort_centroid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_centroid</span></code></a>([transform,&nbsp;inplace])</td>
 <td>Sort the features based on the center of mass</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_ids.html#calour.experiment.Experiment.sort_ids" title="calour.experiment.Experiment.sort_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_ids</span></code></a>(ids[,&nbsp;axis,&nbsp;inplace])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_ids.html#calour.experiment.Experiment.sort_ids" title="calour.experiment.Experiment.sort_ids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_ids</span></code></a>(ids[,&nbsp;axis,&nbsp;inplace])</td>
 <td>Sort the features or samples by the given ids.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.sort_samples.html#calour.experiment.Experiment.sort_samples" title="calour.experiment.Experiment.sort_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_samples</span></code></a>(field,&nbsp;**kwargs)</td>
-<td>Sort samples by field</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.sort_samples.html#calour.experiment.Experiment.sort_samples" title="calour.experiment.Experiment.sort_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_samples</span></code></a>(field,&nbsp;**kwargs)</td>
+<td>Sort samples by field A convenience function for sort_by_metadata</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.split_train_test.html#calour.experiment.Experiment.split_train_test" title="calour.experiment.Experiment.split_train_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_train_test</span></code></a>(field,&nbsp;test_size[,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.split_train_test.html#calour.experiment.Experiment.split_train_test" title="calour.experiment.Experiment.split_train_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_train_test</span></code></a>(field,&nbsp;test_size[,&nbsp;…])</td>
 <td>Split experiment data into train and test set.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.subsample_count.html#calour.experiment.Experiment.subsample_count" title="calour.experiment.Experiment.subsample_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsample_count</span></code></a>(total[,&nbsp;replace,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.subsample_count.html#calour.experiment.Experiment.subsample_count" title="calour.experiment.Experiment.subsample_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsample_count</span></code></a>(total[,&nbsp;replace,&nbsp;inplace,&nbsp;…])</td>
 <td>Randomly subsample each sample to the same number of counts.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.to_pandas.html#calour.experiment.Experiment.to_pandas" title="calour.experiment.Experiment.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
+<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.to_pandas.html#calour.experiment.Experiment.to_pandas" title="calour.experiment.Experiment.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([sample_field,&nbsp;feature_field,&nbsp;sparse])</td>
 <td>Get a pandas dataframe of the abundances Samples are rows, features are columns.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="calour.experiment.Experiment.transform.html#calour.experiment.Experiment.transform" title="calour.experiment.Experiment.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>([steps,&nbsp;inplace])</td>
+<tr class="row-even"><td><a class="reference internal" href="calour.experiment.Experiment.transform.html#calour.experiment.Experiment.transform" title="calour.experiment.Experiment.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>([steps,&nbsp;inplace])</td>
 <td>Chain transformations together.</td>
 </tr>
 </tbody>
@@ -401,7 +404,7 @@ are in row and features in column</li>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
     </p>
   </div>
 </footer>

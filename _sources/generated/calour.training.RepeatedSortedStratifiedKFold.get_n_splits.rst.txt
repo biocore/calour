@@ -1,0 +1,8 @@
+:orphan:
+
+calour.training.RepeatedSortedStratifiedKFold.get_n_splits
+==========================================================
+
+.. currentmodule:: calour.training
+
+.. automethod:: RepeatedSortedStratifiedKFold.get_n_splits

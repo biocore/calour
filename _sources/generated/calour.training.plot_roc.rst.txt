@@ -1,0 +1,6 @@
+calour.training.plot\_roc
+=========================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: plot_roc

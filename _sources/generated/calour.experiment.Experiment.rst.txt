@@ -42,11 +42,11 @@ calour.experiment.Experiment
          
             ~Experiment.center_log
          
+            ~Experiment.classify
+         
             ~Experiment.cluster_data
          
             ~Experiment.cluster_features
-         
-            ~Experiment.collect_cv_prediction
          
             ~Experiment.copy
          
@@ -113,6 +113,8 @@ calour.experiment.Experiment
             ~Experiment.plot_stacked_bar
          
             ~Experiment.random_permute_data
+         
+            ~Experiment.regress
          
             ~Experiment.reorder
          

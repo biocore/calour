@@ -1,0 +1,6 @@
+calour.training.plot\_scatter
+=============================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: plot_scatter

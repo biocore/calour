@@ -1,0 +1,6 @@
+calour.training.plot\_cm
+========================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: plot_cm

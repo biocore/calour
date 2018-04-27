@@ -42,13 +42,13 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.center_log
          
+            ~AmpliconExperiment.classify
+         
             ~AmpliconExperiment.cluster_data
          
             ~AmpliconExperiment.cluster_features
          
             ~AmpliconExperiment.collapse_taxonomy
-         
-            ~AmpliconExperiment.collect_cv_prediction
          
             ~AmpliconExperiment.copy
          
@@ -125,6 +125,8 @@ calour.amplicon_experiment.AmpliconExperiment
             ~AmpliconExperiment.plot_stacked_bar
          
             ~AmpliconExperiment.random_permute_data
+         
+            ~AmpliconExperiment.regress
          
             ~AmpliconExperiment.reorder
          

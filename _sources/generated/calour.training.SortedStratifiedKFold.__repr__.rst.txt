@@ -1,0 +1,8 @@
+:orphan:
+
+calour.training.SortedStratifiedKFold.__repr__
+==============================================
+
+.. currentmodule:: calour.training
+
+.. automethod:: SortedStratifiedKFold.__repr__

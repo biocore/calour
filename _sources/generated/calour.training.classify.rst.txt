@@ -1,0 +1,6 @@
+calour.training.classify
+========================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: classify

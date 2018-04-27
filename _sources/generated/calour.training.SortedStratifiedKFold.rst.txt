@@ -1,0 +1,43 @@
+calour.training.SortedStratifiedKFold
+=====================================
+.. currentmodule:: calour.training
+.. autoclass:: SortedStratifiedKFold
+   :show-inheritance:
+
+
+
+
+
+   .. rubric:: Methods
+   .. autosummary::
+      :toctree:
+      
+         
+         
+         
+         
+         
+         
+         
+            ~SortedStratifiedKFold.__repr__
+         
+         
+         
+         
+         
+         
+         
+            ~SortedStratifiedKFold.get_n_splits
+         
+            ~SortedStratifiedKFold.split
+
+
+
+
+
+
+   .. rubric:: Attributes
+   .. autosummary::
+      :toctree:
+      
+
