@@ -6,11 +6,25 @@ machine learning (:mod:`calour.training`)
 
 This module contains the functions related to machine learning.
 
+
+Classes
+^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   SortedStratifiedKFold
+   RepeatedSortedStratifiedKFold
+
 Functions
 ^^^^^^^^^
 .. autosummary::
    :toctree: generated
 
+   classify
+   plot_cm
+   plot_roc
+   regress
+   plot_scatter
    add_sample_metadata_as_features
 '''
 
@@ -18,11 +32,13 @@ from logging import getLogger
 import itertools
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold
-from sklearn.model_selection._split import check_cv
+from sklearn.model_selection import (train_test_split,
+                                     RepeatedStratifiedKFold,
+                                     StratifiedKFold)
+from sklearn.model_selection._split import check_cv, _RepeatedSplits
 from sklearn.base import is_classifier, clone
 from sklearn.metrics import roc_curve, auc, confusion_matrix
-from scipy import interp
+from scipy import interp, stats
 from scipy.sparse import hstack
 import pandas as pd
 import numpy as np
@@ -123,6 +139,159 @@ def split_train_test(exp: Experiment, field, test_size, train_size=None, stratif
     train_X, test_X, train_y, test_y = train_test_split(
         exp.data, y, test_size=test_size, train_size=train_size, stratify=stratify, random_state=random_state)
     return train_X, test_X, train_y, test_y
+
+
+class SortedStratifiedKFold(StratifiedKFold):
+    '''Stratified K-Fold cross validator.
+
+    Please see :class:`sklearn.model_selection.StratifiedKFold` for
+    documentation for parameters, etc. It is very similar to that
+    except this is for regression of numeric values.
+
+    This implementation basically assigns a unique label (int here) to
+    each consecutive `n_splits` values after y is sorted. Then rely on
+    StratifiedKFold to split. The idea is borrowed from this `blog
+    <http://scottclowe.com/2016-03-19-stratified-regression-partitions/>`_.
+
+    See Also
+    --------
+    RepeatedSortedStratifiedKFold
+    '''
+    def __init__(self, n_splits=3, shuffle=False, random_state=None):
+        super().__init__(n_splits, shuffle, random_state)
+
+    def _sort_partition(self, y):
+        n = len(y)
+        cats = np.empty(n, dtype='u4')
+        div, mod = divmod(n, self.n_splits)
+        cats[:n-mod] = np.repeat(range(div), self.n_splits)
+        cats[n-mod:] = div + 1
+        # run argsort twice to get the rank of each y value
+        return cats[np.argsort(np.argsort(y))]
+
+    def split(self, X, y, groups=None):
+        y_cat = self._sort_partition(y)
+        return super().split(X, y_cat, groups)
+
+
+class RepeatedSortedStratifiedKFold(_RepeatedSplits):
+    '''Repeated Stratified K-Fold cross validator.
+
+    Please see :class:`sklearn.model_selection.RepeatedStratifiedKFold` for
+    documentation for parameters, etc. It is very similar to that
+    except this is for regression of numeric values.
+
+    See Also
+    --------
+    SortedStratifiedKFold
+    '''
+    def __init__(self, n_splits=5, n_repeats=10, random_state=None):
+        super().__init__(SortedStratifiedKFold, n_repeats, random_state, n_splits=n_splits)
+
+
+def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(3, 1), params=None):
+    '''Evaluate regression during cross validation.
+
+    Parameters
+    ----------
+    field : str
+        column name in the sample metadata, which contains the variable we want to predict.
+    estimator : estimator object implementing `fit` and `predict`
+        scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestRegressor`
+    cv : int, cross-validation generator or an iterable
+        similar to the `cv` parameter in :class:`sklearn.model_selection.GridSearchCV`
+    params : dict of string to sequence, or sequence of such
+        For example, the output of
+        :class:`sklearn.model_selection.ParameterGrid` or
+        :class:`sklearn.model_selection.ParameterSampler`. By default,
+        it uses whatever default parameters of the `estimator` set in
+        `scikit-learn`
+
+    Yields
+    ------
+    pandas.DataFrame
+        The result of prediction per sample for a given parameter set. It contains the
+        following columns:
+        - Y_TRUE: the true value for the samples
+        - SAMPLE: sample IDs
+        - CV: which split of the cross validation
+        - Y_PRED: the predicted value for the samples
+    '''
+    X = exp.data
+    y = exp.sample_metadata[field]
+    cv = check_cv(cv, y, classifier=is_classifier(estimator))
+
+    if params is None:
+        # use sklearn default param values for the given estimator
+        params = [{}]
+
+    for param in params:
+        logger.debug('run regression with parameters: %r' % param)
+        dfs = []
+        for i, (train, test) in enumerate(cv.split(X, y)):
+            # deep copy the model by clone to avoid the impact from last iteration of fit.
+            model = clone(estimator)
+            model = model.set_params(**param)
+            model.fit(X[train], y[train])
+            pred = model.predict(X[test])
+            df = pd.DataFrame({'Y_PRED': pred,
+                               'Y_TRUE': y[test].values,
+                               'SAMPLE': y[test].index.values,
+                               'CV': i})
+            dfs.append(df)
+        yield pd.concat(dfs, axis=0).reset_index(drop=True)
+
+
+def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
+    '''Plot prediction vs. observation for regression.
+
+    Parameters
+    ----------
+    result : pandas.DataFrame
+        data frame containing predictions per sample (in row). It must have a column of
+        true class named "Y_TRUE". It must have a column of predicted class named "Y_PRED".
+        It typically takes the output of :func:`classify`.
+    title : str
+        plot title
+    cmap : str or matplotlib.colors.ListedColormap
+        str to indicate the colormap name. Default is "Blues" colormap.
+        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    cor : Callable or None
+        a correlation function that takes predicted y and observed y as inputs and returns
+        correlation coefficient and p-value. If None, don't compute and label correlation
+        on the plot.
+    ax : matplotlib.axes.Axes or None (default), optional
+        The axes where the confusion matrix is plotted. None (default) to create a new figure and
+        axes to plot the confusion matrix
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The axes for the confusion matrix
+
+    '''
+    from matplotlib import pyplot as plt
+    if cmap is None:
+        cmap = plt.cm.tab10
+    if ax is None:
+        fig, ax = plt.subplots()
+    # ax.axis('equal')
+    for i, (grp, df) in enumerate(result.groupby('CV')):
+        ax.scatter(df['Y_TRUE'], df['Y_PRED'],
+                   color=cmap.colors[i],
+                   label='CV {}'.format(grp))
+
+    m1 = result[['Y_TRUE', 'Y_PRED']].min()
+    m2 = result[['Y_TRUE', 'Y_PRED']].max()
+    ax.plot([m1, m2], [m1, m2], color='black', alpha=.3)
+    ax.set_xlabel('Observation')
+    ax.set_ylabel('Prediction')
+    ax.set_title(title)
+    ax.legend(loc="lower right")
+    if cor is not None:
+        r, p = cor(result['Y_TRUE'], result['Y_PRED'])
+        ax.annotate("r={0:.2f} p-value={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
+    return ax
 
 
 def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1),
