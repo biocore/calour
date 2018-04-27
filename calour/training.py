@@ -6,11 +6,25 @@ machine learning (:mod:`calour.training`)
 
 This module contains the functions related to machine learning.
 
+
+Classes
+^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   SortedStratifiedKFold
+   RepeatedSortedStratifiedKFold
+
 Functions
 ^^^^^^^^^
 .. autosummary::
    :toctree: generated
 
+   classify
+   plot_cm
+   plot_roc
+   regress
+   plot_scatter
    add_sample_metadata_as_features
 '''
 
@@ -18,8 +32,10 @@ from logging import getLogger
 import itertools
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold, RepeatedKFold
-from sklearn.model_selection._split import check_cv
+from sklearn.model_selection import (train_test_split,
+                                     RepeatedStratifiedKFold,
+                                     StratifiedKFold)
+from sklearn.model_selection._split import check_cv, _RepeatedSplits
 from sklearn.base import is_classifier, clone
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 from scipy import interp, stats
@@ -125,7 +141,55 @@ def split_train_test(exp: Experiment, field, test_size, train_size=None, stratif
     return train_X, test_X, train_y, test_y
 
 
-def regress(exp: Experiment, field, estimator, cv=RepeatedKFold(3, 1), params=None):
+class SortedStratifiedKFold(StratifiedKFold):
+    '''Stratified K-Fold cross validator.
+
+    Please see :class:`sklearn.model_selection.StratifiedKFold` for
+    documentation for parameters, etc. It is very similar to that
+    except this is for regression of numeric values.
+
+    This implementation basically assigns a unique label (int here) to
+    each consecutive `n_splits` values after y is sorted. Then rely on
+    StratifiedKFold to split. The idea is borrowed from this `blog
+    <http://scottclowe.com/2016-03-19-stratified-regression-partitions/>`_.
+
+    See Also
+    --------
+    RepeatedSortedStratifiedKFold
+    '''
+    def __init__(self, n_splits=3, shuffle=False, random_state=None):
+        super().__init__(n_splits, shuffle, random_state)
+
+    def _sort_partition(self, y):
+        n = len(y)
+        cats = np.empty(n, dtype='u4')
+        div, mod = divmod(n, self.n_splits)
+        cats[:n-mod] = np.repeat(range(div), self.n_splits)
+        cats[n-mod:] = div + 1
+        # run argsort twice to get the rank of each y value
+        return cats[np.argsort(np.argsort(y))]
+
+    def split(self, X, y, groups=None):
+        y_cat = self._sort_partition(y)
+        return super().split(X, y_cat, groups)
+
+
+class RepeatedSortedStratifiedKFold(_RepeatedSplits):
+    '''Repeated Stratified K-Fold cross validator.
+
+    Please see :class:`sklearn.model_selection.RepeatedStratifiedKFold` for
+    documentation for parameters, etc. It is very similar to that
+    except this is for regression of numeric values.
+
+    See Also
+    --------
+    SortedStratifiedKFold
+    '''
+    def __init__(self, n_splits=5, n_repeats=10, random_state=None):
+        super().__init__(SortedStratifiedKFold, n_repeats, random_state, n_splits=n_splits)
+
+
+def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(3, 1), params=None):
     '''Evaluate regression during cross validation.
 
     Parameters
@@ -133,7 +197,7 @@ def regress(exp: Experiment, field, estimator, cv=RepeatedKFold(3, 1), params=No
     field : str
         column name in the sample metadata, which contains the variable we want to predict.
     estimator : estimator object implementing `fit` and `predict`
-        scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestRegresser`
+        scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestRegressor`
     cv : int, cross-validation generator or an iterable
         similar to the `cv` parameter in :class:`sklearn.model_selection.GridSearchCV`
     params : dict of string to sequence, or sequence of such

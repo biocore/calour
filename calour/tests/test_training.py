@@ -19,7 +19,7 @@ from sklearn.model_selection import KFold
 
 import calour as ca
 from calour._testing import Tests
-from calour.training import plot_cm, plot_roc, plot_scatter
+from calour.training import plot_cm, plot_roc, plot_scatter, SortedStratifiedKFold, RepeatedSortedStratifiedKFold
 
 
 class TTests(Tests):
@@ -133,6 +133,54 @@ class TTests(Tests):
         for exp, obs in zip(ax.get_children(), obs):
             self.assertEqual(exp.get_text(), obs[1])
             self.assertEqual(exp.get_position(), obs[0])
+
+
+class RTests(Tests):
+    def setUp(self):
+        self.y = np.array([9.1, 7.1, 8.1, 5.1, 3.1, 1.1, 2.1, 6.1, 4.1])
+        self.X = self.y[:, np.newaxis]
+
+    def test_sorted_stratified_k3(self):
+        k = SortedStratifiedKFold(3, shuffle=True, random_state=9)
+        splits = [[9.1, 8.1, 5.1, 3.1, 2.1, 4.1], [7.1, 1.1, 6.1],
+                  [7.1, 8.1, 1.1, 2.1, 6.1, 4.1], [9.1, 5.1, 3.1],
+                  [9.1, 7.1, 5.1, 3.1, 1.1, 6.1], [8.1, 2.1, 4.1]]
+
+        for i, (train, test) in enumerate(k.split(self.X, self.y)):
+            exp_train = splits[i * 2]
+            exp_test = splits[i * 2 + 1]
+            assert_array_equal(self.y[train], exp_train)
+            assert_array_equal(self.y[test], exp_test)
+            assert_array_equal(self.X[train], np.array(exp_train)[:, np.newaxis])
+            assert_array_equal(self.X[test], np.array(exp_test)[:, np.newaxis])
+
+    def test_sorted_stratified_k2(self):
+        # another split scheme
+        k = SortedStratifiedKFold(2, shuffle=True, random_state=9)
+        split1, split2 = [9.1, 7.1, 5.1, 3.1, 1.1], [8.1, 2.1, 6.1, 4.1]
+
+        for (train, test), exp in zip(k.split(self.X, self.y), [(split1, split2), (split2, split1)]):
+            assert_array_equal(self.y[train], exp[0])
+            assert_array_equal(self.y[test], exp[1])
+            assert_array_equal(self.X[train], np.array(exp[0])[:, np.newaxis])
+            assert_array_equal(self.X[test], np.array(exp[1])[:, np.newaxis])
+
+    def test_rep_sorted_strtified_k2(self):
+        k = RepeatedSortedStratifiedKFold(2, 3, random_state=9)
+        splits = [[9.1, 8.1, 5.1, 3.1, 1.1], [7.1, 2.1, 6.1, 4.1],
+                  [7.1, 2.1, 6.1, 4.1], [9.1, 8.1, 5.1, 3.1, 1.1],
+                  [8.1, 5.1, 1.1, 4.1], [9.1, 7.1, 3.1, 2.1, 6.1],
+                  [9.1, 7.1, 3.1, 2.1, 6.1], [8.1, 5.1, 1.1, 4.1],
+                  [9.1, 7.1, 3.1, 1.1, 6.1], [8.1, 5.1, 2.1, 4.1],
+                  [8.1, 5.1, 2.1, 4.1], [9.1, 7.1, 3.1, 1.1, 6.1]]
+
+        for i, (train, test) in enumerate(k.split(self.X, self.y)):
+            exp_train = splits[i * 2]
+            exp_test = splits[i * 2 + 1]
+            assert_array_equal(self.y[train], exp_train)
+            assert_array_equal(self.y[test], exp_test)
+            assert_array_equal(self.X[train], np.array(exp_train)[:, np.newaxis])
+            assert_array_equal(self.X[test], np.array(exp_test)[:, np.newaxis])
 
 
 if __name__ == "__main__":
