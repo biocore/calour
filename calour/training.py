@@ -212,6 +212,7 @@ def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(
     pandas.DataFrame
         The result of prediction per sample for a given parameter set. It contains the
         following columns:
+
         - Y_TRUE: the true value for the samples
         - SAMPLE: sample IDs
         - CV: which split of the cross validation
@@ -322,6 +323,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
     pandas.DataFrame
         The result of prediction per sample for a given parameter set. It contains the
         following columns:
+
         - Y_TRUE: the true class for the samples
         - SAMPLE: sample IDs
         - CV: which split of the cross validation
