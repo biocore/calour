@@ -1,6 +1,6 @@
 # calour changelog
 
-## Version 1.0.rc0 (unreleased yet)
+## Version 2018.5.1
 
 * In `calour.training` module, added functions to do regression and classification and to visualize their results. `SortedStratifiedKFold` and `RepeatedSortedStratifiedKFold` are aslo added for stratified cross validation for regression. They are recommended.
 
