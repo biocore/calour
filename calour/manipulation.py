@@ -165,7 +165,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         else:
             raise ValueError('Unknown aggregation method: %r' % agg)
         merge_number[i] = pos.sum()
-        merge_ids[i] = ';'.join(metadata.index[pos])
+        merge_ids[i] = ';'.join(str(metadata.index[pos]))
         replace_pos = np.where(pos)[0][which_to_replace]
         keep_pos[i] = replace_pos
 
