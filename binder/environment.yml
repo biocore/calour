@@ -1,24 +1,21 @@
-name: calour-environment
+name: calour
 channels:
+  - bioconda
   - conda-forge
-  - biocore
+  - defaults
 dependencies:
   - python
-  - nose
-  - pep8
-  - flake8=3.3.0
   - numpy
   - scipy
   - pyqt>=5
   - pandas
-  - matplotlib
-  - scikit-learn
+  - matplotlib>=2.0
+  - scikit-learn>=0.19
   - scikit-bio>=0.5.1
   - biom-format
   - statsmodels
   - ipywidgets
-  - numpydoc
-  - sphinx
-  - sphinx_bootstrap_theme
-  - biom-format
-  - scikit-bio
+  - pip
+  - pip:
+      - git+git://github.com/biocore/calour.git
+      - git+git://github.com/amnona/dbbact-calour.git

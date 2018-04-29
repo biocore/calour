@@ -30,7 +30,7 @@ import configparser
 from types import FunctionType
 from functools import wraps, update_wrapper
 from importlib import import_module
-from collections.abc import Container
+from collections.abc import Sequence
 from logging import getLogger
 from numbers import Real
 from pkg_resources import resource_filename
@@ -55,13 +55,12 @@ def compute_prevalence(abundance):
 
     Examples
     --------
-    >>> abund = [0, 0, 1, 2, 4, 1]
+    >>> abund = [0, 0, 1, 2, 4]
     >>> x, y = compute_prevalence(abund)
-    >>> x
+    >>> x   #doctest: +SKIP
     array([0, 1, 2, 4])
-    >>> y
-    array([0.66666667, 0.33333333, 0.16666667, 0.        ])
-
+    >>> y   #doctest: +SKIP
+    array([0.6, 0.4, 0.2, 0.])
     '''
     # unique values are sorted
     cutoffs, counts = np.unique(abundance, return_counts=True)
@@ -363,10 +362,24 @@ def set_log_level(level):
 
 
 def _to_list(x):
-    '''if x is non iterable or string, convert to iterable '''
+    '''if x is non iterable or string, convert to iterable.
+
+    See the expected behavior in the examples below.
+
+    Examples
+    --------
+    >>> _to_list('a')
+    ['a']
+    >>> _to_list({})
+    [{}]
+    >>> _to_list(['a'])
+    ['a']
+    >>> _to_list(set(['a']))
+    [{'a'}]
+    '''
     if isinstance(x, str):
         return [x]
-    if isinstance(x, Container):
+    if isinstance(x, Sequence):
         return x
     return [x]
 

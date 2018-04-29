@@ -9,13 +9,13 @@
 .DEFAULT_GOAL := help
 
 ifeq ($(WITH_COVERAGE), TRUE)
-	TEST_COMMAND = COVERAGE_FILE=.coverage coverage run --rcfile .coveragerc setup.py nosetests --with-doctest
+	TEST_COMMAND = COVERAGE_FILE=.coverage coverage run --rcfile .coveragerc setup.py nosetests --with-doctest --verbosity=2
 else
-	TEST_COMMAND = nosetests --with-doctest
+	TEST_COMMAND = nosetests --with-doctest --verbosity=2
 endif
 
 
-MSG ?= 
+MSG ?=
 
 
 help:

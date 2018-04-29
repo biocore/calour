@@ -277,8 +277,8 @@ class AmpliconExperiment(Experiment):
 
         '''
         def find_highest(s):
-            l = s.split(';')
-            b = [len(i) > 3 for i in l]
-            return np.array(l)[b][-1]
+            levels = s.split(';')
+            b = [len(i) > 3 for i in levels]
+            return np.array(levels)[b][-1]
         self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_highest)
         return self

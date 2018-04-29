@@ -434,6 +434,7 @@ intersphinx_mapping = {
     'http://docs.scipy.org/doc/scipy/reference': None,
     'http://matplotlib.org': None,
     'http://pandas.pydata.org/pandas-docs/stable': None,
+    'http://scikit-learn.org/stable': None,
     'http://www.biom-format.org': None,
     'http://scikit-bio.org/docs/latest': None
 }

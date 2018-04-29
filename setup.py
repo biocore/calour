@@ -43,7 +43,7 @@ description = 'CALOUR: exploratory and interactive microbiome analyses based on 
 with open('README.md') as f:
     long_description = f.read()
 
-keywords = 'microbiome heatmap analysis bioinformatics',
+keywords = 'microbiome heatmap analysis bioinformatics'
 
 setup(name='calour',
       version=version,
@@ -53,8 +53,9 @@ setup(name='calour',
       keywords=keywords,
       classifiers=classifiers,
       author="calour development team",
+      author_email='zhenjiang.xu@gmail.com',
       maintainer="calour development team",
-      url='http://microbio.me/calour',
+      url='http://biocore.github.io/calour',
       test_suite='nose.collector',
       packages=find_packages(),
       package_data={'calour': ['log.cfg', 'calour.config', 'export_html_template.html']},
@@ -63,15 +64,12 @@ setup(name='calour',
           'scipy',
           'pandas',
           'matplotlib >= 2.0',
-          'scikit-learn',
-          'scikit-bio',
+          'scikit-learn >= 0.19.1',
+          'scikit-bio >= 0.5.1',
           'biom-format',
           'statsmodels',
-          'ipywidgets'],
+          'ipywidgets',
+          'docrep'],
       extras_require={'test': ["nose", "pep8", "flake8"],
-                      'coverage': ["coverage"],
-                      'doc': ["Sphinx >= 1.4"]},
-      entry_points={
-          'console_scripts': [
-              'calour=calour.cli:cmd',
-          ]})
+                      'coverage': ["coveralls"],
+                      'doc': ["Sphinx >= 1.4", "sphinx-autodoc-typehints", "nbsphinx"]})

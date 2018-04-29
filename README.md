@@ -1,7 +1,8 @@
 CALOUR
 ======
-
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/biocore/calour/master?filepath=doc%2Fsource%2Fnotebooks)
 [![Build Status](https://travis-ci.org/biocore/calour.png?branch=master)](https://travis-ci.org/biocore/calour)
+[![Build status](https://ci.appveyor.com/api/projects/status/yd5sxx9afxaoedvk/branch/master?svg=true)](https://ci.appveyor.com/project/biocore/calour/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/biocore/calour/badge.svg?branch=master)](https://coveralls.io/github/biocore/calour?branch=master)
 
 exploratory and interactive microbiome analysis based on heatmaps
@@ -16,4 +17,7 @@ exploratory and interactive microbiome analysis based on heatmaps
 
 
 [Mouse & Keyboard Operation](http://biocore.github.io/calour/generated/calour.heatmap.plot.html#calour.heatmap.plot)
-==========================================================================================================
+====================================================================================================================
+
+[Change History](https://github.com/biocore/calour/blob/master/CHANGELOG.md)
+============================================================================

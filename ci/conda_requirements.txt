@@ -1,14 +1,13 @@
 nose
 pep8
-flake8=3.3.0
+flake8
 numpy
 scipy
 pyqt>=5
 pandas
 matplotlib
+h5py
 scikit-learn
-scikit-bio>=0.5.1
-biom-format
 statsmodels
 ipywidgets
 sphinx
