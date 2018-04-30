@@ -169,11 +169,9 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
         The new experiment contains additional feature_metadata_fields that include:
 
-            [
-            '_calour_diff_abundance_pval' : the p-value for the feature,
-            '_calour_diff_abundance_effect' : the effect size (t-statistic),
-            '__calour_diff_abundance_group' : the value (in field) where the statistic is higher
-            ]
+        - '_calour_diff_abundance_pval' : the p-value for the feature,
+        - '_calour_diff_abundance_effect' : the effect size (t-statistic),
+        - '_calour_diff_abundance_group' : the value (in field) where the statistic is higher
     '''
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
