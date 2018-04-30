@@ -184,10 +184,16 @@
       d3.select('#reset')
           .on('click', resetted);
 
-      d3.select('#zoomplus')
+      d3.select('#zoomsplus')
+          .on('click', zoomX);
+
+      d3.select('#zoomsminus')
+          .on('click', unzoomX);
+
+      d3.select('#zoomfplus')
           .on('click', zoomY);
 
-      d3.select('#zoomminus')
+      d3.select('#zoomfminus')
           .on('click', unzoomY);
 
       d3.select('#movedown')
@@ -195,6 +201,12 @@
 
       d3.select('#moveup')
           .on('click', moveUp);
+
+      d3.select('#moveright')
+          .on('click', moveRight);
+
+      d3.select('#moveleft')
+          .on('click', moveLeft);
 
       var initial_scale_factor = hwidth / samples.length;
 
@@ -308,6 +320,8 @@
       }
 
       function zoomX() {
+        old_shiftdown = shiftdown;
+        shiftdown = 1;
         ctrans = d3.zoomTransform(heatmapregion.node());
         ctrans.x = 0;
         ctrans.k = ctrans.k * 2;
@@ -323,9 +337,12 @@
         newpos = -newpos;
         ctrans.x = newpos;
         heatmapregion.call(zoom.transform, ctrans);
+        shiftdown = old_shiftdown;
       }
 
       function unzoomX() {
+        old_shiftdown = shiftdown;
+        shiftdown = 1;
         ctrans = d3.zoomTransform(heatmapregion.node());
         ctrans.x = 0;
         ctrans.k = ctrans.k / 2
@@ -342,6 +359,7 @@
         newpos = -newpos;
         ctrans.x = newpos;
         heatmapregion.call(zoom.transform, ctrans);
+        shiftdown = old_shiftdown;
       }
 
       function zoomY() {
@@ -491,10 +509,14 @@
       (sorted by field: <b><span id='field_name'> NA </span></b>)
       <span style="float: right;">
         <button id="reset" class="btn btn-default btn-xs">Reset</button>
-        <button id="zoomplus" class="btn btn-default btn-xs">+</button>
-        <button id="zoomminus" class="btn btn-default btn-xs">-</button>
+        <button id="zoomfplus" class="btn btn-default btn-xs">F+</button>
+        <button id="zoomfminus" class="btn btn-default btn-xs">F-</button>
+        <button id="zoomsplus" class="btn btn-default btn-xs">S+</button>
+        <button id="zoomsminus" class="btn btn-default btn-xs">S-</button>
         <button id="moveup" class="btn btn-default btn-xs">&uarr;</button>
         <button id="movedown" class="btn btn-default btn-xs">&darr;</button>
+        <button id="moveleft" class="btn btn-default btn-xs">&larr;</button>
+        <button id="moveright" class="btn btn-default btn-xs">&rarr;</button>
         <button id="btn-help" class="btn btn-default btn-xs" onclick="$('#div-help').toggle();">Help</button>
       </span>
     </div>
