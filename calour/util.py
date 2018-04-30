@@ -456,7 +456,7 @@ def register_functions(cls, modules=None):
     if modules is None:
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
-                    'heatmap.heatmap', 'plotting', 'manipulation', 'database']]
+                    'heatmap.heatmap', 'plotting', 'manipulation', 'database', 'export_html']]
     for module_name in modules:
         module = import_module(module_name)
         functions = inspect.getmembers(module, inspect.isfunction)

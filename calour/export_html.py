@@ -1,3 +1,17 @@
+'''
+export_html (:mod:`calour.export_html`)
+=======================================
+
+.. currentmodule:: calour.export_html
+
+Functions
+^^^^^^^^^
+.. autosummary::
+   :toctree: generated
+
+   export_html
+'''
+
 # ----------------------------------------------------------------------------
 # Copyright (c) 2016--,  Calour development team.
 #
@@ -53,10 +67,10 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     Parameters
     ----------
     sample_field : str or None, optional
-        The field to display on the x-axis (sample):
+        The field to display on the x-axis (sample).
         None (default) to not show x labels.
-        str to display field values for this field
-    feature_field : str or None or False(optional)
+        str to display field values for this field.
+    feature_field : str or None, optional
         Name of the field to display on the y-axis (features) or None not to display names
     title : None or str (optional)
         None (default) to show experiment description field as title. str to set title to str.
@@ -112,12 +126,13 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     # add parameters to html template
     with open(html_template) as fl:
         html_page = fl.read()
-    html_page = html_page.replace('// yticklabels go here', 'var yticklabels = %s;' %
-                                  _list_to_string(exp.feature_metadata[feature_field].values))
     html_page = html_page.replace('// ids go here', 'var ids = %s;' %
                                   _list_to_string(exp.feature_metadata.index.values))
     html_page = html_page.replace('// samples go here', 'var samples = %s;' %
                                   _list_to_string(exp.sample_metadata.index.values))
+    if feature_field is not None:
+        html_page = html_page.replace('// yticklabels go here', 'var yticklabels = %s;' %
+                                      _list_to_string(exp.feature_metadata[feature_field].values))
     if sample_field is not None:
         html_page = html_page.replace('// field_name goes here', 'var field_name = "%s";' %
                                       sample_field)

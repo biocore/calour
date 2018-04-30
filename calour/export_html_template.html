@@ -211,43 +211,77 @@
       resetted();
 
       function onkeydown() {
+        console.log('keydown')
+        shiftdown = d3.event.shiftKey;
         if (d3.event.key == '-') {
           unzoomY();
+          return;
         };
         if (d3.event.key == '=') {
           zoomY();
+          return;
+        };
+        if (d3.event.key == '+') {
+          zoomX();
+          return;
         };
         if (d3.event.key == 'ArrowDown') {
           moveDown();
+          return;
         };
         if (d3.event.key == 'ArrowUp') {
           moveUp();
+          return;
         };
         // and now process the shift
-        onkey();
+        // onkey();
+        process_key();
+      }
+
+      function process_key() {
+        console.log('process_key')
+        shiftdown = d3.event.shiftKey;
+        // if (shiftdown) {
+        //   xyratio = xyratio * zoom_k / shift_zoom_k;
+        //   zoom_k = shift_zoom_k;
+        //   shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
+        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
+        //   zoom.translateBy(heatmapregion, 0, 0);
+        // } else {
+        //   xyratio = xyratio * zoom_k / shift_zoom_k;
+        //   zoom_ty = zoom_ty / shift_zoom_k;
+        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
+        //   zoom.translateBy(heatmapregion, 0, 0);
+        // }
+
+        // // zoom.scaleExtent([initial_scale_factor*xyratio, 1000]);
+        // // heatmapregion.call(zoom);        
       }
 
       function onkey() {
         shiftdown = d3.event.shiftKey;
-        if (shiftdown) {
-          xyratio = xyratio * zoom_k / shift_zoom_k;
-          zoom_k = shift_zoom_k;
-          shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
-          heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
-          zoom.translateBy(heatmapregion, 0, 0);
-        } else {
-          xyratio = xyratio * zoom_k / shift_zoom_k;
-          zoom_ty = zoom_ty / shift_zoom_k;
-          heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
-          zoom.translateBy(heatmapregion, 0, 0);
-        }
-        // zoom.scaleExtent([initial_scale_factor*xyratio, 1000]);
-        // heatmapregion.call(zoom);
+        console.log('onkey')
+        // if (shiftdown) {
+        //   xyratio = xyratio * zoom_k / shift_zoom_k;
+        //   zoom_k = shift_zoom_k;
+        //   shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
+        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
+        //   zoom.translateBy(heatmapregion, 0, 0);
+        // } else {
+        //   xyratio = xyratio * zoom_k / shift_zoom_k;
+        //   zoom_ty = zoom_ty / shift_zoom_k;
+        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
+        //   zoom.translateBy(heatmapregion, 0, 0);
+        // }
+        // // zoom.scaleExtent([initial_scale_factor*xyratio, 1000]);
+        // // heatmapregion.call(zoom);
       }
 
       function zoomed() {
+        console.log('zoomed called')
         tt = d3.event.transform
         if (shiftdown != 0) {
+          console.log('zoomed zoomx')
           newt = 'translate(' + tt.x + ',' + zoom_ty + ') scale(' + tt.k + ',' + zoom_k * xyratio + ')';
           shift_zoom_tx = tt.x;
           shift_zoom_k = tt.k;
@@ -256,6 +290,7 @@
           focus.selectAll('#focusLineY').style('stroke-width', 2 / tt.k);
         };
         if (shiftdown != 1) {
+          console.log('zoomed zoomy')
           newt = 'translate(' + shift_zoom_tx + ',' + tt.y + ') scale(' + shift_zoom_k + ',' + tt.k * xyratio + ')';
           zoom_k = tt.k;
           zoom_ty = tt.y;
@@ -291,20 +326,25 @@
       }
 
       function zoomY() {
+        console.log('the real zoomY')
         ctrans = d3.zoomTransform(heatmapregion.node());
         ctrans.y = 0;
         // the topmost feature showing in the screen
         screen_start = yAxis.scale().invert(0);
 
+        console.log('1')
         // move so 0th feature is top row displaying
         // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
         heatmapregion.call(zoom.transform, ctrans);
+        console.log('2')
 
         xyratio = xyratio * 2;
         zoom.translateBy(heatmapregion, 0, 0);
+        console.log('3')
         newpos = yAxis.scale()(screen_start);
         newpos = -newpos;
         ctrans.y = newpos;
+        console.log('4')
         heatmapregion.call(zoom.transform, ctrans);
       }
 
@@ -323,6 +363,30 @@
         newpos = yAxis.scale()(screen_start);
         newpos = -newpos;
         ctrans.y = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
+      function zoomX() {
+        console.log('zoomx keypress')
+          // xyratio = xyratio * zoom_k / shift_zoom_k;
+          // zoom_k = shift_zoom_k;
+          // shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
+
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.x = 0;
+        // the topmost feature showing in the screen
+        screen_start = xAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        xyratio = xyratio * 2;
+        zoom.translateBy(heatmapregion, 0, 0);
+        heatmapregion.call(zoom.scaleBy,2);
+        newpos = xAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.x = newpos;
         heatmapregion.call(zoom.transform, ctrans);
       }
 
