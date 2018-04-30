@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <style>
+    .axis path {
+      display: none;
+    }
+    .pixel {
+      /* image-rendering: pixelated; */
+      padding: 0px;
+      margin: 0px;
+      border: 0px;
+        image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+        image-rendering: -moz-crisp-edges;          /* Firefox                        */
+        image-rendering: -o-crisp-edges;            /* Opera                          */
+        image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+        image-rendering: pixelated;                 /* Chrome */
+        image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+        -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+    }
+    .axis line {
+      stroke-opacity: 0.3;
+      shape-rendering: crispEdges;
+    }
+    .line {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 2px;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function() {
+
+      var yticklabels = ['NA'];
+      var ids = ['NA'];
+      var samples = ['NA'];
+      var vlines = [];
+      var xtick_pos = [];
+      var xtick_labels = [];
+      var field_name = '';
+      var title_text = 'Experiment';
+
+      //**********************************************************
+      // following variables are set by the external python program
+      // DO NOT DELETE/CHANGE
+      var yticklabels = ["k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Prevotellaceae; g__Prevotella; s__","k__Bacteria; p__Tenericutes; c__Mollicutes; o__Mycoplasmatales; f__Mycoplasmataceae; g__Mycoplasma; s__","k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Oxalobacteraceae; g__Janthinobacterium; s__lividum","k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Variovorax; s__paradoxus","k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Veillonellaceae; g__Veillonella; s__","k__Bacteria; p__Bacteroidetes; c__Flavobacteriia; o__Flavobacteriales; f__Flavobacteriaceae; g__Capnocytophaga; s__","k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Actinomycetaceae; g__Actinomyces; s__","k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__[Mogibacteriaceae]; g__; s__","k__Bacteria; p__Firmicutes; c__Erysipelotrichi; o__Erysipelotrichales; f__Erysipelotrichaceae; g__Bulleidia; s__moorei","k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales","Unknown","bad_bacteria"];
+      var ids = ["AA","AT","AG","AC","TA","TT","TG","TC","GA","GT","GG","badfeature"];
+      var samples = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","badsample"];
+      var vlines = ["11.0","20.0"];
+      var xtick_pos = ["5.5","15.5","20.5"];
+      var xtick_labels = ["1","2","nan"];
+      var field_name = "group";
+      var title_text = "the heatmap";
+      //***********************************************************
+
+      var yaxiswidth = 100;
+      var xaxisheight = 20;
+
+      // set the title
+      $('#field_name').html(field_name);
+      $('#title_text').html(title_text);
+
+      var svg = d3.select('svg');
+
+      var width = $('#div-heatmap').width();
+      var height = $('#div-heatmap').height();
+
+      // available display for the heatmap (without axes)
+      var hwidth = width - yaxiswidth;
+      var hheight = height - xaxisheight;
+
+      svg.attr('width', width)
+          .attr('height', height);
+
+      svg.on('click', onclick);
+
+      var xScale = d3.scaleLinear()
+          .domain([0, width])
+          .range([0, width]);
+
+      var yScale = d3.scaleLinear()
+          .domain([0, ids.length])
+          .range([0.5, ids.length + 0.5]);
+
+      var heatmapregion = svg
+          .append('svg')
+          .attr('width', width - yaxiswidth + 'px')
+          .attr('height', height - xaxisheight + 'px')
+          .attr('x', yaxiswidth)
+          .attr('y', 0);
+
+      var heatmap = heatmapregion.append('g')
+          .append('image')
+          .attr('class', 'pixel')
+          .attr('width', samples.length)
+          .attr('height', ids.length)
+          .attr('xlink:xlink:href', 'data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAABUAAAAMCAYAAACNzvbFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAuIwAALiMBeKU/dgAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMS4yLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvNQv5yAAAAVJJREFUKJG1kb9KA0EQxn%2BzexvOhBCVXBQRFQQrsbJQ6zyCtT6FL2CtYGFjJQiCNhaWPkASQRRBSzGkECsV/5x6ub21uAgmBDWgH3wMM3w7882szC6vO3pA/071R40XDkkvPWFp/keJlGXReRNj2IE8NmewWQ%2BbUSQZwRoh8cBpIdHpA6dbVGndKdqIgAcQ1xtQB0VK842Lhzan3S/n3awsgANJOmhdK6ZUtrWadagYdNOhIoeOEnQYo1%2Ba6Psn4noDFZxHjKxVKF5EDG9UCE5DSpsVSrVHiltV%2Bu4SBrer6RDrKOzWeO8XsgfHhIHGHJ1wO5fFnV3yOlVKB0/ur/b0%2B7%2BBHF5NO43DInyNn%2BjMu6FTI2VZ/HOn6q8bAnjXezOMB/eM5h4oZp4pmmcKOiSv38irV3LqHV%2Ba%2BBID4IvFF4sR8EUwCEYURjQeGi3qf9b/AD5ffIoFOyZjAAAAAElFTkSuQmCC')
+          // .attr('xlink:href', 'out.png');
+
+      var xyratio = get_xyratio();
+
+      var scalex = 1;
+      var scaley = 1;
+
+      var xAxis = d3.axisBottom(xScale)
+          .tickValues(xtick_pos)
+          .tickFormat(function(d, i) {return xtick_labels[i];});
+
+      function customTickFunction(d) {
+        var dom = yAxis.scale().domain();
+        if ((dom[1] - dom[0]) < 50) {
+          return Math.round(dom[1] - dom[0]);
+        }
+        return 50;
+      }
+
+      var yAxis = d3.axisLeft(yScale)
+          .ticks(50)
+          .tickFormat(function(d) {
+            try {
+              var taxa = yticklabels[Math.round(d)].replace(/;+$/, '').split(';');
+              var label = taxa.pop();
+              if (label[0] != label[0].toUpperCase() && taxa.length > 0) {
+                label = taxa.pop() + ' ' + label;
+              }
+            }
+            catch(err) {
+              label=''
+            }
+            return label;
+          });
+      yAxis.ticks(customTickFunction());
+
+      var gX = svg.append('g')
+          .attr('class', 'axis axis--x')
+          .attr('transform', 'translate(' + yaxiswidth + ',' + (hheight) + ')')
+          .call(xAxis);
+
+      console.log(gX)
+
+      var gY = svg.append('g')
+          .attr('class', 'axis axis--y')
+          .attr('transform', 'translate(' + yaxiswidth + ',0)')
+          .call(yAxis);
+
+      // The per sample-type vlines
+      var vline_lines = heatmapregion.append('g');
+      for (idx=0;idx<vlines.length; idx++) {
+        vline_lines.append('line')
+            .attr('id', 'vline')
+            .attr('class', 'vLine')
+            .style('stroke', 'white')
+            // .style('stroke-dasharray', '1,1')
+            .style('stroke-opacity', 1)
+            .style('stroke-width', 6 * xyratio)
+            .attr('x1', vlines[idx]).attr('y1', 0)
+            .attr('x2', vlines[idx]).attr('y2', ids.length);
+      }
+
+      // The cursor crosshair
+      var focus = heatmapregion.append('g');
+
+      var xline = focus.append('line')
+          .attr('id', 'focusLineX')
+          .attr('class', 'focusLine')
+          .style('stroke', 'white')
+          // .style('stroke-dasharray', '1,1')
+          .style('stroke-opacity', 0.5)
+          .style('stroke-width', 1);
+
+      focus.append('line')
+          .attr('id', 'focusLineY')
+          .attr('class', 'focusLine')
+          .style('stroke', 'white')
+          .style("stroke-opacity", 0.5)
+          // .style('stroke-dasharray', '1,1')
+          .style('stroke-width', 1 * xyratio);
+
+      d3.select('#reset')
+          .on('click', resetted);
+
+      d3.select('#zoomsplus')
+          .on('click', zoomX);
+
+      d3.select('#zoomsminus')
+          .on('click', unzoomX);
+
+      d3.select('#zoomfplus')
+          .on('click', zoomY);
+
+      d3.select('#zoomfminus')
+          .on('click', unzoomY);
+
+      d3.select('#movedown')
+          .on('click', moveDown);
+
+      d3.select('#moveup')
+          .on('click', moveUp);
+
+      d3.select('#moveright')
+          .on('click', moveRight);
+
+      d3.select('#moveleft')
+          .on('click', moveLeft);
+
+      var initial_scale_factor = hwidth / samples.length;
+
+      var shiftdown = 0;
+      var current_tx, current_scale_x, current_scale_y, current_ty;
+      d3.select('body').on('keydown', onkeydown);
+      d3.select('body').on('keyup', onkey);
+
+      var zoom = d3.zoom()
+          .scaleExtent([initial_scale_factor, 10000])
+          .translateExtent([[0, 0], [width / initial_scale_factor, 100000000]])
+          .on('zoom', zoomed);
+
+      heatmapregion.call(zoom);
+
+      // and initial zoom to have full screen
+      resetted();
+
+      function onkeydown() {
+        if (d3.event.key == '-') {
+          unzoomY();
+          return;
+        };
+        if (d3.event.key == '=') {
+          zoomY();
+          return;
+        };
+        if (d3.event.key == '+') {
+          zoomX();
+          return;
+        };
+        if (d3.event.key == '_') {
+          unzoomX();
+          return;
+        };
+        if (d3.event.key == 'ArrowDown') {
+          moveDown();
+          return;
+        };
+        if (d3.event.key == 'ArrowUp') {
+          moveUp();
+          return;
+        };
+        if (d3.event.key == 'ArrowLeft') {
+          moveLeft();
+          return;
+        };
+        if (d3.event.key == 'ArrowRight') {
+          moveRight();
+          return;
+        };
+        // and now process the shift
+        onkey();
+      }
+
+      function onkey() {
+        shiftdown = d3.event.shiftKey;
+        if (shiftdown) {
+          xyratio = xyratio * current_scale_y / current_scale_x;
+          current_scale_y = current_scale_x;
+          current_tx = current_tx / (current_scale_x);
+        } else {
+          xyratio = xyratio * current_scale_y / current_scale_x;
+          current_ty = current_ty / current_scale_x;
+        }
+      }
+
+      function zoomed() {
+        tt = d3.event.transform
+        // if shift pressed we're in x-axis zoom/move mode
+        if (shiftdown != 0) {
+          current_tx = tt.x;
+          current_scale_x = tt.k;
+          gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
+          vline_lines.selectAll('#vline').style('stroke-width', 3 / tt.k);
+          focus.selectAll('#focusLineY').style('stroke-width', 2 / tt.k);
+        };
+        // if no shift pressed - we're in y-axis move/zoom mode
+        if (shiftdown != 1) {
+          current_ty = tt.y;
+          current_scale_y = tt.k;
+          ytransform = d3.zoomIdentity.translate(tt.x, tt.y).scale(tt.k * xyratio);
+          gY.call(yAxis.scale(ytransform.rescaleY(yScale)).ticks(customTickFunction()));
+          focus.selectAll('#focusLineX').style('stroke-width', 2 / (xyratio * tt.k));
+        };
+        newt = 'translate(' + current_tx + ',' + current_ty + ') scale(' + current_scale_x + ',' + current_scale_y * xyratio + ')';
+        heatmap.attr('transform', newt);
+        vline_lines.attr('transform', newt);
+        focus.attr('transform', newt);
+      }
+
+      function reset_coords() {
+        xyratio = get_xyratio();
+        current_tx = 0;
+        current_scale_x = initial_scale_factor;
+        current_ty = 0;
+        current_scale_y = initial_scale_factor;
+      }
+
+      function resetted() {
+        console.log('reset');
+        reset_coords();
+        old_shiftdown = shiftdown;
+        shiftdown = 2;
+        heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(initial_scale_factor));
+        shiftdown = old_shiftdown;
+        // The nice transition didn't work with the shift up/down
+        // heatmapregion.transition()
+        //     .duration(750)
+        //     .call(zoom.transform, d3.zoomIdentity.scale(initial_scale_factor));
+      }
+
+      function zoomX() {
+        old_shiftdown = shiftdown;
+        shiftdown = 1;
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.x = 0;
+        ctrans.k = ctrans.k * 2;
+        // the leftmost feature showing in the screen
+        screen_start = xAxis.scale().invert(0);
+
+        // move so 0th sample is left column displaying
+        heatmapregion.call(zoom.transform, ctrans);
+
+        zoom.translateBy(heatmapregion, 0, 0);
+        zoom.scaleBy(heatmapregion,1);
+        newpos = xAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.x = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+        shiftdown = old_shiftdown;
+      }
+
+      function unzoomX() {
+        old_shiftdown = shiftdown;
+        shiftdown = 1;
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.x = 0;
+        ctrans.k = ctrans.k / 2
+        // the topmost feature showing in the screen
+        screen_start = xAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        zoom.translateBy(heatmapregion, 0, 0);
+        zoom.scaleBy(heatmapregion,1);
+        newpos = xAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.x = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+        shiftdown = old_shiftdown;
+      }
+
+      function zoomY() {
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.y = 0;
+        // the topmost feature showing in the screen
+        screen_start = yAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        xyratio = xyratio * 2;
+        zoom.translateBy(heatmapregion, 0, 0);
+        newpos = yAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.y = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
+      function unzoomY() {
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.y = 0;
+        // the topmost feature showing in the screen
+        screen_start = yAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        xyratio = xyratio / 2;
+        zoom.translateBy(heatmapregion, 0, 0);
+        newpos = yAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.y = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
+      function moveDown() {
+        screen_start = yAxis.scale().invert(0);
+        screen_end = yAxis.scale().invert(height - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 0;
+        zoom.translateBy(heatmapregion, 0, (screen_start - screen_end) * xyratio);
+        shiftdown = old_shiftdown;
+      }
+
+      function moveUp() {
+        screen_start = yAxis.scale().invert(0);
+        screen_end = yAxis.scale().invert(height - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 0;
+        zoom.translateBy(heatmapregion, 0, (screen_end - screen_start) * xyratio);
+        shiftdown = old_shiftdown;
+      }
+      function moveLeft() {
+        screen_start = xAxis.scale().invert(0);
+        screen_end = xAxis.scale().invert(width - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 1;
+        zoom.translateBy(heatmapregion, (screen_end - screen_start), 0);
+        shiftdown = old_shiftdown;
+      }
+      function moveRight() {
+        screen_start = xAxis.scale().invert(0);
+        screen_end = xAxis.scale().invert(width - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 1;
+        zoom.translateBy(heatmapregion, (screen_start - screen_end), 0);
+        shiftdown = old_shiftdown;
+      }
+
+      function onclick() {
+        var pos = d3.mouse(heatmap.node());
+        var cx = Math.round(xScale.invert(pos[0])), cy = Math.round(yScale.invert(pos[1]));
+        var posx = xScale.invert(pos[0]), posy = yScale.invert(pos[1]);
+
+        focus.select('#focusLineY')
+            .attr('x1', Math.round(posx + 0.5) - 0.5).attr('y1', 0)
+            .attr('x2', Math.round(posx + 0.5) - 0.5).attr('y2', ids.length);
+        focus.select('#focusLineX')
+            .attr('x1', 0).attr('y1', Math.round(posy) + 0.5)
+            .attr('x2', samples.length).attr('y2', Math.round(posy) + 0.5);
+
+        var cid = ids[cy];
+        var csamp = samples[cx];
+        var ctax = yticklabels[cy].split(';').map(function(e) {
+          return '<a href="https://en.wikipedia.org/wiki/' + e + '" target="_blank">' + e + '</a>'
+        }).join('; ');
+        $('#taxonomy').html(ctax);
+        $('#sampleid').html(csamp);
+        // Get dbBact annotations for selection
+        $.ajax({
+          url: 'http://api.dbbact.org/sequences/get_string_annotations',
+          type: 'POST',
+          data: JSON.stringify({'sequence': cid}),
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          success: function(data) {
+              if (data.annotations.length == 0) {
+                atext = 'No annotations found for sequence'
+              }
+              else {
+                var atext = '';
+                var clink = 'http://dbbact.org/sequence_annotations/' + cid;
+                var ctext = '<p><a href="' + clink + '" target="_blank">dbBact Summary</a></p>';
+                atext += ctext;
+                for (i = 0; i < data.annotations.length; i++) {
+                    clink = 'http://dbbact.org/annotation_info/' + data.annotations[i].annotationid.toString();
+                    ctext = '<a href="' + clink + '" target="_blank">' + data.annotations[i].annotation_string + '</a><br>';
+                    atext += ctext;
+                }
+              }
+              $('#p-annotation').html(atext);
+          }
+        });
+      }
+
+      function get_xyratio() {
+        return (hheight / ids.length) * (samples.length / hwidth);
+      }
+
+      $(window).on('resize', function(){
+        $('body').height('calc(100vh - 50px)');
+      });
+    });
+  </script>
+</head>
+<body style="height: calc(100vh - 50px); min-height: 600px; min-width: 1080px;">
+  <div>&nbsp;</div>
+  <div id="div-annotation" class="panel panel-default" style="float: right; margin: 10px; width: 360px; height: auto; white-space: nowrap;">
+    <!--Here goes the annotations!-->
+    <div class="panel-heading">
+      <b>dbBact annotations</b>
+    </div>
+    <div class="panel-body" style="overflow: auto;">
+      <p id="p-annotation">Click on heatmap to see annotations</p>
+    </div>
+    <div class="panel-footer">
+      For more analysis options, download <a href='https://github.com/amnona/calour' target='_blank'>Calour</a>.
+    </div>
+  </div>
+
+  <div class="panel panel-default" style="margin: 10px; width: auto; height: 100%; overflow: hidden;">
+    <div id="div-title" class="panel-heading">
+      <b><span id="title_text">Experiment</span></b>
+      (sorted by field: <b><span id='field_name'> NA </span></b>)
+      <span style="float: right;">
+        <button id="reset" class="btn btn-default btn-xs">Reset</button>
+        <button id="zoomfplus" class="btn btn-default btn-xs">F+</button>
+        <button id="zoomfminus" class="btn btn-default btn-xs">F-</button>
+        <button id="zoomsplus" class="btn btn-default btn-xs">S+</button>
+        <button id="zoomsminus" class="btn btn-default btn-xs">S-</button>
+        <button id="moveup" class="btn btn-default btn-xs">&uarr;</button>
+        <button id="movedown" class="btn btn-default btn-xs">&darr;</button>
+        <button id="moveleft" class="btn btn-default btn-xs">&larr;</button>
+        <button id="moveright" class="btn btn-default btn-xs">&rarr;</button>
+        <button id="btn-help" class="btn btn-default btn-xs" onclick="$('#div-help').toggle();">Help</button>
+      </span>
+    </div>
+    <div id="div-heatmap" class="panel-body" style="height: calc(100% - 80px);">
+      <svg id="heatmap" style="width: 100%; height: 100%;)"></svg>
+    </div>
+    <div id="div-selection" class="panel-footer">
+      <!--Here goes the selection!-->
+      <span style="display: inline-block; float: left; overflow: hidden;"><b>Sample:&nbsp;&nbsp;</b></span>
+      <span id="sampleid" style="display: inline-block; float: left; width: 120px; overflow: auto; white-space: nowrap;">NA</span>
+      <span style="display: inline-block; float: left; overflow: hidden;">&nbsp;&nbsp;<b>Taxonomy:&nbsp;&nbsp;</b></span>
+      <span id="taxonomy" style="display: block; overflow: auto; white-space: nowrap;">NA</span>
+    </div>
+  </div>
+
+  <div id="div-help" class="panel panel-info" style="display: none; position: fixed; left: 50%; width: 400px; margin-left: -200px; top: 200px; box-shadow: 10px 10px 5px rgba(0,0,0,0.5);">
+    <div class="panel-heading">
+      Help
+      <span style="float: right;"><button class="btn btn-default btn-xs" onclick="$('#div-help').hide();">&times;</button></span>
+    </div>
+    <div class="panel-body">
+      <p>Use mouse or -/= for zooming bacteria, shift+mouse or _/+ for zooming samples, arrow keys to move in heatmap.</p>
+    </div>
+  </div>
+</body>
+</html>
