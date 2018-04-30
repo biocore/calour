@@ -104,6 +104,9 @@
 
       var xyratio = get_xyratio();
 
+      var scalex = 1;
+      var scaley = 1;
+
       var xAxis = d3.axisBottom(xScale)
           .tickValues(xtick_pos)
           .tickFormat(function(d, i) {return xtick_labels[i];});
@@ -196,7 +199,7 @@
       var initial_scale_factor = hwidth / samples.length;
 
       var shiftdown = 0;
-      var shift_zoom_tx, shift_zoom_k, zoom_k, zoom_ty;
+      var current_tx, current_scale_x, current_scale_y, current_ty;
       d3.select('body').on('keydown', onkeydown);
       d3.select('body').on('keyup', onkey);
 
@@ -211,8 +214,6 @@
       resetted();
 
       function onkeydown() {
-        console.log('keydown')
-        shiftdown = d3.event.shiftKey;
         if (d3.event.key == '-') {
           unzoomY();
           return;
@@ -225,6 +226,10 @@
           zoomX();
           return;
         };
+        if (d3.event.key == '_') {
+          unzoomX();
+          return;
+        };
         if (d3.event.key == 'ArrowDown') {
           moveDown();
           return;
@@ -233,72 +238,49 @@
           moveUp();
           return;
         };
+        if (d3.event.key == 'ArrowLeft') {
+          moveLeft();
+          return;
+        };
+        if (d3.event.key == 'ArrowRight') {
+          moveRight();
+          return;
+        };
         // and now process the shift
-        // onkey();
-        process_key();
-      }
-
-      function process_key() {
-        console.log('process_key')
-        shiftdown = d3.event.shiftKey;
-        // if (shiftdown) {
-        //   xyratio = xyratio * zoom_k / shift_zoom_k;
-        //   zoom_k = shift_zoom_k;
-        //   shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
-        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
-        //   zoom.translateBy(heatmapregion, 0, 0);
-        // } else {
-        //   xyratio = xyratio * zoom_k / shift_zoom_k;
-        //   zoom_ty = zoom_ty / shift_zoom_k;
-        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
-        //   zoom.translateBy(heatmapregion, 0, 0);
-        // }
-
-        // // zoom.scaleExtent([initial_scale_factor*xyratio, 1000]);
-        // // heatmapregion.call(zoom);        
+        onkey();
       }
 
       function onkey() {
         shiftdown = d3.event.shiftKey;
-        console.log('onkey')
-        // if (shiftdown) {
-        //   xyratio = xyratio * zoom_k / shift_zoom_k;
-        //   zoom_k = shift_zoom_k;
-        //   shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
-        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
-        //   zoom.translateBy(heatmapregion, 0, 0);
-        // } else {
-        //   xyratio = xyratio * zoom_k / shift_zoom_k;
-        //   zoom_ty = zoom_ty / shift_zoom_k;
-        //   heatmapregion.call(zoom.transform, d3.zoomIdentity.scale(shift_zoom_k).translate(shift_zoom_tx, zoom_ty));
-        //   zoom.translateBy(heatmapregion, 0, 0);
-        // }
-        // // zoom.scaleExtent([initial_scale_factor*xyratio, 1000]);
-        // // heatmapregion.call(zoom);
+        if (shiftdown) {
+          xyratio = xyratio * current_scale_y / current_scale_x;
+          current_scale_y = current_scale_x;
+          current_tx = current_tx / (current_scale_x);
+        } else {
+          xyratio = xyratio * current_scale_y / current_scale_x;
+          current_ty = current_ty / current_scale_x;
+        }
       }
 
       function zoomed() {
-        console.log('zoomed called')
         tt = d3.event.transform
+        // if shift pressed we're in x-axis zoom/move mode
         if (shiftdown != 0) {
-          console.log('zoomed zoomx')
-          newt = 'translate(' + tt.x + ',' + zoom_ty + ') scale(' + tt.k + ',' + zoom_k * xyratio + ')';
-          shift_zoom_tx = tt.x;
-          shift_zoom_k = tt.k;
+          current_tx = tt.x;
+          current_scale_x = tt.k;
           gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
           vline_lines.selectAll('#vline').style('stroke-width', 3 / tt.k);
           focus.selectAll('#focusLineY').style('stroke-width', 2 / tt.k);
         };
+        // if no shift pressed - we're in y-axis move/zoom mode
         if (shiftdown != 1) {
-          console.log('zoomed zoomy')
-          newt = 'translate(' + shift_zoom_tx + ',' + tt.y + ') scale(' + shift_zoom_k + ',' + tt.k * xyratio + ')';
-          zoom_k = tt.k;
-          zoom_ty = tt.y;
+          current_ty = tt.y;
+          current_scale_y = tt.k;
           ytransform = d3.zoomIdentity.translate(tt.x, tt.y).scale(tt.k * xyratio);
           gY.call(yAxis.scale(ytransform.rescaleY(yScale)).ticks(customTickFunction()));
           focus.selectAll('#focusLineX').style('stroke-width', 2 / (xyratio * tt.k));
         };
-        console.log(newt);
+        newt = 'translate(' + current_tx + ',' + current_ty + ') scale(' + current_scale_x + ',' + current_scale_y * xyratio + ')';
         heatmap.attr('transform', newt);
         vline_lines.attr('transform', newt);
         focus.attr('transform', newt);
@@ -306,10 +288,10 @@
 
       function reset_coords() {
         xyratio = get_xyratio();
-        shift_zoom_tx = 0;
-        shift_zoom_k = initial_scale_factor;
-        zoom_ty = 0;
-        zoom_k = initial_scale_factor;
+        current_tx = 0;
+        current_scale_x = initial_scale_factor;
+        current_ty = 0;
+        current_scale_y = initial_scale_factor;
       }
 
       function resetted() {
@@ -325,26 +307,58 @@
         //     .call(zoom.transform, d3.zoomIdentity.scale(initial_scale_factor));
       }
 
+      function zoomX() {
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.x = 0;
+        ctrans.k = ctrans.k * 2;
+        // the leftmost feature showing in the screen
+        screen_start = xAxis.scale().invert(0);
+
+        // move so 0th sample is left column displaying
+        heatmapregion.call(zoom.transform, ctrans);
+
+        zoom.translateBy(heatmapregion, 0, 0);
+        zoom.scaleBy(heatmapregion,1);
+        newpos = xAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.x = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
+      function unzoomX() {
+        ctrans = d3.zoomTransform(heatmapregion.node());
+        ctrans.x = 0;
+        ctrans.k = ctrans.k / 2
+        // the topmost feature showing in the screen
+        screen_start = xAxis.scale().invert(0);
+
+        // move so 0th feature is top row displaying
+        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
+        heatmapregion.call(zoom.transform, ctrans);
+
+        zoom.translateBy(heatmapregion, 0, 0);
+        zoom.scaleBy(heatmapregion,1);
+        newpos = xAxis.scale()(screen_start);
+        newpos = -newpos;
+        ctrans.x = newpos;
+        heatmapregion.call(zoom.transform, ctrans);
+      }
+
       function zoomY() {
-        console.log('the real zoomY')
         ctrans = d3.zoomTransform(heatmapregion.node());
         ctrans.y = 0;
         // the topmost feature showing in the screen
         screen_start = yAxis.scale().invert(0);
 
-        console.log('1')
         // move so 0th feature is top row displaying
         // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
         heatmapregion.call(zoom.transform, ctrans);
-        console.log('2')
 
         xyratio = xyratio * 2;
         zoom.translateBy(heatmapregion, 0, 0);
-        console.log('3')
         newpos = yAxis.scale()(screen_start);
         newpos = -newpos;
         ctrans.y = newpos;
-        console.log('4')
         heatmapregion.call(zoom.transform, ctrans);
       }
 
@@ -366,49 +380,41 @@
         heatmapregion.call(zoom.transform, ctrans);
       }
 
-      function zoomX() {
-        console.log('zoomx keypress')
-          // xyratio = xyratio * zoom_k / shift_zoom_k;
-          // zoom_k = shift_zoom_k;
-          // shift_zoom_tx = shift_zoom_tx / (shift_zoom_k);
-
-        ctrans = d3.zoomTransform(heatmapregion.node());
-        ctrans.x = 0;
-        // the topmost feature showing in the screen
-        screen_start = xAxis.scale().invert(0);
-
-        // move so 0th feature is top row displaying
-        // zoom.translateBy(heatmapregion, 0, -tozero/xyratio)
-        heatmapregion.call(zoom.transform, ctrans);
-
-        xyratio = xyratio * 2;
-        zoom.translateBy(heatmapregion, 0, 0);
-        heatmapregion.call(zoom.scaleBy,2);
-        newpos = xAxis.scale()(screen_start);
-        newpos = -newpos;
-        ctrans.x = newpos;
-        heatmapregion.call(zoom.transform, ctrans);
-      }
-
       function moveDown() {
-        // xyratio = xyratio / 2;
-        // zoom.translateBy(svg, 0, 0);
         screen_start = yAxis.scale().invert(0);
         screen_end = yAxis.scale().invert(height - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 0;
         zoom.translateBy(heatmapregion, 0, (screen_start - screen_end) * xyratio);
+        shiftdown = old_shiftdown;
       }
 
       function moveUp() {
-        // xyratio = xyratio / 2;
-        // zoom.translateBy(svg, 0, 0);
         screen_start = yAxis.scale().invert(0);
         screen_end = yAxis.scale().invert(height - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 0;
         zoom.translateBy(heatmapregion, 0, (screen_end - screen_start) * xyratio);
+        shiftdown = old_shiftdown;
+      }
+      function moveLeft() {
+        screen_start = xAxis.scale().invert(0);
+        screen_end = xAxis.scale().invert(width - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 1;
+        zoom.translateBy(heatmapregion, (screen_end - screen_start), 0);
+        shiftdown = old_shiftdown;
+      }
+      function moveRight() {
+        screen_start = xAxis.scale().invert(0);
+        screen_end = xAxis.scale().invert(width - xaxisheight);
+        old_shiftdown = shiftdown
+        shiftdown = 1;
+        zoom.translateBy(heatmapregion, (screen_start - screen_end), 0);
+        shiftdown = old_shiftdown;
       }
 
       function onclick() {
-        console.log('click');
-
         var pos = d3.mouse(heatmap.node());
         var cx = Math.round(xScale.invert(pos[0])), cy = Math.round(yScale.invert(pos[1]));
         var posx = xScale.invert(pos[0]), posy = yScale.invert(pos[1]);
@@ -506,11 +512,11 @@
 
   <div id="div-help" class="panel panel-info" style="display: none; position: fixed; left: 50%; width: 400px; margin-left: -200px; top: 200px; box-shadow: 10px 10px 5px rgba(0,0,0,0.5);">
     <div class="panel-heading">
-    	Help
-    	<span style="float: right;"><button class="btn btn-default btn-xs" onclick="$('#div-help').hide();">&times;</button></span>
+      Help
+      <span style="float: right;"><button class="btn btn-default btn-xs" onclick="$('#div-help').hide();">&times;</button></span>
     </div>
     <div class="panel-body">
-      <p>Use mouse or -/= for zooming bacteria, shift+mouse for zooming samples, arrow keys to scroll up/down in heatmap.</p>
+      <p>Use mouse or -/= for zooming bacteria, shift+mouse or _/+ for zooming samples, arrow keys to move in heatmap.</p>
     </div>
   </div>
 </body>
