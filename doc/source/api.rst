@@ -64,5 +64,6 @@ Functions operating on ``Experiment`` object
    transforming
    analysis
    manipulation
+   export_html
    training
    database
