@@ -162,6 +162,8 @@ class PlotGUI(ABC):
         tuple of (str, str, numeric)
             sample id, feature id, abundance
         '''
+        if self.current_select is None:
+            return 'na', 'na', 0
         row, col = self.current_select
         fid = self.exp.feature_metadata.index[col]
         sid = self.exp.sample_metadata.index[row]

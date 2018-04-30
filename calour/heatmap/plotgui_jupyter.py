@@ -229,8 +229,13 @@ class PlotGUI_Jupyter(PlotGUI):
                 annt_type = details.get('annotationtype', 'None')
                 # annt_id = details.get('annotationid', 'NA')
                 ccolor = colors.get(annt_type, 'black')
-                link_address = details['_db_interface'].get_annotation_website(details)
-                cline = ('<p><a href="%s" target="_blank"><span style="color:%s;">%s</span></a></p>' % (link_address, ccolor, cstr))
+                # if we have annotations, add them
+                if '_db_interface' in details:
+                    link_address = details['_db_interface'].get_annotation_website(details)
+                    cline = ('<p><a href="%s" target="_blank"><span style="color:%s;">%s</span></a></p>' % (link_address, ccolor, cstr))
+                # otherwise - no annotations from the database
+                else:
+                    cline = ('<p><span style="color:%s;">%s</span></p>' % (ccolor, cstr))
                 idata.append(cline)
         except Exception as e:
             # use try/except to catch and show the error; otherwise the error goes unnoticed
