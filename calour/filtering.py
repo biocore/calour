@@ -14,8 +14,7 @@ Functions
    filter_samples
    filter_ids
    filter_prevalence
-   filter_mean_abundance
-   filter_sum_abundance
+   filter_abundance
    filter_sample_categories
    downsample
 '''
@@ -278,7 +277,7 @@ def _sum_abundance(data, axis, cutoff=10, strict=False):
 
     It can be used filter features with at least "cutoff" abundance
     total over all samples
-    NOTE: this is a "fast" function working on the whole matrix at once
+    NOTE: this is a "fast" function working on the whole matrix
 
     Parameters
     ----------
@@ -439,15 +438,18 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 
 @ds.with_indent(4)
 @Experiment._record_sig
-def filter_sum_abundance(exp: Experiment, cutoff, **kwargs):
+def filter_abundance(exp: Experiment, sum_cutoff=None, mean_cutoff=None, **kwargs):
     '''Filter keeping only features with >= `cutoff` over all samples.
 
     This is a convenience function wrapping filter_by_data()
 
     Parameters
     ----------
-    cutoff : numeric
-        The minimal total abundance fraction for each feature over all samples.
+    sum_cutoff : numeric
+        The minimal total abundance for each feature over all samples.
+    mean_cutoff :
+        The minimal mean abundance for each feature. Either `sum_cutoff` or
+        `mean_cutoff` has to be not `None`.
 
     Keyword Arguments
     -----------------
