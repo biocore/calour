@@ -48,14 +48,14 @@
       //**********************************************************
       // following variables are set by the external python program
       // DO NOT DELETE/CHANGE
-      // yticklabels go here
-      // ids go here
-      // samples go here
-      // vlines go here
-      // xtick_pos go here
-      // xtick_labels go here
-      // field_name goes here
-      // title_text goes here
+      var yticklabels = ["k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Prevotellaceae; g__Prevotella; s__","k__Bacteria; p__Tenericutes; c__Mollicutes; o__Mycoplasmatales; f__Mycoplasmataceae; g__Mycoplasma; s__","k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Oxalobacteraceae; g__Janthinobacterium; s__lividum","k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Variovorax; s__paradoxus","k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Veillonellaceae; g__Veillonella; s__","k__Bacteria; p__Bacteroidetes; c__Flavobacteriia; o__Flavobacteriales; f__Flavobacteriaceae; g__Capnocytophaga; s__","k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Actinomycetaceae; g__Actinomyces; s__","k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__[Mogibacteriaceae]; g__; s__","k__Bacteria; p__Firmicutes; c__Erysipelotrichi; o__Erysipelotrichales; f__Erysipelotrichaceae; g__Bulleidia; s__moorei","k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales","Unknown","bad_bacteria"];
+      var ids = ["AA","AT","AG","AC","TA","TT","TG","TC","GA","GT","GG","badfeature"];
+      var samples = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","badsample"];
+      var vlines = ["11.0","20.0"];
+      var xtick_pos = ["5.5","15.5","20.5"];
+      var xtick_labels = ["1","2","nan"];
+      var field_name = "group";
+      var title_text = "the heatmap";
       //***********************************************************
 
       var yaxiswidth = 100;
@@ -99,7 +99,7 @@
           .attr('class', 'pixel')
           .attr('width', samples.length)
           .attr('height', ids.length)
-          .attr('xlink:xlink:href', 'data:image/png;base64, **image_goes_here**')
+          .attr('xlink:xlink:href', 'data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAABUAAAAMCAYAAACNzvbFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAuIwAALiMBeKU/dgAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMS4yLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvNQv5yAAAAVJJREFUKJG1kb9KA0EQxn%2BzexvOhBCVXBQRFQQrsbJQ6zyCtT6FL2CtYGFjJQiCNhaWPkASQRRBSzGkECsV/5x6ub21uAgmBDWgH3wMM3w7882szC6vO3pA/071R40XDkkvPWFp/keJlGXReRNj2IE8NmewWQ%2BbUSQZwRoh8cBpIdHpA6dbVGndKdqIgAcQ1xtQB0VK842Lhzan3S/n3awsgANJOmhdK6ZUtrWadagYdNOhIoeOEnQYo1%2Ba6Psn4noDFZxHjKxVKF5EDG9UCE5DSpsVSrVHiltV%2Bu4SBrer6RDrKOzWeO8XsgfHhIHGHJ1wO5fFnV3yOlVKB0/ur/b0%2B7%2BBHF5NO43DInyNn%2BjMu6FTI2VZ/HOn6q8bAnjXezOMB/eM5h4oZp4pmmcKOiSv38irV3LqHV%2Ba%2BBID4IvFF4sR8EUwCEYURjQeGi3qf9b/AD5ffIoFOyZjAAAAAElFTkSuQmCC')
           // .attr('xlink:href', 'out.png');
 
       var xyratio = get_xyratio();
