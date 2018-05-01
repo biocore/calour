@@ -27,6 +27,7 @@ import hashlib
 import inspect
 import re
 import configparser
+import warnings
 from types import FunctionType
 from functools import wraps, update_wrapper
 from importlib import import_module
@@ -452,7 +453,7 @@ def register_functions(cls, modules=None):
         modules in `calour`.
     '''
     # pattern to recognize the Parameters section
-    p = re.compile(r"(\n +Parameters\n +-+ *)")
+    p = re.compile(r"(\n +Parameters\n +-+ *)\n(?! +exp : )")
     if modules is None:
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
@@ -476,9 +477,29 @@ def register_functions(cls, modules=None):
                         updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
                                    '\\1'
                                    '\n    exp : {0}'
-                                   '\n        Input experiment object.')
+                                   '\n        Input experiment object.'
+                                   '\n')
 
                         if not f.__doc__:
                             f.__doc__ = ''
 
                         f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)
+
+
+def deprecated(message):
+    '''Deprecation decorator.
+
+    Parameters
+    ----------
+    message : str
+        the message to print together with deprecation info.
+    '''
+    def deprecated_decorator(func):
+        def deprecated_func(*args, **kwargs):
+            warnings.warn("{} is a deprecated function. {}".format(func.__name__, message),
+                          category=DeprecationWarning,
+                          stacklevel=2)
+            warnings.simplefilter('default', DeprecationWarning)
+            return func(*args, **kwargs)
+        return deprecated_func
+    return deprecated_decorator

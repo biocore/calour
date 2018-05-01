@@ -13,9 +13,9 @@ Functions
    filter_by_metadata
    filter_samples
    filter_ids
-   filter_mean
    filter_prevalence
-   filter_abundance
+   filter_mean_abundance
+   filter_sum_abundance
    filter_sample_categories
    downsample
 '''
@@ -38,7 +38,7 @@ from scipy.sparse import issparse
 
 from . import Experiment
 from ._doc import ds
-from .util import _to_list
+from .util import _to_list, deprecated
 
 
 logger = getLogger(__name__)
@@ -70,6 +70,10 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
     Returns
     -------
     Experiment
+
+    See Also
+    --------
+    filter_sample_categories
     '''
     logger.debug('downsample on field %s' % field)
     if axis == 0:
@@ -133,6 +137,9 @@ def filter_sample_categories(exp: Experiment, field, min_samples=5, inplace=Fals
     -------
     Experiment
 
+    See Also
+    --------
+    downsample
     '''
     if field not in exp.sample_metadata:
         raise ValueError('field %s not in sample_metadata (fields are: %s)' % (field, exp.sample_metadata.columns))
@@ -208,13 +215,9 @@ def filter_by_data(exp: Experiment, predicate, axis=0, negate=False, inplace=Fal
         it also accepts the following strings:
 
         * 'sum_abundance': calls ``_sum_abundance``,
-
         * 'freq_ratio': calls ``_freq_ratio``,
-
         * 'unique_cut': calls ``_unique_cut``,
-
         * 'mean_abundance': calls ``_mean_abundance``,
-
         * 'prevalence': calls ``_prevalence``
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (samples) (0) or each column (features) (1)
@@ -436,14 +439,15 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 
 @ds.with_indent(4)
 @Experiment._record_sig
-def filter_abundance(exp: Experiment, min_abundance, **kwargs):
-    '''Filter keeping only features with >= min_abundance total over all samples
+def filter_sum_abundance(exp: Experiment, cutoff, **kwargs):
+    '''Filter keeping only features with >= `cutoff` over all samples.
+
     This is a convenience function wrapping filter_by_data()
 
     Parameters
     ----------
-    min_abundance : numeric
-        The minimal total abundance for each feature over all samples
+    cutoff : numeric
+        The minimal total abundance fraction for each feature over all samples.
 
     Keyword Arguments
     -----------------
@@ -459,20 +463,60 @@ def filter_abundance(exp: Experiment, min_abundance, **kwargs):
     filter_by_data
 
     '''
-    newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=min_abundance, **kwargs)
+    newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=cutoff, **kwargs)
     return newexp
+
+
+filter_abundance = deprecated('Use `filter_sum_abundance` instead.')(filter_sum_abundance)
+
+
+@ds.with_indent(4)
+@Experiment._record_sig
+def filter_mean_abundance(exp: Experiment, cutoff=0.01, **kwargs):
+    '''Filter features with a mean at least cutoff of the mean total abundance/sample
+
+    For example, to keep features with mean abundance of 1% use `filter_mean_abundance(cutoff=0.01)`.
+
+    Parameters
+    ----------
+    cutoff : float, optional
+        The minimal mean abundance fraction (out of the mean of total
+        abundance per sample) for a feature in order to keep
+        it. Default is 0.01 - keep features with mean abundance >=1%
+        of mean total abundance per sample
+
+    Keyword Arguments
+    -----------------
+    %(filtering.filter_by_data.parameters.negate)s
+
+    Returns
+    -------
+    Experiment
+
+    See Also
+    --------
+    filter_by_data
+
+    '''
+    factor = np.mean(exp.data.sum(axis=1))
+    newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
+    return newexp
+
+# filter_mean is deprecated and will be removed
+filter_mean = deprecated('Use `filter_mean_abundance` instead.')(filter_mean_abundance)
 
 
 @ds.with_indent(4)
 @Experiment._record_sig
 def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
-    '''Filter features keeping only ones present in at least fraction fraction of the samples.
-    This is a convenience function wrapping filter_by_data()
+    '''Filter features keeping only ones present in more than certain fraction of all samples.
+
+    This is a convenience function wrapping `filter_by_data`
 
     Parameters
     ----------
     fraction : float
-        Keep features present at least in fraction of samples
+        Keep features present in more than `fraction` of samples
     cutoff : float, optional
         The minimal fraction of reads for the otu to be called present in a sample
 
@@ -491,37 +535,6 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, **kwargs):
 
     '''
     newexp = exp.filter_by_data('prevalence', axis=1, fraction=fraction, cutoff=cutoff, **kwargs)
-    return newexp
-
-
-@ds.with_indent(4)
-@Experiment._record_sig
-def filter_mean(exp: Experiment, cutoff=0.01, **kwargs):
-    '''Filter features with a mean at least cutoff of the mean total abundance/sample
-
-    In order to keep features with mean abundance of 1% use ``filter_mean(cutoff=0.01)``
-
-    Parameters
-    ----------
-    cutoff : float, optional
-        The minimal mean abundance fraction (out of the mean of total abundance per sample) for a feature in order
-        to keep it. Default is 0.01 - keep features with mean abundance >=1% of mean total abundance per sample
-
-    Keyword Arguments
-    -----------------
-    %(filtering.filter_by_data.parameters.negate)s
-
-    Returns
-    -------
-    Experiment
-
-    See Also
-    --------
-    filter_by_data
-
-    '''
-    factor = np.mean(exp.data.sum(axis=1))
-    newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
     return newexp
 
 
