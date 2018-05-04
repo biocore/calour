@@ -485,6 +485,7 @@ def filter_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
             select = select | _mean_abundance(exp.data[indices == grp], axis=0, cutoff=cutoff)
         return exp.reorder(select, axis=1, **kwargs)
 
+
 # filter_mean is deprecated and will be removed
 filter_mean = deprecated('Use `filter_abundance` instead.')(filter_abundance)
 
