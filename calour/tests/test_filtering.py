@@ -155,9 +155,18 @@ class FilteringTests(Tests):
                 self.assertIsNot(obs, self.test2)
 
     def test_filter_abundance(self):
-        exp = self.test1.filter_abundance(17008)
+        test1 = self.test1.normalize()
+        exp = test1.filter_abundance(0.4, field=None)
         self.assertEqual(exp.shape[1], 2)
         fids = ['TC', 'GG']
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
+
+        exp = test1.filter_abundance(0.5, field=None)
+        self.assertEqual(exp.shape[1], 0)
+
+        exp = test1.filter_abundance(0.5, field='group')
+        self.assertEqual(exp.shape[1], 1)
+        fids = ['TC']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
 
     def test_filter_prevalence(self):
@@ -170,10 +179,9 @@ class FilteringTests(Tests):
 
     def test_filter_mean(self):
         # default is 0.01 - keep features with mean abundance >= 1%
-        exp = self.test1.filter_mean()
-        fids = ['TG', 'TC', 'GG']
+        exp = self.test1.normalize().filter_mean()
+        fids = ['AT', 'TG', 'TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
-        self.assertEqual(exp.shape[1], 3)
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
     def test_filter_ids_raise(self):

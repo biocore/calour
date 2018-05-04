@@ -328,10 +328,10 @@ def _mean_abundance(data, axis, cutoff=0.01, strict=False):
     axis : int
         0 to sum each feature, 1 to sum each sample
     cutoff : float
-        keep features with mean>=cutoff
+        keep features with mean >= cutoff
     strict : bool, optional
-        False (default) to use mean >=cutoff
-        True to use mean>cutoff
+        False (default) to use mean >= cutoff;
+        True to use mean > cutoff
 
     Returns
     -------
@@ -438,46 +438,10 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 
 @ds.with_indent(4)
 @Experiment._record_sig
-def filter_abundance(exp: Experiment, sum_cutoff=None, mean_cutoff=None, **kwargs):
-    '''Filter keeping only features with >= `cutoff` over all samples.
-
-    This is a convenience function wrapping filter_by_data()
-
-    Parameters
-    ----------
-    sum_cutoff : numeric
-        The minimal total abundance for each feature over all samples.
-    mean_cutoff :
-        The minimal mean abundance for each feature. Either `sum_cutoff` or
-        `mean_cutoff` has to be not `None`.
-
-    Keyword Arguments
-    -----------------
-    %(filtering.filter_by_data.parameters.negate)s
-
-    Returns
-    -------
-    Experiment
-        the filtered object
-
-    See Also
-    --------
-    filter_by_data
-
-    '''
-    newexp = exp.filter_by_data('sum_abundance', axis=1, cutoff=cutoff, **kwargs)
-    return newexp
-
-
-filter_abundance = deprecated('Use `filter_sum_abundance` instead.')(filter_sum_abundance)
-
-
-@ds.with_indent(4)
-@Experiment._record_sig
-def filter_mean_abundance(exp: Experiment, cutoff=0.01, **kwargs):
+def filter_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
 
-    For example, to keep features with mean abundance of 1% use `filter_mean_abundance(cutoff=0.01)`.
+    For example, to keep features with mean abundance of 1% use `filter_abundance(cutoff=0.01)`.
 
     Parameters
     ----------
@@ -485,7 +449,12 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, **kwargs):
         The minimal mean abundance fraction (out of the mean of total
         abundance per sample) for a feature in order to keep
         it. Default is 0.01 - keep features with mean abundance >=1%
-        of mean total abundance per sample
+        of mean total abundance per sample.
+    field : str or `None`, optional
+        The column in the sample_metadata. If it is not `None`, the
+        features that has mean abundance lower than the cutoff in *ALL*
+        sample categories in the specified sample_metadata column will
+        be filtered away.
 
     Keyword Arguments
     -----------------
@@ -500,12 +469,24 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, **kwargs):
     filter_by_data
 
     '''
-    factor = np.mean(exp.data.sum(axis=1))
-    newexp = exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff * factor, **kwargs)
-    return newexp
+    if exp.normalized <= 0:
+        logger.warning('Do you forget to normalize your data? It is required to run this function')
+
+    cutoff = exp.normalized * cutoff
+
+    if field is None:
+        return exp.filter_by_data('mean_abundance', axis=1, cutoff=cutoff, **kwargs)
+    else:
+        select = np.zeros(exp.shape[1], dtype='?')
+        # convert it to unicode str in case there are NaNs
+        samples = exp.sample_metadata[field].values.astype('U')
+        groups, indices = np.unique(samples, return_inverse=True)
+        for grp in groups:
+            select = select | _mean_abundance(exp.data[indices == grp], axis=0, cutoff=cutoff)
+        return exp.reorder(select, axis=1, **kwargs)
 
 # filter_mean is deprecated and will be removed
-filter_mean = deprecated('Use `filter_mean_abundance` instead.')(filter_mean_abundance)
+filter_mean = deprecated('Use `filter_abundance` instead.')(filter_abundance)
 
 
 @ds.with_indent(4)

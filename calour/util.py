@@ -453,7 +453,7 @@ def register_functions(cls, modules=None):
         modules in `calour`.
     '''
     # pattern to recognize the Parameters section
-    p = re.compile(r"(\n +Parameters\n +-+ *)\n(?! +exp : )")
+    p = re.compile(r"(\n +Parameters\n +-+ *)")
     if modules is None:
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
@@ -495,6 +495,7 @@ def deprecated(message):
         the message to print together with deprecation info.
     '''
     def deprecated_decorator(func):
+        @wraps(func)
         def deprecated_func(*args, **kwargs):
             warnings.warn("{} is a deprecated function. {}".format(func.__name__, message),
                           category=DeprecationWarning,
