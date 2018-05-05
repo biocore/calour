@@ -161,12 +161,12 @@ class FilteringTests(Tests):
         fids = ['TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
 
-        exp = test1.filter_abundance(0.5, field=None)
+        exp = test1.filter_abundance(0.6, field=None)
         self.assertEqual(exp.shape[1], 0)
 
-        exp = test1.filter_abundance(0.5, field='group')
+        exp = test1.filter_abundance(0.6, field='group')
         self.assertEqual(exp.shape[1], 1)
-        fids = ['TC']
+        fids = ['GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
 
     def test_filter_prevalence(self):

@@ -470,7 +470,7 @@ def filter_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
 
     '''
     if exp.normalized <= 0:
-        logger.warning('Do you forget to normalize your data? It is required to run this function')
+        logger.warning('Do you forget to normalize your data? It is required before running this function')
 
     cutoff = exp.normalized * cutoff
 
@@ -479,10 +479,11 @@ def filter_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
     else:
         select = np.zeros(exp.shape[1], dtype='?')
         # convert it to unicode str in case there are NaNs
-        samples = exp.sample_metadata[field].values.astype('U')
-        groups, indices = np.unique(samples, return_inverse=True)
-        for grp in groups:
-            select = select | _mean_abundance(exp.data[indices == grp], axis=0, cutoff=cutoff)
+        values = exp.sample_metadata[field].values.astype('U')
+        groups, indices = np.unique(values, return_inverse=True)
+        for i, _ in enumerate(groups):
+            # Here axis is 0 not 1.
+            select = select | _mean_abundance(exp.data[indices == i], axis=0, cutoff=cutoff)
         return exp.reorder(select, axis=1, **kwargs)
 
 
