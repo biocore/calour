@@ -149,31 +149,34 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
 
     Returns
     -------
-    pandas.DataFrame
+        pandas.DataFrame with  info about significantly enriched terms. The columns include:
 
-        The dataframe contains info about significantly enriched terms. The columns include:
+            feature : str the feature
 
-        feature : str the feature
+            pval : the p-value for the enrichment (float)
 
-        pval : the p-value for the enrichment (float)
+            odif : the effect size (float)
 
-        odif : the effect size (float)
+            observed : the number of observations of this term in group1 (int)
 
-        group : str The value group where the tern in enriched
+            expected : the expected (based on all features) number of observations of this term in group1 (float)
 
-        observed : the number of observations of this term in group1 (int)
+            frac_group1 : fraction of total terms in group 1 which are the specific term (float)
 
-        expected : the expected (based on all features) number of observations of this term in group1 (float)
+            frac_group2 : fraction of total terms in group 2 which are the specific term (float)
 
-        frac_group1 : fraction of total terms in group 1 which are the specific term (float)
+            num_group1 : number of total terms in group 1 which are the specific term (float)
 
-        frac_group2 : fraction of total terms in group 2 which are the specific term (float)
+            num_group2 : number of total terms in group 2 which are the specific term (float)
 
-        num_group1 : number of total terms in group 1 which are the specific term (float)
+            description : the term (str)
+        numpy.Array where rows are features (ordered like the dataframe), columns are features and value is score
+            for term in feature
+        pandas.DataFrame with info about the features used. columns:
 
-        num_group2 : number of total terms in group 2 which are the specific term (float)
+            group : int, the group (1/2) to which the feature belongs
 
-        description : str. the term
+            sequence: str
     '''
     db = _get_database_class(dbname, exp=exp)
     if not db.can_do_enrichment:
