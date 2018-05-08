@@ -411,7 +411,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
         exp.feature_metadata['taxonomy'] = 'NA'
 
     if min_reads is not None:
-        exp.filter_by_data('sum_abundance', cutoff=min_reads, inplace=True)
+        exp.filter_by_data('sum_abundance', axis=0, cutoff=min_reads, inplace=True)
     if normalize is not None:
         exp.normalize(total=normalize, axis='s', inplace=True)
 

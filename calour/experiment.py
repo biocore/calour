@@ -69,7 +69,8 @@ class Experiment:
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
-        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
     normalized : int
         the normalization factor. it is zero if not normalized
     description : str
