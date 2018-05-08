@@ -107,7 +107,13 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
     logger.info('method %s for field %s. Positive correlated features : %d. Negative correlated features : %d. total %d'
                 % (method, field, np.sum(odif[keep] > 0), np.sum(odif[keep] < 0), np.sum(keep)))
-    return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+
+    newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    group1_name = 'positively correlated with %s' % field
+    group2_name = 'negatively correlated with %s' % field
+    orig_group = [group1_name if x > 0 else group2_name for x in newexp.feature_metadata['_calour_diff_abundance_effect']]
+    newexp.feature_metadata['_calour_diff_abundance_group'] = orig_group
+    return newexp
 
 
 @Experiment._record_sig

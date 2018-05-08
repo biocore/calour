@@ -80,7 +80,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     Parameters
     ----------
     enriched : pandas.DataFrame
-        The enriched terms ( from exp.enrichment() )
+        The enriched terms ( from exp.enrichment(). i.e. if res=exp.enrichment, use res[0] )
         must contain columns 'term', 'odif'
     max_show: int or (int, int) or None, optional
         The maximal number of terms to show
@@ -120,8 +120,10 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     if negative > 0:
         ax.barh(np.arange(negative), evals[:negative], color=colors[1])
     use = np.zeros(len(enriched), dtype=bool)
-    use[:positive] = True
-    use[-negative:] = True
+    if positive > 0:
+        use[-positive:] = True
+    if negative > 0:
+        use[:negative] = True
     ticks = enriched['term'].values[use]
     ticks = [x.split('(')[0] for x in ticks]
     ticks = ['LOWER IN '+x[1:] if x[0] == '-' else x for x in ticks]
@@ -137,7 +139,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
 
 
 def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None,
-                                   score_method='all_mean', colors=('green', 'red'), show_legend=True):
+                                   score_method='all_mean', colors=('green', 'red'), show_legend=True, random_seed=None):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -176,6 +178,9 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
         Colors for terms enriched in group1 or group2 respectively
     show_legend: bool (optional)
         True to show the color legend, False to hide it
+    random_seed : int or None, optional
+        int to set the numpy random seed to this number before running the random permutation test.
+        None to not set the numpy random seed
 
     Returns
     -------
@@ -192,7 +197,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     positive = exp.feature_metadata.index.values[positive.values]
 
     # get the enrichment
-    enriched, term_features, features = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp, score_method=score_method)
+    enriched, term_features, features = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp, score_method=score_method, random_seed=random_seed)
     # features=pd.DataFrame({'sequence': features}, index=features)
 
     # Create an new experiment where features are the enriched terms, and samples are the features
