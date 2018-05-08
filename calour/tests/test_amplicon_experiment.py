@@ -39,7 +39,6 @@ class ExperimentTests(Tests):
 
     def test_filter_fasta(self):
         # test keeping the sequences from fasta
-        print(self.seqs1_fasta)
         exp = self.test1.filter_fasta(self.seqs1_fasta)
         # test we get only 1 sequence and the correct one
         self.assertEqual(len(exp.feature_metadata), 1)

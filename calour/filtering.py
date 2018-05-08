@@ -15,6 +15,7 @@ Functions
    filter_ids
    filter_prevalence
    filter_abundance
+   filter_mean_abundance
    filter_sample_categories
    downsample
 '''
@@ -221,10 +222,13 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (ie samples) (0, 's') or each column (ie features) (1, 'f')
     field : str or `None`, optional
-        The column in the sample_metadata (feature_metadata). If it is not `None`, the
-        features that has mean abundance lower than the cutoff in *ALL*
-        sample categories in the specified sample_metadata column will
-        be filtered away.
+        The column in the sample_metadata (or feature_metadata,
+        depending on `axis`). If it is `None`, the `predicate`
+        operates on the whole data set; if it is not `None`, the data
+        set is divided into groups according to the sample_metadata
+        (feature_metadata) column and the `predicate` operates on each
+        partition of data - only the features (or samples) that fail
+        to pass every partition will be filtered away.
     negate : bool
         negate the predicate for selection
     kwargs : dict
@@ -234,6 +238,13 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
     -------
     Experiment
         the filtered object
+
+    See Also
+    --------
+    filter_mean_abundance
+    filter_abundance
+    filter_prevalence
+
     '''
     if axis == 0:
         x = exp.feature_metadata
@@ -384,9 +395,9 @@ def prevalence(data, axis, cutoff=1/10000, fraction=0.1):
     axis : int
         compute prevalence of each column (0) or row (1).
     cutoff : float
-        the mean threshold
-    strict : bool, optional
-        False (default) to use prevalence >= cutoff; True to use prevalence > cutoff
+        the min threshold of abundance
+    fraction : float
+        [0, 1). the min threshold of presence (in fraction)
 
     Returns
     -------
@@ -478,22 +489,23 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
     Parameters
     ----------
     cutoff : float, optional
-        The minimal mean abundance fraction (out of the mean of total
-        abundance per sample) for a feature in order to keep
-        it. Default is 0.01 - keep features with mean abundance >=1%
-        of mean total abundance per sample.
+        The minimal mean abundance (in fraction) for a feature in order to keep
+        it. Default is 0.01 - keep features with mean abundance >= 1%
+        over all samples.
     field : str or `None`, optional
         The column in the sample_metadata. If it is not `None`, the
-        features that has mean abundance lower than the cutoff in *ALL*
-        sample categories in the specified sample_metadata column will
-        be filtered away.
+        data set are divided into groups according to the sample
+        metadata column. The features that has mean abundance lower
+        than the cutoff in *ALL* sample groups will be filtered away.
+        If it is `None`, the mean abundance is computed over the whole
+        data set.
 
     Keyword Arguments
     -----------------
     %(filtering.filter_by_data.parameters.negate)s
 
     Returns
-    ------s-
+    -------
     Experiment
 
     See Also
@@ -512,17 +524,15 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
 @ds.with_indent(4)
 @Experiment._record_sig
 def filter_abundance(exp: Experiment, cutoff=10, **kwargs):
-    '''Filter features with a mean at least cutoff of the mean total abundance/sample
+    '''Filter features with sum abundance across all samples less than the cutoff.
 
     For example, to keep features with mean abundance of 1% use `filter_abundance(cutoff=0.01)`.
 
     Parameters
     ----------
     cutoff : float, optional
-        The minimal mean abundance fraction (out of the mean of total
-        abundance per sample) for a feature in order to keep
-        it. Default is 0.01 - keep features with mean abundance >=1%
-        of mean total abundance per sample.
+        The minimal total abundance across all samples.
+        Default is 10 - keep features with total abundance >= 10.
 
     Keyword Arguments
     -----------------
@@ -545,7 +555,7 @@ def filter_abundance(exp: Experiment, cutoff=10, **kwargs):
 
 @ds.with_indent(4)
 @Experiment._record_sig
-def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, field=None, **kwargs):
+def filter_prevalence(exp: Experiment, fraction, cutoff=0.01, field=None, **kwargs):
     '''Filter features keeping only ones present in more than certain fraction of all samples.
 
     This is a convenience function wrapping `filter_by_data`
@@ -555,7 +565,14 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, field=None, **k
     fraction : float
         Keep features present in more than `fraction` of samples
     cutoff : float, optional
-        The minimal fraction of reads for the otu to be called present in a sample
+        The min abundance threshold to be called present in a sample
+    field : str or `None`, optional
+        The column in the sample_metadata. If it is not `None`, the
+        data set are divided into groups according to the sample
+        metadata column. The features that has prevalence lower
+        than the fraction in *ALL* sample groups will be filtered away.
+        If it is `None`, the prevalence is computed over the whole
+        data set.
 
     Keyword Arguments
     -----------------
@@ -569,7 +586,7 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1/10000, field=None, **k
     See Also
     --------
     filter_by_data
-
+    filter_mean_abundance
     '''
     if exp.normalized <= 0:
         logger.warning('Do you forget to normalize your data? It is required before running this function')
