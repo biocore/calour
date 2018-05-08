@@ -145,7 +145,7 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
         the database to use for the annotation terms and enrichment analysis
     *args : tuple
     **kwargs : dict
-        Additional database specific parameters
+        Additional database specific parameters (see per-database module documentation for .enrichment() method)
 
     Returns
     -------
@@ -160,8 +160,10 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
             * 'num_group1' : number of total terms in group 1 which are the specific term (float)
             * 'num_group2' : number of total terms in group 2 which are the specific term (float)
             * 'description' : the term (str)
+
         numpy.Array where rows are features (ordered like the dataframe), columns are terms, and value is score
             for term in feature
+
         pandas.DataFrame with info about the features used. columns:
             * 'group' : int, the group (1/2) to which the feature belongs
             * 'sequence': str
