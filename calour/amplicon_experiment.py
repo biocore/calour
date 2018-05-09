@@ -215,8 +215,13 @@ class AmpliconExperiment(Experiment):
             False (default) to create a copy
             True to Replace data in exp
         '''
-        level_dict = {'kingdom': 0, 'k': 0, 'phylum': 1, 'p': 1, 'class': 2, 'c': 2, 'order': 3, 'o': 3,
-                      'family': 4, 'f': 4, 'genus': 5, 'g': 5, 'species': 6, 's': 6}
+        level_dict = {'kingdom': 0, 'k': 0,
+                      'phylum': 1, 'p': 1,
+                      'class': 2, 'c': 2,
+                      'order': 3, 'o': 3,
+                      'family': 4, 'f': 4,
+                      'genus': 5, 'g': 5,
+                      'species': 6, 's': 6}
         if not isinstance(level, int):
             if level not in level_dict:
                 raise ValueError('Unsupported taxonomy level %s. Please use out of %s' % (level, list(level_dict.keys())))

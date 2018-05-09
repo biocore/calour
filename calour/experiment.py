@@ -69,7 +69,10 @@ class Experiment:
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
-        store the data as sparse matrix (scipy.sparse.csr_matrix) or numpy array.
+        store the data array in :class:`scipy.sparse.csr_matrix`
+        or :class:`numpy.ndarray`
+    normalized : int
+        the normalization factor. it is zero if not normalized
     description : str
         name of the experiment
 
@@ -84,7 +87,7 @@ class Experiment:
         self.feature_metadata = feature_metadata
         self.exp_metadata = exp_metadata
         self.description = description
-
+        self.normalized = 0
         # the function calling history list
         self._call_history = []
         # whether to log to history
