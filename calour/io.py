@@ -381,10 +381,9 @@ def read_amplicon(data_file, sample_metadata_file=None,
     sample_metadata_file : None or str, optional
         None (default) to just use samplenames (no additional metadata).
     min_reads : int or None
-        int to remove all samples with less than ``min_reads``.
-        ``None`` to not filter
+        remove all samples with less than `min_reads`. `None` to keep all samples
     normalize : int or None
-        normalize each sample to the specified reads. ``None`` to not normalize
+        normalize each sample to the specified count. `None` to not normalize
 
     Keyword Arguments
     -----------------
@@ -411,7 +410,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
         exp.feature_metadata['taxonomy'] = 'NA'
 
     if min_reads is not None:
-        exp.filter_by_data('sum_abundance', axis=0, cutoff=min_reads, inplace=True)
+        exp.filter_by_data('abundance', axis=0, cutoff=min_reads, mean_or_sum='sum', inplace=True)
     if normalize is not None:
         exp.normalize(total=normalize, axis='s', inplace=True)
 
@@ -516,7 +515,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         False (default) to store data as dense matrix (faster but more memory)
         True to store as sparse (CSR)
     normalize : int or None
-        normalize each sample to the specified reads. ``None`` to not normalize
+        normalize each sample to the specified reads. `None` to not normalize
 
     Keyword Arguments
     -----------------
@@ -639,8 +638,8 @@ def save_biom(exp: Experiment, f, fmt='hdf5', add_metadata='taxonomy'):
         'json' same to json biom table.
         'txt' save to text (tsv) biom table.
     add_metadata : str or None, optional
-        add metadata column from ``Experiment.feature_metadata`` to biom table.
-        Don't add if it is ``None``.
+        add metadata column from `Experiment.feature_metadata` to biom table.
+        Don't add if it is `None`.
 
     '''
     logger.debug('save biom table to file %s format %s' % (f, fmt))
@@ -727,8 +726,8 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     ----------
     exp : Experiment
     add_metadata : str or None, optional
-        add metadata column from ``Experiment.feature_metadata`` to biom table.
-        Don't add if it is ``None``.
+        add metadata column from `Experiment.feature_metadata` to biom table.
+        Don't add if it is `None`.
     to_list: bool, optional
         True to convert the metadata field to list (for hdf5)
 

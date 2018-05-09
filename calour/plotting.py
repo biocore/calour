@@ -381,9 +381,7 @@ def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alph
         fig, ax = plt.subplots()
 
     for uniq in exp.sample_metadata[field].unique():
-        data = exp.filter_samples(
-            field, uniq).filter_by_data(
-                'mean_abundance', cutoff=min_abund, axis=1).data
+        data = exp.filter_samples(field, uniq).filter_by_data('abundance', cutoff=min_abund, axis=1, mean_or_sum='mean').data
         flag = True
         # this implementation is for both dense and sparse arrays
         for column in range(data.shape[1]):

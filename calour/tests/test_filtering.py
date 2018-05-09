@@ -109,10 +109,10 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_sample_edge_cases(self):
         # all samples are filtered out
-        obs = self.test2.filter_by_data('sum_abundance', axis=0, cutoff=100000)
+        obs = self.test2.filter_by_data('abundance', axis=0, cutoff=100000, mean_or_sum='sum')
         self.assertEqual(obs.shape, (0, 8))
         # none is filtered out
-        obs = self.test2.filter_by_data('sum_abundance', axis=0, cutoff=1)
+        obs = self.test2.filter_by_data('abundance', axis=0, cutoff=1, mean_or_sum='sum')
         assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
@@ -120,7 +120,7 @@ class FilteringTests(Tests):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
             test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse, normalize=None)
             # filter out samples with abundance < 1200. only the last sample is filtered out.
-            obs = test2.filter_by_data('sum_abundance', axis=0, inplace=inplace, cutoff=1200)
+            obs = test2.filter_by_data('abundance', axis=0, inplace=inplace, cutoff=1200, mean_or_sum='sum')
             self.assertEqual(obs.shape, (8, 8))
             self.assertNotIn('S9', obs.sample_metadata)
             for sid in obs.sample_metadata.index:
@@ -133,18 +133,18 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_feature_edge_cases(self):
         # all features are filtered out
-        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=10000)
+        obs = self.test2.filter_by_data('abundance', axis=1, cutoff=10000, mean_or_sum='sum')
         self.assertEqual(obs.shape, (9, 0))
 
         # none is filtered out
-        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=1)
+        obs = self.test2.filter_by_data('abundance', axis=1, cutoff=1, mean_or_sum='sum')
         assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
     def test_filter_by_data_feature(self):
         # one feature is filtered out when cutoff is set to 25
         for inplace in [True, False]:
-            obs = self.test2.filter_by_data('sum_abundance', axis=1, inplace=inplace, cutoff=25)
+            obs = self.test2.filter_by_data('abundance', axis=1, inplace=inplace, cutoff=25, mean_or_sum='sum')
             self.assertEqual(obs.shape, (9, 7))
             self.assertNotIn('TA', obs.feature_metadata)
             for fid in obs.feature_metadata.index:

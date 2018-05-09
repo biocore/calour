@@ -212,13 +212,12 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
     ----------
     predicate : str or callable
         The callable accepts a list of numeric and return a bool. Alternatively
-        it also accepts the following strings:
+        it also accepts the following strings to filter along the specified axis:
 
-        * 'sum_abundance': calls :func:`.sum_abundance`,
-        * 'mean_abundance': calls :func:`.mean_abundance`,
-        * 'prevalence': calls :func:`.prevalence`
-        * 'freq_ratio': calls :func:`.freq_ratio`,
-        * 'unique_cut': calls :func:`.unique_cut`
+        * 'abundance': calls :func:`.is_abundant`, filter by abundance;
+        * 'prevalence': calls :func:`.is_prevalent`, filter by prevalence;
+        * 'freq_ratio': calls :func:`.freq_ratio` and
+        * 'unique_cut': calls :func:`.unique_cut`, filter by how diversified the values.
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (ie samples) (0, 's') or each column (ie features) (1, 'f')
     field : str or `None`, optional
@@ -264,9 +263,8 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
 
     # functions that can be applied to full matrix
     # this is much faster
-    func_vec = {'sum_abundance': sum_abundance,
-                'mean_abundance': mean_abundance,
-                'prevalence': prevalence}
+    func_vec = {'abundance': is_abundant,
+                'prevalence': is_prevalent}
 
     func_slow = {'freq_ratio': freq_ratio,
                  'unique_cut': unique_cut}
@@ -287,6 +285,7 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
             select_i = pred(data[indices == i], axis=0, **kwargs)
         else:
             select_i = np.ones(n, dtype='?')
+            # this loop works for both dense or sparse arrays
             for row in range(n):
                 # convert the row from sparse to dense, and cast to 1d array
                 select_i[row] = pred(data[row, indices == i].todense().A1, **kwargs)
@@ -303,48 +302,8 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
 ds.keep_params('filtering.filter_by_data.parameters', 'negate')
 
 
-def sum_abundance(data, axis, cutoff=10, strict=False):
-    '''Check if the sum abundance larger than cutoff.
-
-    It can be used filter features with at least "cutoff" abundance
-    total over all samples.
-
-    Parameters
-    ----------
-    data : numpy.ndarray or scipy.sparse.csr_matrix
-    axis : int
-        0 to sum each column, 1 to sum each row. passed to :func:`numpy.sum`
-    cutoff : float
-        the mean threshold
-    strict : bool, optional
-        False (default) to use sum >= cutoff; True to use sum > cutoff
-
-    Returns
-    -------
-    np.ndarray
-        bool array with True if sum >= cutoff.
-
-    Examples
-    --------
-    >>> np.sum(sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2)) == 1
-    True
-    >>> np.sum(sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2, strict=True)) == 0
-    True
-    >>> np.sum(sum_abundance(np.array([[0, 1, 1]]), axis=1, cutoff=2.01)) == 0
-    True
-
-    '''
-    if strict:
-        res = data.sum(axis=axis) > cutoff
-    else:
-        res = data.sum(axis=axis) >= cutoff
-    if issparse(data):
-        res = res.A1
-    return res
-
-
-def mean_abundance(data, axis, cutoff=0.01, strict=False):
-    '''Check if the mean abundance larger than cutoff.
+def is_abundant(data, axis, cutoff=0.01, strict=False, mean_or_sum='mean'):
+    '''Check if the mean or sum abundance larger than cutoff.
 
     Can be used to keep features with means at least "cutoff" in all
     samples
@@ -358,6 +317,8 @@ def mean_abundance(data, axis, cutoff=0.01, strict=False):
         the mean threshold
     strict : bool, optional
         False (default) to use mean >= cutoff; True to use mean > cutoff
+    mean_or_sum : str
+        what abundance to compute: 'mean' or 'sum'
 
     Returns
     -------
@@ -366,15 +327,25 @@ def mean_abundance(data, axis, cutoff=0.01, strict=False):
 
     Examples
     --------
-    >>> mean_abundance(np.array([[0, 0, 1], [1, 1, 1]]), axis=1, cutoff=0.51).tolist()
+    >>> is_abundant(np.array([[0, 0, 1], [1, 1, 1]]), axis=1, cutoff=0.51).tolist()
     [False, True]
-    >>> mean_abundance(np.array([0, 0, 1, 1]), axis=0, cutoff=0.5)
+    >>> is_abundant(np.array([0, 0, 1, 1]), axis=0, cutoff=0.5)
     True
-    >>> mean_abundance(np.array([0, 0, 1, 1]), axis=0, cutoff=0.5, strict=True)
+    >>> is_abundant(np.array([0, 0, 1, 1]), axis=0, cutoff=0.5, strict=True)
     False
+    >>> is_abundant(np.array([[0, 1, 1]]), axis=1, cutoff=2, mean_or_sum='sum').tolist()
+    [True]
+    >>> is_abundant(np.array([0, 1, 1]), axis=0, cutoff=2, strict=True, mean_or_sum='sum')
+    False
+    >>> is_abundant(np.array([[0, 1, 1]]), axis=1, cutoff=2.01, mean_or_sum='sum').tolist()
+    [False]
+
 
     '''
-    m = data.mean(axis=axis)
+    if mean_or_sum == 'mean':
+        m = data.mean(axis=axis)
+    elif mean_or_sum == 'sum':
+        m = data.sum(axis=axis)
     if strict is True:
         res = m > cutoff
     else:
@@ -384,8 +355,8 @@ def mean_abundance(data, axis, cutoff=0.01, strict=False):
     return res
 
 
-def prevalence(data, axis, cutoff=1/10000, fraction=0.1):
-    '''Check the prevalence of values above the cutoff.
+def is_prevalent(data, axis, cutoff=1, fraction=0.1):
+    '''Check the prevalent of values above the cutoff.
 
     present (abundance >= cutoff) in at least "fraction" of samples
 
@@ -406,10 +377,10 @@ def prevalence(data, axis, cutoff=1/10000, fraction=0.1):
 
     Examples
     --------
-    >>> x = prevalence(np.array([[0, 1, 2], [0, 1, 2]]), 0, 2, 0.51)
+    >>> x = is_prevalent(np.array([[0, 1, 2], [0, 1, 2]]), 0, 2, 0.51)
     >>> x.tolist()
     [False, False, True]
-    >>> x = prevalence(np.array([[0, 1, 2], [0, 2, 2]]), 0, 2, 0.5)
+    >>> x = is_prevalent(np.array([[0, 1, 2], [0, 2, 2]]), 0, 2, 0.5)
     >>> x.tolist()
     [False, True, True]
     '''
@@ -420,7 +391,7 @@ def prevalence(data, axis, cutoff=1/10000, fraction=0.1):
 
 
 def unique_cut(x, unique=0.05):
-    '''the percentage of distinct values out of the number of total samples.
+    '''the percentage of distinct values out of the length of x.
 
     Examples
     --------
@@ -484,12 +455,12 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
 def filter_mean_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
     '''Filter features with a mean at least cutoff of the mean total abundance/sample
 
-    For example, to keep features with mean abundance of 1% use `filter_abundance(cutoff=0.01)`.
+    For example, to keep features with mean abundance of 1% use `filter_mean_abundance(cutoff=0.01)`.
 
     Parameters
     ----------
     cutoff : float, optional
-        The minimal mean abundance (in fraction) for a feature in order to keep
+        The minimal mean abundance (*in fraction*) for a feature in order to keep
         it. Default is 0.01 - keep features with mean abundance >= 1%
         over all samples.
     field : str or `None`, optional
@@ -518,7 +489,7 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
 
     cutoff = exp.normalized * cutoff
 
-    return exp.filter_by_data('mean_abundance', axis=1, field=field, cutoff=cutoff, **kwargs)
+    return exp.filter_by_data('abundance', axis=1, field=field, cutoff=cutoff, mean_or_sum='mean', **kwargs)
 
 
 @ds.with_indent(4)
@@ -526,7 +497,7 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
 def filter_abundance(exp: Experiment, cutoff=10, **kwargs):
     '''Filter features with sum abundance across all samples less than the cutoff.
 
-    For example, to keep features with mean abundance of 1% use `filter_abundance(cutoff=0.01)`.
+    For example, to keep features with mean abundance of 150 use `filter_abundance(cutoff=150)`.
 
     Parameters
     ----------
@@ -550,12 +521,12 @@ def filter_abundance(exp: Experiment, cutoff=10, **kwargs):
     if exp.normalized <= 0:
         logger.warning('Do you forget to normalize your data? It is required before running this function')
 
-    return exp.filter_by_data('sum_abundance', axis=1, field=None, cutoff=cutoff, **kwargs)
+    return exp.filter_by_data('abundance', axis=1, field=None, cutoff=cutoff, mean_or_sum='sum', **kwargs)
 
 
 @ds.with_indent(4)
 @Experiment._record_sig
-def filter_prevalence(exp: Experiment, fraction, cutoff=0.01, field=None, **kwargs):
+def filter_prevalence(exp: Experiment, fraction, cutoff=1, field=None, **kwargs):
     '''Filter features keeping only ones present in more than certain fraction of all samples.
 
     This is a convenience function wrapping `filter_by_data`
@@ -569,9 +540,9 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=0.01, field=None, **kwar
     field : str or `None`, optional
         The column in the sample_metadata. If it is not `None`, the
         data set are divided into groups according to the sample
-        metadata column. The features that has prevalence lower
+        metadata column. The features that has is_prevalent lower
         than the fraction in *ALL* sample groups will be filtered away.
-        If it is `None`, the prevalence is computed over the whole
+        If it is `None`, the is_prevalent is computed over the whole
         data set.
 
     Keyword Arguments

@@ -138,7 +138,7 @@ class IOTests(Tests):
         # test loading a taxonomy biom table and filtering/normalizing
         exp1 = ca.read_amplicon(self.test1_biom, min_reads=1000, normalize=10000)
         exp2 = ca.read(self.test1_biom, normalize=None)
-        exp2.filter_by_data('sum_abundance', axis=0, cutoff=1000, inplace=True)
+        exp2.filter_by_data('abundance', axis=0, cutoff=1000, inplace=True, mean_or_sum='sum')
         exp2.normalize(inplace=True)
         assert_experiment_equal(exp1, exp2)
         self.assertIn('taxonomy', exp1.feature_metadata.columns)
