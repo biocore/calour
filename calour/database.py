@@ -133,7 +133,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
 
 
 def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
-    '''Get the list of enriched annotation terms in features compared to all features in exp.
+    '''Get the list of enriched annotation terms in features compared to all other features in exp.
 
     Uses the database specific enrichment analysis method.
 
@@ -145,35 +145,28 @@ def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
         the database to use for the annotation terms and enrichment analysis
     *args : tuple
     **kwargs : dict
-        Additional database specific parameters
+        Additional database specific parameters (see per-database module documentation for .enrichment() method)
 
     Returns
     -------
-    pandas.DataFrame
+        pandas.DataFrame with  info about significantly enriched terms. The columns include:
+            * 'feature' : the feature ID (str)
+            * 'pval' : the p-value for the enrichment (float)
+            * 'odif' : the effect size (float)
+            * 'observed' : the number of observations of this term in group1 (int)
+            * 'expected' : the expected (based on all features) number of observations of this term in group1 (float)
+            * 'frac_group1' : fraction of total terms in group 1 which are the specific term (float)
+            * 'frac_group2' : fraction of total terms in group 2 which are the specific term (float)
+            * 'num_group1' : number of total terms in group 1 which are the specific term (float)
+            * 'num_group2' : number of total terms in group 2 which are the specific term (float)
+            * 'description' : the term (str)
 
-        The dataframe contains info about significantly enriched terms. The columns include:
+        numpy.Array where rows are features (ordered like the dataframe), columns are terms, and value is score
+            for term in feature
 
-        feature : str the feature
-
-        pval : the p-value for the enrichment (float)
-
-        odif : the effect size (float)
-
-        group : str The value group where the tern in enriched
-
-        observed : the number of observations of this term in group1 (int)
-
-        expected : the expected (based on all features) number of observations of this term in group1 (float)
-
-        frac_group1 : fraction of total terms in group 1 which are the specific term (float)
-
-        frac_group2 : fraction of total terms in group 2 which are the specific term (float)
-
-        num_group1 : number of total terms in group 1 which are the specific term (float)
-
-        num_group2 : number of total terms in group 2 which are the specific term (float)
-
-        description : str. the term
+        pandas.DataFrame with info about the features used. columns:
+            * 'group' : int, the group (1/2) to which the feature belongs
+            * 'sequence': str
     '''
     db = _get_database_class(dbname, exp=exp)
     if not db.can_do_enrichment:

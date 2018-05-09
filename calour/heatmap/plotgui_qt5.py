@@ -416,8 +416,11 @@ class ApplicationWindow(QMainWindow):
                 dblclick_data['database'] = cdb
                 dblclick_data['term'] = cname
                 dblclick_data['exp'] = exp
-                dblclick_data['features1'] = group1_seqs
-                dblclick_data['features2'] = list(group2_seqs)
+                g1_seqs = set(group1_seqs)
+                ordered_g1_seqs = [s for s in exp.feature_metadata.index.values if s in g1_seqs]
+                ordered_g2_seqs = [s for s in exp.feature_metadata.index.values if s in group2_seqs]
+                dblclick_data['features1'] = ordered_g1_seqs
+                dblclick_data['features2'] = ordered_g2_seqs
                 listwin.add_item('%s - effect %f, pval %f ' % (cname, cres['odif'], cres['pvals']), color=ccolor, dblclick_data=dblclick_data)
             listwin.exec_()
 
