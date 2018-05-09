@@ -74,7 +74,7 @@ def normalize(exp: Experiment, total=10000, axis=0, inplace=False):
         exp = deepcopy(exp)
     exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
     # store the normalization depth into the experiment metadata
-    exp.exp_metadata['normalized'] = total
+    exp.normalized = total
     return exp
 
 
@@ -395,9 +395,8 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False, random
         newexp = deepcopy(exp)
     if newexp.sparse:
         newexp.sparse = False
-    # subsample_counts() require int as input;
-    # check if it is normalized: if so, raise error
-    if exp.exp_metadata.get('normalized'):
+    # subsample_counts() require int as input; if not, raise error
+    if exp.data.dtype.kind not in {'u', 'i'}:
         raise ValueError('Your `Experiment` object is normalized: subsample operates on integer raw data, not on normalized data.')
 
     drops = []

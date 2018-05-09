@@ -109,10 +109,10 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_sample_edge_cases(self):
         # all samples are filtered out
-        obs = self.test2.filter_by_data('sum_abundance', cutoff=100000)
+        obs = self.test2.filter_by_data('abundance', axis=0, cutoff=100000, mean_or_sum='sum')
         self.assertEqual(obs.shape, (0, 8))
         # none is filtered out
-        obs = self.test2.filter_by_data('sum_abundance', cutoff=1)
+        obs = self.test2.filter_by_data('abundance', axis=0, cutoff=1, mean_or_sum='sum')
         assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
@@ -120,7 +120,7 @@ class FilteringTests(Tests):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
             test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, sparse=sparse, normalize=None)
             # filter out samples with abundance < 1200. only the last sample is filtered out.
-            obs = test2.filter_by_data('sum_abundance', axis=0, inplace=inplace, cutoff=1200)
+            obs = test2.filter_by_data('abundance', axis=0, inplace=inplace, cutoff=1200, mean_or_sum='sum')
             self.assertEqual(obs.shape, (8, 8))
             self.assertNotIn('S9', obs.sample_metadata)
             for sid in obs.sample_metadata.index:
@@ -133,18 +133,18 @@ class FilteringTests(Tests):
 
     def test_filter_by_data_feature_edge_cases(self):
         # all features are filtered out
-        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=10000)
+        obs = self.test2.filter_by_data('abundance', axis=1, cutoff=10000, mean_or_sum='sum')
         self.assertEqual(obs.shape, (9, 0))
 
         # none is filtered out
-        obs = self.test2.filter_by_data('sum_abundance', axis=1, cutoff=1)
+        obs = self.test2.filter_by_data('abundance', axis=1, cutoff=1, mean_or_sum='sum')
         assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
     def test_filter_by_data_feature(self):
         # one feature is filtered out when cutoff is set to 25
         for inplace in [True, False]:
-            obs = self.test2.filter_by_data('sum_abundance', axis=1, inplace=inplace, cutoff=25)
+            obs = self.test2.filter_by_data('abundance', axis=1, inplace=inplace, cutoff=25, mean_or_sum='sum')
             self.assertEqual(obs.shape, (9, 7))
             self.assertNotIn('TA', obs.feature_metadata)
             for fid in obs.feature_metadata.index:
@@ -154,27 +154,38 @@ class FilteringTests(Tests):
             else:
                 self.assertIsNot(obs, self.test2)
 
+    def test_filter_prevalence(self):
+        # keep only features present at least in 0.5 the samples
+        exp = self.test1.filter_prevalence(fraction=0.5)
+        fids = ['AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 'GG']
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
+        self.assertEqual(exp.shape[0], self.test1.shape[0])
+
     def test_filter_abundance(self):
         exp = self.test1.filter_abundance(17008)
         self.assertEqual(exp.shape[1], 2)
         fids = ['TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
 
-    def test_filter_prevalence(self):
-        # keep only features present at least in 0.5 the samples
-        exp = self.test1.filter_prevalence(fraction=0.5)
-        fids = ['AA', 'AT', 'AG', 'TA', 'TT', 'TG', 'TC', 'GG']
+    def test_filter_mean_abundance(self):
+        # default is 0.01 - keep features with mean abundance >= 1%
+        test1 = self.test1.normalize()
+
+        exp = test1.filter_mean_abundance()
+        fids = ['AT', 'TG', 'TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
-        self.assertEqual(exp.shape[1], 8)
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
-    def test_filter_mean(self):
-        # default is 0.01 - keep features with mean abundance >= 1%
-        exp = self.test1.filter_mean()
-        fids = ['TG', 'TC', 'GG']
+        exp = test1.filter_mean_abundance(0.4, field=None)
+        fids = ['TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
-        self.assertEqual(exp.shape[1], 3)
-        self.assertEqual(exp.shape[0], self.test1.shape[0])
+
+        exp = test1.filter_mean_abundance(0.6, field=None)
+        self.assertListEqual(exp.feature_metadata.index.tolist(), [])
+
+        exp = test1.filter_mean_abundance(0.6, field='group')
+        fids = ['GG']
+        self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
 
     def test_filter_ids_raise(self):
         fids = ['GG', 'pita']
