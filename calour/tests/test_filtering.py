@@ -155,10 +155,16 @@ class FilteringTests(Tests):
                 self.assertIsNot(obs, self.test2)
 
     def test_filter_prevalence(self):
-        # keep only features present at least in 0.5 the samples
+        # this should filter all features because the upper limit is 100%
         exp = self.test1.filter_prevalence(fraction=0.5)
-        fids = ['AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 'GG']
+        fids = ['AA', 'AT', 'AG', 'TA', 'TT', 'TG', 'TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
+        self.assertEqual(exp.shape[0], self.test1.shape[0])
+
+    def test_filter_prevalence_zero(self):
+        # keep only features present at least in 0.5 the samples
+        exp = self.test1.filter_prevalence(fraction=1.01)
+        self.assertListEqual(exp.feature_metadata.index.tolist(), [])
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
     def test_filter_abundance(self):
