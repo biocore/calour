@@ -18,6 +18,10 @@ Functions
    filter_mean_abundance
    filter_sample_categories
    downsample
+   is_abundant
+   is_prevalent
+   freq_ratio
+   unique_cut
 '''
 
 # ----------------------------------------------------------------------------
@@ -214,10 +218,10 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
         The callable accepts a list of numeric and return a bool. Alternatively
         it also accepts the following strings to filter along the specified axis:
 
-        * 'abundance': calls :func:`.is_abundant`, filter by abundance;
-        * 'prevalence': calls :func:`.is_prevalent`, filter by prevalence;
-        * 'freq_ratio': calls :func:`.freq_ratio` and
-        * 'unique_cut': calls :func:`.unique_cut`, filter by how diversified the values.
+        * 'abundance': calls :func:`is_abundant`, filter by abundance;
+        * 'prevalence': calls :func:`is_prevalent`, filter by prevalence;
+        * 'freq_ratio': calls :func:`freq_ratio` and
+        * 'unique_cut': calls :func:`unique_cut`, filter by how diversified the values.
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (ie samples) (0, 's') or each column (ie features) (1, 'f')
     field : str or `None`, optional
@@ -231,7 +235,7 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
     negate : bool
         negate the predicate for selection
     kwargs : dict
-        keyword argument passing to predicate function
+        keyword argument passing to predicate function.
 
     Returns
     -------
@@ -562,7 +566,7 @@ def filter_prevalence(exp: Experiment, fraction, cutoff=1, field=None, **kwargs)
     if exp.normalized <= 0:
         logger.warning('Do you forget to normalize your data? It is required before running this function')
 
-    return exp.filter_by_data('prevalence', axis=1, field=None, cutoff=cutoff, **kwargs)
+    return exp.filter_by_data('prevalence', axis=1, field=None, cutoff=cutoff, fraction=fraction, **kwargs)
 
 
 @Experiment._record_sig
