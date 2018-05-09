@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.experiment.Experiment.diff_abundance &#8212; calour 1.0-dev documentation</title>
+    <title>calour.experiment.Experiment.diff_abundance &#8212; calour 2018.5.2 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>2018.5.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,7 @@
 <h1>calour.experiment.Experiment.diff_abundance<a class="headerlink" href="#calour-experiment-experiment-diff-abundance" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.diff_abundance">
-<code class="descclassname">Experiment.</code><code class="descname">diff_abundance</code><span class="sig-paren">(</span><em>field</em>, <em>val1</em>, <em>val2=None</em>, <em>method='meandiff'</em>, <em>transform='rankdata'</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em>, <em>random_seed=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/util.py#L120"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.diff_abundance" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">diff_abundance</code><span class="sig-paren">(</span><em>field</em>, <em>val1</em>, <em>val2=None</em>, <em>method='meandiff'</em>, <em>transform='rankdata'</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em>, <em>random_seed=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.diff_abundance" title="Permalink to this definition">¶</a></dt>
 <dd><p>test the differential expression between 2 groups (val1 and val2 in field field)
 using permutation based fdr (dsfdr)
 for bacteria that have a significant difference.</p>
@@ -142,12 +142,12 @@ for bacteria that have a significant difference.</p>
 <li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The field to test by</li>
 <li><strong>val1</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em>) – The values for the first group.</li>
 <li><strong>val2</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – None (default) to compare to all other samples (not in val1)</li>
-<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>function</em>) – the method to use for the t-statistic test. options:
-‘meandiff’ : mean(A)-mean(B) (binary)
-‘mannwhitney’ : mann-whitneu u-test (binary)
-‘kruwallis’ : kruskal-wallis test (multiple groups)
-‘stdmeandiff’ : (mean(A)-mean(B))/(std(A)+std(B)) (binary)
-function : use this function to calculate the t-statistic (input is data,labels, output is array of float)</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>function</em>) – <p>the method to use for the t-statistic test. options:
+‘meandiff’ : mean(A)-mean(B) (binary)</p>
+<p>’mannwhitney’ : mann-whitneu u-test (binary)</p>
+<p>’stdmeandiff’ : (mean(A)-mean(B))/(std(A)+std(B)) (binary)</p>
+<p>function : use this function to calculate the t-statistic (input is data,labels, output is array of float)</p>
+</li>
 <li><strong>transform</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – transformation to apply to the data before caluculating the statistic.
 ‘rankdata’ : rank transfrom each OTU reads
 ‘log2data’ : calculate log2 for each OTU using minimal cutoff of 2
@@ -170,7 +170,14 @@ None to not set the numpy random seed</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new experiment with only significant (FDR &lt;= maxfval) difference, sorted according to difference</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A new experiment with only significant (FDR &lt;= maxfval) difference, sorted according to the effect size.</p>
+<p>The new experiment contains additional feature_metadata_fields that include:</p>
+<ul class="simple">
+<li>’_calour_diff_abundance_pval’ : the p-value for the feature,</li>
+<li>’_calour_diff_abundance_effect’ : the effect size (t-statistic),</li>
+<li>’_calour_diff_abundance_group’ : the value (in field) where the statistic is higher</li>
+</ul>
+</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment">Experiment</a></p>

@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.filtering.filter_by_metadata &#8212; calour 1.0-dev documentation</title>
+    <title>calour.filtering.filter_by_metadata &#8212; calour 2018.5.2 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>2018.5.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,7 @@
 <h1>calour.filtering.filter_by_metadata<a class="headerlink" href="#calour-filtering-filter-by-metadata" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.filtering.filter_by_metadata">
-<code class="descclassname">calour.filtering.</code><code class="descname">filter_by_metadata</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>field</em>, <em>select</em>, <em>axis=0</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/experiment.py#L220"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.filter_by_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.filtering.</code><code class="descname">filter_by_metadata</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>field</em>, <em>select</em>, <em>axis=0</em>, <em>negate=False</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/experiment.py#L223"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.filter_by_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter samples or features by metadata.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -146,10 +146,10 @@
 <li><strong>select</strong> (<em>None</em><em>, </em><em>Callable</em><em>, or </em><em>list/set/tuple-like</em>) – select what to keep based on the value in the specified field.
 if it is a callable, it accepts a 1D array and return a
 boolean array of the same length; if it is a list/set/tuple-like object,
-keep the samples with the values in the <code class="docutils literal notranslate"><span class="pre">field</span></code> column included
-in the <code class="docutils literal notranslate"><span class="pre">select</span></code>; if it is None, filter out the NA.</li>
+keep the samples with the values in the <cite>field</cite> column included
+in the <cite>select</cite>; if it is None, filter out the NA.</li>
 <li><strong>axis</strong> (<em>0</em><em>, </em><em>1</em><em>, </em><em>'s'</em><em>, or </em><em>'f'</em><em>, </em><em>optional</em>) – the field is on samples (0 or ‘s’) or features (1 or ‘f’) metadata</li>
-<li><strong>negate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – discard instead of keep the select if set to <code class="docutils literal notranslate"><span class="pre">True</span></code></li>
+<li><strong>negate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – discard instead of keep the select if set to <cite>True</cite></li>
 <li><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – do the filtering on the original <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> object or a copied one.</li>
 </ul>
 </td>

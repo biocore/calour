@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.io.read_amplicon &#8212; calour 1.0-dev documentation</title>
+    <title>calour.io.read_amplicon &#8212; calour 2018.5.2 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>2018.5.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,7 @@
 <h1>calour.io.read_amplicon<a class="headerlink" href="#calour-io-read-amplicon" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.io.read_amplicon">
-<code class="descclassname">calour.io.</code><code class="descname">read_amplicon</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>*</em>, <em>min_reads</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/io.py#L370"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read_amplicon" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.io.</code><code class="descname">read_amplicon</code><span class="sig-paren">(</span><em>data_file</em>, <em>sample_metadata_file=None</em>, <em>*</em>, <em>min_reads</em>, <em>normalize</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/io.py#L370"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.read_amplicon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an amplicon experiment.</p>
 <p>Fix taxonomy, normalize reads, and filter low abundance
 samples. This wraps <a class="reference internal" href="calour.io.read.html#calour.io.read" title="calour.io.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a>.  Also convert feature metadata
@@ -141,9 +141,8 @@ index (sequences) to upper case</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>sample_metadata_file</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to just use samplenames (no additional metadata).</li>
-<li><strong>min_reads</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – int to remove all samples with less than <code class="docutils literal notranslate"><span class="pre">min_reads</span></code>.
-<code class="docutils literal notranslate"><span class="pre">None</span></code> to not filter</li>
-<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – normalize each sample to the specified reads. <code class="docutils literal notranslate"><span class="pre">None</span></code> to not normalize</li>
+<li><strong>min_reads</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – remove all samples with less than <cite>min_reads</cite>. <cite>None</cite> to keep all samples</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – normalize each sample to the specified count. <cite>None</cite> to not normalize</li>
 </ul>
 </td>
 </tr>

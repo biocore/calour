@@ -1,0 +1,6 @@
+calour.filtering.filter\_mean\_abundance
+========================================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: filter_mean_abundance

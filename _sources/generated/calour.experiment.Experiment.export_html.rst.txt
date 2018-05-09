@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.export_html
+========================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.export_html

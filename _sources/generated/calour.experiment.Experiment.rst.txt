@@ -60,6 +60,8 @@ calour.experiment.Experiment
          
             ~Experiment.enrichment
          
+            ~Experiment.export_html
+         
             ~Experiment.filter_abundance
          
             ~Experiment.filter_by_data
@@ -68,7 +70,7 @@ calour.experiment.Experiment
          
             ~Experiment.filter_ids
          
-            ~Experiment.filter_mean
+            ~Experiment.filter_mean_abundance
          
             ~Experiment.filter_prevalence
          

@@ -62,6 +62,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.enrichment
          
+            ~AmpliconExperiment.export_html
+         
             ~AmpliconExperiment.filter_abundance
          
             ~AmpliconExperiment.filter_by_data
@@ -72,7 +74,7 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.filter_ids
          
-            ~AmpliconExperiment.filter_mean
+            ~AmpliconExperiment.filter_mean_abundance
          
             ~AmpliconExperiment.filter_orig_reads
          

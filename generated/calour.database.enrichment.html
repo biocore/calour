@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.database.enrichment &#8212; calour 1.0-dev documentation</title>
+    <title>calour.database.enrichment &#8212; calour 2018.5.2 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>1.0-dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>2018.5.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,8 +130,8 @@
 <h1>calour.database.enrichment<a class="headerlink" href="#calour-database-enrichment" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.database.enrichment">
-<code class="descclassname">calour.database.</code><code class="descname">enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>features</em>, <em>dbname</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/master/calour/database.py#L135"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.database.enrichment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the list of enriched annotation terms in features compared to all features in exp.</p>
+<code class="descclassname">calour.database.</code><code class="descname">enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>features</em>, <em>dbname</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/database.py#L135"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.database.enrichment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of enriched annotation terms in features compared to all other features in exp.</p>
 <p>Uses the database specific enrichment analysis method.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -146,26 +146,32 @@
 <li><strong>features</strong> (<em>list of str</em>) – The features to test for enrichment (compared to all other features in exp)</li>
 <li><strong>dbname</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the database to use for the annotation terms and enrichment analysis</li>
 <li><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a>) – </li>
-<li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Additional database specific parameters</li>
+<li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Additional database specific parameters (see per-database module documentation for .enrichment() method)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>The dataframe contains info about significantly enriched terms. The columns include:</p>
-<p>feature : str the feature</p>
-<p>pval : the p-value for the enrichment (float)</p>
-<p>odif : the effect size (float)</p>
-<p>group : str The value group where the tern in enriched</p>
-<p>observed : the number of observations of this term in group1 (int)</p>
-<p>expected : the expected (based on all features) number of observations of this term in group1 (float)</p>
-<p>frac_group1 : fraction of total terms in group 1 which are the specific term (float)</p>
-<p>frac_group2 : fraction of total terms in group 2 which are the specific term (float)</p>
-<p>num_group1 : number of total terms in group 1 which are the specific term (float)</p>
-<p>num_group2 : number of total terms in group 2 which are the specific term (float)</p>
-<p>description : str. the term</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>pandas.DataFrame with  info about significantly enriched terms. The columns include</em> –<ul>
+<li>‘feature’ : the feature ID (str)</li>
+<li>’pval’ : the p-value for the enrichment (float)</li>
+<li>’odif’ : the effect size (float)</li>
+<li>’observed’ : the number of observations of this term in group1 (int)</li>
+<li>’expected’ : the expected (based on all features) number of observations of this term in group1 (float)</li>
+<li>’frac_group1’ : fraction of total terms in group 1 which are the specific term (float)</li>
+<li>’frac_group2’ : fraction of total terms in group 2 which are the specific term (float)</li>
+<li>’num_group1’ : number of total terms in group 1 which are the specific term (float)</li>
+<li>’num_group2’ : number of total terms in group 2 which are the specific term (float)</li>
+<li>’description’ : the term (str)</li>
+</ul>
+</li>
+<li><em>numpy.Array where rows are features (ordered like the dataframe), columns are terms, and value is score</em> – for term in feature</li>
+<li><em>pandas.DataFrame with info about the features used. columns</em> –<ul>
+<li>‘group’ : int, the group (1/2) to which the feature belongs</li>
+<li>’sequence’: str</li>
+</ul>
+</li>
+</ul>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)">pandas.DataFrame</a></p>
 </td>
 </tr>
 </tbody>

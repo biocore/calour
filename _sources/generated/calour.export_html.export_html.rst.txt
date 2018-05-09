@@ -1,0 +1,6 @@
+calour.export\_html.export\_html
+================================
+
+.. currentmodule:: calour.export_html
+
+.. autofunction:: export_html
