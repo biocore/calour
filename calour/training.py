@@ -359,7 +359,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None):
+def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None, **kwargs):
     '''Plot confusion matrix
 
     Parameters
@@ -379,6 +379,8 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
+    kwargs : dict
+        keyword argument passing to :func:`matplotlib.pyplot.imshow`
 
     Returns
     -------
@@ -400,7 +402,7 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
-    img = ax.imshow(cm, cmap=cmap)
+    img = ax.imshow(cm, cmap=cmap, **kwargs)
     ax.set_title(title)
     fig.colorbar(img)
     tick_marks = np.arange(len(classes))
