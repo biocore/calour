@@ -123,14 +123,19 @@ class TTests(Tests):
         self.assertSetEqual(exp, obs)
 
     def test_plot_cm(self):
-        result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
-        ax = plot_cm(result)
+        result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'), index_col=0)
+        ax = plot_cm(result, labels=['setosa', 'virginica', 'versicolor'])
         # from matplotlib import pyplot as plt
         # plt.show()
+
+        # make sure you don't confuse x, y label
+        self.assertEqual(ax.get_xlabel(), 'Prediction')
+        self.assertEqual(ax.get_ylabel(), 'Observation')
+
         obs = [((0, 0), '13'), ((1, 0), '0'), ((2, 0), '0'),
                ((0, 1), '0'), ((1, 1), '9'), ((2, 1), '1'),
                ((0, 2), '0'), ((1, 2), '3'), ((2, 2), '10')]
-        for exp, obs in zip(ax.get_children(), obs):
+        for exp, obs in zip(ax.texts, obs):
             self.assertEqual(exp.get_text(), obs[1])
             self.assertEqual(exp.get_position(), obs[0])
 

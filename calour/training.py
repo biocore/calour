@@ -394,10 +394,7 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     if cmap is None:
         cmap = plt.cm.Blues
     if labels is None:
-        # use the unique values in both columns in case either prediction
-        # or observation does not have any samples in a particular
-        # category
-        classes = np.unique(result[['Y_PRED', 'Y_TRUE']].values)
+        classes = np.unique(result['Y_TRUE'].values)
         classes.sort()
     else:
         # if labels is given, use it (and its order)
@@ -489,10 +486,7 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
     ax.axis('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
-    # use the unique values in both columns in case either prediction
-    # or observation does not have any samples in a particular
-    # category
-    classes = np.unique(result[['Y_PRED', 'Y_TRUE']].values)
+    classes = np.unique(result['Y_TRUE'].values)
 
     # if this is a binary classification, we only need to set one class as positive
     # and just plot ROC for the positive class
