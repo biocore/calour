@@ -359,7 +359,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None, **kwargs):
+def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None, labels=None, **kwargs):
     '''Plot confusion matrix
 
     Parameters
@@ -379,6 +379,8 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
+    labels: list
+        The list of the labels you want to include in the plot in the order specified in the list.
     kwargs : dict
         keyword argument passing to :func:`matplotlib.pyplot.imshow`
 
@@ -391,10 +393,15 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.Blues
-    # use the unique values in both columns in case either prediction
-    # or observation does not have any samples in a particular
-    # category
-    classes = np.unique(result[['Y_PRED', 'Y_TRUE']].values)
+    if labels is None:
+        # use the unique values in both columns in case either prediction
+        # or observation does not have any samples in a particular
+        # category
+        classes = np.unique(result[['Y_PRED', 'Y_TRUE']].values)
+        classes.sort()
+    else:
+        # if labels is given, use it (and its order)
+        classes = labels
     cm = _compute_cm(result, labels=classes)
     accuracy = cm.trace() / cm.sum()
     if normalize:
@@ -422,9 +429,14 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
         ax.text(j, i, format(cm[i, j], fmt),
                 horizontalalignment="center",
                 color="white" if cm[i, j] > thresh else "black")
+    # plot a diagonal line
+    ax.plot([0, 1], [1, 0], alpha=0.3, color='gray', linewidth=1, transform=ax.transAxes)
 
     ax.set_ylabel('Observation')
     ax.set_xlabel('Prediction')
+    # disable grid explicitly because seaborn default style plot grid
+    # lines, which is very disturbing
+    ax.grid(False)
     fig.tight_layout()
     return ax
 
