@@ -145,10 +145,10 @@
 <li><strong>predicate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>callable</em>) – <p>The callable accepts a list of numeric and return a bool. Alternatively
 it also accepts the following strings to filter along the specified axis:</p>
 <ul>
-<li>’abundance’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">is_abundant()</span></code>, filter by abundance;</li>
-<li>’prevalence’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">is_prevalent()</span></code>, filter by prevalence;</li>
-<li>’freq_ratio’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">freq_ratio()</span></code> and</li>
-<li>’unique_cut’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">unique_cut()</span></code>, filter by how diversified the values.</li>
+<li>’abundance’: calls <a class="reference internal" href="calour.filtering.is_abundant.html#calour.filtering.is_abundant" title="calour.filtering.is_abundant"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_abundant()</span></code></a>, filter by abundance;</li>
+<li>’prevalence’: calls <a class="reference internal" href="calour.filtering.is_prevalent.html#calour.filtering.is_prevalent" title="calour.filtering.is_prevalent"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_prevalent()</span></code></a>, filter by prevalence;</li>
+<li>’freq_ratio’: calls <a class="reference internal" href="calour.filtering.freq_ratio.html#calour.filtering.freq_ratio" title="calour.filtering.freq_ratio"><code class="xref py py-func docutils literal notranslate"><span class="pre">freq_ratio()</span></code></a> and</li>
+<li>’unique_cut’: calls <a class="reference internal" href="calour.filtering.unique_cut.html#calour.filtering.unique_cut" title="calour.filtering.unique_cut"><code class="xref py py-func docutils literal notranslate"><span class="pre">unique_cut()</span></code></a>, filter by how diversified the values.</li>
 </ul>
 </li>
 <li><strong>axis</strong> (<em>0</em><em>, </em><em>1</em><em>, </em><em>'s'</em><em>, or </em><em>'f'</em><em>, </em><em>optional</em>) – Apply predicate on each row (ie samples) (0, ‘s’) or each column (ie features) (1, ‘f’)</li>
@@ -160,7 +160,7 @@ set is divided into groups according to the sample_metadata
 partition of data - only the features (or samples) that fail
 to pass every partition will be filtered away.</li>
 <li><strong>negate</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – negate the predicate for selection</li>
-<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – keyword argument passing to predicate function</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – keyword argument passing to predicate function.</li>
 </ul>
 </td>
 </tr>

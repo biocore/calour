@@ -1,0 +1,6 @@
+calour.filtering.unique\_cut
+============================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: unique_cut

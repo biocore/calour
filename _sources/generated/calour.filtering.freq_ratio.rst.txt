@@ -1,0 +1,6 @@
+calour.filtering.freq\_ratio
+============================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: freq_ratio

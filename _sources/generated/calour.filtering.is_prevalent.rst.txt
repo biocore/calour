@@ -1,0 +1,6 @@
+calour.filtering.is\_prevalent
+==============================
+
+.. currentmodule:: calour.filtering
+
+.. autofunction:: is_prevalent
