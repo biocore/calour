@@ -391,8 +391,12 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.Blues
-    classes = result['Y_TRUE'].unique()
+    # use the unique values in both columns in case either prediction
+    # or observation does not have any samples in a particular
+    # category
+    classes = np.unique(result[['Y_PRED', 'Y_TRUE']].values)
     cm = _compute_cm(result, labels=classes)
+    accuracy = cm.trace() / cm.sum()
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         logger.debug("Normalized confusion matrix")
@@ -403,7 +407,7 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     else:
         fig = ax.get_figure()
     img = ax.imshow(cm, cmap=cmap, **kwargs)
-    ax.set_title(title)
+    ax.set_title('{0}\naccuracy: {1:.1%}'.format(title, accuracy))
     fig.colorbar(img)
     tick_marks = np.arange(len(classes))
     ax.tick_params(rotation=45)
@@ -473,7 +477,11 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
     ax.axis('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
-    classes = result['Y_TRUE'].unique()
+    # use the unique values in both columns in case either prediction
+    # or observation does not have any samples in a particular
+    # category
+    classes = np.unique(result[['Y_PRED', 'Y_TRUE']].values)
+
     # if this is a binary classification, we only need to set one class as positive
     # and just plot ROC for the positive class
     if len(classes) == 2:
