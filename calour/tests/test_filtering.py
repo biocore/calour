@@ -9,8 +9,10 @@
 from unittest import main
 
 from numpy.testing import assert_array_equal
+import numpy as np
 
 from calour._testing import Tests, assert_experiment_equal
+from calour.filtering import _balanced_subsample
 import calour as ca
 
 
@@ -19,6 +21,15 @@ class FilteringTests(Tests):
         super().setUp()
         self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
         self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
+
+    def test_balanced_subsample(self):
+        rand = np.random.RandomState(None)
+        d = rand.choice([0, 1, 2], 9)
+        for n in (1, 3, 6, 9, 10):
+            keep = _balanced_subsample(d, n, None)
+            d2 = d[keep]
+            uniq, counts = np.unique(d2, return_counts=True)
+            self.assertTrue(np.all(counts == n))
 
     def test_downsample_sample(self):
         obs = self.test2.downsample('group')
@@ -38,11 +49,6 @@ class FilteringTests(Tests):
         all_sid = self.test2.feature_metadata.index.tolist()
         exp = self.test2.reorder([all_sid.index(i) for i in sid], axis=1)
         self.assertEqual(obs, exp)
-
-    def test_downsample_num_keep_too_big(self):
-        # test error raised when num_keep is too big
-        with self.assertRaises(ValueError):
-            self.test2.downsample('group', num_keep=9)
 
     def test_downsample_num_keep(self):
         # test keeping num_keep samples, and inplace
