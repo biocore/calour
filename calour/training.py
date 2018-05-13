@@ -359,7 +359,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None):
+def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None, labels=None, **kwargs):
     '''Plot confusion matrix
 
     Parameters
@@ -379,6 +379,10 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
+    labels: list
+        The list of the labels you want to include in the plot in the order specified in the list.
+    kwargs : dict
+        keyword argument passing to :func:`matplotlib.pyplot.imshow`
 
     Returns
     -------
@@ -389,8 +393,14 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.Blues
-    classes = result['Y_TRUE'].unique()
+    if labels is None:
+        classes = np.unique(result['Y_TRUE'].values)
+        classes.sort()
+    else:
+        # if labels is given, use it (and its order)
+        classes = labels
     cm = _compute_cm(result, labels=classes)
+    accuracy = cm.trace() / cm.sum()
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         logger.debug("Normalized confusion matrix")
@@ -400,8 +410,8 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
-    img = ax.imshow(cm, cmap=cmap)
-    ax.set_title(title)
+    img = ax.imshow(cm, cmap=cmap, **kwargs)
+    ax.set_title('{0}\naccuracy: {1:.1%}'.format(title, accuracy))
     fig.colorbar(img)
     tick_marks = np.arange(len(classes))
     ax.tick_params(rotation=45)
@@ -416,9 +426,14 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
         ax.text(j, i, format(cm[i, j], fmt),
                 horizontalalignment="center",
                 color="white" if cm[i, j] > thresh else "black")
+    # plot a diagonal line
+    ax.plot([0, 1], [1, 0], alpha=0.3, color='gray', linewidth=1, transform=ax.transAxes)
 
     ax.set_ylabel('Observation')
     ax.set_xlabel('Prediction')
+    # disable grid explicitly because seaborn default style plot grid
+    # lines, which is very disturbing
+    ax.grid(False)
     fig.tight_layout()
     return ax
 
@@ -471,7 +486,8 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
     ax.axis('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
-    classes = result['Y_TRUE'].unique()
+    classes = np.unique(result['Y_TRUE'].values)
+
     # if this is a binary classification, we only need to set one class as positive
     # and just plot ROC for the positive class
     if len(classes) == 2:

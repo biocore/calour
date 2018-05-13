@@ -167,6 +167,16 @@ class FilteringTests(Tests):
         self.assertListEqual(exp.feature_metadata.index.tolist(), [])
         self.assertEqual(exp.shape[0], self.test1.shape[0])
 
+    def test_filter_prevalence_check(self):
+        # filter over all samples always filter more or euqal features than
+        # filter over sample groups
+        frac = 0.001
+        exp = self.test1.filter_prevalence(fraction=frac)
+        n = exp.shape[1]
+        for i in self.test1.sample_metadata.columns:
+            x = self.test1.filter_prevalence(fraction=frac, field=i)
+            self.assertLessEqual(x.shape[1], n)
+
     def test_filter_abundance(self):
         exp = self.test1.filter_abundance(17008)
         self.assertEqual(exp.shape[1], 2)
@@ -192,6 +202,16 @@ class FilteringTests(Tests):
         exp = test1.filter_mean_abundance(0.6, field='group')
         fids = ['GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
+
+    def test_filter_mean_abundance_check(self):
+        # filter over all samples always filter more or euqal features than
+        # filter over sample groups
+        abund = 0.001
+        exp = self.test1.filter_mean_abundance(abund)
+        n = exp.shape[1]
+        for i in self.test1.sample_metadata.columns:
+            x = self.test1.filter_mean_abundance(abund, field=i)
+            self.assertLessEqual(x.shape[1], n)
 
     def test_filter_ids_raise(self):
         fids = ['GG', 'pita']
