@@ -113,7 +113,7 @@ class TTests(Tests):
         result['Y_TRUE'] = ['virginica' if i == 'virginica' else 'not virginica'
                             for i in result['Y_TRUE']]
         result['not virginica'] = 1 - result['virginica']
-        ax = plot_roc(result, pos_label='virginica')
+        ax = plot_roc(result, classes=['virginica'])
         # from matplotlib import pyplot as plt
         # plt.show()
         legend = ax.get_legend()
@@ -124,7 +124,7 @@ class TTests(Tests):
 
     def test_plot_cm(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'), index_col=0)
-        ax = plot_cm(result, labels=['setosa', 'virginica', 'versicolor'])
+        ax = plot_cm(result, classes=['setosa', 'virginica', 'versicolor'])
         # from matplotlib import pyplot as plt
         # plt.show()
 

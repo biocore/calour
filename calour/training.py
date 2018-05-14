@@ -359,7 +359,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None, labels=None, **kwargs):
+def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=None, classes=None, **kwargs):
     '''Plot confusion matrix
 
     Parameters
@@ -379,10 +379,12 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
-    labels: list
+    classes : list
         The list of the labels you want to include in the plot in the order specified in the list.
     kwargs : dict
-        keyword argument passing to :func:`matplotlib.pyplot.imshow`
+        keyword argument passing to :func:`matplotlib.pyplot.imshow`. For example, you can pass
+        `vmin=0, vmax=1` as keyword arguments to manually define color range (especially useful
+        when you set `normalize=True`)
 
     Returns
     -------
@@ -393,12 +395,11 @@ def plot_cm(result, normalize=False, title='confusion matrix', cmap=None, ax=Non
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.Blues
-    if labels is None:
+    # if labels is given, use it (and its order); otherwise:
+    if classes is None:
         classes = np.unique(result['Y_TRUE'].values)
         classes.sort()
-    else:
-        # if labels is given, use it (and its order)
-        classes = labels
+
     cm = _compute_cm(result, labels=classes)
     accuracy = cm.trace() / cm.sum()
     if normalize:
@@ -447,7 +448,7 @@ def _compute_cm(result, labels, **kwargs):
     return confusion_matrix(result['Y_TRUE'], y_pred, labels=labels, **kwargs)
 
 
-def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
+def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     '''Plot ROC curve.
 
     Parameters
@@ -456,12 +457,10 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
         data frame containing predictions per sample (in row). It must have a column of
         true class named "Y_TRUE" and multiple columns of predicted probabilities for each class.
         It typically takes the output of :func:`classify`.
-    pos_label : str, optional
-        the interested class if it is a binary classification. For
-        example, for "Health" vs. "IBD" classification, you would want
-        to set it to "IBD". This is ignored if it is not a binary
-        classification. This value is passed to
-        :func:`sklearn.metrics.roc_curve`
+    classes: list
+        The list of the labels you want to include in the plot in the order specified in the list.
+        If it is a binary classification (eg "Health" vs. "IBD"), you would want
+        to set it to `["IBD"]` and don't plot for "Health" because it is equivalent.
     title : str
         plot title
     cmap : str or matplotlib.colors.ListedColormap
@@ -486,16 +485,10 @@ def plot_roc(result, pos_label=None, title='ROC', cmap=None, ax=None):
     ax.axis('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
-    classes = np.unique(result['Y_TRUE'].values)
+    if classes is None:
+        classes = np.unique(result['Y_TRUE'].values)
+        classes.sort()
 
-    # if this is a binary classification, we only need to set one class as positive
-    # and just plot ROC for the positive class
-    if len(classes) == 2:
-        if pos_label is None:
-            # by default use whatever the first class is as positive
-            classes = classes[:1]
-        else:
-            classes = [pos_label]
     col = dict(zip(classes, itertools.cycle(cmap.colors)))
 
     mean_fpr = np.linspace(0, 1, 100)
