@@ -49,7 +49,7 @@ logger = getLogger(__name__)
 
 
 @Experiment._record_sig
-def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
+def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False, random_state=None):
     '''Downsample the data set.
 
     This down samples all the samples/features to have the same number of
@@ -82,37 +82,44 @@ def downsample(exp: Experiment, field, axis=0, num_keep=None, inplace=False):
     logger.debug('downsample on field %s' % field)
     if axis == 0:
         x = exp.sample_metadata
-        error_axis_name = 'sample'
+        axis_name = 'sample'
     elif axis == 1:
         x = exp.feature_metadata
-        error_axis_name = 'feature'
+        axis_name = 'feature'
 
     if field not in x:
-        raise ValueError('Field %s not in %s_metadata. (fields are: %s)' % (field, error_axis_name, x.columns))
+        raise ValueError('Field %s not in %s_metadata. (fields are: %s)' % (field, axis_name, x.columns))
 
     # convert to string type because nan values, if they exist in the column,
     # will fail `np.unique`
     values = x[field].astype(str).values
-    unique, counts = np.unique(values, return_counts=True)
-    if num_keep is None:
-        num_keep = counts.min()
-    indices = []
-    num_skipped = 0
-    for i in unique:
-        i_indice = np.where(values == i)[0]
-        if len(i_indice) < num_keep:
-            num_skipped += 1
-            continue
-        elif len(i_indice) == num_keep:
-            indices.append(i_indice)
-        else:
-            indices.append(np.random.choice(i_indice, num_keep, replace=False))
-    if num_skipped > 0:
-        logger.info('%d values had < %d items and were skipped' % (num_skipped, num_keep))
-    # if nothing left, raise error
-    if len(indices) == 0:
-        raise ValueError('No groups have more than %d items' % num_keep)
-    return exp.reorder(np.concatenate(indices), axis=axis, inplace=inplace)
+    keep = _balanced_subsample(values, num_keep, random_state)
+    return exp.reorder(keep, axis=axis, inplace=inplace)
+
+
+def _balanced_subsample(x, n=None, random_state=None):
+    '''subsample the array to have equal number count for each unique values.
+
+    Parameters
+    ----------
+    x : array
+    n : int. count
+
+    Returns
+    -------
+    array of bool
+    '''
+    rand = np.random.RandomState(random_state)
+    keep = np.zeros(x.shape[0], dtype='?')
+    unique, counts = np.unique(x, return_counts=True)
+    if n is None:
+        n = counts.min()
+    for value in unique:
+        i_indice = np.where(x == value)[0]
+        if i_indice.shape[0] >= n:
+            idx = rand.choice(i_indice, n, replace=False)
+            keep[idx] = True
+    return keep
 
 
 @Experiment._record_sig
@@ -185,15 +192,15 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
     '''
     if axis == 0:
         x = exp.sample_metadata
-        error_axis_name = 'sample'
+        axis_name = 'sample'
     elif axis == 1:
         x = exp.feature_metadata
-        error_axis_name = 'feature'
+        axis_name = 'feature'
     else:
         raise ValueError('unknown axis %s' % axis)
 
     if field not in x:
-        raise ValueError('Field %s not in %s_metadata. (fields are: %s)' % (field, error_axis_name, x.columns))
+        raise ValueError('Field %s not in %s_metadata. (fields are: %s)' % (field, axis_name, x.columns))
 
     if isinstance(select, Callable):
         select = select(x[field])
