@@ -307,7 +307,7 @@
       }
 
       function resetted() {
-        console.log('reset');
+        console.log('reset coordinates');
         reset_coords();
         old_shiftdown = shiftdown;
         shiftdown = 2;
@@ -448,6 +448,13 @@
         var csamp = samples[cx];
         try {
           var ctax = yticklabels[cy].split(';').map(function(e) {
+            try {
+              e = e.split('_').pop()
+            } catch(err) {
+              console.log('failed to split taxonomy on "_":');
+              console.log(e)
+              console.log(err)
+            }
             return '<a href="https://en.wikipedia.org/wiki/' + e + '" target="_blank">' + e + '</a>'
           }).join('; ');
         } catch (err) {
