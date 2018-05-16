@@ -446,9 +446,22 @@
 
         var cid = ids[cy];
         var csamp = samples[cx];
-        var ctax = yticklabels[cy].split(';').map(function(e) {
-          return '<a href="https://en.wikipedia.org/wiki/' + e + '" target="_blank">' + e + '</a>'
-        }).join('; ');
+        try {
+          var ctax = yticklabels[cy].split(';').map(function(e) {
+            try {
+              e = e.split('_').pop()
+            } catch(err) {
+              console.log('failed to split taxonomy on "_":');
+              console.log(e)
+              console.log(err)
+            }
+            return '<a href="https://en.wikipedia.org/wiki/' + e + '" target="_blank">' + e + '</a>'
+          }).join('; ');
+        } catch (err) {
+          console.log('error when parsing taxonomy:');
+          console.log(err);
+          ctax = "No taxonomy in biom table";
+        }
         $('#taxonomy').html(ctax);
         $('#sampleid').html(csamp);
         // Get dbBact annotations for selection
