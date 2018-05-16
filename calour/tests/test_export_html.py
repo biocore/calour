@@ -25,6 +25,11 @@ class ExportHtmlTests(Tests):
         d = mkdtemp()
         f = join(d, 'calour_interactive_heatmap.html')
         exp.export_html(sample_field='group', output_file=f, feature_field='taxonomy', title='the heatmap')
+
+        # to create the file for testing visually
+        # (needs to be manually opened and inspected before accepting)
+        # exp.export_html(sample_field='group', output_file=join(self.test_data_dir, 'export_html_result.html'), feature_field='taxonomy', title='the heatmap')
+
         # load the results
         with open(f) as output_fl:
             output_data = output_fl.readlines()
