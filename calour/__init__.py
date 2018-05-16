@@ -25,6 +25,9 @@ __all__ = ['read', 'read_amplicon', 'read_ms',
            'Experiment', 'AmpliconExperiment', 'MS1Experiment',
            'set_log_level']
 
+# this is the global random seed; if it's None, it is unset
+SEED = None
+
 # add member functions to the class
 register_functions(Experiment)
 register_functions(AmpliconExperiment)

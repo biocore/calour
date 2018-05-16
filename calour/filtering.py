@@ -42,7 +42,7 @@ from scipy.sparse import issparse
 
 from . import Experiment
 from ._doc import ds
-from .util import _to_list
+from .util import _to_list, _set_random_state
 
 
 logger = getLogger(__name__)
@@ -109,7 +109,7 @@ def _balanced_subsample(x, n=None, random_state=None):
     -------
     array of bool
     '''
-    rand = np.random.RandomState(random_state)
+    rand = _set_random_state(random_state)
     keep = np.zeros(x.shape[0], dtype='?')
     unique, counts = np.unique(x, return_counts=True)
     if n is None:
