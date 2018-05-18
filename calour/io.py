@@ -753,7 +753,7 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     return table
 
 
-def _split_sample_ids(sid, split_char=None, ignore_split=['row m/z', 'row retention time']):
+def _split_sample_ids(sid, split_char=None, ignore_split=('row m/z', 'row retention time')):
     '''Split the data table sample id using the split_char returning the first split str.
     Used in the read_ms() function, as a callable for the read() function
 

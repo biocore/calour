@@ -224,8 +224,9 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
     # when both experiments contain the same sample ids)
     if len(exp.sample_metadata.index.intersection(other.sample_metadata.index)) > 0:
         if prefixes is None:
-            raise ValueError('You need provide prefixes=() to add to sample IDs '
-                             'because the two experiments have some identical sample IDs.')
+            raise ValueError('You need provide the prefixes parameter to add to sample IDs, '
+                             'because the two experiments have some identical '
+                             'sample IDs:\n%r' % exp.sample_metadata.index.intersection(other.sample_metadata.index))
         exp_prefix, other_prefix = prefixes
         logger.info('Both experiments contain same sample IDs - adding prefixes')
         if exp_prefix:
