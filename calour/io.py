@@ -716,7 +716,7 @@ def save_fasta(exp: Experiment, f, seqs=None):
             else:
                 cheader = '%d %s' % (idx, cseq)
             fasta_file.write('>%s\n%s\n' % (cheader, cseq))
-    logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs)-num_skipped, num_skipped))
+    logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs) - num_skipped, num_skipped))
 
 
 def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
@@ -753,7 +753,7 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     return table
 
 
-def _split_sample_ids(sid, split_char=None):
+def _split_sample_ids(sid, split_char=None, ignore_split=('row m/z', 'row retention time')):
     '''Split the data table sample id using the split_char returning the first split str.
     Used in the read_ms() function, as a callable for the read() function
 
@@ -772,4 +772,4 @@ def _split_sample_ids(sid, split_char=None):
     if split_char is None:
         return sid
     logger.info('splitting table sample ids using separator %s. use "data_table_params={\'cut_sample_id_sep\'=None}" to disable cutting.' % split_char)
-    return [x.split(split_char)[0] for x in sid]
+    return [x.split(split_char)[0] if x not in ignore_split else x for x in sid]
