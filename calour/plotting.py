@@ -138,8 +138,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=10, max_len=40, ax=None, ignore_exp=None,
-                                   score_method='all_mean', colors=('green', 'red'), show_legend=True, random_seed=None):
+def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, **kwargs):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -159,28 +158,12 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     ax: matplotlib.axes.Axes or None, optional
         The axis to which to plot the figure
         None (default) to create a new figure
-    ignore_exp : list None, optional
-        list of experiment ids to ignore when doing the enrichment_analysis.
-        Useful when you don't want to get terms from your own experiment analysis.
-        For dbbact it is a list of int
-    score_method : str (optional)
-        The scoring function used to give each term the score (for each feature).
-        This parameter manages how the different annotations (such as 'common'/'high freq')
-        from different experiments are used to give each term the score (which is later
-        used as the statistic for the enrichment analysis).
-        Options are:
-        'all_mean' (default) : for each experiment, for each term use the mean of the term score over
-        all annotations cotaining this term (from the experiment). This means if we see the term in
-        a lot of annotations from the same experiment, we treat it the same as if we see it in an experiment
-        with only one annotation
-        'sum' : treat each annotation independently
     colors: tuple of (str, str) or None (optional)
         Colors for terms enriched in group1 or group2 respectively
     show_legend: bool (optional)
         True to show the color legend, False to hide it
-    random_seed : int or None, optional
-        int to set the numpy random seed to this number before running the random permutation test.
-        None to not set the numpy random seed
+    **kwargs : dict, optional
+        Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)
 
     Returns
     -------
@@ -197,7 +180,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
     positive = exp.feature_metadata.index.values[positive.values]
 
     # get the enrichment
-    enriched, term_features, features = exp.enrichment(positive, 'dbbact', term_type=term_type, ignore_exp=ignore_exp, score_method=score_method, random_seed=random_seed)
+    enriched, term_features, features = exp.enrichment(features=positive, dbname='dbbact', **kwargs)
     # features=pd.DataFrame({'sequence': features}, index=features)
 
     # Create an new experiment where features are the enriched terms, and samples are the features
@@ -218,7 +201,6 @@ def plot_diff_abundance_enrichment(exp: Experiment, term_type='term', max_show=1
 
     # and plot
     ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors)
-    # enriched = enriched.sort_values('odif')
 
     return ax2, newexp
 
