@@ -274,12 +274,13 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.tab10
+    colors = itertools.cycle(cmap.colors)
     if ax is None:
         fig, ax = plt.subplots()
     # ax.axis('equal')
-    for i, (grp, df) in enumerate(result.groupby('CV')):
+    for c, (grp, df) in zip(colors, result.groupby('CV')):
         ax.scatter(df['Y_TRUE'], df['Y_PRED'],
-                   color=cmap.colors[i],
+                   color=c,
                    label='CV {}'.format(grp))
 
     m1 = result[['Y_TRUE', 'Y_PRED']].min()
