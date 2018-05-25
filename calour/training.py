@@ -483,7 +483,7 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     if ax is None:
         fig, ax = plt.subplots()
 
-    ax.axis('equal')
+    ax.set_aspect('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
     if classes is None:
@@ -517,12 +517,13 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
         tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
         tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
         ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
-        ax.set_xlim([-0.05, 1.05])
-        ax.set_ylim([-0.05, 1.05])
-        ax.set_xlabel('False Positive Rate')
-        ax.set_ylabel('True Positive Rate')
-        ax.set_title(title)
-        ax.legend(loc="lower right")
+
+    ax.set_xlim(-0.05, 1.05)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_title(title)
+    ax.legend(loc="lower right")
 
     return ax
 
