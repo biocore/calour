@@ -10,7 +10,6 @@ import inspect
 from logging.config import fileConfig
 
 from pkg_resources import resource_filename
-
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
 from .ms1_experiment import MS1Experiment
