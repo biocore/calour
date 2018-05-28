@@ -109,7 +109,7 @@ def _balanced_subsample(x, n=None, random_state=None):
     -------
     array of bool
     '''
-    rand = _set_random_state(random_state)
+    rand = np.random.RandomState(random_state)
     keep = np.zeros(x.shape[0], dtype='?')
     unique, counts = np.unique(x, return_counts=True)
     if n is None:
