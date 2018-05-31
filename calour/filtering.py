@@ -42,7 +42,7 @@ from scipy.sparse import issparse
 
 from . import Experiment
 from ._doc import ds
-from .util import _to_list, _set_random_state
+from .util import _to_list
 
 
 logger = getLogger(__name__)

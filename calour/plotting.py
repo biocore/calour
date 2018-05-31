@@ -27,7 +27,7 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from itertools import cycle
+from itertools import cycle, combinations
 
 import numpy as np
 from scipy import stats
@@ -514,7 +514,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
     return fig
 
 
-def plot_feature_matrix(exp: Experiment, field, feature_ids, title_field=None,
+def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
                         transform_x=None, transform_y=None, plot=None,
                         ncols=5, nrows=None, size=2, aspect=1):
     '''This plots an array of scatter plots between each features against the specified sample metadata.
@@ -525,12 +525,14 @@ def plot_feature_matrix(exp: Experiment, field, feature_ids, title_field=None,
 
     Parameters
     ----------
-    field : str
+    fields : str
         the column in the sample metadata to plot against
     feature_ids : list-like
         the IDs of features
     transform_x, transform_y : callable
         the transformation for values on x- and y-axis
+    plot : str, {'scatter', 'box'}
+        the plot type
     ncols, nrows : int
         plot nrows x ncols number of scatter plots. If nrows is None, then its value is determined
         automatically by the-number-features / ncols
@@ -545,17 +547,18 @@ def plot_feature_matrix(exp: Experiment, field, feature_ids, title_field=None,
     '''
     from matplotlib import pyplot as plt
 
-    x = exp.sample_metadata[field].values
+    x = exp.sample_metadata[fields].values
 
     if plot is None:
         if True:
-            plot = plot_box
+            plot = 'box'
         else:
-            plot = plot_scatter
-
-    if plot is plot_scatter:
+            plot = 'scatter'
+    if plot == 'scatter':
         if transform_x is not None:
             x = transform_x(x)
+    d = {'box': plot_box, 'scatter': plot_scatter}
+    plot = d[plot]
 
     if nrows is None:
         # get the ceiling of the division
@@ -572,7 +575,10 @@ def plot_feature_matrix(exp: Experiment, field, feature_ids, title_field=None,
         y = exp[:, fid]
         if transform_y is not None:
             y = transform_y(y)
-        title = exp.feature_metadata.loc[fid, title_field]
+        if title_field is None:
+            title = ''
+        else:
+            title = exp.feature_metadata.loc[fid, title_field]
         plot(x, y, title, ax)
 
     fig.tight_layout()
@@ -584,9 +590,9 @@ def plot_box(x, y, title='', ax=None):
 
     Parameters
     ----------
-    x :
-        values for x-axis
-    y : numeric
+    x : numpy.array of object
+        values to group y. its unique values are labels for x-axis
+    y : numpy.array of numeric
         values for y-axis
     title : str
         title for the plot
@@ -604,25 +610,27 @@ def plot_box(x, y, title='', ax=None):
 
     uniq = np.unique(x)
     values = [y[x==i] for i in uniq]
-    # sort by the max values in each group so that the significance bars dont interfere
-    idx = np.argsort([max(i) for i in values])
-    uniq = uniq[idx]
-    values = [values[i] for i in idx]
     ax.boxplot(values, labels=uniq)
-    for i, j in itertools.combinations(range(len(uniq)), 2):
+    # plot significance bars
+    n = len(uniq)
+    tests = []
+    for i, j in combinations(range(n), 2):
         y1 = values[i]
         y2 = values[j]
-        test = scipy.stats.ttest_ind(y1, y2, equal_var=False)
-        if test.pvalue < 0.01:
-            s = '**'
-        elif test.pvalue < 0.05:
-            s = '*'
-        else:
-            continue
-        height = max(y1.max(), y2.max()) * 1.05
-        ax.plot([i + 1, j + 1], [height, height], lw=1.5, c='black')
-        ax.text((i + j + 2) / 2, height, s, ha='center', va='bottom', color='red')
+        test = stats.ttest_ind(y1, y2, equal_var=False)
+        tests.append((uniq[i], uniq[j], test))
+    ax.set_title(title)
+    return ax, tests
 
+
+def plot_hist(x, y, title='', ax=None):
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+
+    uniq = np.unique(x)
+    values = [y[x==i] for i in uniq]
+    ax.hist(values, label=uniq)
     ax.set_title(title)
     return ax
 
@@ -663,46 +671,3 @@ def plot_scatter(x, y, title='', ax=None):
     ax.set_title(title)
     return ax
 
-
-def plot_boxplot_matrix(exp: Experiment, field, feature_ids, ncols=5, nrows=None, size=2, aspect=1):
-    '''This plots an array of scatter plots between each features against the specified sample metadata.
-
-    For each panel of scatter plot, the x-axis is the co-variates
-    specified by sample metadata field; the y-axis is the feature
-    abundance.
-
-    Parameters
-    ----------
-    field : str
-        the column in the sample metadata to plot against
-    feature_id : list-like
-        the IDs of features
-    ncols, nrows : int
-        plot nrows x ncols number of scatter plots. If nrows is None, then its value is determined
-        automatically by the-number-features / ncols
-    size : numeric
-        the height of each figure panel in inches
-    aspect : numeric
-        Aspect ratio of each figure panel, so that aspect * size gives its width
-
-    Returns
-    -------
-    matplotlib.figure.Figure
-
-    '''
-    from matplotlib import pyplot as plt
-
-    x = exp.sample_metadata[field].values
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols,
-                            figsize=(size * ncols * aspect, size * nrows))
-    for ax, fid in zip(axs.flat, feature_ids):
-        # y is 1d np array
-        y = exp[:, fid]
-        ax.plot(x, fit[0] * x + fit[1], color=c)
-        ax.scatter(x, y, alpha=0.2, color=c)
-        ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
-        if title_field is not None:
-            title = exp.feature_metadata.loc[fid, title_field]
-            ax.set_title(title)
-    fig.tight_layout()
-    return fig

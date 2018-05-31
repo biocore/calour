@@ -504,13 +504,3 @@ def deprecated(message):
             return func(*args, **kwargs)
         return deprecated_func
     return deprecated_decorator
-
-
-def _set_random_state(rand):
-    from . import SEED
-    r = rand or SEED
-    if isinstance(r, np.random.RandomState):
-        return r
-    else:
-        return np.random.RandomState(rand)
-
