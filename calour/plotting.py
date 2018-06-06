@@ -605,7 +605,7 @@ def plot_box(x, y, title='', ax=None):
         fig, ax = plt.subplots()
 
     uniq = np.unique(x)
-    values = [y[x==i] for i in uniq]
+    values = [y[x == i] for i in uniq]
     ax.boxplot(values, labels=uniq)
     # plot significance bars
     n = len(uniq)
@@ -656,4 +656,3 @@ def plot_scatter(x, y, title='', ax=None):
     ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
     ax.set_title(title)
     return ax
-

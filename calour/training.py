@@ -529,7 +529,7 @@ def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax
     ax.set_xlabel('Recall')
     ax.set_ylabel('Precision')
     ax.set_title(title)
-    ax.legend(lines, labels, loc='bottom left', fancybox=True, framealpha=0.5)
+    ax.legend(lines, labels, loc='lower left', fancybox=True, framealpha=0.5)
     return ax
 
 
