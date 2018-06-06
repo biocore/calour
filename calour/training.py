@@ -468,29 +468,37 @@ def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax
 
     col = dict(zip(classes, itertools.cycle(cmap.colors)))
 
+    lines = []
+    labels = []
     for cls in classes:
-        y_true = result['Y_TRUE'].values == cls
-        precision, recall, thresholds = precision_recall_curve(y_true, result[cls])
-        auc = average_precision_score(y_true, result[cls])
-        ax.plot(recall, precision, color=col[cls],
-                label='{0} ({1:.2f})'.format(cls, auc),
-                lw=2, alpha=.8)
+        aucs = []
+        for grp, df in result.groupby('CV'):
+            y_true = df['Y_TRUE'].values == cls
+            precision, recall, thresholds = precision_recall_curve(y_true, df[cls])
+            auc = average_precision_score(y_true, df[cls])
+            aucs.append(auc)
+            line, = ax.plot(recall, precision, color=col[cls], lw=2, alpha=.5)
+        mean_auc = np.mean(aucs)
+        std_auc = np.std(aucs)
+        lines.append(line)
+        labels.append('{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc))
 
     # plot iso-f1 curves
     f_scores = np.linspace(0.2, 0.8, num=4)
     for f_score in f_scores:
         x = np.linspace(0.01, 1)
         y = f_score * x / (2 * x - f_score)
-        l, = ax.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.2)
+        l, = ax.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.25)
         ax.annotate('f1={0:0.1f}'.format(f_score), xy=(0.8, y[45] + 0.02))
+    lines.append(l)
+    labels.append('iso-f1 curves')
 
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlabel('Recall')
     ax.set_ylabel('Precision')
     ax.set_title(title)
-    ax.legend(loc="lower left")
-
+    ax.legend(lines, labels, loc='bottom left', fancybox=True, framealpha=0.5)
     return ax
 
 
