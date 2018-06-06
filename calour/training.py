@@ -468,31 +468,13 @@ def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax
 
     col = dict(zip(classes, itertools.cycle(cmap.colors)))
 
-    mean_recall = np.linspace(0, 1, 100)
     for cls in classes:
-        precisions = []
-        aucs = []
-        for grp, df in result.groupby('CV'):
-            y_true = df['Y_TRUE'].values == cls
-            precision, recall, thresholds = precision_recall_curve(y_true, df[cls])
-            print(precision)
-            mean_precision = _interpolate_precision_recall(mean_recall, recall, precision)
-            precisions.append(mean_precision)
-            auc = average_precision_score(y_true, df[cls])
-            aucs.append(auc)
-
-        mean_precision = np.mean(precisions, axis=0)
-        print(mean_precision)
-        mean_auc = np.mean(aucs)
-        std_auc = np.std(aucs)
-        ax.plot(mean_recall, mean_precision, color=col[cls],
-                label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
+        y_true = result['Y_TRUE'].values == cls
+        precision, recall, thresholds = precision_recall_curve(y_true, result[cls])
+        auc = average_precision_score(y_true, result[cls])
+        ax.plot(recall, precision, color=col[cls],
+                label='{0} ({1:.2f})'.format(cls, auc),
                 lw=2, alpha=.8)
-
-        std_precision = np.std(precisions, axis=0)
-        precisions_upper = np.minimum(mean_recall + std_precision, 1)
-        precisions_lower = np.maximum(mean_recall - std_precision, 0)
-        #ax.fill_between(mean_recall, precisions_lower, precisions_upper, color=col[cls], alpha=.5)
 
     # plot iso-f1 curves
     f_scores = np.linspace(0.2, 0.8, num=4)
