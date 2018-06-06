@@ -15,7 +15,7 @@ from numpy.testing import assert_array_almost_equal
 import calour as ca
 from calour._testing import Tests
 from calour.util import compute_prevalence
-from calour.plotting import _compute_frac_nonzero
+from calour.plotting import _compute_frac_nonzero, plot_box
 
 
 class PlotTests(Tests):
@@ -107,10 +107,20 @@ class PlotTests(Tests):
         frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=5, frac=1, random_state=1)
         assert_array_almost_equal(frac, np.array([0, 0, 0]))
 
+    def test_plot_box(self):
+        x = np.array(['a', 'c', 'a', 'b', 'a', 'b', 'c', 'c', 'b', 'c'])
+        y = np.array([1, 7, 2, 4, 3, 5, 8, 9, 6, 10])
+        ax = plot_box(x, y, 'foo title')
+        t = ax.texts[0]
+        exp = ('a vs. b: stat -3.674 p-val 0.021\n'
+               'a vs. c: stat -7.506 p-val 0.001\n'
+               'b vs. c: stat -4.041 p-val 0.010')
+        self.assertEqual(t.get_text(), exp)
+
     def test_plot_scatter_matrix(self):
         self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=100)
         fids = ['AA', 'AT', 'AG', 'AC']
-        fig = self.test2.plot_scatter_matrix('ori.order', fids, ncols=2, nrows=2)
+        fig = self.test2.plot_feature_matrix('ori.order', fids, plot='scatter', ncols=2, nrows=2)
         self.assertEqual(len(fig.axes), 4)
         for ax, fid in zip(fig.axes, fids):
             # check the trend line

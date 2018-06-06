@@ -515,7 +515,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
 
 def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
-                        transform_x=None, transform_y=None, plot=None,
+                        transform_x=None, transform_y=None, plot='scatter',
                         ncols=5, nrows=None, size=2, aspect=1):
     '''This plots an array of scatter plots between each features against the specified sample metadata.
 
@@ -549,11 +549,6 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
 
     x = exp.sample_metadata[fields].values
 
-    if plot is None:
-        if True:
-            plot = 'box'
-        else:
-            plot = 'scatter'
     if plot == 'scatter':
         if transform_x is not None:
             x = transform_x(x)
@@ -570,6 +565,7 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
                                   'please explicitly specify it in the nrows function argument.''' % max_rows)
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols,
                             figsize=(size * ncols * aspect, size * nrows))
+
     for ax, fid in zip(axs.flat, feature_ids):
         # y is 1d np array
         y = exp[:, fid]
@@ -613,24 +609,14 @@ def plot_box(x, y, title='', ax=None):
     ax.boxplot(values, labels=uniq)
     # plot significance bars
     n = len(uniq)
-    tests = []
+    annot = []
     for i, j in combinations(range(n), 2):
         y1 = values[i]
         y2 = values[j]
         test = stats.ttest_ind(y1, y2, equal_var=False)
-        tests.append((uniq[i], uniq[j], test))
-    ax.set_title(title)
-    return ax, tests
-
-
-def plot_hist(x, y, title='', ax=None):
-    if ax is None:
-        from matplotlib import pyplot as plt
-        fig, ax = plt.subplots()
-
-    uniq = np.unique(x)
-    values = [y[x==i] for i in uniq]
-    ax.hist(values, label=uniq)
+        annot.append('{0} vs. {1}: stat {2:.3f} p-val {3:.3f}'.format(
+            uniq[i], uniq[j], test.statistic, test.pvalue))
+    ax.annotate('\n'.join(annot), xy=(0, 1), xycoords=ax.transAxes)
     ax.set_title(title)
     return ax
 
