@@ -23,6 +23,7 @@ Functions
    classify
    plot_cm
    plot_roc
+   plot_prc
    regress
    plot_scatter
    add_sample_metadata_as_features
@@ -58,9 +59,9 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     encoding scheme and add them into the data table as new features.
 
     .. note:: This is only for numeric and/or nominal covariates in
-    sample metadata. If you want to add a ordinal column as a feature,
-    use `pandas.Series.map` to convert ordinal column to numeric
-    column first.
+       sample metadata. If you want to add a ordinal column as a
+       feature, use `pandas.Series.map` to convert ordinal column to
+       numeric column first.
 
     Examples
     --------
@@ -107,6 +108,7 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     See Also
     --------
     sklearn.preprocessing.OneHotEncoder
+
     '''
     logger.debug('Add the sample metadata {} as features'.format(fields))
     if inplace:
@@ -453,7 +455,36 @@ def _compute_cm(result, labels, **kwargs):
 
 
 def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax=None):
-    ''''''
+    '''Plot precision-recall curve.
+
+    Parameters
+    ----------
+    result : pandas.DataFrame
+        data frame containing predictions per sample (in row). It must have a column of
+        true class named "Y_TRUE" and multiple columns of predicted probabilities for each class.
+        It typically takes the output of :func:`classify`.
+    classes: list
+        The list of the labels you want to include in the plot in the order specified in the list.
+        If it is a binary classification (eg "Health" vs. "IBD"), you would want
+        to set it to `["IBD"]` and don't plot for "Health" because it is equivalent.
+    title : str
+        plot title
+    cmap : str or matplotlib.colors.ListedColormap
+        str to indicate the colormap name. Default is "Dark2" colormap.
+        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    ax : matplotlib.axes.Axes or None (default), optional
+        The axes where to plot. None (default) to create a new figure and
+        axes to plot
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The axes for the curve
+
+    See Also
+    --------
+    plot_roc
+    '''
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.Dark2
@@ -477,7 +508,7 @@ def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax
             precision, recall, thresholds = precision_recall_curve(y_true, df[cls])
             auc = average_precision_score(y_true, df[cls])
             aucs.append(auc)
-            line, = ax.plot(recall, precision, color=col[cls], lw=2, alpha=.5)
+            line, = ax.step(recall, precision, color=col[cls], lw=2, alpha=.5)
         mean_auc = np.mean(aucs)
         std_auc = np.std(aucs)
         lines.append(line)
@@ -514,6 +545,22 @@ def _interpolate_precision_recall(x, recall, precision):
 
 def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     '''Plot ROC curve.
+
+    .. note:: You may want to consider using precision-recall curve
+       (`:func:plot_prc`) instead of ROC curve. If your model needs to
+       perform equally well on the positive class as the negative
+       class, you would use the ROC AUC. For example, for classifying
+       images between cats and dogs, if you would like the model to
+       perform well on the cats as well as on the dogs, then you can
+       use ROC and ROC is more intuitive to understand. If you have
+       *imbalanced* classes OR you don't care about the negative class
+       at all, then you should use precision-recall curve. Take cancer
+       diagnosis as an example, you tends to have way more negative
+       samples than positive cancer samples and want to make sure you
+       positive predictions are correct (precision) and don't miss any
+       cancer (recall or aka sensitivity), you should use
+       precision-recall curve. If the classes are balanced, ROC
+       usually works fine even in this scenario.
 
     Parameters
     ----------
