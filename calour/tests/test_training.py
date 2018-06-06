@@ -9,7 +9,7 @@
 from unittest import main
 from os.path import join
 
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_almost_equal
 import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
@@ -19,7 +19,10 @@ from sklearn.model_selection import KFold
 
 import calour as ca
 from calour._testing import Tests
-from calour.training import plot_cm, plot_roc, plot_scatter, SortedStratifiedKFold, RepeatedSortedStratifiedKFold
+from calour.training import (
+    plot_cm, plot_roc, plot_scatter,
+    SortedStratifiedKFold, RepeatedSortedStratifiedKFold,
+    _interpolate_precision_recall)
 
 
 class TTests(Tests):
@@ -186,6 +189,30 @@ class RTests(Tests):
             assert_array_equal(self.y[test], exp_test)
             assert_array_equal(self.X[train], np.array(exp_train)[:, np.newaxis])
             assert_array_equal(self.X[test], np.array(exp_test)[:, np.newaxis])
+
+    def test_interpolate_precision_recall(self):
+        n = 9
+        recall = np.linspace(0.0, 1.0, num=n)
+        rand = np.random.RandomState(9)
+        precision = rand.rand(n) * (1 - recall)
+
+        x = np.linspace(0, 1, num=20)
+        obs = _interpolate_precision_recall(x, recall, precision)
+        print(obs)
+        exp = np.array([0.43914, 0.43914, 0.43914, 0.37183, 0.37183, 0.104627,
+                        0.104627, 0.104627, 0.104627, 0.104627, 0.104627, 0.104627,
+                        0.104627, 0.104627, 0.104627, 0.031013, 0.031013, 0.,
+                        0., 0.])
+        assert_almost_equal(obs, exp, decimal=5)
+        # # use the plot to check visually check the func works as expected
+        # from matplotlib import pyplot as plt
+        # fig, axes = plt.subplots(nrows=2, ncols=1)
+        # axes[0].hold(True)
+        # axes[0].plot(recall, precision, '--b')
+        # decreasing_max_precision = np.maximum.accumulate(precision[::-1])[::-1]
+        # axes[0].step(recall, decreasing_max_precision, '-r')
+        # axes[1].step(x, obs, '-g')
+        # plt.show()
 
 
 if __name__ == "__main__":

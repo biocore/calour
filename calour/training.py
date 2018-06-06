@@ -37,7 +37,7 @@ from sklearn.model_selection import (train_test_split,
                                      StratifiedKFold)
 from sklearn.model_selection._split import check_cv, _RepeatedSplits
 from sklearn.base import is_classifier, clone
-from sklearn.metrics import roc_curve, auc, confusion_matrix
+from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc, confusion_matrix
 from scipy import interp, stats
 from scipy.sparse import hstack
 import pandas as pd
@@ -296,14 +296,17 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     return ax
 
 
-def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1),
+def classify(exp: Experiment, fields, estimator, cv=RepeatedStratifiedKFold(3, 1),
              predict='predict_proba', params=None):
     '''Evaluate classification during cross validation.
 
     Parameters
     ----------
-    field : str
-        column name in the sample metadata, which contains the classes we want to predict.
+    fields : str or list of str
+        column name(s) in the sample metadata, which contains the classes we want to predict.
+        If it is a list of str, this function does multi-task (aka multioutput-multiclass)
+        classification and you must provide an `estimator` of multi-task classifier. See
+        `http://scikit-learn.org/stable/modules/multiclass.html` for more information.
     estimator : estimator object implementing `fit` and `predict`
         scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestClassifer`
     cv : int, cross-validation generator or an iterable
@@ -333,7 +336,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
 
     '''
     X = exp.data
-    y = exp.sample_metadata[field]
+    y = exp.sample_metadata[fields]
     cv = check_cv(cv, y, classifier=is_classifier(estimator))
 
     if params is None:
@@ -447,6 +450,76 @@ def _compute_cm(result, labels, **kwargs):
     else:
         y_pred = result['Y_PRED']
     return confusion_matrix(result['Y_TRUE'], y_pred, labels=labels, **kwargs)
+
+
+def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax=None):
+    ''''''
+    from matplotlib import pyplot as plt
+    if cmap is None:
+        cmap = plt.cm.Dark2
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    ax.set_aspect('equal')
+
+    if classes is None:
+        classes = np.unique(result['Y_TRUE'].values)
+        classes.sort()
+
+    col = dict(zip(classes, itertools.cycle(cmap.colors)))
+
+    mean_recall = np.linspace(0, 1, 100)
+    for cls in classes:
+        precisions = []
+        aucs = []
+        for grp, df in result.groupby('CV'):
+            y_true = df['Y_TRUE'].values == cls
+            precision, recall, thresholds = precision_recall_curve(y_true, df[cls])
+            print(precision)
+            mean_precision = _interpolate_precision_recall(mean_recall, recall, precision)
+            precisions.append(mean_precision)
+            auc = average_precision_score(y_true, df[cls])
+            aucs.append(auc)
+
+        mean_precision = np.mean(precisions, axis=0)
+        print(mean_precision)
+        mean_auc = np.mean(aucs)
+        std_auc = np.std(aucs)
+        ax.plot(mean_recall, mean_precision, color=col[cls],
+                label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
+                lw=2, alpha=.8)
+
+        std_precision = np.std(precisions, axis=0)
+        precisions_upper = np.minimum(mean_recall + std_precision, 1)
+        precisions_lower = np.maximum(mean_recall - std_precision, 0)
+        #ax.fill_between(mean_recall, precisions_lower, precisions_upper, color=col[cls], alpha=.5)
+
+    # plot iso-f1 curves
+    f_scores = np.linspace(0.2, 0.8, num=4)
+    for f_score in f_scores:
+        x = np.linspace(0.01, 1)
+        y = f_score * x / (2 * x - f_score)
+        l, = ax.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.2)
+        ax.annotate('f1={0:0.1f}'.format(f_score), xy=(0.8, y[45] + 0.02))
+
+    ax.set_xlim(-0.05, 1.05)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlabel('Recall')
+    ax.set_ylabel('Precision')
+    ax.set_title(title)
+    ax.legend(loc="lower left")
+
+    return ax
+
+
+def _interpolate_precision_recall(x, recall, precision):
+    '''https://stackoverflow.com/a/39862264/489564'''
+    increasing_max_precision = np.maximum.accumulate(precision[::-1])
+    y = np.zeros(x.shape)
+    for xpi, ypi in zip(reversed(recall), increasing_max_precision):
+        y[x <= xpi] = ypi
+
+    return y
 
 
 def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
