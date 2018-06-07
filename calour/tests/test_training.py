@@ -63,7 +63,8 @@ class TTests(Tests):
         run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, random_state=0))
         res = next(run)
         obs = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
-        pdt.assert_frame_equal(res, obs)
+        # make sure the column order are the same for comparison
+        pdt.assert_frame_equal(res.sort_index(axis=1), obs.sort_index(axis=1))
 
     def test_plot_scatter(self):
         res = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
