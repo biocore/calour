@@ -245,7 +245,7 @@ def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
+def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, cv=False, ax=None, **kwargs):
     '''Plot prediction vs. observation for regression.
 
     Parameters
@@ -266,6 +266,8 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
+    kwargs : dict
+        keyword arguments passing to :func:`matplotlib.pyplot.scatter`
 
     Returns
     -------
@@ -280,10 +282,15 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     if ax is None:
         fig, ax = plt.subplots()
     # ax.axis('equal')
-    for c, (grp, df) in zip(colors, result.groupby('CV')):
-        ax.scatter(df['Y_TRUE'], df['Y_PRED'],
-                   color=c,
-                   label='CV {}'.format(grp))
+    if cv is True:
+        for c, (grp, df) in zip(colors, result.groupby('CV')):
+            ax.scatter(df['Y_TRUE'], df['Y_PRED'],
+                       color=c,
+                       label='CV {}'.format(grp),
+                       **kwargs)
+        ax.legend(loc="lower right")
+    else:
+        ax.scatter(result['Y_TRUE'], result['Y_PRED'], **kwargs)
 
     m1 = result[['Y_TRUE', 'Y_PRED']].min()
     m2 = result[['Y_TRUE', 'Y_PRED']].max()
@@ -291,7 +298,7 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     ax.set_xlabel('Observation')
     ax.set_ylabel('Prediction')
     ax.set_title(title)
-    ax.legend(loc="lower right")
+
     if cor is not None:
         r, p = cor(result['Y_TRUE'], result['Y_PRED'])
         ax.annotate("r={0:.2f} p-value={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
@@ -505,10 +512,11 @@ def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax
         aucs = []
         for grp, df in result.groupby('CV'):
             y_true = df['Y_TRUE'].values == cls
-            precision, recall, thresholds = precision_recall_curve(y_true, df[cls])
             auc = average_precision_score(y_true, df[cls])
             aucs.append(auc)
-            line, = ax.step(recall, precision, color=col[cls], lw=2, alpha=.5)
+        precision, recall, thresholds = precision_recall_curve(
+            result['Y_TRUE'].values == cls, result[cls])
+        line, = ax.step(recall, precision, color=col[cls], lw=2, alpha=.5)
         mean_auc = np.mean(aucs)
         std_auc = np.std(aucs)
         lines.append(line)
@@ -560,7 +568,7 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
        positive predictions are correct (precision) and don't miss any
        cancer (recall or aka sensitivity), you should use
        precision-recall curve. If the classes are balanced, ROC
-       usually works fine even in this scenario.
+       usually works fine even in this scenario. [1]_.
 
     Parameters
     ----------
@@ -585,6 +593,12 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     -------
     matplotlib.axes.Axes
         The axes for the ROC
+
+    References
+    ----------
+    .. [1] Saito T and Rehmsmeier M (2015) The Precision-Recall Plot
+       Is More Informative than the ROC Plot When Evaluating Binary
+       Classifiers on Imbalanced Datasets. PLoS One, 10.
 
     '''
     from matplotlib import pyplot as plt
