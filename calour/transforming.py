@@ -283,7 +283,7 @@ def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace
     Experiment
         The normalized experiment. Note that all features are normalized (including the ones with mean>=min_frac)
     '''
-    comp_features = exp.filter_mean(min_frac)
+    comp_features = exp.filter_mean_abundance(min_frac)
     logger.info('ignoring %d features' % comp_features.shape[1])
     newexp = exp.normalize_by_subset_features(comp_features.feature_metadata.index.values,
                                               total=total, negate=True, inplace=inplace)

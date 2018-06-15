@@ -232,7 +232,7 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
         if exp_prefix:
             smd1 = exp.sample_metadata.rename(lambda x: '{}_{!s}'.format(exp_prefix, x), inplace=False)
         if other_prefix:
-            smd2 = exp.sample_metadata.rename(lambda x: '{}_{!s}'.format(other_prefix, x), inplace=False)
+            smd2 = other.sample_metadata.rename(lambda x: '{}_{!s}'.format(other_prefix, x), inplace=False)
     # concatenate the sample_metadata
     smd = pd.concat([smd1, smd2], join='outer')
     if field_name is not None:
