@@ -112,9 +112,9 @@ class PlotTests(Tests):
         y = np.array([1, 7, 2, 4, 3, 5, 8, 9, 6, 10])
         ax = plot_box(x, y, 'foo title')
         t = ax.texts[0]
-        exp = ('a vs. b: stat -3.674 p-val 0.021\n'
-               'a vs. c: stat -7.506 p-val 0.001\n'
-               'b vs. c: stat -4.041 p-val 0.010')
+        exp = ('a vs. b: 0.021\n'
+               'a vs. c: 0.001\n'
+               'b vs. c: 0.010')
         self.assertEqual(t.get_text(), exp)
 
     def test_plot_scatter_matrix(self):

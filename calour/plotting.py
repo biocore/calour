@@ -544,7 +544,7 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
         if nrows > max_rows:
             raise ResourceWarning('There are over %d figure rows; it will be slow. '
                                   'If you really want to plot this number of figures, '
-                                  'please explicitly specify it in the nrows function argument.''' % max_rows)
+                                  'please explicitly specify it in the nrows function argument.' % max_rows)
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols,
                             figsize=(size * ncols * aspect, size * nrows))
 
@@ -563,7 +563,7 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
     return fig
 
 
-def plot_box(x, y, title='', ax=None):
+def plot_box(x, y, title='', ax=None, **kwargs):
     '''Plot box plot.
 
     Parameters
@@ -576,6 +576,8 @@ def plot_box(x, y, title='', ax=None):
         title for the plot
     ax : matplotlib.axes.Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
+    kwargs : dict
+        keyword arguments passing to :func:`matplotlib.pyplot.boxplot`
 
     Returns
     -------
@@ -588,7 +590,7 @@ def plot_box(x, y, title='', ax=None):
 
     uniq = np.unique(x)
     values = [y[x == i] for i in uniq]
-    ax.boxplot(values, labels=uniq)
+    ax.boxplot(values, labels=uniq, **kwargs)
     # plot significance bars
     n = len(uniq)
     annot = []
@@ -596,14 +598,18 @@ def plot_box(x, y, title='', ax=None):
         y1 = values[i]
         y2 = values[j]
         test = stats.ttest_ind(y1, y2, equal_var=False)
-        annot.append('{0} vs. {1}: stat {2:.3f} p-val {3:.3f}'.format(
-            uniq[i], uniq[j], test.statistic, test.pvalue))
-    ax.annotate('\n'.join(annot), xy=(0, 1), xycoords=ax.transAxes)
+        annot.append('{0} vs. {1}: {2:.3f}'.format(
+            uniq[i], uniq[j], test.pvalue))
+    ax.annotate('\n'.join(annot), xycoords=ax.transAxes,
+                xy=(.5, 1), ha='center', va='top',
+                fontsize='x-small',
+                # fc, ec: face/edge color
+                bbox=dict(boxstyle="round", fc="0.8", ec="none", alpha=0.7))
     ax.set_title(title)
     return ax
 
 
-def plot_scatter(x, y, title='', ax=None):
+def plot_scatter(x, y, title='', ax=None, **kwargs):
     '''Plot scatter plot.
 
     Parameters
@@ -616,6 +622,8 @@ def plot_scatter(x, y, title='', ax=None):
         title for the plot
     ax : matplotlib.axes.Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
+    kwargs : dict
+        keyword arguments passing to :func:`matplotlib.pyplot.scatter`
 
     Returns
     -------
@@ -634,7 +642,10 @@ def plot_scatter(x, y, title='', ax=None):
         c = 'red'
     fit = np.polyfit(x, y, deg=1)
     ax.plot(x, fit[0] * x + fit[1], color=c)
-    ax.scatter(x, y, alpha=0.2, color=c)
-    ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
+    ax.scatter(x, y, alpha=0.2, color=c, **kwargs)
+    ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xycoords=ax.transAxes,
+                xy=(.5, 1), ha='center', va='top',
+                fontsize='small',
+                bbox=dict(boxstyle="round", fc="0.8", ec="none", alpha=0.7))
     ax.set_title(title)
     return ax
