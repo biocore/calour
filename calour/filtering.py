@@ -606,7 +606,7 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
     if len(fids) < len(ids):
         logger.warning('%d ids were not in the experiment and were dropped.' % (len(ids) - len(fids)))
     try:
-        ids_pos = [index.get_loc(i) for i in fids]
+        ids_pos = [index.get_loc(i) for i in ids if i in fids]
     except KeyError as e:
         raise ValueError('Unknown IDs provided: %s' % str(e))
     # use reprlib to shorten the list if it is too long
