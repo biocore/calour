@@ -399,8 +399,11 @@ def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alph
     return ax
 
 
-def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_bar_label=True, title=None,
-                     figsize=(12, 8), legend_size='small', xtick=False, cmap='Paired'):
+def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None,
+                     color_bar_label=True,
+                     barx_label_kwargs=None, barx_width=0.3, barx_colors=None,
+                     title=None, figsize=(12, 8), legend_size='small',
+                     xtick=False, cmap='Paired'):
     '''Plot the stacked bar for feature abundances.
 
     Parameters
@@ -412,6 +415,15 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
         for each unique column to indicate sample group. It doesn't plot color bars by default (``None``)
     color_bar_label : bool
         whether to show the label on the color bars
+    barx_label_kwargs : dict, optional
+        keyword arguments to pass in for :func:`matplotlib.axes.Axes.annotate`
+        for labels on the X-axis bar
+    barx_width : float, optional
+        the width of the color bar
+    barx_colors : dict, optional
+        the colors for each unique value in the ``values`` list.
+        if it is ``None``, it will use ``Dark2`` discrete color map
+        in a cycling way.
     title : str
         figure title
     figsize : tuple of numeric
@@ -471,7 +483,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
     xax = fig.add_subplot(gs[0], sharex=bar)
     xax.axis('off')
-    barwidth = 0.3
+    barwidth = barx_width
     barspace = 0.05
     if sample_color_bars is not None:
         sample_color_bars = _to_list(sample_color_bars)
@@ -479,8 +491,9 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
         for s in sample_color_bars:
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
-            _ax_bar(
-                xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
+            _ax_bar(xax, values=values, width=barwidth, position=position,
+                    colors=barx_colors, label_kwargs=barx_label_kwargs,
+                    label=color_bar_label, axis=0)
             position += (barspace + barwidth)
 
     if field is not None:
