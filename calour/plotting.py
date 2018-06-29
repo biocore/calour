@@ -511,7 +511,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None,
 
 def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
                         transform_x=None, transform_y=None, plot='scatter',
-                        ncols=5, nrows=None, size=2, aspect=1):
+                        ncols=5, nrows=None, size=2, aspect=1, **kwargs):
     '''This plots an array of scatter plots between each features against the specified sample metadata.
 
     For each panel of scatter plot, the x-axis is the co-variates
@@ -535,6 +535,9 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
         the height of each figure panel in inches
     aspect : numeric
         Aspect ratio of each figure panel, so that aspect * size gives its width
+    kwargs : dict
+        keyword arguments passing to either :func:`matplotlib.pyplot.boxplot` or
+        :func:`matplotlib.pyplot.scatter`, depending on `plot` argument.
 
     Returns
     -------
@@ -570,7 +573,7 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
             title = ''
         else:
             title = exp.feature_metadata.loc[fid, title_field]
-        plot(x, y, title, ax)
+        plot(x, y, title, ax, **kwargs)
 
     fig.tight_layout()
     return fig
