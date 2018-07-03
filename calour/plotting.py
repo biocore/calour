@@ -15,7 +15,7 @@ Functions
    plot_stacked_bar
    plot_core_features
    plot_abund_prevalence
-   plot_scatter_matrix
+   plot_feature_matrix
 '''
 
 # ----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from itertools import cycle
+from itertools import cycle, combinations
 
 import numpy as np
 from scipy import stats
@@ -249,15 +249,10 @@ def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0
         from matplotlib import pyplot as plt
         fig, ax = plt.subplots()
 
-    # filter out the illegal large values
-    steps = sorted([i for i in steps if i <= exp.shape[0]], reverse=True)
-    logger.debug('steps are filtered and sorted to %r' % steps)
-
     def plot_lines(data, steps, label):
         y_sum = np.zeros(len(steps))
         for i in range(iterations):
             y = _compute_frac_nonzero(data, steps, cutoff, frac, i)
-            y = y * 100
             y_sum += y
             if i == 0:
                 line, = ax.plot(steps, y, alpha=alpha, linewidth=linewidth)
@@ -283,7 +278,7 @@ def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0
     return ax
 
 
-def _compute_frac_nonzero(data, steps, cutoff=2, frac=0.9, random_state=None):
+def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_state=None):
     '''iteratively compute the fraction of non-zeros in each column after subsampling rows.
 
     Parameters
@@ -309,6 +304,14 @@ def _compute_frac_nonzero(data, steps, cutoff=2, frac=0.9, random_state=None):
         fractions of core features for each subsample size
     '''
     n_samples, n_features = data.shape
+
+    # filter out the illegal large values
+    if steps is None:
+        steps = [int(i) for i in np.logspace(2, np.log2(n_samples), num=7)]
+    else:
+        steps = sorted([i for i in steps if i <= n_samples], reverse=True)
+    logger.debug('steps are filtered and sorted to %r' % steps)
+
     shared = np.zeros(len(steps))
     rand = np.random.RandomState(random_state)
     if cutoff <= 0:
@@ -362,6 +365,11 @@ def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alph
     ax : matplotlib.axes.Axes, optional
         Axes object to draw the plot onto, otherwise uses the current Axes.
 
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The Axes object containing the plot.
+
     '''
     if ax is None:
         from matplotlib import pyplot as plt
@@ -391,8 +399,11 @@ def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alph
     return ax
 
 
-def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_bar_label=True, title=None,
-                     figsize=(12, 8), legend_size='small', xtick=False, cmap='Paired'):
+def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None,
+                     color_bar_label=True,
+                     barx_label_kwargs=None, barx_width=0.3, barx_colors=None,
+                     title=None, figsize=(12, 8), legend_size='small',
+                     xtick=False, cmap='Paired'):
     '''Plot the stacked bar for feature abundances.
 
     Parameters
@@ -404,6 +415,15 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
         for each unique column to indicate sample group. It doesn't plot color bars by default (``None``)
     color_bar_label : bool
         whether to show the label on the color bars
+    barx_label_kwargs : dict, optional
+        keyword arguments to pass in for :func:`matplotlib.axes.Axes.annotate`
+        for labels on the X-axis bar
+    barx_width : float, optional
+        the width of the color bar
+    barx_colors : dict, optional
+        the colors for each unique value in the ``values`` list.
+        if it is ``None``, it will use ``Dark2`` discrete color map
+        in a cycling way.
     title : str
         figure title
     figsize : tuple of numeric
@@ -420,7 +440,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
     Returns
     -------
-    fig : matplotlib Figure
+    matplotlib.figure.Figure
         The Figure object containing the plot.
     '''
     from matplotlib.gridspec import GridSpec
@@ -463,7 +483,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
 
     xax = fig.add_subplot(gs[0], sharex=bar)
     xax.axis('off')
-    barwidth = 0.3
+    barwidth = barx_width
     barspace = 0.05
     if sample_color_bars is not None:
         sample_color_bars = _to_list(sample_color_bars)
@@ -471,8 +491,9 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
         for s in sample_color_bars:
             # convert to string and leave it as empty if it is None
             values = ['' if i is None else str(i) for i in exp.sample_metadata[s]]
-            _ax_bar(
-                xax, values=values, width=barwidth, position=position, label=color_bar_label, axis=0)
+            _ax_bar(xax, values=values, width=barwidth, position=position,
+                    colors=barx_colors, label_kwargs=barx_label_kwargs,
+                    label=color_bar_label, axis=0)
             position += (barspace + barwidth)
 
     if field is not None:
@@ -488,9 +509,9 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None, color_
     return fig
 
 
-def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
-                        transform_x=None, transform_y=None,
-                        ncols=5, nrows=None, size=2, aspect=1):
+def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
+                        transform_x=None, transform_y=None, plot='scatter',
+                        ncols=5, nrows=None, size=2, aspect=1, **kwargs):
     '''This plots an array of scatter plots between each features against the specified sample metadata.
 
     For each panel of scatter plot, the x-axis is the co-variates
@@ -499,12 +520,14 @@ def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
 
     Parameters
     ----------
-    field : str
+    fields : str
         the column in the sample metadata to plot against
     feature_ids : list-like
         the IDs of features
     transform_x, transform_y : callable
         the transformation for values on x- and y-axis
+    plot : str, {'scatter', 'box'}
+        the plot type
     ncols, nrows : int
         plot nrows x ncols number of scatter plots. If nrows is None, then its value is determined
         automatically by the-number-features / ncols
@@ -512,12 +535,24 @@ def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
         the height of each figure panel in inches
     aspect : numeric
         Aspect ratio of each figure panel, so that aspect * size gives its width
+    kwargs : dict
+        keyword arguments passing to either :func:`matplotlib.pyplot.boxplot` or
+        :func:`matplotlib.pyplot.scatter`, depending on `plot` argument.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
     '''
     from matplotlib import pyplot as plt
 
-    x = exp.sample_metadata[field].values
-    if transform_x is not None:
-        x = transform_x(x)
+    x = exp.sample_metadata[fields].values
+
+    if plot == 'scatter':
+        if transform_x is not None:
+            x = transform_x(x)
+    d = {'box': plot_box, 'scatter': plot_scatter}
+    plot = d[plot]
+
     if nrows is None:
         # get the ceiling of the division
         nrows = -(-len(feature_ids) // ncols)
@@ -525,25 +560,108 @@ def plot_scatter_matrix(exp: Experiment, field, feature_ids, title_field=None,
         if nrows > max_rows:
             raise ResourceWarning('There are over %d figure rows; it will be slow. '
                                   'If you really want to plot this number of figures, '
-                                  'please explicitly specify it in the nrows function argument.''' % max_rows)
+                                  'please explicitly specify it in the nrows function argument.' % max_rows)
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols,
                             figsize=(size * ncols * aspect, size * nrows))
+
     for ax, fid in zip(axs.flat, feature_ids):
         # y is 1d np array
         y = exp[:, fid]
         if transform_y is not None:
             y = transform_y(y)
-        r, p = stats.spearmanr(x, y)
-        if r > 0:
-            c = 'green'
+        if title_field is None:
+            title = ''
         else:
-            c = 'red'
-        fit = np.polyfit(x, y, deg=1)
-        ax.plot(x, fit[0] * x + fit[1], color=c)
-        ax.scatter(x, y, alpha=0.2, color=c)
-        ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
-        if title_field is not None:
             title = exp.feature_metadata.loc[fid, title_field]
-            ax.set_title(title)
+        plot(x, y, title, ax, **kwargs)
+
     fig.tight_layout()
     return fig
+
+
+def plot_box(x, y, title='', ax=None, **kwargs):
+    '''Plot box plot.
+
+    Parameters
+    ----------
+    x : numpy.array of object
+        values to group y. its unique values are labels for x-axis
+    y : numpy.array of numeric
+        values for y-axis
+    title : str
+        title for the plot
+    ax : matplotlib.axes.Axes, optional
+        Axes object to draw the plot onto, otherwise uses the current Axes.
+    kwargs : dict
+        keyword arguments passing to :func:`matplotlib.pyplot.boxplot`
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The Axes object containing the plot.
+    '''
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+
+    uniq = np.unique(x)
+    values = [y[x == i] for i in uniq]
+    ax.boxplot(values, labels=uniq, **kwargs)
+    # plot significance bars
+    n = len(uniq)
+    annot = []
+    for i, j in combinations(range(n), 2):
+        y1 = values[i]
+        y2 = values[j]
+        test = stats.ttest_ind(y1, y2, equal_var=False)
+        annot.append('{0} vs. {1}: {2:.3f}'.format(
+            uniq[i], uniq[j], test.pvalue))
+    ax.annotate('\n'.join(annot), xycoords=ax.transAxes,
+                xy=(.5, 1), ha='center', va='top',
+                fontsize='x-small',
+                # fc, ec: face/edge color
+                bbox=dict(boxstyle="round", fc="0.8", ec="none", alpha=0.7))
+    ax.set_title(title)
+    return ax
+
+
+def plot_scatter(x, y, title='', ax=None, **kwargs):
+    '''Plot scatter plot.
+
+    Parameters
+    ----------
+    x : numeric
+        values for x-axis
+    y : numeric
+        values for y-axis
+    title : str
+        title for the plot
+    ax : matplotlib.axes.Axes, optional
+        Axes object to draw the plot onto, otherwise uses the current Axes.
+    kwargs : dict
+        keyword arguments passing to :func:`matplotlib.pyplot.scatter`
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The Axes object containing the plot.
+
+    '''
+    if ax is None:
+        from matplotlib import pyplot as plt
+        fig, ax = plt.subplots()
+
+    r, p = stats.spearmanr(x, y)
+    if r > 0:
+        c = 'green'
+    else:
+        c = 'red'
+    fit = np.polyfit(x, y, deg=1)
+    ax.plot(x, fit[0] * x + fit[1], color=c)
+    ax.scatter(x, y, alpha=0.2, color=c, **kwargs)
+    ax.annotate("r={0:.2f} p={1:.3f}".format(r, p), xycoords=ax.transAxes,
+                xy=(.5, 1), ha='center', va='top',
+                fontsize='small',
+                bbox=dict(boxstyle="round", fc="0.8", ec="none", alpha=0.7))
+    ax.set_title(title)
+    return ax

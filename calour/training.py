@@ -23,6 +23,7 @@ Functions
    classify
    plot_cm
    plot_roc
+   plot_prc
    regress
    plot_scatter
    add_sample_metadata_as_features
@@ -37,7 +38,7 @@ from sklearn.model_selection import (train_test_split,
                                      StratifiedKFold)
 from sklearn.model_selection._split import check_cv, _RepeatedSplits
 from sklearn.base import is_classifier, clone
-from sklearn.metrics import roc_curve, auc, confusion_matrix
+from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc, confusion_matrix
 from scipy import interp, stats
 from scipy.sparse import hstack
 import pandas as pd
@@ -58,9 +59,9 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     encoding scheme and add them into the data table as new features.
 
     .. note:: This is only for numeric and/or nominal covariates in
-    sample metadata. If you want to add a ordinal column as a feature,
-    use `pandas.Series.map` to convert ordinal column to numeric
-    column first.
+       sample metadata. If you want to add a ordinal column as a
+       feature, use `pandas.Series.map` to convert ordinal column to
+       numeric column first.
 
     Examples
     --------
@@ -107,6 +108,7 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     See Also
     --------
     sklearn.preprocessing.OneHotEncoder
+
     '''
     logger.debug('Add the sample metadata {} as features'.format(fields))
     if inplace:
@@ -243,7 +245,7 @@ def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(
         yield pd.concat(dfs, axis=0).reset_index(drop=True)
 
 
-def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
+def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, cv=False, ax=None, **kwargs):
     '''Plot prediction vs. observation for regression.
 
     Parameters
@@ -264,6 +266,8 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
+    kwargs : dict
+        keyword arguments passing to :func:`matplotlib.pyplot.scatter`
 
     Returns
     -------
@@ -274,13 +278,19 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     from matplotlib import pyplot as plt
     if cmap is None:
         cmap = plt.cm.tab10
+    colors = itertools.cycle(cmap.colors)
     if ax is None:
         fig, ax = plt.subplots()
     # ax.axis('equal')
-    for i, (grp, df) in enumerate(result.groupby('CV')):
-        ax.scatter(df['Y_TRUE'], df['Y_PRED'],
-                   color=cmap.colors[i],
-                   label='CV {}'.format(grp))
+    if cv is True:
+        for c, (grp, df) in zip(colors, result.groupby('CV')):
+            ax.scatter(df['Y_TRUE'], df['Y_PRED'],
+                       color=c,
+                       label='CV {}'.format(grp),
+                       **kwargs)
+        ax.legend(loc="lower right")
+    else:
+        ax.scatter(result['Y_TRUE'], result['Y_PRED'], **kwargs)
 
     m1 = result[['Y_TRUE', 'Y_PRED']].min()
     m2 = result[['Y_TRUE', 'Y_PRED']].max()
@@ -288,21 +298,24 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, ax=None):
     ax.set_xlabel('Observation')
     ax.set_ylabel('Prediction')
     ax.set_title(title)
-    ax.legend(loc="lower right")
+
     if cor is not None:
         r, p = cor(result['Y_TRUE'], result['Y_PRED'])
         ax.annotate("r={0:.2f} p-value={1:.3f}".format(r, p), xy=(.1, .95), xycoords=ax.transAxes)
     return ax
 
 
-def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1),
+def classify(exp: Experiment, fields, estimator, cv=RepeatedStratifiedKFold(3, 1),
              predict='predict_proba', params=None):
     '''Evaluate classification during cross validation.
 
     Parameters
     ----------
-    field : str
-        column name in the sample metadata, which contains the classes we want to predict.
+    fields : str or list of str
+        column name(s) in the sample metadata, which contains the classes we want to predict.
+        If it is a list of str, this function does multi-task (aka multioutput-multiclass)
+        classification and you must provide an `estimator` of multi-task classifier. See
+        `http://scikit-learn.org/stable/modules/multiclass.html` for more information.
     estimator : estimator object implementing `fit` and `predict`
         scikit-learn estimator. e.g. :class:`sklearn.ensemble.RandomForestClassifer`
     cv : int, cross-validation generator or an iterable
@@ -332,7 +345,7 @@ def classify(exp: Experiment, field, estimator, cv=RepeatedStratifiedKFold(3, 1)
 
     '''
     X = exp.data
-    y = exp.sample_metadata[field]
+    y = exp.sample_metadata[fields]
     cv = check_cv(cv, y, classifier=is_classifier(estimator))
 
     if params is None:
@@ -448,8 +461,114 @@ def _compute_cm(result, labels, **kwargs):
     return confusion_matrix(result['Y_TRUE'], y_pred, labels=labels, **kwargs)
 
 
+def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax=None):
+    '''Plot precision-recall curve.
+
+    Parameters
+    ----------
+    result : pandas.DataFrame
+        data frame containing predictions per sample (in row). It must have a column of
+        true class named "Y_TRUE" and multiple columns of predicted probabilities for each class.
+        It typically takes the output of :func:`classify`.
+    classes: list
+        The list of the labels you want to include in the plot in the order specified in the list.
+        If it is a binary classification (eg "Health" vs. "IBD"), you would want
+        to set it to `["IBD"]` and don't plot for "Health" because it is equivalent.
+    title : str
+        plot title
+    cmap : str or matplotlib.colors.ListedColormap
+        str to indicate the colormap name. Default is "Dark2" colormap.
+        For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
+    ax : matplotlib.axes.Axes or None (default), optional
+        The axes where to plot. None (default) to create a new figure and
+        axes to plot
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The axes for the curve
+
+    See Also
+    --------
+    plot_roc
+    '''
+    from matplotlib import pyplot as plt
+    if cmap is None:
+        cmap = plt.cm.Dark2
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    ax.set_aspect('equal')
+
+    if classes is None:
+        classes = np.unique(result['Y_TRUE'].values)
+        classes.sort()
+
+    col = dict(zip(classes, itertools.cycle(cmap.colors)))
+
+    lines = []
+    labels = []
+    for cls in classes:
+        aucs = []
+        for grp, df in result.groupby('CV'):
+            y_true = df['Y_TRUE'].values == cls
+            auc = average_precision_score(y_true, df[cls])
+            aucs.append(auc)
+        precision, recall, thresholds = precision_recall_curve(
+            result['Y_TRUE'].values == cls, result[cls])
+        line, = ax.step(recall, precision, color=col[cls], lw=2, alpha=.5)
+        mean_auc = np.mean(aucs)
+        std_auc = np.std(aucs)
+        lines.append(line)
+        labels.append('{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc))
+
+    # plot iso-f1 curves
+    f_scores = np.linspace(0.2, 0.8, num=4)
+    for f_score in f_scores:
+        x = np.linspace(0.01, 1)
+        y = f_score * x / (2 * x - f_score)
+        l, = ax.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.25)
+        ax.annotate('f1={0:0.1f}'.format(f_score), xy=(0.8, y[45] + 0.02))
+    lines.append(l)
+    labels.append('iso-f1 curves')
+
+    ax.set_xlim(-0.05, 1.05)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlabel('Recall')
+    ax.set_ylabel('Precision')
+    ax.set_title(title)
+    ax.legend(lines, labels, loc='lower left', fancybox=True, framealpha=0.5)
+    return ax
+
+
+def _interpolate_precision_recall(x, recall, precision):
+    '''https://stackoverflow.com/a/39862264/489564'''
+    increasing_max_precision = np.maximum.accumulate(precision[::-1])
+    y = np.zeros(x.shape)
+    for xpi, ypi in zip(reversed(recall), increasing_max_precision):
+        y[x <= xpi] = ypi
+
+    return y
+
+
 def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     '''Plot ROC curve.
+
+    .. note:: You may want to consider using precision-recall curve
+       (`:func:plot_prc`) instead of ROC curve. If your model needs to
+       perform equally well on the positive class as the negative
+       class, you would use the ROC AUC. For example, for classifying
+       images between cats and dogs, if you would like the model to
+       perform well on the cats as well as on the dogs, then you can
+       use ROC and ROC is more intuitive to understand. If you have
+       *imbalanced* classes OR you don't care about the negative class
+       at all, then you should use precision-recall curve. Take cancer
+       diagnosis as an example, you tends to have way more negative
+       samples than positive cancer samples and want to make sure you
+       positive predictions are correct (precision) and don't miss any
+       cancer (recall or aka sensitivity), you should use
+       precision-recall curve. If the classes are balanced, ROC
+       usually works fine even in this scenario. [1]_.
 
     Parameters
     ----------
@@ -475,6 +594,12 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     matplotlib.axes.Axes
         The axes for the ROC
 
+    References
+    ----------
+    .. [1] Saito T and Rehmsmeier M (2015) The Precision-Recall Plot
+       Is More Informative than the ROC Plot When Evaluating Binary
+       Classifiers on Imbalanced Datasets. PLoS One, 10.
+
     '''
     from matplotlib import pyplot as plt
     if cmap is None:
@@ -482,7 +607,7 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     if ax is None:
         fig, ax = plt.subplots()
 
-    ax.axis('equal')
+    ax.set_aspect('equal')
     ax.plot([0, 1], [0, 1], linestyle='-', lw=1, color='black', label='Luck', alpha=.5)
 
     if classes is None:
@@ -516,12 +641,13 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
         tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
         tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
         ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
-        ax.set_xlim([-0.05, 1.05])
-        ax.set_ylim([-0.05, 1.05])
-        ax.set_xlabel('False Positive Rate')
-        ax.set_ylabel('True Positive Rate')
-        ax.set_title(title)
-        ax.legend(loc="lower right")
+
+    ax.set_xlim(-0.05, 1.05)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_title(title)
+    ax.legend(loc="lower right")
 
     return ax
 

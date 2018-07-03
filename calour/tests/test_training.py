@@ -9,7 +9,7 @@
 from unittest import main
 from os.path import join
 
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_almost_equal
 import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
@@ -19,7 +19,10 @@ from sklearn.model_selection import KFold
 
 import calour as ca
 from calour._testing import Tests
-from calour.training import plot_cm, plot_roc, plot_scatter, SortedStratifiedKFold, RepeatedSortedStratifiedKFold
+from calour.training import (
+    plot_cm, plot_roc, plot_prc, plot_scatter,
+    SortedStratifiedKFold, RepeatedSortedStratifiedKFold,
+    _interpolate_precision_recall)
 
 
 class TTests(Tests):
@@ -60,7 +63,8 @@ class TTests(Tests):
         run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, random_state=0))
         res = next(run)
         obs = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
-        pdt.assert_frame_equal(res, obs)
+        # make sure the column order are the same for comparison
+        pdt.assert_frame_equal(res.sort_index(axis=1), obs.sort_index(axis=1))
 
     def test_plot_scatter(self):
         res = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
@@ -119,6 +123,62 @@ class TTests(Tests):
         legend = ax.get_legend()
         exp = {'Luck',
                'virginica (0.96 $\pm$ 0.05)'}
+        obs = {i.get_text() for i in legend.get_texts()}
+        self.assertSetEqual(exp, obs)
+
+    def test_interpolate_precision_recall(self):
+        n = 9
+        recall = np.linspace(0.0, 1.0, num=n)
+        rand = np.random.RandomState(9)
+        precision = rand.rand(n) * (1 - recall)
+
+        x = np.linspace(0, 1, num=20)
+        obs = _interpolate_precision_recall(x, recall, precision)
+        exp = np.array([0.43914, 0.43914, 0.43914, 0.37183, 0.37183, 0.104627,
+                        0.104627, 0.104627, 0.104627, 0.104627, 0.104627, 0.104627,
+                        0.104627, 0.104627, 0.104627, 0.031013, 0.031013, 0.,
+                        0., 0.])
+        assert_almost_equal(obs, exp, decimal=5)
+        # # use the plot to visually check the func works as expected
+        # from matplotlib import pyplot as plt
+        # fig, axes = plt.subplots(nrows=2, ncols=1)
+        # axes[0].hold(True)
+        # axes[0].plot(recall, precision, '--b')
+        # decreasing_max_precision = np.maximum.accumulate(precision[::-1])[::-1]
+        # axes[0].step(recall, decreasing_max_precision, '-r')
+        # axes[1].step(x, obs, '-g')
+        # plt.show()
+
+    def test_plot_prc(self):
+        # generating test data set:
+        # http://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html#plot-the-precision-recall-curve
+        # from sklearn import svm, datasets
+        # from sklearn.model_selection import train_test_split
+        # iris = datasets.load_iris()
+        # X = iris.data
+        # y = iris.target
+        # # Add noisy features
+        # random_state = np.random.RandomState(0)
+        # n_samples, n_features = X.shape
+        # X = np.c_[X, random_state.randn(n_samples, 200 * n_features)]
+
+        # # Limit to the two first classes, and split into training and test
+        # X_train, X_test, y_train, y_test = train_test_split(X[y < 2], y[y < 2],
+        #                                                     test_size=.5,
+        #                                                     random_state=random_state)
+        # # Create a simple classifier
+        # classifier = svm.LinearSVC(random_state=random_state)
+        # classifier.fit(X_train, y_train)
+        # y_score = classifier.decision_function(X_test)
+        # result = pd.DataFrame({'Y_TRUE': ['setosa' if i == 1 else 'non-setosa' for i in y_test],
+        #                        'setosa': y_score, 'CV': 0})
+
+        f = join(self.test_data_dir, 'plot_prc.txt')
+        result = pd.read_table(f, index_col=0)
+        ax = plot_prc(result, classes=['setosa'])
+        legend = ax.get_legend()
+        exp = {'iso-f1 curves',
+               'setosa (0.88 $\\pm$ 0.00)'}
         obs = {i.get_text() for i in legend.get_texts()}
         self.assertSetEqual(exp, obs)
 

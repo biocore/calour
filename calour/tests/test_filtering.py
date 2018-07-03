@@ -219,10 +219,10 @@ class FilteringTests(Tests):
             x = self.test1.filter_mean_abundance(abund, field=i)
             self.assertLessEqual(x.shape[1], n)
 
-    def test_filter_ids_raise(self):
+    def test_filter_ids_not_in_list(self):
         fids = ['GG', 'pita']
-        with self.assertRaisesRegex(ValueError, 'pita'):
-            self.test1.filter_ids(fids)
+        exp = self.test1.filter_ids(fids)
+        self.assertListEqual(exp.feature_metadata.index.tolist(), ['GG'])
 
     def test_filter_ids_default(self):
         fids = ['GG', 'AA', 'TT']
