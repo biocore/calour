@@ -131,16 +131,34 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     return new
 
 
-def split_train_test(exp: Experiment, field, test_size, train_size=None, stratify=None, random_state=None):
-    '''Split experiment data into train and test set.
+def split_train_test(exp: Experiment,
+                     # the following parameters are passed to `sklearn.model_selection.train_test_split`
+                     test_size, train_size=None, stratify=None, shuffle=False, random_state=None):
+    '''Split experiment into train experiment and test experiment.
 
+    Parameters
+    ----------
+    test_size, train_size, shuffle, random_state :
+        They are passed to :func:`sklearn.model_selection.train_test_split`.
+        Please check documentation there.
+    stratify : str or array-like or None
+        If it is array-like or None, it is directly passed to
+        :func:`sklearn.model_selection.train_test_split`. If it is a
+        str, it must be a valid column name in the sample_metadata and
+        this column will be passed to the function for stratified split.
+
+    Returns
+    -------
+    tuple of 2 Experiment objects
+        train, test
     '''
     if isinstance(stratify, str):
         stratify = exp.sample_metadata[stratify]
-    y = exp.sample_metadata[field]
-    train_X, test_X, train_y, test_y = train_test_split(
-        exp.data, y, test_size=test_size, train_size=train_size, stratify=stratify, random_state=random_state)
-    return train_X, test_X, train_y, test_y
+    train_idx, test_idx = train_test_split(
+        range(exp.shape[0]), test_size=test_size, train_size=train_size,
+        stratify=stratify, random_state=random_state)
+
+    return exp.reorder(train_idx), exp.reorder(test_idx)
 
 
 class SortedStratifiedKFold(StratifiedKFold):

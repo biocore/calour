@@ -18,7 +18,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import KFold
 
 import calour as ca
-from calour._testing import Tests
+from calour._testing import Tests, assert_experiment_equal
 from calour.training import (
     plot_cm, plot_roc, plot_prc, plot_scatter,
     SortedStratifiedKFold, RepeatedSortedStratifiedKFold,
@@ -47,12 +47,13 @@ class TTests(Tests):
                              ['categorical=A', 'categorical=B', 'categorical=C'])
 
     def test_split_train_test(self):
-        train_X, test_X, train_y, test_y = self.test2_dense.split_train_test(
+        train, test = self.test2_dense.split_train_test(
             test_size=3, field='group', stratify='categorical', random_state=7)
-        self.assertListEqual(test_y.tolist(), [1, 2, 1])
-        self.assertListEqual(test_y.index.tolist(), ['S3', 'S8', 'S1'])
-        self.assertListEqual(train_y.tolist(), [2, 1, 1, 1, 1, 1])
-        self.assertListEqual(train_y.index.tolist(), ['S9', 'S6', 'S5', 'S2', 'S4', 'S7'])
+
+        assert_experiment_equal(
+            test, self.test2_dense.filter_ids(['S3', 'S8', 'S1'], axis='s'))
+        assert_experiment_equal(
+            train, self.test2_dense.filter_ids(['S9', 'S6', 'S5', 'S2', 'S4', 'S7'], axis='s'))
 
     def test_regress(self):
         diabetes = datasets.load_diabetes()
