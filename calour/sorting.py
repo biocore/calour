@@ -82,13 +82,14 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     '''
     logger.debug('sorting features by center of mass')
     if transform is None:
-        data = exp.data
+        newexp = exp
     else:
         logger.debug('transforming data using %r' % transform)
         newexp = deepcopy(exp)
-        data = transform(newexp, **kwargs).data
+        newexp = transform(newexp, **kwargs)
+    data = newexp.get_data(sparse=False)
     data = data.T
-    coordinates = np.arange(data.shape[1]) - ((data.shape[1] - 1)/2)
+    coordinates = np.arange(data.shape[1]) - ((data.shape[1] - 1) / 2)
     center_mass = data.dot(coordinates)
     center_mass = np.divide(center_mass, data.sum(axis=1))
 
