@@ -514,4 +514,4 @@ class SListWindow(QtWidgets.QDialog):
     def list_double_click(self, item):
         data = item.data(QtCore.Qt.UserRole)
         if data is not None:
-            data['database'].show_term_details(data['term'], data['exp'], data['features1'], data['features2'])
+            data['database'].show_term_details(data['term'], data['exp'], data['features1'], data['features2'], gui='qt5')
