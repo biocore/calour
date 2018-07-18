@@ -180,13 +180,13 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     table.set_index(table.columns[0], drop=True, inplace=True)
     if sample_in_row:
         table = table.transpose()
-    logger.info('loaded %d samples, %d features' % table.shape)
     sid = table.columns
     fid = table.index
     data = table.values.astype(float)
     if transpose:
         logger.debug('transposing table')
         data = data.transpose()
+    logger.info('loaded %d samples, %d features' % data.shape)
     return sid, fid, data
 
 
@@ -549,10 +549,9 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     logger.debug('Reading MS data (data table %s, map file %s, data_file_type %s)' % (data_file, sample_metadata_file, data_file_type))
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
                data_file_type=default_params[data_file_type]['ctype'], sparse=sparse,
-               normalize=normalize, cls=MS1Experiment,
+               normalize=None, cls=MS1Experiment,
                table_sample_id_proc=lambda x: _split_sample_ids(x, split_char=cut_sample_id_sep),
                sample_in_row=sample_in_row, **kwargs)
-
     # get the MZ/RT data
     if data_file_type == 'mzmine2':
         if 'row m/z' not in exp.sample_metadata.index:
@@ -595,6 +594,10 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         # mz and rt are numbers
         exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].astype(float)
         exp.feature_metadata['RT'] = exp.feature_metadata['RT'].astype(float)
+
+    if normalize is not None:
+        # record the original total read count into sample metadata
+        exp.normalize(total=normalize, inplace=True)
 
     if gnps_file:
         # load the gnps table
