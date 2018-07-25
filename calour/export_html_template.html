@@ -85,7 +85,6 @@
 
       var yScale = d3.scaleLinear()
           .domain([0, ids.length])
-          // .range([0.5, ids.length + 0.5]);
           .range([0.5, hheight + 0.5]);
 
       var heatmapregion = svg
@@ -101,7 +100,6 @@
           .attr('width', samples.length)
           .attr('height', ids.length)
           .attr('xlink:xlink:href', 'data:image/png;base64, **image_goes_here**')
-          // .attr('xlink:href', 'out.png');
 
       var xyratio = get_xyratio();
 
@@ -125,20 +123,11 @@
           .tickFormat(function(d) {
             try {
               var taxa = yticklabels[Math.round(d)].replace(/;+$/, '').split(';');
-              console.log(taxa)
               var label = taxa.pop();
-              console.log(label)
-              console.log(label.length)
-              console.log(label.substring(1,3))
-              console.log('pita')
               while (label.length == 3 && label.substring(1,3) == '__') {
-                console.log('popping '+label)
                 label = taxa.pop()
               }
-              console.log(label)
-              // if (label[0] != label[0].toUpperCase() && taxa.length > 0) {
               if (taxa.length > 0) {
-                // && ( label.length > 3 || label.substring(1,3) != '__')
                  label = taxa.pop() + ' ' + label;
               }
             }
