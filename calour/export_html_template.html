@@ -85,7 +85,8 @@
 
       var yScale = d3.scaleLinear()
           .domain([0, ids.length])
-          .range([0.5, ids.length + 0.5]);
+          // .range([0.5, ids.length + 0.5]);
+          .range([0.5, hheight + 0.5]);
 
       var heatmapregion = svg
           .append('svg')
@@ -124,9 +125,21 @@
           .tickFormat(function(d) {
             try {
               var taxa = yticklabels[Math.round(d)].replace(/;+$/, '').split(';');
+              console.log(taxa)
               var label = taxa.pop();
-              if (label[0] != label[0].toUpperCase() && taxa.length > 0) {
-                label = taxa.pop() + ' ' + label;
+              console.log(label)
+              console.log(label.length)
+              console.log(label.substring(1,3))
+              console.log('pita')
+              while (label.length == 3 && label.substring(1,3) == '__') {
+                console.log('popping '+label)
+                label = taxa.pop()
+              }
+              console.log(label)
+              // if (label[0] != label[0].toUpperCase() && taxa.length > 0) {
+              if (taxa.length > 0) {
+                // && ( label.length > 3 || label.substring(1,3) != '__')
+                 label = taxa.pop() + ' ' + label;
               }
             }
             catch(err) {
@@ -136,17 +149,15 @@
           });
       yAxis.ticks(customTickFunction());
 
-      var gX = svg.append('g')
-          .attr('class', 'axis axis--x')
-          .attr('transform', 'translate(' + yaxiswidth + ',' + (hheight) + ')')
-          .call(xAxis);
-
-      console.log(gX)
-
       var gY = svg.append('g')
           .attr('class', 'axis axis--y')
           .attr('transform', 'translate(' + yaxiswidth + ',0)')
           .call(yAxis);
+
+      var gX = svg.append('g')
+          .attr('class', 'axis axis--x')
+          .attr('transform', 'translate(' + yaxiswidth + ',' + (hheight) + ')')
+          .call(xAxis);
 
       // The per sample-type vlines
       var vline_lines = heatmapregion.append('g');
@@ -289,7 +300,11 @@
           current_ty = tt.y;
           current_scale_y = tt.k;
           ytransform = d3.zoomIdentity.translate(tt.x, tt.y).scale(tt.k * xyratio);
-          gY.call(yAxis.scale(ytransform.rescaleY(yScale)).ticks(customTickFunction()));
+
+          // for the y-axis we need to update the scale since it's already scaled by ids/hheight
+          ytransform2 = d3.zoomIdentity.translate(tt.x, tt.y).scale(tt.k * xyratio * ids.length / hheight);
+          gY.call(yAxis.scale(ytransform2.rescaleY(yScale)).ticks(customTickFunction()));
+
           focus.selectAll('#focusLineX').style('stroke-width', 2 / (xyratio * tt.k));
         };
         newt = 'translate(' + current_tx + ',' + current_ty + ') scale(' + current_scale_x + ',' + current_scale_y * xyratio + ')';
@@ -434,15 +449,16 @@
 
       function onclick() {
         var pos = d3.mouse(heatmap.node());
-        var cx = Math.round(xScale.invert(pos[0])), cy = Math.round(yScale.invert(pos[1]));
-        var posx = xScale.invert(pos[0]), posy = yScale.invert(pos[1]);
-
+        // var cx = Math.round(xScale.invert(pos[0])), cy = Math.round(yScale.invert(pos[1]));
+        var cx = Math.round(pos[0]-0.5), cy = Math.round(pos[1]-0.5);
+        // var posx = xScale.invert(pos[0]), posy = yScale.invert(pos[1]);
+        var posx = pos[0], posy = pos[1];
         focus.select('#focusLineY')
             .attr('x1', Math.round(posx + 0.5) - 0.5).attr('y1', 0)
             .attr('x2', Math.round(posx + 0.5) - 0.5).attr('y2', ids.length);
         focus.select('#focusLineX')
-            .attr('x1', 0).attr('y1', Math.round(posy) + 0.5)
-            .attr('x2', samples.length).attr('y2', Math.round(posy) + 0.5);
+            .attr('x1', 0).attr('y1', Math.round(posy-0.5) + 0.5)
+            .attr('x2', samples.length).attr('y2', Math.round(posy-0.5) + 0.5);
 
         var cid = ids[cy];
         var csamp = samples[cx];
@@ -464,6 +480,7 @@
         }
         $('#taxonomy').html(ctax);
         $('#sampleid').html(csamp);
+        $('#sequence').html(cid);
         // Get dbBact annotations for selection
         $.ajax({
           url: 'http://api.dbbact.org/sequences/get_string_annotations',
@@ -533,7 +550,7 @@
         <button id="btn-help" class="btn btn-default btn-xs" onclick="$('#div-help').toggle();">Help</button>
       </span>
     </div>
-    <div id="div-heatmap" class="panel-body" style="height: calc(100% - 80px);">
+    <div id="div-heatmap" class="panel-body" style="height: calc(100% - 100px);">
       <svg id="heatmap" style="width: 100%; height: 100%;)"></svg>
     </div>
     <div id="div-selection" class="panel-footer">
@@ -542,6 +559,8 @@
       <span id="sampleid" style="display: inline-block; float: left; width: 120px; overflow: auto; white-space: nowrap;">NA</span>
       <span style="display: inline-block; float: left; overflow: hidden;">&nbsp;&nbsp;<b>Taxonomy:&nbsp;&nbsp;</b></span>
       <span id="taxonomy" style="display: block; overflow: auto; white-space: nowrap;">NA</span>
+      <span style="display: inline-block; float: left; overflow: hidden;"><b>Sequence:&nbsp;&nbsp;</b></span>
+      <span id="sequence" style="display: block; overflow: auto; white-space: nowrap;">NA</span>
     </div>
   </div>
 
