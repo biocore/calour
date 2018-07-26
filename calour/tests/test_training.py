@@ -48,7 +48,7 @@ class TTests(Tests):
 
     def test_split_train_test(self):
         train, test = self.test2_dense.split_train_test(
-            test_size=3, field='group', stratify='categorical', random_state=7)
+            test_size=3, stratify='categorical', random_state=7)
 
         assert_experiment_equal(
             test, self.test2_dense.filter_ids(['S3', 'S8', 'S1'], axis='s'))
