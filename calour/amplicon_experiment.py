@@ -99,7 +99,7 @@ class AmpliconExperiment(Experiment):
             With only features with matching taxonomy
         '''
         if 'taxonomy' not in exp.feature_metadata.columns:
-            logger.warn('No taxonomy field in experiment')
+            logger.warning('No taxonomy field in experiment')
             return None
 
         values = _to_list(values)
