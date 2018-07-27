@@ -130,7 +130,7 @@
 <h1>calour.filtering.is_prevalent<a class="headerlink" href="#calour-filtering-is-prevalent" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.filtering.is_prevalent">
-<code class="descclassname">calour.filtering.</code><code class="descname">is_prevalent</code><span class="sig-paren">(</span><em>data</em>, <em>axis</em>, <em>cutoff=1</em>, <em>fraction=0.1</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/filtering.py#L362"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.is_prevalent" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.filtering.</code><code class="descname">is_prevalent</code><span class="sig-paren">(</span><em>data</em>, <em>axis</em>, <em>cutoff=1</em>, <em>fraction=0.1</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/filtering.py#L370"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.is_prevalent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the prevalent of values above the cutoff.</p>
 <p>present (abundance &gt;= cutoff) in at least “fraction” of samples</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -138,7 +138,7 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v1.1.0)"><em>scipy.sparse.csr_matrix</em></a>) – </li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix" title="(in SciPy v1.1.0)"><em>scipy.sparse.csr_matrix</em></a>) – </li>
 <li><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – compute prevalence of each column (0) or row (1).</li>
 <li><strong>cutoff</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the min threshold of abundance</li>
 <li><strong>fraction</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – [0, 1). the min threshold of presence (in fraction)</li>

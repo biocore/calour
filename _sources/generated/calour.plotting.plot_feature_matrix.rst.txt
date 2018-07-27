@@ -1,0 +1,6 @@
+calour.plotting.plot\_feature\_matrix
+=====================================
+
+.. currentmodule:: calour.plotting
+
+.. autofunction:: plot_feature_matrix

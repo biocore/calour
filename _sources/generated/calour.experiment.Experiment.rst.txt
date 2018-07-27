@@ -108,9 +108,9 @@ calour.experiment.Experiment
          
             ~Experiment.plot_enrichment
          
-            ~Experiment.plot_hist
+            ~Experiment.plot_feature_matrix
          
-            ~Experiment.plot_scatter_matrix
+            ~Experiment.plot_hist
          
             ~Experiment.plot_stacked_bar
          

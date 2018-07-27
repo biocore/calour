@@ -136,11 +136,11 @@
 encoding scheme and add them into the data table as new features.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is only for numeric and/or nominal covariates in</p>
+<p class="last">This is only for numeric and/or nominal covariates in
+sample metadata. If you want to add a ordinal column as a
+feature, use <cite>pandas.Series.map</cite> to convert ordinal column to
+numeric column first.</p>
 </div>
-<p>sample metadata. If you want to add a ordinal column as a feature,
-use <cite>pandas.Series.map</cite> to convert ordinal column to numeric
-column first.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]),</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="gp">... </span>                 <span class="n">sample_metadata</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span>

@@ -19,7 +19,7 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="calour.training.regress" href="calour.training.regress.html" />
+    <link rel="next" title="calour.training.plot_prc" href="calour.training.plot_prc.html" />
     <link rel="prev" title="calour.training.plot_cm" href="calour.training.plot_cm.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -130,22 +130,40 @@
 <h1>calour.training.plot_roc<a class="headerlink" href="#calour-training-plot-roc" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.training.plot_roc">
-<code class="descclassname">calour.training.</code><code class="descname">plot_roc</code><span class="sig-paren">(</span><em>result</em>, <em>pos_label=None</em>, <em>title='ROC'</em>, <em>cmap=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L435"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.plot_roc" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.training.</code><code class="descname">plot_roc</code><span class="sig-paren">(</span><em>result</em>, <em>classes=None</em>, <em>title='ROC'</em>, <em>cv=True</em>, <em>cmap=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L575"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.plot_roc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot ROC curve.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You may want to consider using precision-recall curve
+(<cite>:func:plot_prc</cite>) instead of ROC curve. If your model needs to
+perform equally well on the negative class as the positive
+class, you would use the ROC AUC. For example, for classifying
+images between cats and dogs, if you would like the model to
+perform well on the cats as well as on the dogs, then you can
+use ROC and ROC is more intuitive to understand. If you have
+<em>imbalanced</em> classes OR you don’t care about the negative class
+at all, then you should use precision-recall curve. Take cancer
+diagnosis as an example, you tends to have way more negative
+samples than positive cancer samples and want to make sure you
+positive predictions are correct (precision) and don’t miss any
+cancer (recall or aka sensitivity), you should use
+precision-recall curve. If the classes are balanced, ROC
+usually works fine even in this scenario. <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
+<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.3)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
 true class named “Y_TRUE” and multiple columns of predicted probabilities for each class.
 It typically takes the output of <a class="reference internal" href="calour.training.classify.html#calour.training.classify" title="calour.training.classify"><code class="xref py py-func docutils literal notranslate"><span class="pre">classify()</span></code></a>.</li>
-<li><strong>pos_label</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – the interested class if it is a binary classification. For
-example, for “Health” vs. “IBD” classification, you would want
-to set it to “IBD”. This is ignored if it is not a binary
-classification. This value is passed to
-<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html#sklearn.metrics.roc_curve" title="(in scikit-learn v0.19.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.roc_curve()</span></code></a></li>
+<li><strong>classes</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – The list of the labels you want to include in the plot in the order specified in the list.
+If it is a binary classification (eg “Health” vs. “IBD”), you would want
+to set it to <cite>[“IBD”]</cite> and don’t plot for “Health” because it is equivalent.</li>
 <li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – plot title</li>
+<li><strong>cv</strong> (<em>boolean</em>) – Whether to plot ROC curve shade by different folds of cross validation. You need to have
+‘CV’ column in the input <cite>result</cite> data frame.</li>
 <li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.2.2)"><em>matplotlib.colors.ListedColormap</em></a>) – str to indicate the colormap name. Default is “Dark2” colormap.
 For all available colormaps in matplotlib: <a class="reference external" href="https://matplotlib.org/users/colormaps.html">https://matplotlib.org/users/colormaps.html</a></li>
 <li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where to plot. None (default) to create a new figure and
@@ -159,6 +177,15 @@ axes to plot</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)">matplotlib.axes.Axes</a></p>
 </td>
 </tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Saito T and Rehmsmeier M (2015) The Precision-Recall Plot
+Is More Informative than the ROC Plot When Evaluating Binary
+Classifiers on Imbalanced Datasets. PLoS One, 10.</td></tr>
 </tbody>
 </table>
 </dd></dl>

@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="calour.training.plot_scatter" href="calour.training.plot_scatter.html" />
-    <link rel="prev" title="calour.training.plot_roc" href="calour.training.plot_roc.html" />
+    <link rel="prev" title="calour.training.plot_prc" href="calour.training.plot_prc.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -130,7 +130,7 @@
 <h1>calour.training.regress<a class="headerlink" href="#calour-training-regress" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.training.regress">
-<code class="descclassname">calour.training.</code><code class="descname">regress</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>field</em>, <em>estimator</em>, <em>cv=&lt;calour.training.RepeatedSortedStratifiedKFold object&gt;</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L192"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.regress" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.training.</code><code class="descname">regress</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>field</em>, <em>estimator</em>, <em>cv=&lt;calour.training.RepeatedSortedStratifiedKFold object&gt;</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L212"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.regress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate regression during cross validation.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -143,11 +143,11 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>exp</strong> (<a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><em>Experiment</em></a>) – Input experiment object.</li>
 <li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – column name in the sample metadata, which contains the variable we want to predict.</li>
-<li><strong>estimator</strong> (estimator object implementing <cite>fit</cite> and <cite>predict</cite>) – scikit-learn estimator. e.g. <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="(in scikit-learn v0.19.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestRegressor</span></code></a></li>
-<li><strong>cv</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>cross-validation generator</em><em> or </em><em>an iterable</em>) – similar to the <cite>cv</cite> parameter in <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.19.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a></li>
+<li><strong>estimator</strong> (estimator object implementing <cite>fit</cite> and <cite>predict</cite>) – scikit-learn estimator. e.g. <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestRegressor</span></code></a></li>
+<li><strong>cv</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>cross-validation generator</em><em> or </em><em>an iterable</em>) – similar to the <cite>cv</cite> parameter in <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a></li>
 <li><strong>params</strong> (<em>dict of string to sequence</em><em>, or </em><em>sequence of such</em>) – For example, the output of
-<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterGrid.html#sklearn.model_selection.ParameterGrid" title="(in scikit-learn v0.19.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterGrid</span></code></a> or
-<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterSampler.html#sklearn.model_selection.ParameterSampler" title="(in scikit-learn v0.19.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterSampler</span></code></a>. By default,
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterGrid.html#sklearn.model_selection.ParameterGrid" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterGrid</span></code></a> or
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterSampler.html#sklearn.model_selection.ParameterSampler" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterSampler</span></code></a>. By default,
 it uses whatever default parameters of the <cite>estimator</cite> set in
 <cite>scikit-learn</cite></li>
 </ul>

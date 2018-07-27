@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.io.save &#8212; calour 2018.5.2 documentation</title>
+    <title>calour.experiment.Experiment.plot_feature_matrix &#8212; calour 2018.5.2 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -19,8 +19,8 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="calour.io.save_biom" href="calour.io.save_biom.html" />
-    <link rel="prev" title="calour.io.read_ms" href="calour.io.read_ms.html" />
+    <link rel="next" title="calour.experiment.Experiment.plot_hist" href="calour.experiment.Experiment.plot_hist.html" />
+    <link rel="prev" title="calour.experiment.Experiment.plot_enrichment" href="calour.experiment.Experiment.plot_enrichment.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -96,7 +96,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">calour.io.save</a></li>
+<li><a class="reference internal" href="#">calour.experiment.Experiment.plot_feature_matrix</a></li>
 </ul>
 </ul>
 </li>
@@ -126,25 +126,37 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="calour-io-save">
-<h1>calour.io.save<a class="headerlink" href="#calour-io-save" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="calour.io.save">
-<code class="descclassname">calour.io.</code><code class="descname">save</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>prefix</em>, <em>fmt='hdf5'</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/io.py#L616"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.io.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the experiment data to disk.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This function is also available as a class method <a class="reference internal" href="calour.experiment.Experiment.save.html#calour.experiment.Experiment.save" title="calour.experiment.Experiment.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Experiment.save()</span></code></a></p>
-</div>
+  <div class="section" id="calour-experiment-experiment-plot-feature-matrix">
+<h1>calour.experiment.Experiment.plot_feature_matrix<a class="headerlink" href="#calour-experiment-experiment-plot-feature-matrix" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="calour.experiment.Experiment.plot_feature_matrix">
+<code class="descclassname">Experiment.</code><code class="descname">plot_feature_matrix</code><span class="sig-paren">(</span><em>fields</em>, <em>feature_ids</em>, <em>title_field=None</em>, <em>transform_x=None</em>, <em>transform_y=None</em>, <em>plot='scatter'</em>, <em>ncols=5</em>, <em>nrows=None</em>, <em>size=2</em>, <em>aspect=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.plot_feature_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>This plots an array of scatter plots between each features against the specified sample metadata.</p>
+<p>For each panel of scatter plot, the x-axis is the co-variates
+specified by sample metadata field; the y-axis is the feature
+abundance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>exp</strong> (<a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><em>Experiment</em></a>) – Input experiment object.</li>
-<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – file path to save to.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – format for the data table. could be ‘hdf5’, ‘txt’, or ‘json’.</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fields</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the column in the sample metadata to plot against</li>
+<li><strong>feature_ids</strong> (<em>list-like</em>) – the IDs of features</li>
+<li><strong>transform_y</strong> (<em>transform_x</em><em>,</em>) – the transformation for values on x- and y-axis</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>{'scatter'</em><em>, </em><em>'box'}</em>) – the plot type</li>
+<li><strong>nrows</strong> (<em>ncols</em><em>,</em>) – plot nrows x ncols number of scatter plots. If nrows is None, then its value is determined
+automatically by the-number-features / ncols</li>
+<li><strong>size</strong> (<em>numeric</em>) – the height of each figure panel in inches</li>
+<li><strong>aspect</strong> (<em>numeric</em>) – Aspect ratio of each figure panel, so that aspect * size gives its width</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – keyword arguments passing to either <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.boxplot.html#matplotlib.pyplot.boxplot" title="(in Matplotlib v2.2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.boxplot()</span></code></a> or
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v2.2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter()</span></code></a>, depending on <cite>plot</cite> argument.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v2.2.2)">matplotlib.figure.Figure</a></p>
 </td>
 </tr>
 </tbody>

@@ -130,7 +130,7 @@
 <h1>calour.plotting.plot_diff_abundance_enrichment<a class="headerlink" href="#calour-plotting-plot-diff-abundance-enrichment" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.plotting.plot_diff_abundance_enrichment">
-<code class="descclassname">calour.plotting.</code><code class="descname">plot_diff_abundance_enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>term_type='term'</em>, <em>max_show=10</em>, <em>max_len=40</em>, <em>ax=None</em>, <em>ignore_exp=None</em>, <em>score_method='all_mean'</em>, <em>colors=('green'</em>, <em>'red')</em>, <em>show_legend=True</em>, <em>random_seed=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/plotting.py#L141"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.plotting.plot_diff_abundance_enrichment" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.plotting.</code><code class="descname">plot_diff_abundance_enrichment</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>max_show=10</em>, <em>max_len=40</em>, <em>ax=None</em>, <em>colors=('green'</em>, <em>'red')</em>, <em>show_legend=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/plotting.py#L141"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.plotting.plot_diff_abundance_enrichment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the term enrichment of differentially abundant bacteria</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -154,23 +154,9 @@ if int, show at most the max_show maximal positive and negative terms
 if (int, int), show at most XXX maximal positive and YYY maximal negative terms</li>
 <li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The axis to which to plot the figure
 None (default) to create a new figure</li>
-<li><strong>ignore_exp</strong> (<em>list None</em><em>, </em><em>optional</em>) – list of experiment ids to ignore when doing the enrichment_analysis.
-Useful when you don’t want to get terms from your own experiment analysis.
-For dbbact it is a list of int</li>
-<li><strong>score_method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> (</em><em>optional</em><em>)</em>) – The scoring function used to give each term the score (for each feature).
-This parameter manages how the different annotations (such as ‘common’/’high freq’)
-from different experiments are used to give each term the score (which is later
-used as the statistic for the enrichment analysis).
-Options are:
-‘all_mean’ (default) : for each experiment, for each term use the mean of the term score over
-all annotations cotaining this term (from the experiment). This means if we see the term in
-a lot of annotations from the same experiment, we treat it the same as if we see it in an experiment
-with only one annotation
-‘sum’ : treat each annotation independently</li>
 <li><strong>colors</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – Colors for terms enriched in group1 or group2 respectively</li>
 <li><strong>show_legend</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> (</em><em>optional</em><em>)</em>) – True to show the color legend, False to hide it</li>
-<li><strong>random_seed</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – int to set the numpy random seed to this number before running the random permutation test.
-None to not set the numpy random seed</li>
+<li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)</li>
 </ul>
 </td>
 </tr>

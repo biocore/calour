@@ -131,7 +131,7 @@
 <dl class="function">
 <dt id="calour.filtering.filter_by_data">
 <code class="descclassname">calour.filtering.</code><code class="descname">filter_by_data</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>predicate</em>, <em>axis=1</em>, <em>field=None</em>, <em>negate=False</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/experiment.py#L223"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.filtering.filter_by_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter samples or features by data.</p>
+<dd><p>Filter samples or features by the data matrix.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This function is also available as a class method <a class="reference internal" href="calour.experiment.Experiment.filter_by_data.html#calour.experiment.Experiment.filter_by_data" title="calour.experiment.Experiment.filter_by_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Experiment.filter_by_data()</span></code></a></p>
@@ -147,7 +147,7 @@ it also accepts the following strings to filter along the specified axis:</p>
 <ul>
 <li>’abundance’: calls <a class="reference internal" href="calour.filtering.is_abundant.html#calour.filtering.is_abundant" title="calour.filtering.is_abundant"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_abundant()</span></code></a>, filter by abundance;</li>
 <li>’prevalence’: calls <a class="reference internal" href="calour.filtering.is_prevalent.html#calour.filtering.is_prevalent" title="calour.filtering.is_prevalent"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_prevalent()</span></code></a>, filter by prevalence;</li>
-<li>’freq_ratio’: calls <a class="reference internal" href="calour.filtering.freq_ratio.html#calour.filtering.freq_ratio" title="calour.filtering.freq_ratio"><code class="xref py py-func docutils literal notranslate"><span class="pre">freq_ratio()</span></code></a> and</li>
+<li>’freq_ratio’: calls <a class="reference internal" href="calour.filtering.freq_ratio.html#calour.filtering.freq_ratio" title="calour.filtering.freq_ratio"><code class="xref py py-func docutils literal notranslate"><span class="pre">freq_ratio()</span></code></a>, filter if there is a dominant unique value;</li>
 <li>’unique_cut’: calls <a class="reference internal" href="calour.filtering.unique_cut.html#calour.filtering.unique_cut" title="calour.filtering.unique_cut"><code class="xref py py-func docutils literal notranslate"><span class="pre">unique_cut()</span></code></a>, filter by how diversified the values.</li>
 </ul>
 </li>

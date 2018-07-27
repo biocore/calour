@@ -130,14 +130,14 @@
 <h1>calour.training.plot_cm<a class="headerlink" href="#calour-training-plot-cm" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.training.plot_cm">
-<code class="descclassname">calour.training.</code><code class="descname">plot_cm</code><span class="sig-paren">(</span><em>result</em>, <em>normalize=False</em>, <em>title='confusion matrix'</em>, <em>cmap=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L362"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.plot_cm" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.training.</code><code class="descname">plot_cm</code><span class="sig-paren">(</span><em>result</em>, <em>normalize=False</em>, <em>title='confusion matrix'</em>, <em>cmap=None</em>, <em>ax=None</em>, <em>classes=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L396"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.plot_cm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot confusion matrix</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
+<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.3)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
 true class named “Y_TRUE”. It must have a column of predicted class named “Y_PRED”
 or multiple columns of predicted probabilities for each class. It typically takes
 the output of <a class="reference internal" href="calour.training.classify.html#calour.training.classify" title="calour.training.classify"><code class="xref py py-func docutils literal notranslate"><span class="pre">classify()</span></code></a>.</li>
@@ -147,6 +147,10 @@ the output of <a class="reference internal" href="calour.training.classify.html#
 For all available colormaps in matplotlib: <a class="reference external" href="https://matplotlib.org/users/colormaps.html">https://matplotlib.org/users/colormaps.html</a></li>
 <li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where the confusion matrix is plotted. None (default) to create a new figure and
 axes to plot the confusion matrix</li>
+<li><strong>classes</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – The list of the labels you want to include in the plot in the order specified in the list.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – keyword argument passing to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html#matplotlib.pyplot.imshow" title="(in Matplotlib v2.2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.imshow()</span></code></a>. For example, you can pass
+<cite>vmin=0, vmax=1</cite> as keyword arguments to manually define color range (especially useful
+when you set <cite>normalize=True</cite>)</li>
 </ul>
 </td>
 </tr>

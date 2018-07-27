@@ -120,9 +120,9 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.plot_enrichment
          
-            ~AmpliconExperiment.plot_hist
+            ~AmpliconExperiment.plot_feature_matrix
          
-            ~AmpliconExperiment.plot_scatter_matrix
+            ~AmpliconExperiment.plot_hist
          
             ~AmpliconExperiment.plot_stacked_bar
          

@@ -131,7 +131,7 @@
 <dl class="method">
 <dt id="calour.experiment.Experiment.filter_by_data">
 <code class="descclassname">Experiment.</code><code class="descname">filter_by_data</code><span class="sig-paren">(</span><em>predicate</em>, <em>axis=1</em>, <em>field=None</em>, <em>negate=False</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.filter_by_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter samples or features by data.</p>
+<dd><p>Filter samples or features by the data matrix.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -142,7 +142,7 @@ it also accepts the following strings to filter along the specified axis:</p>
 <ul>
 <li>’abundance’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">is_abundant()</span></code>, filter by abundance;</li>
 <li>’prevalence’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">is_prevalent()</span></code>, filter by prevalence;</li>
-<li>’freq_ratio’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">freq_ratio()</span></code> and</li>
+<li>’freq_ratio’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">freq_ratio()</span></code>, filter if there is a dominant unique value;</li>
 <li>’unique_cut’: calls <code class="xref py py-func docutils literal notranslate"><span class="pre">unique_cut()</span></code>, filter by how diversified the values.</li>
 </ul>
 </li>

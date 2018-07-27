@@ -224,7 +224,7 @@ if not None, file path to the sample metadata (aka mapping file in QIIME).</li>
 ‘openms_transpose’ an OpenMS bucket table csv (columns are feature, rows are samples)
 ‘gnps_ms’ : an OpenMS bucket table tsv with samples as columns (exported from GNPS)
 ‘qiime2’ : a qiime2 biom table artifact (need to have qiime2 installed)</li>
-<li><strong>feature_metadata_kwargs</strong> (<em>sample_metadata_kwargs</em><em>,</em>) – keyword arguments passing to <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_table.html#pandas.read_table" title="(in pandas v0.22.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.read_table()</span></code></a> when reading sample metadata
+<li><strong>feature_metadata_kwargs</strong> (<em>sample_metadata_kwargs</em><em>,</em>) – keyword arguments passing to <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_table.html#pandas.read_table" title="(in pandas v0.23.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.read_table()</span></code></a> when reading sample metadata
 or feature metadata. For example, you can set <code class="docutils literal notranslate"><span class="pre">sample_metadata_kwargs={'dtype':</span>
 <span class="pre">{'ph':</span> <span class="pre">int},</span> <span class="pre">'encoding':</span> <span class="pre">'latin-8'}</span></code> to read the column of ph in the sample metadata
 as int and parse the file as latin-8 instead of utf-8. By default, it assumes the first column in

@@ -1,0 +1,6 @@
+calour.training.plot\_prc
+=========================
+
+.. currentmodule:: calour.training
+
+.. autofunction:: plot_prc

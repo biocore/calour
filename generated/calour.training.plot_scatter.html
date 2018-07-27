@@ -130,14 +130,14 @@
 <h1>calour.training.plot_scatter<a class="headerlink" href="#calour-training-plot-scatter" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="calour.training.plot_scatter">
-<code class="descclassname">calour.training.</code><code class="descname">plot_scatter</code><span class="sig-paren">(</span><em>result</em>, <em>title=''</em>, <em>cmap=None</em>, <em>cor=&lt;function pearsonr&gt;</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L246"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.plot_scatter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">calour.training.</code><code class="descname">plot_scatter</code><span class="sig-paren">(</span><em>result</em>, <em>title=''</em>, <em>cmap=None</em>, <em>cor=&lt;function pearsonr&gt;</em>, <em>cv=False</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/training.py#L266"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.training.plot_scatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot prediction vs. observation for regression.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.22.0)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
+<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.3)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
 true class named “Y_TRUE”. It must have a column of predicted class named “Y_PRED”.
 It typically takes the output of <a class="reference internal" href="calour.training.classify.html#calour.training.classify" title="calour.training.classify"><code class="xref py py-func docutils literal notranslate"><span class="pre">classify()</span></code></a>.</li>
 <li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – plot title</li>
@@ -146,8 +146,11 @@ For all available colormaps in matplotlib: <a class="reference external" href="h
 <li><strong>cor</strong> (<em>Callable</em><em> or </em><em>None</em>) – a correlation function that takes predicted y and observed y as inputs and returns
 correlation coefficient and p-value. If None, don’t compute and label correlation
 on the plot.</li>
+<li><strong>cv</strong> (<em>boolean</em>) – Whether to color the plot by different folds of cross validation. You need to have
+‘CV’ column in the input <cite>result</cite> data frame.</li>
 <li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where the confusion matrix is plotted. None (default) to create a new figure and
 axes to plot the confusion matrix</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – keyword arguments passing to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v2.2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter()</span></code></a></li>
 </ul>
 </td>
 </tr>
