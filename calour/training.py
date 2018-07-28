@@ -281,6 +281,9 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, cv=False, ax=N
         a correlation function that takes predicted y and observed y as inputs and returns
         correlation coefficient and p-value. If None, don't compute and label correlation
         on the plot.
+    cv : boolean
+        Whether to color the plot by different folds of cross validation. You need to have
+        'CV' column in the input `result` data frame.
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the confusion matrix is plotted. None (default) to create a new figure and
         axes to plot the confusion matrix
@@ -569,12 +572,12 @@ def _interpolate_precision_recall(x, recall, precision):
     return y
 
 
-def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
+def plot_roc(result, classes=None, title='ROC', cv=True, cmap=None, ax=None):
     '''Plot ROC curve.
 
     .. note:: You may want to consider using precision-recall curve
        (`:func:plot_prc`) instead of ROC curve. If your model needs to
-       perform equally well on the positive class as the negative
+       perform equally well on the negative class as the positive
        class, you would use the ROC AUC. For example, for classifying
        images between cats and dogs, if you would like the model to
        perform well on the cats as well as on the dogs, then you can
@@ -600,6 +603,9 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
         to set it to `["IBD"]` and don't plot for "Health" because it is equivalent.
     title : str
         plot title
+    cv : boolean
+        Whether to plot ROC curve shade by different folds of cross validation. You need to have
+        'CV' column in the input `result` data frame.
     cmap : str or matplotlib.colors.ListedColormap
         str to indicate the colormap name. Default is "Dark2" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
@@ -638,27 +644,46 @@ def plot_roc(result, classes=None, title='ROC', cmap=None, ax=None):
     for cls in classes:
         tprs = []
         aucs = []
-        for grp, df in result.groupby('CV'):
-            y_true = df['Y_TRUE'].values == cls
-            fpr, tpr, thresholds = roc_curve(y_true, df[cls])
-            mean_tpr = interp(mean_fpr, fpr, tpr)
-            tprs.append(mean_tpr)
-            tprs[-1][0] = 0.0
-            roc_auc = auc(mean_fpr, mean_tpr)
-            aucs.append(roc_auc)
+        if cv is True:
+            for grp, df in result.groupby('CV'):
+                y_true = df['Y_TRUE'].values == cls
+                fpr, tpr, thresholds = roc_curve(y_true.astype(int), df[cls])
+                if np.isnan(fpr[-1]) or np.isnan(tpr[-1]):
+                    logger.warning(
+                        'The cross validation fold %r is skipped because the true positive rate or '
+                        'false positive rate computation failed. This is likely because you '
+                        'have either no true positive or no negative samples in this '
+                        'cross validation for the class %r' % (grp, cls))
+                    continue
+                mean_tpr = interp(mean_fpr, fpr, tpr)
+                tprs.append(mean_tpr)
+                tprs[-1][0] = 0.0
+                roc_auc = auc(mean_fpr, mean_tpr)
+                aucs.append(roc_auc)
 
-        mean_tpr = np.mean(tprs, axis=0)
-        mean_tpr[-1] = 1.0
-        mean_auc = np.mean(aucs)
-        std_auc = np.std(aucs)
-        ax.plot(mean_fpr, mean_tpr, color=col[cls],
-                label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
-                lw=2, alpha=.8)
+            mean_tpr = np.mean(tprs, axis=0)
+            mean_tpr[-1] = 1.0
+            mean_auc = np.mean(aucs)
+            std_auc = np.std(aucs)
+            ax.plot(mean_fpr, mean_tpr, color=col[cls],
+                    label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
+                    lw=2, alpha=.8)
 
-        std_tpr = np.std(tprs, axis=0)
-        tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
-        tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
-        ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
+            std_tpr = np.std(tprs, axis=0)
+            tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
+            tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
+            ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color=col[cls], alpha=.5)
+        else:
+            y_true = result['Y_TRUE'].values == cls
+            fpr, tpr, thresholds = roc_curve(y_true.astype(int), result[cls])
+            if np.isnan(fpr[-1]) or np.isnan(tpr[-1]):
+                logger.warning(
+                    'The class %r is skipped because the true positive rate or '
+                    'false positive rate computation failed. This is likely because you '
+                    'have either no true positive or no negative samples for this class' % cls)
+            roc_auc = auc(fpr, tpr)
+            # prepend zero because, if not, the curve may start in the middle of the plot.
+            ax.plot(np.insert(fpr, 0, 0), np.insert(tpr, 0, 0), label='{0} ({1:.2f})'.format(cls, roc_auc), lw=2)
 
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)

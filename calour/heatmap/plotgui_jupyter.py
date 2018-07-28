@@ -146,7 +146,7 @@ class PlotGUI_Jupyter(PlotGUI):
     def _annotate(self, button):
         '''Add annotation of the selected features to the database. '''
         if self._annotation_db is None:
-            logger.warn('No database with add annotation capability selected (use plot(...,databases=[dbname])')
+            logger.warning('No database with add annotation capability selected (use plot(...,databases=[dbname])')
             return
 
         # get the sequences of the selection

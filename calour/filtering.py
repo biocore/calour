@@ -217,7 +217,7 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0, negate=False, inp
 @ds.get_sectionsf('filtering.filter_by_data')
 @Experiment._record_sig
 def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False, inplace=False, **kwargs):
-    '''Filter samples or features by data.
+    '''Filter samples or features by the data matrix.
 
     Parameters
     ----------
@@ -227,7 +227,7 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
 
         * 'abundance': calls :func:`is_abundant`, filter by abundance;
         * 'prevalence': calls :func:`is_prevalent`, filter by prevalence;
-        * 'freq_ratio': calls :func:`freq_ratio` and
+        * 'freq_ratio': calls :func:`freq_ratio`, filter if there is a dominant unique value;
         * 'unique_cut': calls :func:`unique_cut`, filter by how diversified the values.
     axis : 0, 1, 's', or 'f', optional
         Apply predicate on each row (ie samples) (0, 's') or each column (ie features) (1, 'f')
@@ -257,6 +257,7 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None, negate=False,
 
     '''
     if axis == 0:
+        # transpose it so all the following operations are performed on column
         x = exp.feature_metadata
         data = exp.data.T
     elif axis == 1:
