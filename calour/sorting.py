@@ -282,9 +282,9 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
         elif axis == 1:
             for col in range(n):
                 values[col] = key(data_subset[:, col], **kwargs)
-        sort_pos = np.argsort(values)
+        sort_pos = np.argsort(values, kind='mergesort')
     else:
-        sort_pos = np.argsort(np.apply_along_axis(key, 1 - axis, data_subset, **kwargs))
+        sort_pos = np.argsort(np.apply_along_axis(key, 1 - axis, data_subset, **kwargs), kind='mergesort')
 
     if reverse:
         sort_pos = sort_pos[::-1]
