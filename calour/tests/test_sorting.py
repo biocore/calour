@@ -88,9 +88,9 @@ class SortingTests(Tests):
 
     def test_sort_by_data_feature(self):
         obs = self.timeseries.sort_by_data(axis=1)
-        exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.freq.biom'),
-                      join(self.test_data_dir, 'timeseries.sample'),
-                      normalize=None)
+        exp = ca.read_amplicon(join(self.test_data_dir, 'timeseries.sorted.freq.biom'),
+                               join(self.test_data_dir, 'timeseries.sample'),
+                               normalize=None, min_reads=0)
         assert_experiment_equal(obs, exp, almost_equal=True)
 
     def test_sort_centroid(self):
