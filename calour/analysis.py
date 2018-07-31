@@ -92,7 +92,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     # remove the nans
     nanpos = np.where(np.isnan(labels))[0]
     if len(nanpos) > 0:
-        logger.warn('NaN values encountered in labels for correlation. Ignoring these samples')
+        logger.warning('NaN values encountered in labels for correlation. Ignoring these samples')
         labels = np.delete(labels, nanpos)
         data = np.delete(data, nanpos, axis=1)
     # change the method if we have nonzero
@@ -294,7 +294,7 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
     '''
     keep = np.where(keep)
     if len(keep[0]) == 0:
-        logger.warn('no significant features found')
+        logger.warning('no significant features found')
     newexp = cexp.reorder(keep[0], axis=1)
     if exp is not None:
         # we want all samples (rather than the subset in cexp) so use the original exp

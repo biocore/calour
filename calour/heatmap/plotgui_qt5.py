@@ -282,9 +282,9 @@ class ApplicationWindow(QMainWindow):
                 logger.debug('removing window from app window list')
                 app.references.remove(self)
             else:
-                logger.warn('window not in app window list. Not removed')
+                logger.warning('window not in app window list. Not removed')
         else:
-            logger.warn('App not found - not removing window from list')
+            logger.warning('App not found - not removing window from list')
         self.close()
 
     def closeEvent(self, ce):
@@ -440,7 +440,7 @@ class ApplicationWindow(QMainWindow):
         '''
         # get the database used to add annotation
         if self.gui._annotation_db is None:
-            logger.warn('No database with add annotation capability selected (use plot(...,databases=[dbname])')
+            logger.warning('No database with add annotation capability selected (use plot(...,databases=[dbname])')
             return
         # get the sequences of the selection
         seqs = self.gui.get_selected_seqs()

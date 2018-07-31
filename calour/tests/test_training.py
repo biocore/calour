@@ -8,6 +8,7 @@
 
 from unittest import main
 from os.path import join
+import logging
 
 from numpy.testing import assert_array_equal, assert_almost_equal
 import numpy as np
@@ -48,7 +49,7 @@ class TTests(Tests):
 
     def test_split_train_test(self):
         train, test = self.test2_dense.split_train_test(
-            test_size=3, field='group', stratify='categorical', random_state=7)
+            test_size=3, stratify='categorical', random_state=7)
 
         assert_experiment_equal(
             test, self.test2_dense.filter_ids(['S3', 'S8', 'S1'], axis='s'))
@@ -113,6 +114,17 @@ class TTests(Tests):
         # from matplotlib import pyplot as plt
         # plt.show()
 
+    def test_plot_roc_multi_no_cv(self):
+        result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
+        ax = plot_roc(result, cv=False)
+        legend = ax.get_legend()
+        exp = {'Luck',
+               'setosa (1.00)',
+               'virginica (0.94)',
+               'versicolor (0.92)'}
+        obs = {i.get_text() for i in legend.get_texts()}
+        self.assertSetEqual(exp, obs)
+
     def test_plot_roc_binary(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
         result['Y_TRUE'] = ['virginica' if i == 'virginica' else 'not virginica'
@@ -126,6 +138,18 @@ class TTests(Tests):
                'virginica (0.96 $\pm$ 0.05)'}
         obs = {i.get_text() for i in legend.get_texts()}
         self.assertSetEqual(exp, obs)
+
+    def test_plot_roc_warning(self):
+        prob = np.arange(0, 1, 0.1)
+        result = pd.DataFrame({'pos': 1 - prob,
+                               'neg': prob,
+                               'Y_TRUE': ['pos'] * 9 + ['neg'],
+                               'CV': [0, 1] * 5})
+        # re-enable logging because it is disabled in parent setUp
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='WARNING') as cm:
+            plot_roc(result)
+            self.assertRegex(cm.output[0], 'no true positive or no negative samples')
 
     def test_interpolate_precision_recall(self):
         n = 9
