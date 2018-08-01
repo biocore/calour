@@ -83,7 +83,7 @@ class TestTransforming(Tests):
         obs = self.test2.log_n(inplace=True)
         self.assertIs(obs, self.test2)
 
-    def test_center_log(self):
+    def test_center_log_ration(self):
         dat = np.array(
             [[10, 20, 1, 20, 5, 100, 844, 100],
              [10, 20, 2, 19, 0, 100, 849, 200],
@@ -94,10 +94,10 @@ class TestTransforming(Tests):
              [10, 20, 7, 14, 3, 100, 846, 700],
              [10, 20, 8, 13, 0, 100, 849, 800],
              [10, 20, 9, 12, 7, 100, 842, 900]]) + 1
-        obs = self.test2.center_log()
+        obs = self.test2.center_log_ratio()
         exp = clr(dat)
         assert_array_almost_equal(exp, obs.data)
-        obs = self.test2.center_log(centralize=True)
+        obs = self.test2.center_log_ratio(centralize=True)
         exp = clr(centralize(dat))
         assert_array_almost_equal(exp, obs.data)
 
