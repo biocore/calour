@@ -19,7 +19,7 @@ Functions
    binarize
    log_n
    transform
-   center_log
+   center_log_ratio
    subsample_count
 '''
 
@@ -317,7 +317,7 @@ def random_permute_data(exp: Experiment, normalize=True):
 
 
 @Experiment._record_sig
-def center_log(exp: Experiment, method=lambda matrix: matrix + 1, centralize=False, inplace=False):
+def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centralize=False, inplace=False):
     """ Performs a clr transform to normalize each sample.
 
     Parameters

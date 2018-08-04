@@ -46,21 +46,20 @@ logger = getLogger(__name__)
 @ds.with_indent(4)
 @Experiment._record_sig
 def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
-    '''Sort the features based on the center of mass
+    r'''Sort the features based on the center of mass
 
-    Assumes exp samples are sorted by some continuous field, and sort
-    the features based on their center of mass along this field order:
-    For each feature calculate the center of mass (i.e. for each
-    feature go over all samples i and calculate sum(data(i) * i /
-    sum(data(i)) ).  Features are then sorted according to this center
-    of mass
+    Assuming that samples are already sorted by some continuous field
+    (eg pH), this function will sort features based on their center of
+    mass along this field. Specifically, it calculates the center of
+    mass for each feature and sort features by their center of mass.
 
     Parameters
     ----------
     transform : callable, optional
-        a callable transform on a 2-d matrix. Input and output of transform are :class:`.Experiment`.
-        The transform function can modify ``Experiment.data`` (it is a copy).
-        It should not change the dimension of :attr:`.Experiment.data`.
+        a callable transform on a 2-d matrix. Input and output of
+        transform are :class:`.Experiment`.  The transform function
+        modifies ``Experiment.data`` (it is a copy) but not change the
+        dimension of :attr:`.Experiment.data`.
     inplace : bool, optional
         False (default) to create a copy
         True to Replace data in exp
@@ -79,19 +78,20 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
     See Also
     --------
     transform
+
     '''
     logger.debug('sorting features by center of mass')
     if transform is None:
         data = exp.data
     else:
         logger.debug('transforming data using %r' % transform)
-        newexp = deepcopy(exp)
-        data = transform(newexp, **kwargs).data
+        data = transform(deepcopy(exp), **kwargs).data
     data = data.T
-    coordinates = np.arange(data.shape[1]) - ((data.shape[1] - 1)/2)
-    center_mass = data.dot(coordinates)
-    center_mass = np.divide(center_mass, data.sum(axis=1))
-
+    center_mass = data.dot(np.arange(0, data.shape[1]))
+    s = data.sum(axis=1)
+    if isinstance(s, np.matrix):
+        s = s.A1
+    center_mass = np.divide(center_mass, s)
     sort_pos = np.argsort(center_mass, kind='mergesort')
     exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
     return exp
