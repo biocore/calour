@@ -434,7 +434,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
 def plot(exp: Experiment, title=None,
          barx_fields=None, barx_width=0.3, barx_colors=None, barx_label=True, barx_label_kwargs=None,
          bary_fields=None, bary_width=0.3, bary_colors=None, bary_label=True, bary_label_kwargs=None,
-         tree=None, tree_size=8, gui='cli', databases=False, **heatmap_kwargs):
+         tree=None, tree_size=8, gui='cli', databases=None, **heatmap_kwargs):
 
     '''Plot the interactive heatmap and its associated axes.
 
@@ -525,8 +525,8 @@ def plot(exp: Experiment, title=None,
     --------
     heatmap
     '''
-    # set the databases if default requested (i.e. False)
-    if databases is False:
+    # set the databases if default requested
+    if databases is None:
         databases = exp.heatmap_databases
 
     if tree is None:
