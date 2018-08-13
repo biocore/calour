@@ -155,7 +155,7 @@ usually works fine even in this scenario. <a class="footnote-reference" href="#i
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.3)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
+<li><strong>result</strong> (<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.4)"><em>pandas.DataFrame</em></a>) – data frame containing predictions per sample (in row). It must have a column of
 true class named “Y_TRUE” and multiple columns of predicted probabilities for each class.
 It typically takes the output of <a class="reference internal" href="calour.training.classify.html#calour.training.classify" title="calour.training.classify"><code class="xref py py-func docutils literal notranslate"><span class="pre">classify()</span></code></a>.</li>
 <li><strong>classes</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – The list of the labels you want to include in the plot in the order specified in the list.
@@ -164,9 +164,9 @@ to set it to <cite>[“IBD”]</cite> and don’t plot for “Health” because 
 <li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – plot title</li>
 <li><strong>cv</strong> (<em>boolean</em>) – Whether to plot ROC curve shade by different folds of cross validation. You need to have
 ‘CV’ column in the input <cite>result</cite> data frame.</li>
-<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.2.2)"><em>matplotlib.colors.ListedColormap</em></a>) – str to indicate the colormap name. Default is “Dark2” colormap.
+<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v2.2.3)"><em>matplotlib.colors.ListedColormap</em></a>) – str to indicate the colormap name. Default is “Dark2” colormap.
 For all available colormaps in matplotlib: <a class="reference external" href="https://matplotlib.org/users/colormaps.html">https://matplotlib.org/users/colormaps.html</a></li>
-<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where to plot. None (default) to create a new figure and
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.3)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where to plot. None (default) to create a new figure and
 axes to plot</li>
 </ul>
 </td>
@@ -174,7 +174,7 @@ axes to plot</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The axes for the ROC</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.2)">matplotlib.axes.Axes</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v2.2.3)">matplotlib.axes.Axes</a></p>
 </td>
 </tr>
 </tbody>

@@ -40,7 +40,7 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.binarize
          
-            ~AmpliconExperiment.center_log
+            ~AmpliconExperiment.center_log_ratio
          
             ~AmpliconExperiment.classify
          

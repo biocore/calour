@@ -132,20 +132,19 @@
 <dt id="calour.amplicon_experiment.AmpliconExperiment.sort_centroid">
 <code class="descclassname">AmpliconExperiment.</code><code class="descname">sort_centroid</code><span class="sig-paren">(</span><em>transform=&lt;function log_n&gt;</em>, <em>inplace=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.sort_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sort the features based on the center of mass</p>
-<p>Assumes exp samples are sorted by some continuous field, and sort
-the features based on their center of mass along this field order:
-For each feature calculate the center of mass (i.e. for each
-feature go over all samples i and calculate sum(data(i) * i /
-sum(data(i)) ).  Features are then sorted according to this center
-of mass</p>
+<p>Assuming that samples are already sorted by some continuous field
+(eg pH), this function will sort features based on their center of
+mass along this field. Specifically, it calculates the center of
+mass for each feature and sort features by their center of mass.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – a callable transform on a 2-d matrix. Input and output of transform are <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a>.
-The transform function can modify <code class="docutils literal notranslate"><span class="pre">Experiment.data</span></code> (it is a copy).
-It should not change the dimension of <code class="xref py py-attr docutils literal notranslate"><span class="pre">Experiment.data</span></code>.</li>
+<li><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – a callable transform on a 2-d matrix. Input and output of
+transform are <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a>.  The transform function
+modifies <code class="docutils literal notranslate"><span class="pre">Experiment.data</span></code> (it is a copy) but not change the
+dimension of <code class="xref py py-attr docutils literal notranslate"><span class="pre">Experiment.data</span></code>.</li>
 <li><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – False (default) to create a copy
 True to Replace data in exp</li>
 <li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – additional keyword parameters passed to <code class="docutils literal notranslate"><span class="pre">transform</span></code>.</li>

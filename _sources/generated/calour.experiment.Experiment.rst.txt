@@ -40,7 +40,7 @@ calour.experiment.Experiment
          
             ~Experiment.binarize
          
-            ~Experiment.center_log
+            ~Experiment.center_log_ratio
          
             ~Experiment.classify
          

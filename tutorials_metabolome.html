@@ -19,8 +19,8 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Metabolomics analysis with GNPS" href="notebooks/metabolome_gnps.html" />
-    <link rel="prev" title="Calour microbiome databases interface tutorial" href="notebooks/microbiome_databases.html" />
+    <link rel="next" title="Calour mass-spec analysis demo" href="notebooks/metabolome_gnps.html" />
+    <link rel="prev" title="Microbiome machine learning analysis" href="notebooks/microbiome_machine_learning.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -131,17 +131,32 @@
 <p>Example jupyter notebooks working with metabolome data</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/metabolome_gnps.html">Metabolomics analysis with GNPS</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Setup">Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Load-the-metabolomics-bucket-table">Load the metabolomics bucket table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Preprocessing">Preprocessing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Remove-low-frequency-metabolites-(features)">Remove low frequency metabolites (features)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#sort-the-samples-by-relevant-fields-for-the-plot">sort the samples by relevant fields for the plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/metabolome_gnps.html">Calour mass-spec analysis demo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Using-data-from:">Using data from:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#set-up-calour">set up calour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Load-MZmine2-feature-table,-metadata-and-GnPS-file">Load MZmine2 feature table, metadata and GnPS file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Reorder-the-features-(metabolites)-and-samples">Reorder the features (metabolites) and samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Plotting-the-data">Plotting the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Differentially-abundant-metabolites-between-control-('Air')-and-treatment-('IHH')-groups">Differentially abundant metabolites between control (‘Air’) and treatment (‘IHH’) groups</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Remove-the-age-10,-10.5-samples-since-very-different-from-the-rest">Remove the age 10, 10.5 samples since very different from the rest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Find-the-differentially-abundant-metabolites">Find the differentially abundant metabolites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Plot-these-differentially-abundant-feature">Plot these differentially abundant feature</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Plot-the-data">Plot the data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Looking-only-at-known-metabolites">Looking only at known metabolites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Differential-abundance-only-on-the-identified-metabolites">Differential abundance only on the identified metabolites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#The-metabolites-higher-in-each-group">The metabolites higher in each group</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/metabolome_gnps.html#Differentially-abundant-metabolites-between-baseline-samples-(age=10-weeks)-and-the-rest">Differentially abundant metabolites between baseline samples (age=10 weeks) and the rest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Metabolites-higher-in-normal-diet-(10-weeks-group)">Metabolites higher in normal diet (10 weeks group)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notebooks/metabolome_gnps.html#Metabolites-higher-in-high-fat-diet-(&gt;10-weeks-group)">Metabolites higher in high fat diet (&gt;10 weeks group)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/metabolome_gnps.html#Looking-at-gnps-components">Looking at gnps components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/metabolome_gnps.html#Looking-for-metabolite-artifacts">Looking for metabolite artifacts</a></li>
 </ul>
 </div>
 </div>

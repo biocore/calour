@@ -1,0 +1,8 @@
+:orphan:
+
+calour.experiment.Experiment.center_log_ratio
+=============================================
+
+.. currentmodule:: calour.experiment
+
+.. automethod:: Experiment.center_log_ratio
