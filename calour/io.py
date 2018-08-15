@@ -229,7 +229,7 @@ def _read_metadata(ids, f, kwargs):
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
         if diff:
-            logger.warning('These have metadata but do not have data - dropped: %r' % diff)
+            logger.warning('These have metadata but do not have data - dropped (%d): %r' % (len(diff), diff))
         diff = ids2 - mid
         if diff:
             logger.warning('These have data but do not have metadata: %r' % diff)
