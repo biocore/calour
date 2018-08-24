@@ -603,15 +603,14 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False):
         index = exp.sample_metadata.index
     else:
         index = exp.feature_metadata.index
-    fids = set(ids).intersection(set(index.values))
+    fids = set(ids) & set(index.values)
     if len(fids) < len(ids):
         logger.warning('%d ids were not in the experiment and were dropped.' % (len(ids) - len(fids)))
-    try:
-        ids_pos = [index.get_loc(i) for i in ids if i in fids]
-    except KeyError as e:
-        raise ValueError('Unknown IDs provided: %s' % str(e))
+
+    ids_pos = [index.get_loc(i) for i in ids if i in fids]
+
     # use reprlib to shorten the list if it is too long
-    logger.debug('Filter by IDs %s on axis %d' % (reprlib.repr(ids), axis))
+    logger.debug('Filter by IDs %s on axis %d' % (reprlib.repr(fids), axis))
     if negate:
         ids_pos = np.setdiff1d(np.arange(len(index)), ids_pos, assume_unique=True)
     newexp = exp.reorder(ids_pos, axis=axis, inplace=inplace)
