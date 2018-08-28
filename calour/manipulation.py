@@ -103,6 +103,8 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
     The number of samples/features in each group and their IDs are stored in new metadata columns
     '_calour_merge_number' and '_calour_merge_ids', respectively
 
+    .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
+
     Parameters
     ----------
     field : str
@@ -112,9 +114,12 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
         * 'mean' : the mean of the group
 
+        * 'median' : the median of the group
+
         * 'random' : a random selection from the group
 
         * 'sum' : the sum of of the group
+
     axis : 0, 1, 's', or 'f', optional
         0 or 's' (default) to aggregate samples; 1 or 'f' to aggregate features
     inplace : bool, optional
@@ -142,12 +147,12 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
     uniq = metadata[field].unique()
     n = len(uniq)
-    keep_pos = np.empty(n, dtype=np.int16)
-    merge_number = np.empty(n, dtype=np.int16)
+    keep_pos = np.empty(n, dtype=np.uint32)
+    merge_number = np.empty(n, dtype=np.uint32)
+    # use object as dtype for string
     merge_ids = np.empty(n, dtype=object)
 
     for i, val in enumerate(uniq):
-        # in case the metadata column has nan
         if pd.isnull(val):
             pos = metadata[field].isnull()
         else:
@@ -156,6 +161,8 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         which_to_replace = 0
         if agg == 'mean':
             newdat = cdata.mean(axis=axis)
+        elif agg == 'median':
+            newdat = cdata.median(axis=axis)
         elif agg == 'sum':
             newdat = cdata.sum(axis=axis)
         elif agg == 'random':

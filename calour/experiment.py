@@ -324,7 +324,7 @@ class Experiment:
         # <0x4 sparse matrix of type '<class 'numpy.int8'>'
 
         # if new_order is empty, we want to return empty experiment
-        # it doesn't work for dense data is we use np.array([]) for the indexing
+        # it doesn't work for dense data if we use np.array([]) for the indexing
         if len(new_order) > 0:
             new_order = np.array(new_order)
         if axis == 0:

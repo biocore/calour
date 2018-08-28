@@ -11,3 +11,4 @@ Example jupyter notebooks explaining various Calour commands for microbiome anal
    notebooks/microbiome_internal_structure.ipynb
    notebooks/microbiome_normalization.ipynb
    notebooks/microbiome_databases.ipynb
+   notebooks/microbiome_machine_learning.ipynb
