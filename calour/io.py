@@ -224,7 +224,11 @@ def _read_metadata(ids, f, kwargs):
         else:
             kwargs['dtype'] = {index_col: str}
 
-        metadata = pd.read_table(f, **kwargs)
+        try:
+            metadata = pd.read_table(f, **kwargs)
+        except Exception as err:
+            logger.error('Error reading metadata file %r\nError: %s' % (f, err))
+            raise err
         metadata.set_index(metadata.columns[index_col], inplace=True)
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
@@ -235,6 +239,13 @@ def _read_metadata(ids, f, kwargs):
             logger.warning('These have data but do not have metadata: %r' % diff)
         # reorder the id in metadata to align with biom
         # metadata = metadata.loc[ids, ]
+
+        # check if we have duplicate index ids (which will raise)
+        dup = metadata.index.duplicated(keep=False)
+        if dup.sum() > 0:
+            errmsg = '%d duplicate id values encountered in column %s of mapping file %r:' % (dup.sum(), metadata.index.name, f)
+            errmsg += '\n%s' % set(metadata.index[dup].values)
+            raise ValueError(errmsg)
         metadata = metadata.reindex(ids)
     return metadata
 
