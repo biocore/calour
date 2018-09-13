@@ -113,21 +113,25 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     logger.debug('got %d terms from database' % len(term_list))
     feature_terms = []
     for cfeature in features:
-        term_count = defaultdict(int)
-        if len(term_list[cfeature]) == 0:
-            feature_terms.append('NA')
+        if cfeature not in term_list:
+            feature_terms.append('na')
             continue
-        for cterm in term_list[cfeature]:
-            if use_term_list is not None:
-                if cterm in use_term_list:
-                    term_count[cterm] += 1
-            else:
-                term_count[cterm] += 1
-        if len(term_count) == 0:
-            max_term = 'other'
+        if len(term_list[cfeature]) == 0:
+            feature_terms.append('na')
+            continue
+        if use_term_list is None:
+            bterm = max(term_list[cfeature], key=term_list[cfeature].get)
         else:
-            max_term = max(term_count, key=term_count.get)
-        feature_terms.append(max_term)
+            bterm = 'other'
+            bscore = 0
+            for cterm in use_term_list:
+                if cterm not in term_list[cfeature]:
+                    continue
+                cscore = term_list[cfeature][cterm]
+                if cscore > bscore:
+                    bscore = cscore
+                    bterm = cterm
+        feature_terms.append(bterm)
     exp.feature_metadata[field_name] = feature_terms
     return exp
 
