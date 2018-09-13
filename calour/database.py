@@ -113,7 +113,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
     logger.debug('got %d terms from database' % len(term_list))
 
-    # find the 
+    # find the most enriched term (out of the list) for each feature
     feature_terms = []
     for cfeature in features:
         if cfeature not in term_list:
