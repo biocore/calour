@@ -23,7 +23,6 @@ Functions
 
 from logging import getLogger
 from abc import ABC
-from collections import defaultdict
 import importlib
 
 from .util import get_config_value, get_config_file, get_config_sections
@@ -109,8 +108,12 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
     logger.debug('found %d features' % len(features))
+
+    # get the per feature term scores
     term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
     logger.debug('got %d terms from database' % len(term_list))
+
+    # find the 
     feature_terms = []
     for cfeature in features:
         if cfeature not in term_list:
