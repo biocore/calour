@@ -101,8 +101,6 @@
 <li><a class="reference internal" href="#Import-the-calour-module">Import the calour module</a></li>
 </ul>
 </li>
-</ul>
-</li>
 <li><a class="reference internal" href="#Regression">Regression</a><ul>
 <li><a class="reference internal" href="#Loading-the-data">Loading the data</a></li>
 <li><a class="reference internal" href="#Process-the-data">Process the data</a><ul>
@@ -113,6 +111,8 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#Classification">Classification</a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -348,11 +348,10 @@ div.nboutput div.output_area.stderr {
 </div>
 </div>
 </div>
-</div>
 <div class="section" id="Regression">
-<h1>Regression<a class="headerlink" href="#Regression" title="Permalink to this headline">¶</a></h1>
+<h2>Regression<a class="headerlink" href="#Regression" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="Loading-the-data">
-<h2>Loading the data<a class="headerlink" href="#Loading-the-data" title="Permalink to this headline">¶</a></h2>
+<h3>Loading the data<a class="headerlink" href="#Loading-the-data" title="Permalink to this headline">¶</a></h3>
 <p>We will use the data from Qitta study 103
 (<a class="reference external" href="https://qiita.ucsd.edu/study/description">https://qiita.ucsd.edu/study/description</a>/103#)</p>
 <div class="nbinput nblast docutils container">
@@ -387,9 +386,9 @@ AmpliconExperiment (&#34;88-soil.biom&#34;) with 88 samples, 7396 features
 </div>
 </div>
 <div class="section" id="Process-the-data">
-<h2>Process the data<a class="headerlink" href="#Process-the-data" title="Permalink to this headline">¶</a></h2>
+<h3>Process the data<a class="headerlink" href="#Process-the-data" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="Get-rid-of-the-features-(bacteria)-with-small-amount-of-reads">
-<h3>Get rid of the features (bacteria) with small amount of reads<a class="headerlink" href="#Get-rid-of-the-features-(bacteria)-with-small-amount-of-reads" title="Permalink to this headline">¶</a></h3>
+<h4>Get rid of the features (bacteria) with small amount of reads<a class="headerlink" href="#Get-rid-of-the-features-(bacteria)-with-small-amount-of-reads" title="Permalink to this headline">¶</a></h4>
 <p>We throw away all features with total reads (over all samples) &lt; 1
 (after each sample was normalized to 100 reads/sample). Note
 alternatively we could filter based on mean reads/sample or fraction of
@@ -419,7 +418,7 @@ filtering functions.</p>
 </div>
 </div>
 <div class="section" id="Use-soil-microbiome-to-predict-its-pH">
-<h3>Use soil microbiome to predict its pH<a class="headerlink" href="#Use-soil-microbiome-to-predict-its-pH" title="Permalink to this headline">¶</a></h3>
+<h4>Use soil microbiome to predict its pH<a class="headerlink" href="#Use-soil-microbiome-to-predict-its-pH" title="Permalink to this headline">¶</a></h4>
 <p>Let’s look at the distribution of pH for all the samples:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -3884,7 +3883,7 @@ the prediction is much better with a higher correlation coefficient.</p>
 </div>
 </div>
 <div class="section" id="Classification">
-<h1>Classification<a class="headerlink" href="#Classification" title="Permalink to this headline">¶</a></h1>
+<h2>Classification<a class="headerlink" href="#Classification" title="Permalink to this headline">¶</a></h2>
 <p>We can do analysis similarly for classification. Let’s show it with
 another data set that was introduced in previous notebook.</p>
 <div class="nbinput docutils container">
@@ -7378,6 +7377,7 @@ if (IPython.notebook.kernel != null) {
 <p>From the confusion matrix and ROC plots, you can see, with more trees in
 the Random Forest model, similar to regression, the classification
 accuracy is much better.</p>
+</div>
 </div>
 
 

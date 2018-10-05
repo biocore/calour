@@ -122,10 +122,21 @@
 <li><a class="reference internal" href="#Metabolites-higher-in-high-fat-diet-(&gt;10-weeks-group)">Metabolites higher in high fat diet (&gt;10 weeks group)</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#Looking-at-gnps-components">Looking at gnps components</a><ul>
+<li><a class="reference internal" href="#Sorting-by-the-cluster-index">Sorting by the cluster index</a></li>
+<li><a class="reference internal" href="#Merging-all-metabolites-in-each-cluster">Merging all metabolites in each cluster</a></li>
+<li><a class="reference internal" href="#A-code-snipplet-to-add-all-gnps-ids-to-each-merged-cluster">A code snipplet to add all gnps ids to each merged cluster</a></li>
+<li><a class="reference internal" href="#Now-we-can-do-this-differential-abundance-analysis-on-these-super-metabolites">Now we can do this differential abundance analysis on these super-metabolites</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#Looking-at-gnps-components">Looking at gnps components</a></li>
-<li><a class="reference internal" href="#Looking-for-metabolite-artifacts">Looking for metabolite artifacts</a></li>
+<li><a class="reference internal" href="#Looking-for-metabolite-artifacts">Looking for metabolite artifacts</a><ul>
+<li><a class="reference internal" href="#(split-features-due-to-RT/MZ-tolerances-during-feature-finding)">(split features due to RT/MZ tolerances during feature finding)</a></li>
+<li><a class="reference internal" href="#Similar-mz-and-RT-and-same-trend-across-samples">Similar mz and RT and same trend across samples</a></li>
+<li><a class="reference internal" href="#Identical-m/z-and-very-close-RT">Identical m/z and very close RT</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -4256,12 +4267,13 @@ Similar results have been observed in other studies as well
 trends in very easy steps!</p>
 </div>
 </div>
-</div>
 <div class="section" id="Looking-at-gnps-components">
-<h1>Looking at gnps components<a class="headerlink" href="#Looking-at-gnps-components" title="Permalink to this headline">¶</a></h1>
+<h2>Looking at gnps components<a class="headerlink" href="#Looking-at-gnps-components" title="Permalink to this headline">¶</a></h2>
 <p>each gnps component include metabolites that are related to each other.
 We can sort the metabolites based on their component in order to reduce
 noise and gain more meaning</p>
+<div class="section" id="Sorting-by-the-cluster-index">
+<h3>Sorting by the cluster index<a class="headerlink" href="#Sorting-by-the-cluster-index" title="Permalink to this headline">¶</a></h3>
 <p>This way we can examine if clusters of metabolites in the molecular
 network. In addition to being an easier alternative to look at molecular
 networking data ( as opposed to rendering it as a network in cytoscape &amp;
@@ -5114,6 +5126,9 @@ if (IPython.notebook.kernel != null) {
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="Merging-all-metabolites-in-each-cluster">
+<h3>Merging all metabolites in each cluster<a class="headerlink" href="#Merging-all-metabolites-in-each-cluster" title="Permalink to this headline">¶</a></h3>
 <p>We create a single “super-metabolite” for each cluster, containing the
 sum of frequencies of all metabolites in the cluster.</p>
 <div class="nbinput docutils container">
@@ -5960,6 +5975,9 @@ if (IPython.notebook.kernel != null) {
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="A-code-snipplet-to-add-all-gnps-ids-to-each-merged-cluster">
+<h3>A code snipplet to add all gnps ids to each merged cluster<a class="headerlink" href="#A-code-snipplet-to-add-all-gnps-ids-to-each-merged-cluster" title="Permalink to this headline">¶</a></h3>
 <p>They are added to a new feature_metadata field called “gnps_all”</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -5986,6 +6004,9 @@ if (IPython.notebook.kernel != null) {
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="Now-we-can-do-this-differential-abundance-analysis-on-these-super-metabolites">
+<h3>Now we can do this differential abundance analysis on these super-metabolites<a class="headerlink" href="#Now-we-can-do-this-differential-abundance-analysis-on-these-super-metabolites" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [25]:
@@ -6850,8 +6871,11 @@ if (IPython.notebook.kernel != null) {
 </div>
 </div>
 </div>
+</div>
 <div class="section" id="Looking-for-metabolite-artifacts">
-<h1>Looking for metabolite artifacts<a class="headerlink" href="#Looking-for-metabolite-artifacts" title="Permalink to this headline">¶</a></h1>
+<h2>Looking for metabolite artifacts<a class="headerlink" href="#Looking-for-metabolite-artifacts" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="(split-features-due-to-RT/MZ-tolerances-during-feature-finding)">
+<h3>(split features due to RT/MZ tolerances during feature finding)<a class="headerlink" href="#(split-features-due-to-RT/MZ-tolerances-during-feature-finding)" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes feature finding is not perfect, and we get several metabolites
 with very close mz/rt.</p>
 <p>In order to identify these occurances, we sort the features by the MZ
@@ -7695,6 +7719,9 @@ if (IPython.notebook.kernel != null) {
 <div class="output_area docutils container">
 <script type="application/vnd.jupyter.widget-view+json">{"model_id": "50ecaf28175849dda4945e214bca6df7"}</script></div>
 </div>
+</div>
+<div class="section" id="Similar-mz-and-RT-and-same-trend-across-samples">
+<h3>Similar mz and RT and same trend across samples<a class="headerlink" href="#Similar-mz-and-RT-and-same-trend-across-samples" title="Permalink to this headline">¶</a></h3>
 <p>Here are some examples we found when interactively looking at the
 heatmap.</p>
 <p>We get the rect coordinates by pressing the “print axes ranges” button
@@ -8535,6 +8562,9 @@ if (IPython.notebook.kernel != null) {
 <p><strong>Observation 4a.</strong> They have MZ of 994.5221123 and 977.4951502999999
 and RT of 228.17 and 227.38. They could be NH4 adducts of the same ion
 (<a class="reference external" href="http://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator">http://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator</a>)</p>
+</div>
+<div class="section" id="Identical-m/z-and-very-close-RT">
+<h3>Identical m/z and very close RT<a class="headerlink" href="#Identical-m/z-and-very-close-RT" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [30]:
@@ -10212,6 +10242,8 @@ adducts, isomers or split features in these data. All this could be done
 by following some easy steps in calour in a single Jupyter notebook (as
 opposed to using different software packages for each task,
 re-formatting data for each platform and so on)</p>
+</div>
+</div>
 </div>
 
 
