@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.amplicon_experiment.AmpliconExperiment.classify &#8212; calour 2018.5.2 documentation</title>
+    <title>calour.amplicon_experiment.AmpliconExperiment.classify &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>2018.5.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>2018.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,7 @@
 <h1>calour.amplicon_experiment.AmpliconExperiment.classify<a class="headerlink" href="#calour-amplicon-experiment-ampliconexperiment-classify" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.amplicon_experiment.AmpliconExperiment.classify">
-<code class="descclassname">AmpliconExperiment.</code><code class="descname">classify</code><span class="sig-paren">(</span><em>fields</em>, <em>estimator</em>, <em>cv=&lt;sklearn.model_selection._split.RepeatedStratifiedKFold object&gt;</em>, <em>predict='predict_proba'</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.classify" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">AmpliconExperiment.</code><code class="descname">classify</code><span class="sig-paren">(</span><em>fields</em>, <em>estimator</em>, <em>cv=&lt;sklearn.model_selection._split.RepeatedStratifiedKFold object&gt;</em>, <em>predict='predict_proba'</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.10.1/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.amplicon_experiment.AmpliconExperiment.classify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate classification during cross validation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -142,13 +142,13 @@ If it is a list of str, this function does multi-task (aka multioutput-multiclas
 classification and you must provide an <cite>estimator</cite> of multi-task classifier. See
 <cite>http://scikit-learn.org/stable/modules/multiclass.html</cite> for more information.</li>
 <li><strong>estimator</strong> (estimator object implementing <cite>fit</cite> and <cite>predict</cite>) – scikit-learn estimator. e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestClassifer</span></code></li>
-<li><strong>cv</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>cross-validation generator</em><em> or </em><em>an iterable</em>) – similar to the <cite>cv</cite> parameter in <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a></li>
+<li><strong>cv</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>cross-validation generator</em><em> or </em><em>an iterable</em>) – similar to the <cite>cv</cite> parameter in <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.20.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a></li>
 <li><strong>predict</strong> (<em>{'predict'</em><em>, </em><em>'predict_proba'}</em>) – the function used to predict the validation sets. Some estimators
 have both functions to predict class or predict the probablity of each class
-for a sample. For example, see <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestClassifier</span></code></a></li>
+for a sample. For example, see <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="(in scikit-learn v0.20.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestClassifier</span></code></a></li>
 <li><strong>params</strong> (<em>dict of string to sequence</em><em>, or </em><em>sequence of such</em>) – For example, the output of
-<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterGrid.html#sklearn.model_selection.ParameterGrid" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterGrid</span></code></a> or
-<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterSampler.html#sklearn.model_selection.ParameterSampler" title="(in scikit-learn v0.19.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterSampler</span></code></a>. By default,
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterGrid.html#sklearn.model_selection.ParameterGrid" title="(in scikit-learn v0.20.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterGrid</span></code></a> or
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterSampler.html#sklearn.model_selection.ParameterSampler" title="(in scikit-learn v0.20.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.ParameterSampler</span></code></a>. By default,
 it uses whatever default parameters of the <cite>estimator</cite> set in
 <cite>scikit-learn</cite></li>
 </ul>

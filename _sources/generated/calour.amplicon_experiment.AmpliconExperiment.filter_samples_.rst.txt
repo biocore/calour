@@ -1,0 +1,8 @@
+:orphan:
+
+calour.amplicon_experiment.AmpliconExperiment.filter_samples_
+=============================================================
+
+.. currentmodule:: calour.amplicon_experiment
+
+.. automethod:: AmpliconExperiment.filter_samples_

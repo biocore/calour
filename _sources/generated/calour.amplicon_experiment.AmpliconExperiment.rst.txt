@@ -84,6 +84,8 @@ calour.amplicon_experiment.AmpliconExperiment
          
             ~AmpliconExperiment.filter_samples
          
+            ~AmpliconExperiment.filter_samples_
+         
             ~AmpliconExperiment.filter_taxonomy
          
             ~AmpliconExperiment.find_lowest_taxonomy

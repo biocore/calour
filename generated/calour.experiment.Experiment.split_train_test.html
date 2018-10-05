@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>calour.experiment.Experiment.split_train_test &#8212; calour 2018.5.2 documentation</title>
+    <title>calour.experiment.Experiment.split_train_test &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -54,7 +54,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           calour docs</a>
-        <span class="navbar-text navbar-version pull-left"><b>2018.5.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>2018.10.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,17 +130,17 @@
 <h1>calour.experiment.Experiment.split_train_test<a class="headerlink" href="#calour-experiment-experiment-split-train-test" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="calour.experiment.Experiment.split_train_test">
-<code class="descclassname">Experiment.</code><code class="descname">split_train_test</code><span class="sig-paren">(</span><em>test_size</em>, <em>train_size=None</em>, <em>stratify=None</em>, <em>shuffle=False</em>, <em>random_state=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.5.2/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.split_train_test" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">Experiment.</code><code class="descname">split_train_test</code><span class="sig-paren">(</span><em>test_size</em>, <em>train_size=None</em>, <em>stratify=None</em>, <em>shuffle=False</em>, <em>random_state=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.10.1/calour/util.py#L121"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.experiment.Experiment.split_train_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Split experiment into train experiment and test experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>train_size</strong><strong>, </strong><strong>shuffle</strong><strong>, </strong><strong>random_state</strong> (<em>test_size</em><em>,</em>) – They are passed to <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="(in scikit-learn v0.19.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.model_selection.train_test_split()</span></code></a>.
+<li><strong>train_size</strong><strong>, </strong><strong>shuffle</strong><strong>, </strong><strong>random_state</strong> (<em>test_size</em><em>,</em>) – They are passed to <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="(in scikit-learn v0.20.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.model_selection.train_test_split()</span></code></a>.
 Please check documentation there.</li>
 <li><strong>stratify</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>array-like</em><em> or </em><em>None</em>) – If it is array-like or None, it is directly passed to
-<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="(in scikit-learn v0.19.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.model_selection.train_test_split()</span></code></a>. If it is a
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="(in scikit-learn v0.20.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.model_selection.train_test_split()</span></code></a>. If it is a
 str, it must be a valid column name in the sample_metadata and
 this column will be passed to the function for stratified split.</li>
 </ul>

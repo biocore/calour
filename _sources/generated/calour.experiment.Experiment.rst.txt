@@ -78,6 +78,8 @@ calour.experiment.Experiment
          
             ~Experiment.filter_samples
          
+            ~Experiment.filter_samples_
+         
             ~Experiment.from_pandas
          
             ~Experiment.get_data
