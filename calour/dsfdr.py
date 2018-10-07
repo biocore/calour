@@ -165,9 +165,8 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         for i in range(np.shape(data)[0]):
             nonzeros = np.count_nonzero(data[i, :])
             if nonzeros < min(n0, n1):
-                pval_min = (comb(n0, nonzeros, exact=True) +
-                            comb(n1, nonzeros,
-                                 exact=True)) / comb(n0 + n1, nonzeros)
+                pval_min = (comb(n0, nonzeros, exact=True)
+                            + comb(n1, nonzeros, exact=True)) / comb(n0 + n1, nonzeros)
                 if pval_min <= alpha:
                     index.append(i)
             else:
