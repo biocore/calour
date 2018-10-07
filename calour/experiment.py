@@ -135,9 +135,9 @@ class Experiment:
             other_data = other.data.toarray()
         else:
             other_data = other.data
-        return (np.array_equal(data, other_data) and
-                pd.DataFrame.equals(self.feature_metadata, other.feature_metadata) and
-                pd.DataFrame.equals(self.sample_metadata, other.sample_metadata))
+        return (np.array_equal(data, other_data)
+                and pd.DataFrame.equals(self.feature_metadata, other.feature_metadata)
+                and pd.DataFrame.equals(self.sample_metadata, other.sample_metadata))
 
     def __ne__(self, other):
         return not (self == other)

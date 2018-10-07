@@ -1,3 +1,17 @@
+Installation instructions for Calour
+====================================
+There are three ways to obtain Calour:
+- Install locally on Max/Linux/Windows 10 computer
+
+This is the recommended method for long term Calour usage, as it enables full utilization of the computer resources, as well as easy upgrades. However, the installation process is more complicated (full instructions are detailed below).
+
+- Run locally using a virtualbox image
+
+This enables easy installation, while still running locally on selected computer.
+
+- Run remotely on a mybinder server
+
+Enables hands on trying of Calour without the need to install. However, the mybinder server is not intended for heavy duty work.
 
 Installation instructions for Mac/Linux/Windows 10
 ==================================================
@@ -122,3 +136,54 @@ To use the calour GUI, type and run:
 ```
 ezcalour.py
 ```
+
+Installing Calour using the virtualbox image
+============================================
+Installing VirtualBox
+---------------------
+If not installed, install VirtualBox on your computer. VirtualBox is availble for Windows/Mac and Linux, and can be obtainined from [https://www.virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads).
+
+Downloading the Calour virtualbox image
+---------------------------------------
+Download the Calour image from [http://www.mediafire.com/file/13f6vetjuquha6b/calour_vm_2018_5_2.ova](http://www.mediafire.com/file/13f6vetjuquha6b/calour_vm_2018_5_2.ova). Note this is a large file (~3.5Gb) so download can take some time.
+
+Importing the Calour image to virtualbox
+----------------------------------------
+Run VirtualBox, and select "open appliace" from the file menu. Choose the Calour image file downloaded in the previous step.
+
+Running Calour
+--------------
+After running the Calour virtual machine in VirtualBox, open a new terminal window (using the desktop shortcut). To run EZCalour, type:
+```
+ezcalour
+```
+
+To run a jupyter notebook, type:
+```
+jupyter notebook
+```
+
+Calour example notebooks and datasets are located at:
+```
+/home/calour/examples
+```
+
+NOTE: the root user and password for the virtual machine are both: calour
+
+Running Calour on a remote mybinder server
+==========================================
+Go to the Calour mybinder server
+--------------------------------
+open [https://mybinder.org/v2/gh/biocore/calour/master?filepath=doc%2Fsource%2Fnotebooks](https://mybinder.org/v2/gh/biocore/calour/master?filepath=doc%2Fsource%2Fnotebooks)
+
+Viewing/running tutorial notebooks
+----------------------------------
+Select the notebook (*.ipynb) from the list
+
+Uploading new data
+------------------
+Select the "upload" button and upload the biom table/mapping files
+
+Creating a new analysis notebook
+--------------------------------
+Select the "new" button. Alternatively, you can select the "Generin Analysis.ipynb" notebook as a convenient starting point for analyzing microbiome data using Calour
