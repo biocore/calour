@@ -1,6 +1,4 @@
 coveralls
 sphinx-autodoc-typehints
 docrep
-nbsphinx
-scikit-bio>=0.5.1
 biom-format

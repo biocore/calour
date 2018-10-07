@@ -10,5 +10,7 @@ h5py
 scikit-learn
 statsmodels
 ipywidgets
+scikit-bio>=0.5.1
 sphinx
+nbsphinx
 sphinx_bootstrap_theme
