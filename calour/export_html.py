@@ -101,13 +101,7 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     logger.debug('export_html heatmap')
 
     numrows, numcols = exp.shape
-    # step 1. transform data
-    if transform is None:
-        data = exp.get_data(sparse=False)
-    else:
-        logger.debug('transform exp with %r with param %r' %
-                     (transform, kwargs))
-        data = transform(exp, inplace=False, **kwargs).data
+    data = exp.get_data(sparse=False)
 
     # step 2. plot heatmap.
     # init the default colormap
