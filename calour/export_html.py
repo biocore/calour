@@ -29,7 +29,6 @@ import numpy as np
 import matplotlib as mpl
 
 from . import Experiment
-from .transforming import log_n
 from .heatmap.heatmap import _transition_index
 
 logger = getLogger(__name__)
@@ -59,7 +58,7 @@ def _list_to_string(l):
 
 
 def export_html(exp: Experiment, sample_field=None, feature_field=None, title=None,
-                xticklabel_len=50, cmap=None, clim=None, norm=mpl.colors.LogNorm(),
+                xticklabel_len=50, cmap=None, clim=(None, None), norm=mpl.colors.LogNorm(),
                 output_file='out', html_template=None, **kwargs):
     '''Export an interactive html heatmap for the experiment.
 
