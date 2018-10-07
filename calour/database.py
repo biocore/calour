@@ -80,7 +80,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
+def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None, **kwargs):
     '''Add a field to the feature metadata, with most common term for each feature
 
     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment.
@@ -98,6 +98,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         None to get default type
     ignore_exp : list of int or None, optional
         list of experiments to ignore when adding the terms
+    **kwargs: database specific additional parameters (see database interface get_feature_terms() function for specific terms)
 
     Returns
     -------
@@ -110,7 +111,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     logger.debug('found %d features' % len(features))
 
     # get the per feature term scores
-    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
+    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp, **kwargs)
     logger.debug('got %d terms from database' % len(term_list))
 
     # find the most enriched term (out of the list) for each feature
