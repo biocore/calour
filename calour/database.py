@@ -363,9 +363,8 @@ class Database(ABC):
 
         Returns
         -------
-        feature_terms : dict of {feature(str): dict term_scores {term(str): score(float)}}
-            the terms associated with each feature and their corresponding score (higher is more associated with the feature)
-            key is the feature, value is a dict with terms as keys, term_score as the value
+        featyre_terms : dict of term scores associated with each feature.
+            Key is the feature (str), and the value is a dict of score for each term (i.e. key is the term str, value is the score for this term in this feature)
         '''
         logger.debug('Generic function for get_feature_terms')
         return {}
