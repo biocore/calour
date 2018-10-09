@@ -243,7 +243,11 @@ def _read_metadata(ids, f, kwargs):
         # check if we have duplicate index ids (which will raise)
         dup = metadata.index.duplicated(keep=False)
         if dup.sum() > 0:
-            errmsg = '%d duplicate id values encountered in column %s of mapping file %r:' % (dup.sum(), metadata.index.name, f)
+            column_str = '%d' % index_col
+            if metadata.index.name is not None:
+                if len(metadata.index.name) > 0:
+                    column_str = metadata.index.name
+            errmsg = '%d duplicate id values encountered in index column %s of mapping file %r:' % (dup.sum(), column_str, f)
             errmsg += '\n%s' % set(metadata.index[dup].values)
             raise ValueError(errmsg)
         metadata = metadata.reindex(ids)
