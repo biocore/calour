@@ -26,9 +26,9 @@ import urllib
 from pkg_resources import resource_filename
 
 import numpy as np
+import matplotlib as mpl
 
 from . import Experiment
-from .transforming import log_n
 from .heatmap.heatmap import _transition_index
 
 logger = getLogger(__name__)
@@ -58,7 +58,7 @@ def _list_to_string(l):
 
 
 def export_html(exp: Experiment, sample_field=None, feature_field=None, title=None,
-                xticklabel_len=50, cmap=None, clim=None, transform=log_n,
+                xticklabel_len=50, cmap=None, clim=(None, None), norm=mpl.colors.LogNorm(),
                 output_file='out', html_template=None, **kwargs):
     '''Export an interactive html heatmap for the experiment.
 
@@ -83,8 +83,8 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     clim : tuple of (float, float) or None, optional
         the min and max values for the heatmap or None to use all range. It uses the min
         and max values in the ``data`` array by default.
-    transform : function, optional
-        The transform function to apply to the data before plotting. default is log_n
+    norm : matplotlib.colors.Normalize or None
+        passed to ``norm`` parameter of matplotlib.pyplot.imshow. Default is log scale.
     output_file : str, optional
         Name of the output html file (no .html ending - it will be appended).
     html_template : str or None, optional
@@ -100,13 +100,7 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     logger.debug('export_html heatmap')
 
     numrows, numcols = exp.shape
-    # step 1. transform data
-    if transform is None:
-        data = exp.get_data(sparse=False)
-    else:
-        logger.debug('transform exp with %r with param %r' %
-                     (transform, kwargs))
-        data = transform(exp, inplace=False, **kwargs).data
+    data = exp.get_data(sparse=False)
 
     # step 2. plot heatmap.
     # init the default colormap
@@ -118,7 +112,13 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.imshow(data.transpose(), interpolation='nearest')
+
+    # plot the heatmap
+    vmin, vmax = clim
+    # logNorm requires positive values. set it to default None if vmin is zero
+    if vmin == 0:
+        vmin = None
+    ax.imshow(data.transpose(), interpolation='nearest', vmin=vmin, vmax=vmax, cmap=cmap, norm=norm)
 
     if title is None:
         title = exp.description
