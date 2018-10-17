@@ -23,7 +23,6 @@ Functions
 
 from logging import getLogger
 from abc import ABC
-from collections import defaultdict
 import importlib
 
 from .util import get_config_value, get_config_file, get_config_sections
@@ -81,7 +80,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
                      'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
 
 
-def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None):
+def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None, **kwargs):
     '''Add a field to the feature metadata, with most common term for each feature
 
     Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment.
@@ -99,6 +98,7 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
         None to get default type
     ignore_exp : list of int or None, optional
         list of experiments to ignore when adding the terms
+    **kwargs: database specific additional parameters (see database interface get_feature_terms() function for specific terms)
 
     Returns
     -------
@@ -109,25 +109,33 @@ def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_nam
     db = _get_database_class(dbname, exp)
     features = exp.feature_metadata.index.values
     logger.debug('found %d features' % len(features))
-    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp)
+
+    # get the per feature term scores
+    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp, **kwargs)
     logger.debug('got %d terms from database' % len(term_list))
+
+    # find the most enriched term (out of the list) for each feature
     feature_terms = []
     for cfeature in features:
-        term_count = defaultdict(int)
-        if len(term_list[cfeature]) == 0:
-            feature_terms.append('NA')
+        if cfeature not in term_list:
+            feature_terms.append('na')
             continue
-        for cterm in term_list[cfeature]:
-            if use_term_list is not None:
-                if cterm in use_term_list:
-                    term_count[cterm] += 1
-            else:
-                term_count[cterm] += 1
-        if len(term_count) == 0:
-            max_term = 'other'
+        if len(term_list[cfeature]) == 0:
+            feature_terms.append('na')
+            continue
+        if use_term_list is None:
+            bterm = max(term_list[cfeature], key=term_list[cfeature].get)
         else:
-            max_term = max(term_count, key=term_count.get)
-        feature_terms.append(max_term)
+            bterm = 'other'
+            bscore = 0
+            for cterm in use_term_list:
+                if cterm not in term_list[cfeature]:
+                    continue
+                cscore = term_list[cfeature][cterm]
+                if cscore > bscore:
+                    bscore = cscore
+                    bterm = cterm
+        feature_terms.append(bterm)
     exp.feature_metadata[field_name] = feature_terms
     return exp
 
@@ -363,9 +371,8 @@ class Database(ABC):
 
         Returns
         -------
-        feature_terms : dict of {feature(str): dict term_scores {term(str): score(float)}}
-            the terms associated with each feature and their corresponding score (higher is more associated with the feature)
-            key is the feature, value is a dict with terms as keys, term_score as the value
+        feature_terms : dict of term scores associated with each feature.
+            Key is the feature (str), and the value is a dict of score for each term (i.e. key is the term str, value is the score for this term in this feature)
         '''
         logger.debug('Generic function for get_feature_terms')
         return {}
