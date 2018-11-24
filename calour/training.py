@@ -701,7 +701,7 @@ def plot_calibration(y_true, y_prob, bins=10):
 
     fraction_of_positives, mean_predicted_value = calibration_curve(y_true, y_prob, n_bins=bins)
 
-    fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={'height_ratios':[3, 1]}, figsize=(6, 8))
+    fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={'height_ratios': [3, 1]}, figsize=(6, 8))
     ax1.plot(mean_predicted_value, fraction_of_positives, "s-")
     ax1.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
     ax1.set_ylabel("Fraction of young samples")

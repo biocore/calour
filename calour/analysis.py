@@ -37,7 +37,7 @@ logger = getLogger(__name__)
 
 @Experiment._record_sig
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
-    '''Find features with correlation to a numeric metadata field
+    '''Find features with correlation to a numeric metadata field.
 
     With permutation based p-values and multiple hypothesis correction
 
@@ -46,10 +46,12 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     field: str
         The field to test by. Values are converted to numeric.
     method : str or function
-        the method to use for the t-statistic test. options:
-        'spearman' : spearman correlation (numeric)
-        'pearson' : pearson correlation (numeric)
-        function : use this function to calculate the t-statistic (input is data,labels, output is array of float)
+        the method to use for the statistic. options:
+
+        * 'spearman' : spearman correlation
+        * 'pearson' : pearson correlation
+        * function : use this function to calculate the statistic (input is data,labels, output is array of float)
+
     nonzero : bool, optional
         True to calculate the correlation only for samples where the feature is present (>0).
         False (default) to calculate the correlation over all samples
@@ -57,10 +59,12 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         Note: can be set to True only using 'spearman' or 'pearson', not using a custom function
     transform : str or None
         transformation to apply to the data before caluculating the statistic.
-        'rankdata' : rank transfrom each OTU reads
-        'log2data' : calculate log2 for each OTU using minimal cutoff of 2
-        'normdata' : normalize the data to constant sum per samples
-        'binarydata' : convert to binary absence/presence
+
+        * 'rankdata' : rank transfrom each OTU reads
+        * 'log2data' : calculate log2 for each OTU using minimal cutoff of 2
+        * 'normdata' : normalize the data to constant sum per samples
+        * 'binarydata' : convert to binary absence/presence
+
     alpha : float
         the desired FDR control level
     numperm : int
@@ -135,11 +139,12 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         The values in the `field` column to select the second group.
         `None` (default) to compare to all other samples (excluding `val1`).
     method : str or function
-        the method to compute a statistic. options:
+        the method to compute the statistic. options:
 
         * 'meandiff' : mean(A)-mean(B)
         * 'stdmeandiff' : (mean(A)-mean(B))/(std(A)+std(B))
         * callable : use this to calculate the statistic (input is data,labels, output is array of float)
+
     transform : str or None
         transformation to apply to the data before caluculating the statistic.
 
@@ -147,6 +152,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         * 'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         * 'normdata' : normalize the data to constant sum per samples
         * 'binarydata' : convert to binary absence/presence
+
     alpha : float (optional)
         the desired FDR control level
     numperm : int (optional)
@@ -157,12 +163,11 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         * 'dsfdr' : the discrete FDR control method
         * 'bhfdr' : Benjamini-Hochberg FDR method
         * 'byfdr' : Benjamini-Yekutielli FDR method
-        * 'filterBH' : Benjamini-Hochberg FDR method following
-        removal of all features with minimal possible p-value less
-        than alpha (e.g. a feature that appears in only 1 sample
-        can obtain a minimal p-value of 0.5 and will therefore be
-        removed when say alpha=0.1)
-
+        * 'filterBH' : Benjamini-Hochberg FDR method following removal
+          of all features with minimal possible p-value less than
+          alpha (e.g. a feature that appears in only 1 sample can
+          obtain a minimal p-value of 0.5 and will therefore be
+          removed when say alpha=0.1)
     random_seed : int or None (optional)
         int to set the numpy random seed to this number before running the random permutation test.
         None to not set the numpy random seed
@@ -218,6 +223,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 @Experiment._record_sig
 def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Test the differential expression between multiple sample groups using the Kruskal Wallis test.
+
     uses a permutation based fdr (dsfdr) for bacteria that have a significant difference.
 
     Parameters
@@ -227,10 +233,12 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
         The field to test by
     transform : str or None
         transformation to apply to the data before caluculating the statistic
-        'rankdata' : rank transfrom each OTU reads
-        'log2data' : calculate log2 for each OTU using minimal cutoff of 2
-        'normdata' : normalize the data to constant sum per samples
-        'binarydata' : convert to binary absence/presence
+
+        * 'rankdata' : rank transfrom each OTU reads
+        * 'log2data' : calculate log2 for each OTU using minimal cutoff of 2
+        * 'normdata' : normalize the data to constant sum per samples
+        * 'binarydata' : convert to binary absence/presence
+
     alpha : float
         the desired FDR control level
     numperm : int
@@ -243,6 +251,10 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     -------
     newexp : Experiment
         The experiment with only significant (FDR<=maxfval) difference, sorted according to difference
+
+    See Also
+    --------
+    diff_abundance
     '''
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
