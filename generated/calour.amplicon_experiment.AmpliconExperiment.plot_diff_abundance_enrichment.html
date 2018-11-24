@@ -7,7 +7,7 @@
     <title>calour.amplicon_experiment.AmpliconExperiment.plot_diff_abundance_enrichment &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -143,20 +143,20 @@ Options are:
 ‘parentterm’ - ontology terms including parent terms associated with each feature.
 ‘annotation’ - the full annotation strings associated with each feature
 ‘combined’ - combine ‘term’ and ‘annotation’</li>
-<li><strong>max_show</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>(</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – The maximal number of terms to show
+<li><strong>max_show</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>(</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – The maximal number of terms to show
 if None, show all terms
 if int, show at most the max_show maximal positive and negative terms
 if (int, int), show at most XXX maximal positive and YYY maximal negative terms</li>
-<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.0)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The axis to which to plot the figure
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – The axis to which to plot the figure
 None (default) to create a new figure</li>
-<li><strong>colors</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – Colors for terms enriched in group1 or group2 respectively</li>
+<li><strong>colors</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – Colors for terms enriched in group1 or group2 respectively</li>
 <li><strong>show_legend</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> (</em><em>optional</em><em>)</em>) – True to show the color legend, False to hide it</li>
 <li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li>tuple of <a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></a>, <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> with</li>
+<li>tuple of <a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.axes.Axes</span></code></a>, <a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> with</li>
 <li><em>terms as features, (original features) as samples, result of</em></li>
 <li><a class="reference internal" href="calour.database.enrichment.html#calour.database.enrichment" title="calour.database.enrichment"><code class="xref py py-func docutils literal notranslate"><span class="pre">database.enrichment()</span></code></a></li>
 </ul>
@@ -182,7 +182,7 @@ None (default) to create a new figure</li>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

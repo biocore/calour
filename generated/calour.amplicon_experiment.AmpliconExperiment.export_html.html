@@ -7,7 +7,7 @@
     <title>calour.amplicon_experiment.AmpliconExperiment.export_html &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -138,20 +138,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sample_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The field to display on the x-axis (sample).
+<li><strong>sample_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – The field to display on the x-axis (sample).
 None (default) to not show x labels.
 str to display field values for this field.</li>
-<li><strong>feature_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Name of the field to display on the y-axis (features) or None not to display names</li>
-<li><strong>title</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> (</em><em>optional</em><em>)</em>) – None (default) to show experiment description field as title. str to set title to str.</li>
-<li><strong>xticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em><em> or </em><em>None</em>) – The maximal length for the x label strings (will be cut to
+<li><strong>feature_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – Name of the field to display on the y-axis (features) or None not to display names</li>
+<li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> (</em><em>optional</em><em>)</em>) – None (default) to show experiment description field as title. str to set title to str.</li>
+<li><strong>xticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The maximal length for the x label strings (will be cut to
 this length if longer). Used to prevent long labels from
 taking too much space. None indicates no cutting</li>
-<li><strong>cmap</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to use mpl default color map. str to use colormap named str.</li>
-<li><strong>clim</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em><em>, </em><em>optional</em>) – the min and max values for the heatmap or None to use all range. It uses the min
+<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to use mpl default color map. str to use colormap named str.</li>
+<li><strong>clim</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – the min and max values for the heatmap or None to use all range. It uses the min
 and max values in the <code class="docutils literal notranslate"><span class="pre">data</span></code> array by default.</li>
 <li><strong>transform</strong> (<em>function</em><em>, </em><em>optional</em>) – The transform function to apply to the data before plotting. default is log_n</li>
 <li><strong>output_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the output html file (no .html ending - it will be appended).</li>
-<li><strong>html_template</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Name of the html template to use. None to use the default export_html_template.html template</li>
+<li><strong>html_template</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – Name of the html template to use. None to use the default export_html_template.html template</li>
 </ul>
 </td>
 </tr>
@@ -174,7 +174,7 @@ and max values in the <code class="docutils literal notranslate"><span class="pr
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

@@ -7,7 +7,7 @@
     <title>calour.io.read &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -143,9 +143,9 @@ to align with biom table.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – file path to the biom table.</li>
-<li><strong>sample_metadata_file</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to just use sample names (no additional metadata).
+<li><strong>sample_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to just use sample names (no additional metadata).
 if not None, file path to the sample metadata (aka mapping file in QIIME).</li>
-<li><strong>feature_metadata_file</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – file path to the feature metadata.</li>
+<li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – file path to the feature metadata.</li>
 <li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – description of the experiment</li>
 <li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – read the biom table into sparse or dense array</li>
 <li><strong>data_file_type</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – the data_file format. options:
@@ -162,13 +162,13 @@ as int and parse the file as latin-8 instead of utf-8. By default, it assumes th
 the metadata files is sample/feature IDs and is read in as row index. To avoid this, please provide
 {‘index_col’: False}.</li>
 <li><strong>cls</strong> (<code class="docutils literal notranslate"><span class="pre">class</span></code>, optional) – what class object to read the data into (<a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Experiment</span></code></a> by default)</li>
-<li><strong>table_sample_id_proc</strong> (<em>None</em><em> or </em><em>callable</em><em>, </em><em>optional</em>) – </li>
-<li><strong>table_feature_id_proc</strong> (<em>None</em><em> or </em><em>callable</em><em>, </em><em>optional</em>) – if not None, modify each sample/feature id in the table using the callable function.
+<li><strong>table_sample_id_proc</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><em>callable</em><em>, </em><em>optional</em>) – </li>
+<li><strong>table_feature_id_proc</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><em>callable</em><em>, </em><em>optional</em>) – if not None, modify each sample/feature id in the table using the callable function.
 The callable accepts a list of str and returns a list of str (sample/feature ids after processing).
 Useful in metabolomics experiments, where the sampleIDs in the data table contain additional information compared to the
 mapping file (using a ‘_’ separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.</li>
 <li><strong>sample_in_row</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – False if data table columns are sample, True if rows are samples</li>
-<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – normalize each sample to the specified read count. <code class="docutils literal notranslate"><span class="pre">None</span></code> to not normalize</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – normalize each sample to the specified read count. <code class="docutils literal notranslate"><span class="pre">None</span></code> to not normalize</li>
 </ul>
 </td>
 </tr>
@@ -197,7 +197,7 @@ mapping file (using a ‘_’ separator), and this needs to be removed in order 
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

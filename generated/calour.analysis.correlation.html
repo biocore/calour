@@ -7,7 +7,7 @@
     <title>calour.analysis.correlation &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -152,7 +152,7 @@ function : use this function to calculate the t-statistic (input is data,labels,
 False (default) to calculate the correlation over all samples
 Note: setting nonzero to True slows down the calculation
 Note: can be set to True only using ‘spearman’ or ‘pearson’, not using a custom function</li>
-<li><strong>transform</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – transformation to apply to the data before caluculating the statistic.
+<li><strong>transform</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – transformation to apply to the data before caluculating the statistic.
 ‘rankdata’ : rank transfrom each OTU reads
 ‘log2data’ : calculate log2 for each OTU using minimal cutoff of 2
 ‘normdata’ : normalize the data to constant sum per samples
@@ -160,7 +160,7 @@ Note: can be set to True only using ‘spearman’ or ‘pearson’, not using a
 <li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – the desired FDR control level</li>
 <li><strong>numperm</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of permutations to perform</li>
 <li><strong>fdr_method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – method to compute FDR. Allowed method include “”, “”</li>
-<li><strong>random_seed</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – int to set the numpy random seed to this number before running the random permutation test.
+<li><strong>random_seed</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – int to set the numpy random seed to this number before running the random permutation test.
 None to not set the numpy random seed</li>
 </ul>
 </td>
@@ -190,7 +190,7 @@ None to not set the numpy random seed</li>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

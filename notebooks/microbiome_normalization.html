@@ -7,7 +7,7 @@
     <title>Microbiome data normalization tutorial &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -106,7 +106,7 @@
 <li><a class="reference internal" href="#TSS-normalization-(normalize)">TSS normalization (<code class="docutils literal notranslate"><span class="pre">normalize</span></code>)</a></li>
 <li><a class="reference internal" href="#Compositional-normalization-(normalize_compositional)">Compositional normalization (<code class="docutils literal notranslate"><span class="pre">normalize_compositional</span></code>)</a><ul>
 <li><a class="reference internal" href="#Effect-of-a-high-frequency-artificial-bacteria">Effect of a high frequency artificial bacteria</a></li>
-<li><a class="reference internal" href="#Let's-fix-by-doing-the-compositional-normalization">Let’s fix by doing the compositional normalization</a></li>
+<li><a class="reference internal" href="#Let’s-fix-by-doing-the-compositional-normalization">Let’s fix by doing the compositional normalization</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#Normalization-on-part-of-the-features-(normalize_by_subset_features)">Normalization on part of the features (<code class="docutils literal notranslate"><span class="pre">normalize_by_subset_features</span></code>)</a></li>
@@ -310,7 +310,7 @@ div.nboutput div.output_area.stderr {
 <div class="section" id="Microbiome-data-normalization-tutorial">
 <h1>Microbiome data normalization tutorial<a class="headerlink" href="#Microbiome-data-normalization-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This is a jupyter notebook example of the different ways to normalize
-the reads (i.e. TSS, rarefaction, compositionality correction, etc).</p>
+the reads (i.e.&nbsp;TSS, rarefaction, compositionality correction, etc).</p>
 <div class="section" id="Setup">
 <h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput docutils container">
@@ -350,7 +350,7 @@ individuals with myalgic encephalomyelitis/chronic fatigue syndrome.</p>
 <p>for each sample we normalize to 10000 reads/sample.</p>
 <p>This is done by dividing the number of reads of each feature in a sample
 by the total sum of reads (of all features) in the sample, and then
-multiplying by the desired number of reads (i.e. 10000).</p>
+multiplying by the desired number of reads (i.e.&nbsp;10000).</p>
 <p>After this normalization, the sum of (normalized) reads in each sample
 will be 10000.</p>
 <p>This is different from rarefaction, since each feature can have a
@@ -358,8 +358,8 @@ non-integer number of reads, and less information is thrown away.
 However, you need to be careful not to have a bias by the original
 number of reads (mostly in binary methods). dsFDR works fine with this
 normalization.</p>
-<p>Note that we also throw away samples with less than min_reads=1000
-reads total (before normalization). This is in order to reduce the
+<p>Note that we also throw away samples with less than min_reads=1000 reads
+total (before normalization). This is in order to reduce the
 discretization effect in samples with low number of reads.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -433,8 +433,7 @@ AmpliconExperiment (&#34;chronic-fatigue-syndrome.biom&#34;) with 87 samples, 21
 </div>
 </div>
 <p>The original number of reads per sample (before normalization) is stored
-in the sample_metadata table in the field
-“_calour_original_abundance”</p>
+in the sample_metadata table in the field “_calour_original_abundance”</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [5]:
@@ -1428,8 +1427,8 @@ between healthy and sick</p>
 <p>We get more bacteria which are higher in ‘Patient’ since bacteria 0 is
 now very high in controls, and data is TSS normalized</p>
 </div>
-<div class="section" id="Let's-fix-by-doing-the-compositional-normalization">
-<h3>Let’s fix by doing the compositional normalization<a class="headerlink" href="#Let's-fix-by-doing-the-compositional-normalization" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="Let’s-fix-by-doing-the-compositional-normalization">
+<h3>Let’s fix by doing the compositional normalization<a class="headerlink" href="#Let’s-fix-by-doing-the-compositional-normalization" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [13]:
@@ -1569,7 +1568,7 @@ also contain the ignored features).</p>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

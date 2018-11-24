@@ -7,7 +7,7 @@
     <title>calour.analysis.diff_abundance &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -131,9 +131,11 @@
 <dl class="function">
 <dt id="calour.analysis.diff_abundance">
 <code class="descclassname">calour.analysis.</code><code class="descname">diff_abundance</code><span class="sig-paren">(</span><em>exp: calour.experiment.Experiment</em>, <em>field</em>, <em>val1</em>, <em>val2=None</em>, <em>method='meandiff'</em>, <em>transform='rankdata'</em>, <em>numperm=1000</em>, <em>alpha=0.1</em>, <em>fdr_method='dsfdr'</em>, <em>random_seed=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/biocore/calour/blob/2018.10.1/calour/experiment.py#L223"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calour.analysis.diff_abundance" title="Permalink to this definition">¶</a></dt>
-<dd><p>test the differential expression between 2 groups (val1 and val2 in field field)
-using permutation based fdr (dsfdr)
-for bacteria that have a significant difference.</p>
+<dd><p>Differential abundance test between 2 groups of samples for all the features.</p>
+<p>It uses permutation based nonparametric test and then applies
+multiple hypothesis correction. The idea is that you compute a
+defined statistic and compare it to the distribution of the same
+statistic values computed from many permutations.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This function is also available as a class method <a class="reference internal" href="calour.experiment.Experiment.diff_abundance.html#calour.experiment.Experiment.diff_abundance" title="calour.experiment.Experiment.diff_abundance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Experiment.diff_abundance()</span></code></a></p>
@@ -144,33 +146,40 @@ for bacteria that have a significant difference.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>exp</strong> (<a class="reference internal" href="calour.experiment.Experiment.html#calour.experiment.Experiment" title="calour.experiment.Experiment"><em>Experiment</em></a>) – Input experiment object.</li>
-<li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The field to test by</li>
-<li><strong>val1</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em>) – The values for the first group.</li>
-<li><strong>val2</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – None (default) to compare to all other samples (not in val1)</li>
-<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>function</em>) – <p>the method to use for the t-statistic test. options:
-‘meandiff’ : mean(A)-mean(B) (binary)</p>
-<p>’mannwhitney’ : mann-whitneu u-test (binary)</p>
-<p>’stdmeandiff’ : (mean(A)-mean(B))/(std(A)+std(B)) (binary)</p>
-<p>function : use this function to calculate the t-statistic (input is data,labels, output is array of float)</p>
+<li><strong>field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The field from sample metadata to group samples.</li>
+<li><strong>val1</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em>) – The values in the <cite>field</cite> column for the first group.</li>
+<li><strong>val2</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – The values in the <cite>field</cite> column to select the second group.
+<cite>None</cite> (default) to compare to all other samples (excluding <cite>val1</cite>).</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>function</em>) – <p>the method to compute a statistic. options:</p>
+<ul>
+<li>’meandiff’ : mean(A)-mean(B)</li>
+<li>’stdmeandiff’ : (mean(A)-mean(B))/(std(A)+std(B))</li>
+<li>callable : use this to calculate the statistic (input is data,labels, output is array of float)</li>
+</ul>
 </li>
-<li><strong>transform</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – transformation to apply to the data before caluculating the statistic.
-‘rankdata’ : rank transfrom each OTU reads
-‘log2data’ : calculate log2 for each OTU using minimal cutoff of 2
-‘normdata’ : normalize the data to constant sum per samples
-‘binarydata’ : convert to binary absence/presence</li>
+<li><strong>transform</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – <p>transformation to apply to the data before caluculating the statistic.</p>
+<ul>
+<li>’rankdata’ : rank transfrom each OTU reads</li>
+<li>’log2data’ : calculate log2 for each OTU using minimal cutoff of 2</li>
+<li>’normdata’ : normalize the data to constant sum per samples</li>
+<li>’binarydata’ : convert to binary absence/presence</li>
+</ul>
+</li>
 <li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> (</em><em>optional</em><em>)</em>) – the desired FDR control level</li>
 <li><strong>numperm</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> (</em><em>optional</em><em>)</em>) – number of permutations to perform</li>
 <li><strong>fdr_method</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> (</em><em>optional</em><em>)</em>) – <p>The method used to control the False Discovery Rate. options are:</p>
-<p>’dsfdr’ : the discrete FDR control method</p>
-<p>’bhfdr’ : Benjamini-Hochberg FDR method</p>
-<p>’byfdr’ : Benjamini-Yekutielli FDR method</p>
-<p>’filterBH’ : Benjamini-Hochberg FDR method following
-removal of all features with minimal possible p-value less
+<ul>
+<li>’dsfdr’ : the discrete FDR control method</li>
+<li>’bhfdr’ : Benjamini-Hochberg FDR method</li>
+<li>’byfdr’ : Benjamini-Yekutielli FDR method</li>
+<li>’filterBH’ : Benjamini-Hochberg FDR method following</li>
+</ul>
+<p>removal of all features with minimal possible p-value less
 than alpha (e.g. a feature that appears in only 1 sample
 can obtain a minimal p-value of 0.5 and will therefore be
 removed when say alpha=0.1)</p>
 </li>
-<li><strong>random_seed</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – int to set the numpy random seed to this number before running the random permutation test.
+<li><strong>random_seed</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – int to set the numpy random seed to this number before running the random permutation test.
 None to not set the numpy random seed</li>
 </ul>
 </td>
@@ -207,7 +216,7 @@ None to not set the numpy random seed</li>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

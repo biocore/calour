@@ -7,7 +7,7 @@
     <title>calour.io.read_ms &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -150,17 +150,17 @@ matches the features to the gnps file using an MZ and RT threshold window (speci
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the data table (mzmine2 output/bucket table/biom table) containing the per-metabolite abundances.</li>
-<li><strong>sample_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – <p>None (default) to not load metadata per sample
+<li><strong>sample_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – <p>None (default) to not load metadata per sample
 str to specify name of sample mapping file (tsv).</p>
 <p>Note: sample names in the bucket table and sample_metadata file must match. In case bucket table sample names contains additional
 information, you can split them at the separator character (usually ‘_’), keeping only the first part, using the cut_sample_id_sep=’_’ parameter
 (see below)</p>
 </li>
-<li><strong>gnps_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file, for use with the ‘gnps’ database.
+<li><strong>gnps_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – name of the gnps clusterinfosummarygroup_attributes_withIDs_arbitraryattributes/XXX.tsv file, for use with the ‘gnps’ database.
 This enables identification of the metabolites with known MS2 (for the interactive heatmap and sorting/filtering etc), as well as linking
 to the gnps page for each metabolite (from the interactive heatmap - by double clicking on the metabolite database information).
 Note: requires gnps-calour database interface module (see Calour installation instructions for details).</li>
-<li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – Name of table containing additional metadata about each feature
+<li><strong>feature_metadata_file</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – Name of table containing additional metadata about each feature
 None (default) to not load</li>
 <li><strong>data_file_type</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – <p>the data file format. options include:</p>
 <dl class="docutils">
@@ -182,30 +182,30 @@ GNPS linking is direct via the first column (featureID).
 table is a tsv/json/hdf5 biom table, columns are samples.</dd>
 </dl>
 </li>
-<li><strong>sample_in_row</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – False indicates rows in the data table file are features, True indicates rows are samples.
+<li><strong>sample_in_row</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – False indicates rows in the data table file are features, True indicates rows are samples.
 None to use default value according to data_file_type</li>
-<li><strong>direct_ids</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – True indicates the feature ids in the data table file are the same ids used in the gnps_file.
+<li><strong>direct_ids</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – True indicates the feature ids in the data table file are the same ids used in the gnps_file.
 False indicates feature ids are not the same as in the gnps_file (such as when the ids are the MZ_RT)
 None to use default value according to data_file_type</li>
-<li><strong>get_mz_rt_from_feature_id</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – True indicates the data table file feature ids contain the MZ/RT of the feature.
+<li><strong>get_mz_rt_from_feature_id</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – True indicates the data table file feature ids contain the MZ/RT of the feature.
 False to not obtain MZ/RT from the feature id
 None to use default value according to data_file_type</li>
 <li><strong>use_gnps_id_from_AllFiles</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – True (default) to link the data table file gnps ids to the AllFiles column in the gnps_file.
 False to link the data table file gnps ids to the ‘cluster index’ column in the gnps_file.</li>
-<li><strong>cut_sample_id_sep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – str (typically ‘_’) to split the sampleID in the data table file, keeping only the first part.
+<li><strong>cut_sample_id_sep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – str (typically ‘_’) to split the sampleID in the data table file, keeping only the first part.
 Useful when the sampleIDs in the data table contain additional information compared to the
 mapping file (using a ‘_’ separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.
 None (default) to not change the data table file sampleID</li>
-<li><strong>mz_rt_sep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The separator character between the MZ and RT parts of the featureID (if it contains them) (usually ‘_’).
+<li><strong>mz_rt_sep</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – The separator character between the MZ and RT parts of the featureID (if it contains them) (usually ‘_’).
 If not supplied, autodetect the separator.
 Note this is used only if get_mz_rt_from_feature_id=True</li>
 <li><strong>mz_thresh</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The tolerance for M/Z to match features to the gnps_file. Used only if parameter direct_ids=False.</li>
 <li><strong>rt_thresh</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The tolerance for retention time to match features to the gnps_file. Used only if parameter direct_ids=False.</li>
-<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – Name of the experiment (for display purposes).
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – Name of the experiment (for display purposes).
 None (default) to assign file name</li>
 <li><strong>sparse</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> (</em><em>optional</em><em>)</em>) – False (default) to store data as dense matrix (faster but more memory)
 True to store as sparse (CSR)</li>
-<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – normalize each sample to the specified reads. <cite>None</cite> to not normalize</li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – normalize each sample to the specified reads. <cite>None</cite> to not normalize</li>
 </ul>
 </td>
 </tr>
@@ -270,7 +270,7 @@ mapping file (using a ‘_’ separator), and this needs to be removed in order 
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

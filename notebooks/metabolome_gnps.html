@@ -7,7 +7,7 @@
     <title>Calour mass-spec analysis demo &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -102,7 +102,7 @@
 <li><a class="reference internal" href="#Load-MZmine2-feature-table,-metadata-and-GnPS-file">Load MZmine2 feature table, metadata and GnPS file</a></li>
 <li><a class="reference internal" href="#Reorder-the-features-(metabolites)-and-samples">Reorder the features (metabolites) and samples</a></li>
 <li><a class="reference internal" href="#Plotting-the-data">Plotting the data</a></li>
-<li><a class="reference internal" href="#Differentially-abundant-metabolites-between-control-('Air')-and-treatment-('IHH')-groups">Differentially abundant metabolites between control (‘Air’) and treatment (‘IHH’) groups</a><ul>
+<li><a class="reference internal" href="#Differentially-abundant-metabolites-between-control-(‘Air’)-and-treatment-(‘IHH’)-groups">Differentially abundant metabolites between control (‘Air’) and treatment (‘IHH’) groups</a><ul>
 <li><a class="reference internal" href="#Remove-the-age-10,-10.5-samples-since-very-different-from-the-rest">Remove the age 10, 10.5 samples since very different from the rest</a></li>
 <li><a class="reference internal" href="#Find-the-differentially-abundant-metabolites">Find the differentially abundant metabolites</a></li>
 <li><a class="reference internal" href="#Plot-these-differentially-abundant-feature">Plot these differentially abundant feature</a></li>
@@ -440,8 +440,8 @@ purposes. Then we sort the samples by ‘age’ (to visualize trends over
 time) and then sort by ‘exposure_type’ (to observe differences between
 treatment and control samples)</p>
 <p>Sorting on equal valus retains the previous order, so samples will be
-sorted by exposure_type, and within each exposure_type will be sorted
-by age</p>
+sorted by exposure_type, and within each exposure_type will be sorted by
+age</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [5]:
@@ -1304,8 +1304,8 @@ chow. After that, the diet was switched to a fat-rich, Western type diet
 which causes this dramatic shift in the gut metabolome in both, control
 and treatment group.</p>
 </div>
-<div class="section" id="Differentially-abundant-metabolites-between-control-('Air')-and-treatment-('IHH')-groups">
-<h2>Differentially abundant metabolites between control (‘Air’) and treatment (‘IHH’) groups<a class="headerlink" href="#Differentially-abundant-metabolites-between-control-('Air')-and-treatment-('IHH')-groups" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Differentially-abundant-metabolites-between-control-(‘Air’)-and-treatment-(‘IHH’)-groups">
+<h2>Differentially abundant metabolites between control (‘Air’) and treatment (‘IHH’) groups<a class="headerlink" href="#Differentially-abundant-metabolites-between-control-(‘Air’)-and-treatment-(‘IHH’)-groups" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="Remove-the-age-10,-10.5-samples-since-very-different-from-the-rest">
 <h3>Remove the age 10, 10.5 samples since very different from the rest<a class="headerlink" href="#Remove-the-age-10,-10.5-samples-since-very-different-from-the-rest" title="Permalink to this headline">¶</a></h3>
 <div class="nbinput docutils container">
@@ -1334,8 +1334,8 @@ MS1Experiment metabolomics-apnea.mzmine2.csv with 176 samples, 1099 features
 <p>We use the binarydata transform parameter since we want to detect
 metabolites with differences in their presence/absence rather than
 differences in the frequency in each sample.</p>
-<p>We also set the random_seed since it is a random permutation based
-test, and we want it to replicate on reruns</p>
+<p>We also set the random_seed since it is a random permutation based test,
+and we want it to replicate on reruns</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [8]:
@@ -2200,7 +2200,7 @@ if (IPython.notebook.kernel != null) {
 <p>As a lot of differentially abundant metabolites are not identified, one
 might be interested in looking at just the identified features to begin
 with.</p>
-<p>To do this, we filter the features (axis=’f’) based on the field
+<p>To do this, we filter the features (axis=‘f’) based on the field
 ‘gnps_name’ (which contains the gnps derived name for the metabolite or
 nan if not found in gnps), and use select=None to remove the nan sample.</p>
 <p>** Note ** This only works if you supply the gnps cluster info file
@@ -10259,7 +10259,7 @@ re-formatting data for each platform and so on)</p>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

@@ -7,7 +7,7 @@
     <title>calour.amplicon_experiment.AmpliconExperiment.heatmap &#8212; calour 2018.10.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -144,32 +144,32 @@ The original object is not modified.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sample_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The field of sample metadata to display on the x-axis or None (default) to not show x axis.</li>
-<li><strong>feature_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em><em> (</em><em>optional</em><em>)</em>) – The field of feature meadata to display on the y-axis.
+<li><strong>sample_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – The field of sample metadata to display on the x-axis or None (default) to not show x axis.</li>
+<li><strong>feature_field</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>optional</em><em>)</em>) – The field of feature meadata to display on the y-axis.
 None (default) to not show y axis.</li>
 <li><strong>xticklabel_kwargs</strong> – </li>
-<li><strong>yticklabel_kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – keyword arguments passing as properties to <a class="reference external" href="https://matplotlib.org/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v3.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.text.Text</span></code></a> for
+<li><strong>yticklabel_kwargs</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – keyword arguments passing as properties to <a class="reference external" href="https://matplotlib.org/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v3.0.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.text.Text</span></code></a> for
 tick labels on x axis and y axis. As an example,
 <code class="docutils literal notranslate"><span class="pre">xticklabel_kwargs={'color':</span> <span class="pre">'r',</span> <span class="pre">'ha':</span> <span class="pre">'center',</span> <span class="pre">'rotation':</span> <span class="pre">90,</span>
 <span class="pre">'family':</span> <span class="pre">'serif',</span> <span class="pre">'size'=7}</span></code></li>
-<li><strong>xticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </li>
-<li><strong>yticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The maximal length for the tick labels on x axis and y axis (will be cut to
+<li><strong>xticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </li>
+<li><strong>yticklabel_len</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The maximal length for the tick labels on x axis and y axis (will be cut to
 this length if longer). Used to prevent long labels from
 taking too much space. None indicates no shortening</li>
-<li><strong>xticks_max</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </li>
-<li><strong>yticks_max</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – max number of ticks to render on the heatmap. If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+<li><strong>xticks_max</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </li>
+<li><strong>yticks_max</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – max number of ticks to render on the heatmap. If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
 allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
 which can be very slow if there are a large number of samples or features.</li>
 <li><strong>clim</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><em>optional</em>) – the min and max values for the heatmap color limits. It uses the min
 and max values in the input <code class="xref py py-attr docutils literal notranslate"><span class="pre">Experiment.data</span></code> array by default.</li>
-<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.0.0)"><em>matplotlib.colors.ListedColormap</em></a>) – str to indicate the colormap name. Default is “viridis” colormap.
+<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.0.2)"><em>matplotlib.colors.ListedColormap</em></a>) – str to indicate the colormap name. Default is “viridis” colormap.
 For all available colormaps in matplotlib: <a class="reference external" href="https://matplotlib.org/users/colormaps.html">https://matplotlib.org/users/colormaps.html</a></li>
-<li><strong>norm</strong> (<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="(in Matplotlib v3.0.0)"><em>matplotlib.colors.Normalize</em></a><em> or </em><em>None</em>) – passed to <code class="docutils literal notranslate"><span class="pre">norm</span></code> parameter of matplotlib.pyplot.imshow. Default is log scale.</li>
-<li><strong>title</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to not show title. str to set title to str.</li>
-<li><strong>rect</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em><em>, </em><em>optional</em>) – None (default) to set initial zoom window to the whole experiment.
+<li><strong>norm</strong> (<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="(in Matplotlib v3.0.2)"><em>matplotlib.colors.Normalize</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – passed to <code class="docutils literal notranslate"><span class="pre">norm</span></code> parameter of matplotlib.pyplot.imshow. Default is log scale.</li>
+<li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – None (default) to not show title. str to set title to str.</li>
+<li><strong>rect</strong> (<em>tuple of</em><em> (</em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – None (default) to set initial zoom window to the whole experiment.
 [x_min, x_max, y_min, y_max] to set initial zoom window</li>
-<li><strong>cax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.0)"><em>matplotlib.axes.Axes</em></a><em>, </em><em>optional</em>) – The axes where a legend colorbar for the heatmap is plotted.</li>
-<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.0)"><em>matplotlib.axes.Axes</em></a><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where the heatmap is plotted. None (default) to create a new figure and
+<li><strong>cax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.2)"><em>matplotlib.axes.Axes</em></a><em>, </em><em>optional</em>) – The axes where a legend colorbar for the heatmap is plotted.</li>
+<li><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.2)"><em>matplotlib.axes.Axes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/dev/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> (</em><em>default</em><em>)</em><em>, </em><em>optional</em>) – The axes where the heatmap is plotted. None (default) to create a new figure and
 axes to plot the heatmap</li>
 </ul>
 </td>
@@ -177,7 +177,7 @@ axes to plot the heatmap</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The axes for the heatmap</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.0)">matplotlib.axes.Axes</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.0.2)">matplotlib.axes.Axes</a></p>
 </td>
 </tr>
 </tbody>
@@ -258,7 +258,7 @@ heatmap:</p>
     </p>
     <p>
         &copy; Copyright 2016-2018, calour development team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>
