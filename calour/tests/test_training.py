@@ -106,7 +106,7 @@ class TTests(Tests):
         ax, _ = plot_roc(result)
         legend = ax.get_legend()
         exp = {'Luck',
-               'setosa (0.99 $\pm$ 0.00)',
+               'setosa (0.99 $\\pm$ 0.00)',
                'virginica (0.96 $\\pm$ 0.05)',
                'versicolor (0.95 $\\pm$ 0.07)'}
         obs = {i.get_text() for i in legend.get_texts()}
@@ -135,7 +135,7 @@ class TTests(Tests):
         # plt.show()
         legend = ax.get_legend()
         exp = {'Luck',
-               'virginica (0.96 $\pm$ 0.05)'}
+               'virginica (0.96 $\\pm$ 0.05)'}
         obs = {i.get_text() for i in legend.get_texts()}
         self.assertSetEqual(exp, obs)
 

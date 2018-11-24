@@ -116,9 +116,9 @@ class IOTests(Tests):
                           feature_metadata_kwargs={'dtype': {'ph': str}})
             # test the log messages are correct
             self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
-            self.assertRegex(cm.output[1], "dropped \(1\): {'SAMPLE_NOT_EXIST'}")
+            self.assertRegex(cm.output[1], "dropped \\(1\\): {'SAMPLE_NOT_EXIST'}")
             self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
-            self.assertRegex(cm.output[3], "dropped \(1\): {'FEATURE_NOT_EXIST'}")
+            self.assertRegex(cm.output[3], "dropped \\(1\\): {'FEATURE_NOT_EXIST'}")
             self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
 
             self.assertTrue(scipy.sparse.issparse(exp.data))
