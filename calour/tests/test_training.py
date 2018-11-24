@@ -103,7 +103,7 @@ class TTests(Tests):
 
     def test_plot_roc_multi(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
-        ax = plot_roc(result)
+        ax, _ = plot_roc(result)
         legend = ax.get_legend()
         exp = {'Luck',
                'setosa (0.99 $\pm$ 0.00)',
@@ -116,7 +116,7 @@ class TTests(Tests):
 
     def test_plot_roc_multi_no_cv(self):
         result = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'))
-        ax = plot_roc(result, cv=False)
+        ax, _ = plot_roc(result, cv=False)
         legend = ax.get_legend()
         exp = {'Luck',
                'setosa (1.00)',
@@ -130,7 +130,7 @@ class TTests(Tests):
         result['Y_TRUE'] = ['virginica' if i == 'virginica' else 'not virginica'
                             for i in result['Y_TRUE']]
         result['not virginica'] = 1 - result['virginica']
-        ax = plot_roc(result, classes=['virginica'])
+        ax, _ = plot_roc(result, classes=['virginica'])
         # from matplotlib import pyplot as plt
         # plt.show()
         legend = ax.get_legend()
