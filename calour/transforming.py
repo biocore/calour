@@ -409,4 +409,5 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False, random
             newexp.data[row, :] = subsample_counts(counts, n=total, replace=replace)
 
     newexp.reorder([i not in drops for i in range(newexp.data.shape[0])], inplace=True)
+    newexp.normalized = total
     return newexp

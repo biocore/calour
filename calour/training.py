@@ -541,7 +541,7 @@ def plot_prc(result, classes=None, title='precision-recall curve', cmap=None, ax
         mean_auc = np.mean(aucs)
         std_auc = np.std(aucs)
         lines.append(line)
-        labels.append('{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc))
+        labels.append('{0} ({1:.2f} $\\pm$ {2:.2f})'.format(cls, mean_auc, std_auc))
 
     # plot iso-f1 curves
     f_scores = np.linspace(0.2, 0.8, num=4)
@@ -615,8 +615,8 @@ def plot_roc(result, classes=None, title='ROC', cv=True, cmap=None, ax=None):
 
     Returns
     -------
-    matplotlib.axes.Axes
-        The axes for the ROC
+    tuple of matplotlib.axes.Axes and float
+        The axes for the ROC and the AUC value
 
     References
     ----------
@@ -666,7 +666,7 @@ def plot_roc(result, classes=None, title='ROC', cv=True, cmap=None, ax=None):
             mean_auc = np.mean(aucs)
             std_auc = np.std(aucs)
             ax.plot(mean_fpr, mean_tpr, color=col[cls],
-                    label='{0} ({1:.2f} $\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
+                    label='{0} ({1:.2f} $\\pm$ {2:.2f})'.format(cls, mean_auc, std_auc),
                     lw=2, alpha=.8)
 
             std_tpr = np.std(tprs, axis=0)
@@ -692,7 +692,26 @@ def plot_roc(result, classes=None, title='ROC', cv=True, cmap=None, ax=None):
     ax.set_title(title)
     ax.legend(loc="lower right")
 
-    return ax
+    return ax, mean_auc if cv else roc_auc
+
+
+def plot_calibration(y_true, y_prob, bins=10):
+    from sklearn.calibration import calibration_curve
+    from matplotlib import pyplot as plt
+
+    fraction_of_positives, mean_predicted_value = calibration_curve(y_true, y_prob, n_bins=bins)
+
+    fig, (ax1, ax2) = plt.subplots(nrows=2, gridspec_kw={'height_ratios': [3, 1]}, figsize=(6, 8))
+    ax1.plot(mean_predicted_value, fraction_of_positives, "s-")
+    ax1.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
+    ax1.set_ylabel("Fraction of young samples")
+    ax1.set_ylim([-0.05, 1.05])
+    ax1.set_title('reliability curve')
+
+    ax2.hist(y_prob, range=(0, 1), bins=bins, histtype="step", lw=2)
+    ax2.set_xlabel("Mean predicted probability")
+    ax2.set_ylabel("Count")
+    return fig
 
 
 @Experiment._record_sig
