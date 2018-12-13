@@ -85,7 +85,7 @@ class Experiment:
         self.data = data
         self.sample_metadata = sample_metadata
         if feature_metadata is None:
-            feature_metadata = {}
+            feature_metadata = pd.DataFrame(np.arange(data.shape[1]))
         self.feature_metadata = feature_metadata
         if exp_metadata is None:
             exp_metadata = {}
