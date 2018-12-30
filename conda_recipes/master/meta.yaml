@@ -16,12 +16,13 @@ requirements:
     - pandas
     - matplotlib >=2.0
     - scikit-learn
-    - scikit-bio
+    - scikit-bio >=0.5.1
     - biom-format
     - statsmodels
     - ipython
     - ipywidgets
     - pyqt >5
+    - docrep
   run:
     - python
     - nose
@@ -31,13 +32,13 @@ requirements:
     - pandas
     - matplotlib >=2.0
     - scikit-learn
-    - scikit-bio
+    - scikit-bio >=0.5.1
     - biom-format
     - statsmodels
     - ipython
     - ipywidgets
     - pyqt >5
-
+    - docrep
 test:
   # Python imports
   imports:
