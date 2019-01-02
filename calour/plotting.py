@@ -74,7 +74,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red')):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), enriched_exp_color='w'):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -93,6 +93,9 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
         name for terms enriched in group1 or group2 respectively, or None to not show legend
     colors: tuple of (str, str) or None (optional)
         Colors for terms enriched in group1 or group2 respectively
+    enriched_exp_color: str or None, optional
+        If not None, the color to show the number of enriched experiments for each term in the bar.
+        None to not show the enriched experiments count
 
 
     Returns
@@ -124,21 +127,37 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
         use[-positive:] = True
     if negative > 0:
         use[:negative] = True
+
     ticks = enriched['term'].values[use]
-    ticks = [x.split('(')[0] for x in ticks]
-    ticks = ['LOWER IN '+x[1:] if x[0] == '-' else x for x in ticks]
     ticks = [x[:max_len] for x in ticks]
-    ax.set_yticks(np.arange(negative+positive))
-    ax.set_yticklabels(ticks)
+    ax.set_yticks(np.arange(negative + positive))
+    ax.set_yticklabels(ticks, style='italic', weight='medium')
     if labels is not None:
         ax.set_xlabel('effect size (positive is higher in %s)' % labels[0])
         ax.legend(labels)
-    ax.figure.tight_layout()
 
+    # add the number of enriched experiments for each term
+    if enriched_exp_color is not None and 'num_enriched_exps' in enriched:
+        if positive > 0:
+            for idx in np.arange(negative, negative + positive):
+                cnum_enriched = enriched.iloc[idx]['num_enriched_exps']
+                if cnum_enriched < 0:
+                    continue
+                cstr = ' %d/%d' % (cnum_enriched, enriched.iloc[idx]['num_total_exps'])
+                ax.text(0, idx, cstr, horizontalalignment='left', verticalalignment='center', color=enriched_exp_color, fontweight='bold')
+        if negative > 0:
+            for idx in np.arange(negative):
+                cnum_enriched = enriched.iloc[idx]['num_enriched_exps']
+                if cnum_enriched < 0:
+                    continue
+                cstr = '%d/%d ' % (cnum_enriched, enriched.iloc[idx]['num_total_exps'])
+                ax.text(0, idx, cstr, horizontalalignment='right', verticalalignment='center', color=enriched_exp_color, fontweight='bold')
+
+    ax.figure.tight_layout()
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, **kwargs):
+def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, enriched_exp_color='w', **kwargs):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -164,6 +183,9 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         True to show the color legend, False to hide it
     **kwargs : dict, optional
         Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)
+    enriched_exp_color: str or None, optional
+        If not None, the color to show the number of enriched experiments for each term in the bar.
+        None to not show the enriched experiments count
 
     Returns
     -------
@@ -200,7 +222,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         labels = None
 
     # and plot
-    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors)
+    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors, enriched_exp_color=enriched_exp_color)
 
     return ax2, newexp
 
