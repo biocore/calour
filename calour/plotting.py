@@ -131,7 +131,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     ticks = enriched['term'].values[use]
     ticks = [x[:max_len] for x in ticks]
     ax.set_yticks(np.arange(negative + positive))
-    ax.set_yticklabels(ticks, style='italic', weight='medium')
+    ax.set_yticklabels(ticks, style='italic', weight='semibold')
     if labels is not None:
         ax.set_xlabel('effect size (positive is higher in %s)' % labels[0])
         ax.legend(labels)
