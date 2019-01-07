@@ -68,7 +68,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     # note the count number on top of the histogram bars
     for rect, n in zip(patches, counts):
         height = rect.get_height()
-        ax.text(rect.get_x() + rect.get_width()/2, height + 5,
+        ax.text(rect.get_x() + rect.get_width() / 2, height + 5,
                 int(n), ha='center', va='bottom',
                 rotation=90, fontsize=7)
     return counts, bins, ax
