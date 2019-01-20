@@ -5,7 +5,7 @@ numpy
 scipy
 pyqt>=5
 pandas
-matplotlib=2.1.2
+matplotlib
 h5py
 biom-format
 scikit-learn
