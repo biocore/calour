@@ -74,7 +74,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), enriched_exp_color='w'):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), enriched_exp_color='white'):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -94,7 +94,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     colors: tuple of (str, str) or None (optional)
         Colors for terms enriched in group1 or group2 respectively
     enriched_exp_color: str or None, optional
-        If not None, the color to show the number of enriched experiments for each term in the bar.
+        If not None, the color to show the number of enriched experiments for each term in the bar. Default is white since the background is the bar color (green/red).
         None to not show the enriched experiments count
 
 
@@ -157,7 +157,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, enriched_exp_color='w', **kwargs):
+def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, enriched_exp_color='white', **kwargs):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -184,7 +184,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
     **kwargs : dict, optional
         Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)
     enriched_exp_color: str or None, optional
-        If not None, the color to show the number of enriched experiments for each term in the bar.
+        If not None, the color to show the number of enriched experiments for each term in the bar. Default is white since the background is the bar color (green/red).
         None to not show the enriched experiments count
 
     Returns
