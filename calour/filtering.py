@@ -458,7 +458,10 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
         the filtered object
 
     '''
-    values = _to_list(values)
+    # if it is None - pass to filter_by_metadata so will remove the NaN samples
+    if values is not None:
+        values = _to_list(values)
+
     return filter_by_metadata(exp, field=field, select=values, negate=negate, inplace=inplace)
 
 
