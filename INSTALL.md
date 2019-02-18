@@ -16,6 +16,11 @@ There are three ways to obtain Calour:
 
 # Installation instructions for Mac/Linux/Windows 10
 
+## NEW: EZCalour easy installer for windows
+If you have windows and would like to use calour via a full point and click GUI (EZCalour), you can download a windows installer from [sourceforge](https://sourceforge.net/projects/ezcalour/files/ezcalour_setup.exe/download).
+
+Just download the ezcalour_installer.exe and run it :)
+
 ## Install miniconda \(if already installed - skip this step\)
 
 Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3.6 64 bit installer, and run it.
@@ -211,3 +216,5 @@ Select the "upload" button and upload the biom table/mapping files
 
 Select the "new" button. Alternatively, you can select the "Generic Analysis.ipynb" notebook as a convenient starting point for analyzing microbiome data using Calour
 
+# Problems? Questions? Suggestions?
+Please visit the [Calour forum](https://groups.google.com/forum/#!forum/calour-support) for support
