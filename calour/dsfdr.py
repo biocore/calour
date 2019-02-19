@@ -183,7 +183,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
     elif transform_type == 'normdata':
         data = normdata(data)
     elif transform_type is None:
-            pass
+        pass
     else:
         raise ValueError('transform type %s not supported' % transform_type)
 
