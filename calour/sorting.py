@@ -194,7 +194,7 @@ def cluster_features(exp: Experiment, min_abundance=0, inplace=False, **kwargs):
 
 @ds.get_sectionsf('sorting.sort_by_metadata')
 @Experiment._record_sig
-def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
+def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False, reverse=False):
     '''Sort samples or features based on metadata values in the field.
 
     Parameters
@@ -219,7 +219,7 @@ def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False):
         x = exp.feature_metadata
     else:
         raise ValueError('unknown axis %s' % axis)
-    idx = _argsort(x[field].values)
+    idx = _argsort(x[field].values, reverse)
     return exp.reorder(idx, axis=axis, inplace=inplace)
 
 

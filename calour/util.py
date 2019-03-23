@@ -385,7 +385,7 @@ def _to_list(x):
     return [x]
 
 
-def _argsort(values):
+def _argsort(values, reverse=False):
     '''Sort a sequence of values of heterogeneous variable types.
 
     Used to overcome the problem when using numpy.argsort on a pandas
@@ -400,6 +400,9 @@ def _argsort(values):
     >>> l_sorted = [l[i] for i in idx]
     >>> l_sorted
     [2.5, 10, nan, 'a', 'b']
+    >>> l_sorted_reverse = [l[i] for i in _argsort(l, True)]
+    >>> l_sorted_reverse
+    ['b', 'a', nan, 10, 2.5]
 
     Parameters
     ----------
@@ -426,7 +429,7 @@ def _argsort(values):
     # # make values ordered by type and sort inside each var type
     # values = [(str(type(x)), x) if not np.isnan(x) else (str(type(x)), np.inf) for x in values]
     # return sorted(range(len(values)), key=values.__getitem__)
-    return sorted(range(len(pairs)), key=pairs.__getitem__)
+    return sorted(range(len(pairs)), key=pairs.__getitem__, reverse=reverse)
 
 
 def _clone_function(f):
