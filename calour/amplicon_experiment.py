@@ -287,7 +287,7 @@ class AmpliconExperiment(Experiment):
         AmpliconExperiment
 
         '''
-        def find_highest(s, sep=sep):
+        def find_lowest(s, sep=sep):
             taxon = ''
             for i in s.split(sep):
                 name = i.strip()
@@ -297,5 +297,5 @@ class AmpliconExperiment(Experiment):
                     return taxon
             return taxon
 
-        self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_highest)
+        self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_lowest)
         return self
