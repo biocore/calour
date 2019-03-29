@@ -108,18 +108,18 @@ class ExperimentTests(Tests):
 
     def test_get_lowest_taxonomy(self):
         self.test1.get_lowest_taxonomy(new_field='foo')
-        exp =['g__Prevotella',
-              'g__Mycoplasma',
-              's__lividum',
-              's__paradoxus',
-              'g__Veillonella',
-              'g__Capnocytophaga',
-              'g__Actinomyces',
-              'f__[Mogibacteriaceae]',
-              's__moorei',
-              'o__Clostridiales',
-              'Unknown',
-              'bad_bacteria']
+        exp = ['g__Prevotella',
+               'g__Mycoplasma',
+               's__lividum',
+               's__paradoxus',
+               'g__Veillonella',
+               'g__Capnocytophaga',
+               'g__Actinomyces',
+               'f__[Mogibacteriaceae]',
+               's__moorei',
+               'o__Clostridiales',
+               'Unknown',
+               'bad_bacteria']
         self.assertListEqual(exp, self.test1.feature_metadata['foo'].tolist())
 
     def test_split_taxonomy(self):

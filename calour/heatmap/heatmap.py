@@ -96,9 +96,19 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len, tr
     ----------
     ax : matplotlib.axes.Axes
         The axes to plot into
-    Parameters: axes, x or y axis, list of tick labels, max number
-    of ticks, the upper bound of xlim/ylim, dict passing as text
-    property, the length of each tick label.
+    which : 'x' or 'y'
+        x or y axis
+    ticklabels : list of tick labels,
+    tickmax : int
+        the max number of ticks to plot on heatmap
+    n : int
+        usually it is the number of rows/columns of heatmap
+    kwargs : dict
+        passing as text property
+    ticklabel_len : int
+        the length limit of each tick label
+    transition : bool
+        whether to plot white separate lines (vertically or horizontally) and collapse tick labels.
 
     '''
     ticklabels = _truncate_middle(ticklabels, ticklabel_len)
