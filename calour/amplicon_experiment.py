@@ -257,20 +257,26 @@ class AmpliconExperiment(Experiment):
             the separator between taxa levels
         names : list
             the column names for the new columns split from ``field``
+
+        Returns
+        -------
+        AmpliconExperiment
         '''
         self.feature_metadata[names] = self.feature_metadata[field].str.split(sep, expand=True)
         # return so you can chain the functions
         return self
 
-    def find_lowest_taxonomy(self, field='taxonomy', new_field='taxa'):
+    def get_lowest_taxonomy(self, sep=';', field='taxonomy', new_field='taxa'):
         '''Create a new column that contains the taxonomy of lowest possible level.
 
         For example, 'k__Bacteria; p__Firmicutes; c__Bacilli,
-        o__Lactobacillales; f__Enterococcaceae; g__Enterococcus,
+        o__Lactobacillales; f__Enterococcaceae; g__Enterococcus;
         s__' will return 'g__Enterococcus'
 
         Parameters
         ----------
+        sep : str
+            the separator between taxa levels
         field : str
             column name that contains all levels of taxonomy
         new_field : str
@@ -281,9 +287,15 @@ class AmpliconExperiment(Experiment):
         AmpliconExperiment
 
         '''
-        def find_highest(s):
-            levels = s.split(';')
-            b = [len(i) > 3 for i in levels]
-            return np.array(levels)[b][-1]
-        self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_highest)
+        def find_lowest(s, sep=sep):
+            taxon = ''
+            for i in s.split(sep):
+                name = i.strip()
+                if len(name) > 3:
+                    taxon = name
+                else:
+                    return taxon
+            return taxon
+
+        self.feature_metadata[new_field] = self.feature_metadata[field].apply(find_lowest)
         return self

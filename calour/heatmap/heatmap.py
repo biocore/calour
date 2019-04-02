@@ -89,46 +89,63 @@ def _truncate_middle(x, length=16):
         return ['%s..%s' % (i[:mid], i[-mid:]) if len(i) > length else i for i in y]
 
 
-def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len):
+def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len, transition=True):
     '''Plot tick and ticklabels of x or y axis.
 
     Parameters
     ----------
     ax : matplotlib.axes.Axes
         The axes to plot into
-    Parameters mean axes, x or y axis, list of tick labels, max number
-    of ticks, the upper bound of xlim/ylim, dict passing as text
-    property, the length of each tick label.
+    which : 'x' or 'y'
+        x or y axis
+    ticklabels : list of tick labels,
+    tickmax : int
+        the max number of ticks to plot on heatmap
+    n : int
+        usually it is the number of rows/columns of heatmap
+    kwargs : dict
+        passing as text property
+    ticklabel_len : int
+        the length limit of each tick label
+    transition : bool
+        whether to plot white separate lines (vertically or horizontally) and collapse tick labels.
 
     '''
     ticklabels = _truncate_middle(ticklabels, ticklabel_len)
 
-    ticks = _transition_index(ticklabels)
-    tick_pos, tick_lab = zip(*ticks)
+    if transition:
+        ticks = _transition_index(ticklabels)
+        tick_pos, tick_lab = zip(*ticks)
+    else:
+        tick_pos = list(range(len(ticklabels)))
+        tick_lab = ticklabels
 
     axis = getattr(ax, which + 'axis')
 
     if tickmax is None:
         # show all labels
         tickmax = n
-    # should be not larger than maxticks
+    # should not be larger than maxticks
     tickmax = min(tickmax, mpl.ticker.Locator.MAXTICKS)
     if len(tick_pos) <= tickmax:
-        tick_pos = np.array([0.] + list(tick_pos))
-        # samples position - 0.5 before and go to 0.5 after
-        tick_pos -= 0.5
-        for pos in tick_pos[1:-1]:
-            if which == 'x':
-                method = 'axvline'
-            elif which == 'y':
-                method = 'axhline'
-            else:
-                raise ValueError('Unknow axis: %r.' % which)
-            getattr(ax, method)(pos, color='white', linewidth=1)
-
-        # set tick/label at the middle of each sample group
-        axis.set_ticks(tick_pos[:-1] + (tick_pos[1:] - tick_pos[:-1]) / 2)
-        axis.set_ticklabels(tick_lab)
+        if transition:
+            tick_pos = np.array([0.] + list(tick_pos))
+            # samples position - 0.5 before and go to 0.5 after
+            tick_pos -= 0.5
+            for pos in tick_pos[1:-1]:
+                if which == 'x':
+                    method = 'axvline'
+                elif which == 'y':
+                    method = 'axhline'
+                else:
+                    raise ValueError('Unknow axis: %r.' % which)
+                getattr(ax, method)(pos, color='white', linewidth=1)
+            # set tick/label at the middle of each sample group
+            axis.set_ticks(tick_pos[:-1] + (tick_pos[1:] - tick_pos[:-1]) / 2)
+            axis.set_ticklabels(tick_lab)
+        else:
+            axis.set_ticks(tick_pos)
+            axis.set_ticklabels(tick_lab)
     else:
         def format_fn(tick_val, tick_pos):
             # cf http://matplotlib.org/gallery/ticks_and_spines/tick_labels_from_values.html
@@ -310,7 +327,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         _set_axis_ticks(ax, 'x', ticklabels, xticks_max, numrows, xticklabel_kwargs, xticklabel_len)
         ax.set_xlabel(sample_field)
 
-    # plot y tick labels dynamically
+    # plot y tick labels
     if feature_field is None:
         ax.yaxis.set_visible(False)
     else:
@@ -319,7 +336,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         except KeyError:
             raise ValueError('Feature field %r not in feature metadata' % feature_field)
         # numcols instead of numrows because it is transposed
-        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numcols, yticklabel_kwargs, yticklabel_len)
+        _set_axis_ticks(ax, 'y', ticklabels, yticks_max, numcols, yticklabel_kwargs, yticklabel_len, transition=False)
         ax.set_ylabel(feature_field)
 
     # set the mouse hover string to the value of abundance (in normal scale)
@@ -490,13 +507,13 @@ def plot(exp: Experiment, title=None,
         for each column. It doesn't plot color bars by default (None)
     barx_width : float or list of float, optional
     bary_width : float or list of float, optional
-        The thickness of the each bar. The default thickness usually looks good enough.
+        The thickness of the each bar along x axis or y axis. The default thickness usually looks good enough.
     barx_colors : dict, matplotlib.colors.ListedColormap, optional
     bary_colors : dict, matplotlib.colors.ListedColormap, optional
         The colors for each unique values in the column of sample/feature metadata
-    barx_label : bool, optional
-    bary_label : bool, optional
-        whether to show the labels on the bars.
+    barx_label : bool or list of bool, optional
+    bary_label : bool or list of bool, optional
+        whether to show the labels on the bars along x axis or y axis.
     barx_label_kwargs : dict, optional
     bary_label_kwargs : dict, optional
         keyword arguments passing to :meth:`matplotlib.axes.Axes.annotate` for labels on the bars
