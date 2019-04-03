@@ -184,19 +184,16 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     feature_field : str or None (optional)
         The field of feature meadata to display on the y-axis.
         None (default) to not show y axis.
-    xticklabel_kwargs :
-    yticklabel_kwargs : dict or None, optional
+    xticklabel_kwargs, yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
         ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
         'family': 'serif', 'size'=7}``
-    xticklabel_len : int or None
-    yticklabel_len : int or None
+    xticklabel_len, yticklabel_len : int or None
         The maximal length for the tick labels on x axis and y axis (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no shortening
-    xticks_max : int or None
-    yticks_max : int or None
+    xticks_max, yticks_max : int or None
         max number of ticks to render on the heatmap. If ``None``,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
@@ -501,21 +498,16 @@ def plot(exp: Experiment, title=None,
     ----------
     title : str, optional
         The title of the figure.
-    barx_fields : str or list of str, optional
-    bary_fields : str or list of str, optional
+    barx_fields, bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
         for each column. It doesn't plot color bars by default (None)
-    barx_width : float or list of float, optional
-    bary_width : float or list of float, optional
+    barx_width, bary_width : float or list of float, optional
         The thickness of the each bar along x axis or y axis. The default thickness usually looks good enough.
-    barx_colors : dict, matplotlib.colors.ListedColormap, optional
-    bary_colors : dict, matplotlib.colors.ListedColormap, optional
+    barx_colors, bary_colors : dict, matplotlib.colors.ListedColormap, optional
         The colors for each unique values in the column of sample/feature metadata
-    barx_label : bool or list of bool, optional
-    bary_label : bool or list of bool, optional
+    barx_label, bary_label : bool or list of bool, optional
         whether to show the labels on the bars along x axis or y axis.
-    barx_label_kwargs : dict, optional
-    bary_label_kwargs : dict, optional
+    barx_label_kwargs, bary_label_kwargs : dict, optional
         keyword arguments passing to :meth:`matplotlib.axes.Axes.annotate` for labels on the bars
     tree : skbio.TreeNode or None, optional
         None (default) to not plot a tree

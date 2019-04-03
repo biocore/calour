@@ -269,9 +269,8 @@ class AmpliconExperiment(Experiment):
     def get_lowest_taxonomy(self, sep=';', field='taxonomy', new_field='taxa'):
         '''Create a new column that contains the taxonomy of lowest possible level.
 
-        For example, 'k__Bacteria; p__Firmicutes; c__Bacilli,
-        o__Lactobacillales; f__Enterococcaceae; g__Enterococcus;
-        s__' will return 'g__Enterococcus'
+        For example, "k__Bacteria;p__Firmicutes;c__Bacilli;o__Lactobacillales;
+        f__Enterococcaceae;g__Enterococcus;s__" will return "g__Enterococcus".
 
         Parameters
         ----------
