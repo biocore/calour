@@ -295,12 +295,15 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         {'index_col': False}.
     cls : ``class``, optional
         what class object to read the data into (:class:`.Experiment` by default)
-    table_sample_id_proc: None or callable, optional
-    table_feature_id_proc: None or callable, optional
-        if not None, modify each sample/feature id in the table using the callable function.
-        The callable accepts a list of str and returns a list of str (sample/feature ids after processing).
-        Useful in metabolomics experiments, where the sampleIDs in the data table contain additional information compared to the
-        mapping file (using a '_' separator), and this needs to be removed in order to sync the sampleIDs between table and mapping file.
+    table_sample_id_proc, table_feature_id_proc: None or callable, optional
+        if not None, modify each sample/feature id in the table using
+        the callable function.  The callable accepts a list of str and
+        returns a list of str (sample/feature ids after processing).
+        Useful in metabolomics experiments, where the sampleIDs in the
+        data table contain additional information compared to the
+        mapping file (using a '_' separator), and this needs to be
+        removed in order to sync the sampleIDs between table and
+        mapping file.
     sample_in_row: bool, optional
         False if data table columns are sample, True if rows are samples
     normalize : int or None
