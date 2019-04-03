@@ -26,3 +26,8 @@ exploratory and interactive microbiome analysis based on heatmaps
 
 [How to Contribute](https://github.com/biocore/calour/blob/master/CONTRIBUTING.md)
 ==================================================================================
+
+
+Please Cite
+===========
+[Xu ZZ, Amir A, Sanders J, Zhu Q, Morton JT, Bletz MC, Tripathi A, Huang S, McDonald D, Jiang L, et al. (2019) Calour: an Interactive, Microbe-Centric Analysis Tool. mSystems, 4, e00269-18.](https://msystems.asm.org/content/4/1/e00269-18)

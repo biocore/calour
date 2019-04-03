@@ -2,6 +2,10 @@
 
 ## Next version
 
+* Add `reverse` parameter to the sorting functions.
+* Fix minor documentation formatting issues
+* Update installation instruction with conda install from conda-forge
+
 
 ## Version 2018.10.1
 
