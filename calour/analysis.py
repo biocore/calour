@@ -192,7 +192,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         * '_calour_stat' : the effect size (t-statistic). If
           '_calour_stat' is larger than zero for a given feature, it
           indicates this feature is increased in the first group of
-          samples (`val1`); if smaller than zero, this feature is
+          samples (``val1``); if smaller than zero, this feature is
           decreased in the first group.
     '''
     if field not in exp.sample_metadata.columns:
