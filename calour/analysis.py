@@ -28,14 +28,20 @@ import numpy as np
 import pandas as pd
 
 from .experiment import Experiment
-from .util import _to_list
+from .util import _to_list, format_docstring
 from . import dsfdr
 
 
 logger = getLogger(__name__)
 
 
+_CALOUR_STAT = '_calour_stat'
+_CALOUR_PVAL = '_calour_pval'
+_CALOUR_DIRECTION = '_calour_direction'
+
+
 @Experiment._record_sig
+@format_docstring(_CALOUR_PVAL, _CALOUR_STAT)
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Find features with correlation to a numeric metadata field.
 
@@ -85,9 +91,9 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     Experiment
         The experiment with only correlated features, sorted according to correlation coefficient.
 
-        * '_calour_pval' : the FDR adjusted p-values for each feature
-        * '_calour_stat' : the statistics (correlation coefficient if
-          the `method` is 'spearman' or 'pearson'). If '_calour_stat'
+        * '{}' : the FDR adjusted p-values for each feature
+        * '{}' : the statistics (correlation coefficient if
+          the `method` is 'spearman' or 'pearson'). If it
           is larger than zero for a given feature, it indicates this
           feature is positively correlated with the sample metadata;
           otherwise, negatively correlated.
@@ -130,6 +136,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @Experiment._record_sig
+@format_docstring(_CALOUR_PVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
 def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Differential abundance test between 2 groups of samples for all the features.
 
@@ -188,12 +195,13 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         according to their effect size.  The new experiment contains
         additional ``feature_metadata`` fields that include:
 
-        * '_calour_pval' : the FDR adjusted p-values for each feature
-        * '_calour_stat' : the effect size (t-statistic). If
-          '_calour_stat' is larger than zero for a given feature, it
-          indicates this feature is increased in the first group of
-          samples (``val1``); if smaller than zero, this feature is
-          decreased in the first group.
+        * '{}' : the FDR adjusted p-values for each feature
+        * '{}' : the effect size (t-statistic). If it is larger than
+          zero for a given feature, it indicates this feature is
+          increased in the first group of samples (``val1``); if
+          smaller than zero, this feature is decreased in the first
+          group.
+        * '{}' : in which of the 2 sample groups this given feature is increased.
     '''
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
@@ -205,13 +213,15 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     val1 = _to_list(val1)
-
+    grp1 = ','.join(val1)
     if val2 is not None:
         val2 = _to_list(val2)
         cexp = exp.filter_samples(field, val1 + val2, negate=False)
+        grp2 = ','.join(val2)
         logger.info('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
+        grp2 = 'NOT %s' % grp1
 
     # remove features not present in both groups
     cexp = cexp.filter_abundance(0, strict=True)
@@ -222,8 +232,10 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     labels[cexp.sample_metadata[field].isin(val1).values] = 1
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
     keep, odif, pvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
-    logger.info('method %s. number of higher in %s : %d. number of higher in %s : %d. total %d' % (method, val1, np.sum(odif[keep] > 0), val2, np.sum(odif[keep] < 0), np.sum(keep)))
+    logger.info('number of higher in {}: {}. number of higher in {} : {}. total {}'.format(
+        grp1, np.sum(odif[keep] > 0), grp2, np.sum(odif[keep] < 0), np.sum(keep)))
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    newexp.feature_metadata[_CALOUR_DIRECTION] = [grp1 if x > 0 else grp2 for x in newexp.feature_metadata[_CALOUR_STAT]]
     return newexp
 
 
@@ -327,6 +339,6 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals):
     odif = odif[si]
     pvals = pvals[si]
     newexp = newexp.reorder(si, axis=1)
-    newexp.feature_metadata['_calour_stat'] = odif
-    newexp.feature_metadata['_calour_pval'] = pvals
+    newexp.feature_metadata[_CALOUR_STAT] = odif
+    newexp.feature_metadata[_CALOUR_PVAL] = pvals
     return newexp
