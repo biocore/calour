@@ -507,3 +507,11 @@ def deprecated(message):
             return func(*args, **kwargs)
         return deprecated_func
     return deprecated_decorator
+
+
+def format_docstring(*args, **kwargs):
+    '''Format the docstring of the decorated function.'''
+    def dec(obj):
+        obj.__doc__ = obj.__doc__.format(*args, **kwargs)
+        return obj
+    return dec

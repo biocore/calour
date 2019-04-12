@@ -5,6 +5,7 @@ import glob
 import sys
 import os
 import re
+import datetime
 
 # Force matplotlib to not use any Xwindows backend.
 import matplotlib
@@ -135,7 +136,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'calour'
-copyright = '2016-2018, calour development team'
+now = datetime.datetime.now()
+copyright = '2016-{}, calour development team'.format(now.year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -189,7 +191,6 @@ pygments_style = 'sphinx'
 #keep_warnings = False
 
 # -- Options for napoleon -------------------------------------------------
-
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_include_private_with_doc = False
@@ -198,7 +199,7 @@ napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = True
 napoleon_use_admonition_for_references = False
 napoleon_use_ivar = True
-napoleon_use_param = True
+napoleon_use_param = False
 napoleon_use_keyword = True
 napoleon_use_rtype = True
 
@@ -217,7 +218,7 @@ html_theme_options = {
     'nosidebar': True,
 
     # Navigation bar title. (Default: ``project`` value)
-    'navbar_title': 'calour docs',
+    'navbar_title': 'calour',
 
     # Render the next and previous page links in navbar. (Default: true)
     'navbar_sidebarrel': False,
@@ -429,13 +430,13 @@ matplotlib.rcParams.update(plot_rcparams)
 # Intersphinx configuration
 # -----------------------------------------------------------------------------
 intersphinx_mapping = {
-    'http://docs.python.org/dev': None,
-    'http://docs.scipy.org/doc/numpy': None,
-    'http://docs.scipy.org/doc/scipy/reference': None,
-    'http://matplotlib.org': None,
-    'http://pandas.pydata.org/pandas-docs/stable': None,
-    'http://scikit-learn.org/stable': None,
-    'http://www.biom-format.org': None,
+    'https://docs.python.org/dev': None,
+    'https://docs.scipy.org/doc/numpy': None,
+    'https://docs.scipy.org/doc/scipy/reference': None,
+    'https://matplotlib.org': None,
+    'https://pandas.pydata.org/pandas-docs/stable': None,
+    'https://scikit-learn.org/stable': None,
+    'http://biom-format.org': None,
     'http://scikit-bio.org/docs/latest': None
 }
 
@@ -454,12 +455,10 @@ for name in ['sphinx.ext.linkcode', 'linkcode', 'numpydoc.linkcode']:
     except ImportError:
         pass
 else:
-    print "NOTE: linkcode extension not found -- no links to source generated"
+    print("NOTE: linkcode extension not found -- no links to source generated")
 
 def linkcode_resolve(domain, info):
-    """
-    Determine the URL corresponding to Python object
-    """
+    """Determine the URL corresponding to Python object."""
     if domain != 'py':
         return None
 

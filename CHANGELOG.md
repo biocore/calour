@@ -3,6 +3,13 @@
 ## Next version
 
 
+## Version 2019.5.1
+
+* Add `reverse` parameter to the sorting functions.
+* Fix minor documentation formatting issues
+* Update installation instruction with conda install from conda-forge
+* Change the column names added to `Experiment.feature_metadata` after running `Experiment.correlation` or `Experiment.diff_abundance`
+
 ## Version 2018.10.1
 
 * Add notebook tutorial for `calour.training` module for classification and regression.

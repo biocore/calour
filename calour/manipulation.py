@@ -289,8 +289,8 @@ def join_experiments_featurewise(exp: Experiment, other,
 
     An example of user cases is to combine the 16S and ITS amplicon data together.
 
-    .. warning:: If a sample has only features in one Experiment
-    object and not the other, the sample will be dropped from joining.
+    .. warning:: If a sample has only features in one :class:`.Experiment`
+       object and not the other, the sample will be dropped from joining.
 
     Parameters
     ----------
@@ -310,7 +310,6 @@ def join_experiments_featurewise(exp: Experiment, other,
     :class:`.Experiment`
         A new experiment with samples from both experiments concatenated, features from both
         experiments merged.
-
     '''
     logger.debug('Join 2 experiments featurewise:\n{!r}\n{!r}'.format(exp, other))
     # create an empty object
