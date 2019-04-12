@@ -35,6 +35,7 @@ from scipy import stats
 from . import Experiment
 from .util import _to_list, compute_prevalence
 from .heatmap.heatmap import _ax_bar
+from .analysis import _CALOUR_STAT, _CALOUR_DIRECTION
 
 
 logger = getLogger(__name__)
@@ -181,11 +182,13 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         Colors for terms enriched in group1 or group2 respectively
     show_legend: bool (optional)
         True to show the color legend, False to hide it
+    enriched_exp_color: str or None, optional
+        If not None, the color to show the number of enriched
+        experiments for each term in the bar. Default is white since
+        the background is the bar color (green/red).  None to not show
+        the enriched experiments count
     **kwargs : dict, optional
         Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)
-    enriched_exp_color: str or None, optional
-        If not None, the color to show the number of enriched experiments for each term in the bar. Default is white since the background is the bar color (green/red).
-        None to not show the enriched experiments count
 
     Returns
     -------
@@ -194,11 +197,11 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
     :func:`.database.enrichment`
 
     '''
-    if '_calour_diff_abundance_effect' not in exp.feature_metadata.columns:
-        raise ValueError('Experiment does not seem to be the results of differential_abundance().')
+    if _CALOUR_DIRECTION not in exp.feature_metadata.columns:
+        raise ValueError('Experiment does not seem to be the result of differ_abundance().')
 
     # get the positive effect features
-    positive = exp.feature_metadata._calour_diff_abundance_effect > 0
+    positive = exp.feature_metadata[_CALOUR_STAT] > 0
     positive = exp.feature_metadata.index.values[positive.values]
 
     # get the enrichment
@@ -212,10 +215,10 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
     # get the labels for the two groups
     if show_legend:
         labels = ['group1', 'group2']
-        names1 = exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] > 0]
+        names1 = exp.feature_metadata[_CALOUR_DIRECTION][exp.feature_metadata[_CALOUR_STAT] > 0]
         if len(names1) > 0:
             labels[0] = names1.values[0]
-        names2 = exp.feature_metadata['_calour_diff_abundance_group'][exp.feature_metadata['_calour_diff_abundance_effect'] < 0]
+        names2 = exp.feature_metadata[_CALOUR_DIRECTION][exp.feature_metadata[_CALOUR_STAT] < 0]
         if len(names2) > 0:
             labels[1] = names2.values[0]
     else:

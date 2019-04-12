@@ -82,6 +82,12 @@ class IOTests(Tests):
         self.assertEqual(util._to_list('test'), ['test'])
         self.assertEqual(util._to_list(range(5)), range(5))
 
+    def test_format_docstring(self):
+        @util.format_docstring([], a=1, b='a')
+        def foo():
+            '''{} {a} {b}'''
+        self.assertEqual(foo.__doc__, '[] 1 a')
+
 
 if __name__ == "__main__":
     main()

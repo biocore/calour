@@ -19,7 +19,7 @@ from .util import set_log_level, _convert_axis_name, register_functions
 
 
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
-__version__ = "2018.10.1"
+__version__ = "2019.5.1"
 
 __all__ = ['read', 'read_amplicon', 'read_ms',
            'Experiment', 'AmpliconExperiment', 'MS1Experiment',
