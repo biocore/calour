@@ -16,12 +16,12 @@ There are three ways to obtain Calour:
 
 # Installation instructions for Mac/Linux/Windows 10
 
-## NEW: EZCalour easy installer for windows
+## EZCalour easy installer for Windows
 If you have windows and would like to use calour via a full point and click GUI (EZCalour), you can download a windows installer from [sourceforge](https://sourceforge.net/projects/ezcalour/files/ezcalour_setup.exe/download).
 
 Just download the ezcalour_installer.exe and run it :)
 
-## Install miniconda \(if already installed - skip this step\)
+## Install miniconda (if already installed - skip this step)
 
 Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3.6 64 bit installer, and run it.
 
@@ -39,7 +39,7 @@ source activate calour
 conda install -c bioconda calour
 ```
 
-### Install from github repository
+### Install the latest manually from github repository
 
 > _**Windows Note**_ In the windows start menu, select "anaconda prompt". You will get a command prompt.
 
