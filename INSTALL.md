@@ -21,13 +21,9 @@ If you have windows and would like to use calour via a full point and click GUI 
 
 Just download the ezcalour_installer.exe and run it :)
 
-## Install miniconda (if already installed - skip this step)
+## Install Calour locally
 
-Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3.6 64 bit installer, and run it.
-
-You can select all the default options in the installer.
-
-## Install Calour
+You need to install miniconda (or anaconda) first. Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3 64 bit installer and run it. You can select all the default options in the installer. And then you can follow the instruction to install from bioconda or from github repository:
 
 ### Install from bioconda channel
 
@@ -48,8 +44,6 @@ Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment fo
 ```
 conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn statsmodels
 ```
-
-\(answer `y` to the installation question\)
 
 and activate it using:
 
