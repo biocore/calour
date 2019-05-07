@@ -16,18 +16,14 @@ There are three ways to obtain Calour:
 
 # Installation instructions for Mac/Linux/Windows 10
 
-## NEW: EZCalour easy installer for windows
+## EZCalour easy installer for Windows
 If you have windows and would like to use calour via a full point and click GUI (EZCalour), you can download a windows installer from [sourceforge](https://sourceforge.net/projects/ezcalour/files/ezcalour_setup.exe/download).
 
 Just download the ezcalour_installer.exe and run it :)
 
-## Install miniconda \(if already installed - skip this step\)
+## Install Calour locally
 
-Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3.6 64 bit installer, and run it.
-
-You can select all the default options in the installer.
-
-## Install Calour
+You need to install miniconda (or anaconda) first. Go to [https://conda.io/miniconda.html](https://conda.io/miniconda.html), download the Python 3 64 bit installer and run it. You can select all the default options in the installer. And then you can follow the instruction to install from bioconda or from github repository:
 
 ### Install from bioconda channel
 
@@ -36,10 +32,11 @@ For Mac/Linux users, you can skip the following manual installation steps and di
 ```python
 conda create -n calour python=3.5
 source activate calour
-conda install -c bioconda calour
+conda install -c bioconda calour       # if you want to just install calour
+conda install -c bioconda calour-full  # if you want to install calour and its optional dependencies
 ```
 
-### Install from github repository
+### Install the latest manually from github repository
 
 > _**Windows Note**_ In the windows start menu, select "anaconda prompt". You will get a command prompt.
 
@@ -48,8 +45,6 @@ Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment fo
 ```
 conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn statsmodels
 ```
-
-\(answer `y` to the installation question\)
 
 and activate it using:
 
@@ -111,11 +106,11 @@ pip install git+git://github.com/biocore/calour.git
 
 * Install the [phenotype-database](https://doi.org/10.6084/m9.figshare.4272392) calour interface:
 
-\(based on : [Hiding in Plain Sight: Mining Bacterial Species Records for Phenotypic Trait Information](http://msphere.asm.org/content/2/4/e00237-17) - Barberán et al. 2017\)
+  (based on : [Hiding in Plain Sight: Mining Bacterial Species Records for Phenotypic Trait Information](http://msphere.asm.org/content/2/4/e00237-17) - Barberán et al. 2017\)
 
-```
-pip install git+git://github.com/amnona/pheno-calour
-```
+  ```
+  pip install git+git://github.com/amnona/pheno-calour
+  ```
 
 * For metabolomics, also install the [GNPS](http://gnps.ucsd.edu/) calour interface:
   ```
