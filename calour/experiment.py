@@ -232,13 +232,14 @@ class Experiment:
             log = exp._log
             try:
                 logger.debug('Run func {}'.format(fn))
+                exp._log = False
                 new_exp = func(*args, **kwargs)
-                if exp._log is True:
+                new_exp._log = log
+                if log is True:
                     # do not use `'%r' % i` because it causes error when i is a tuple
                     param = ['{!r}'.format(i) for i in args[1:]] + ['{0!s}={1!r}'.format(k, v) for k, v in kwargs.items()]
                     param = ', '.join(param)
                     new_exp._call_history.append('{0}({1})'.format(fn, param))
-                    exp._log = False
                     logger.debug('Current object: {}'.format(new_exp))
             finally:
                 # set log status back
