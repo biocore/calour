@@ -315,6 +315,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         the new object created
 
     '''
+    # store the function parameters for call history
+    fparams = locals()
+
     logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
     exp_metadata = {'sample_metadata_md5': '', 'data_md5': ''}
@@ -382,6 +385,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
 
+    # initialize the call history
+    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
+    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
+
     return exp
 
 
@@ -416,6 +423,9 @@ def read_amplicon(data_file, sample_metadata_file=None,
     --------
     read
     '''
+    # store the function parameters for call history
+    fparams = locals()
+
     # don't do normalize before the possible filtering
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
                normalize=None, **kwargs)
@@ -427,6 +437,10 @@ def read_amplicon(data_file, sample_metadata_file=None,
         exp.filter_by_data('abundance', axis=0, cutoff=min_reads, mean_or_sum='sum', inplace=True)
     if normalize is not None:
         exp.normalize(total=normalize, axis='s', inplace=True)
+
+    # initialize the call history
+    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
+    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
 
     return exp
 
@@ -543,6 +557,8 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     --------
     read
     '''
+    # store the function parameters for call history
+    fparams = locals()
 
     default_params = {'mzmine2': {'sample_in_row': False, 'direct_ids': True, 'get_mz_rt_from_feature_id': False, 'ctype': 'csv'},
                       'biom': {'sample_in_row': False, 'direct_ids': False, 'get_mz_rt_from_feature_id': True, 'ctype': 'biom'},
@@ -623,6 +639,10 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         gnps_db._prepare_gnps_ids(direct_ids=direct_ids, mz_thresh=mz_thresh, use_gnps_id_from_AllFiles=use_gnps_id_from_AllFiles)
         # add gnps names and cluster to the features as feature_metadata fields (gnps_name and gnps_cluster)
         gnps_db._prepare_gnps_names()
+
+    # initialize the call history
+    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
+    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
 
     return exp
 
