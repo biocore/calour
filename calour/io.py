@@ -51,7 +51,7 @@ def _read_biom(fp, transpose=True):
 
     Parameters
     ----------
-    fp : str
+    fp : str or file object
         file path to the biom table
     transpose : bool (True by default)
         Transpose the table or not. The biom table has samples in
@@ -70,7 +70,10 @@ def _read_biom(fp, transpose=True):
         the feature metadata (if availble in table)
     '''
     logger.debug('loading biom table %s' % fp)
-    table = biom.load_table(fp)
+    if hasattr(fp, 'read'):
+        table = biom.parse_table(fp)
+    else:
+        table = biom.load_table(fp)
     sid = table.ids(axis='sample')
     fid = table.ids(axis='observation')
     logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
@@ -102,20 +105,20 @@ def _file_from_zip(tempdir, data_file, internal_data):
     '''
     if not zipfile.is_zipfile(data_file):
         raise ValueError('the qiime2 file %s is not a valid zip file. Is it a qiime2 artifact (.qza) file?' % data_file)
-    fl = zipfile.ZipFile(data_file)
-    internal_name = None
-    for fname in fl.namelist():
-        if fname.endswith(internal_data):
-            internal_name = fname
-            break
-    if internal_name is None:
-        raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
-    data_file = fl.extract(internal_name, tempdir)
+    with zipfile.ZipFile(data_file) as fl:
+        internal_name = None
+        for fname in fl.namelist():
+            if fname.endswith(internal_data):
+                internal_name = fname
+                break
+        if internal_name is None:
+            raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
+        data_file = fl.extract(internal_name, tempdir)
     return data_file
 
 
 def _read_qiime2_zip(fp, transpose=True):
-    '''Read in a qiime2 qza biom table with optional rep_seq and taxonomy data files
+    '''Read in a qiime2 qza biom table
     NOTE: this function reads2 the qiime2 qza artifacts files using unzip rather than relying on qiime2.
     This enables reading qiime2 artifacts without activating the qiime2 environment
 
@@ -123,11 +126,6 @@ def _read_qiime2_zip(fp, transpose=True):
     ----------
     fp : str
         file path to the qiime2 (.qza) biom table
-    rep_seq_file: str or None, optional
-        If not none, name of the representative sequencees qiime2 artifact, used to translate sequnece hashes
-        to the actual sequences.
-    taxonomy_file: str or None, optional
-        If not none, name of the taxonomy qiime2 artifact file.
     transpose : bool (True by default)
         Transpose the table or not. The biom table has samples in
         column while sklearn and other packages require samples in
@@ -154,7 +152,7 @@ def _read_qiime2_zip(fp, transpose=True):
     return sid, fid, data, fmd
 
 
-def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=None, use_qiime2=False, **kwargs):
+def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=None, **kwargs):
     '''Read a qiime2 feature table and additional optional artifact files (representative sequences and taxonomy) into a Calour.AmpliconExperiment
 
     Parameters
@@ -276,7 +274,7 @@ def _read_metadata(ids, f, kwargs):
     f : str
         file path of metadata
     kwargs : dict
-        keyword argument passed to :func:`pandas.read_table`
+        keyword argument passed to :func:`pandas.read_csv`
 
     Returns
     -------
@@ -301,7 +299,7 @@ def _read_metadata(ids, f, kwargs):
             kwargs['dtype'] = {index_col: str}
 
         try:
-            metadata = pd.read_table(f, **kwargs)
+            metadata = pd.read_table(f, sep='\t', **kwargs)
         except Exception as err:
             logger.error('Error reading metadata file %r\nError: %s' % (f, err))
             raise err
@@ -363,7 +361,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'gnps_ms' : an OpenMS bucket table tsv with samples as columns (exported from GNPS)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
-        keyword arguments passing to :func:`pandas.read_table` when reading sample metadata
+        keyword arguments passing to :func:`pandas.read_csv` when reading sample metadata
         or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
         as int and parse the file as latin-8 instead of utf-8. By default, it assumes the first column in
@@ -403,7 +401,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
-        df = pd.read_table(data_file, sep='\t', index_col=0)
+        df = pd.read_(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
         fid = df.index.tolist()
         data = df.as_matrix().T
