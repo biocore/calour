@@ -179,9 +179,7 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
             logger.debug('loading rep_seqs file %s' % rep_seq_file)
             rep_seqs = []
             rs_name = _file_from_zip(tempdir, rep_seq_file, internal_data='data/dna-sequences.fasta')
-            for cseq in skbio.read(rs_name, format='fasta'):
-                cseq = str(cseq).upper()
-                rep_seqs.append(cseq)
+            rep_seqs = [str(cseq).upper() for cseq in skbio.read(rs_name, format='fasta')]
             newexp.feature_metadata['_hash'] = newexp.feature_metadata['_feature_id']
             newexp.feature_metadata['_feature_id'] = rep_seqs
             newexp.feature_metadata.set_index('_feature_id', inplace=True)
