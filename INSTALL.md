@@ -32,8 +32,7 @@ For Mac/Linux users, you can skip the following manual installation steps and di
 ```python
 conda create -n calour python=3.5
 source activate calour
-conda install -c bioconda calour       # if you want to just install calour
-conda install -c bioconda calour-full  # if you want to install calour and its optional dependencies
+conda install -c bioconda calour
 ```
 
 ### Install the latest manually from github repository
