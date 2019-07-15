@@ -200,7 +200,7 @@ def _read_metadata(ids, f, kwargs):
     f : str
         file path of metadata
     kwargs : dict
-        keyword argument passed to :func:`pandas.read_table`
+        keyword argument passed to :func:`pandas.read_csv`
 
     Returns
     -------
@@ -225,7 +225,7 @@ def _read_metadata(ids, f, kwargs):
             kwargs['dtype'] = {index_col: str}
 
         try:
-            metadata = pd.read_table(f, **kwargs)
+            metadata = pd.read_csv(f, sep='\t', **kwargs)
         except Exception as err:
             logger.error('Error reading metadata file %r\nError: %s' % (f, err))
             raise err
@@ -287,7 +287,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         'gnps_ms' : an OpenMS bucket table tsv with samples as columns (exported from GNPS)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
-        keyword arguments passing to :func:`pandas.read_table` when reading sample metadata
+        keyword arguments passing to :func:`pandas.read_csv` when reading sample metadata
         or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
         {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
         as int and parse the file as latin-8 instead of utf-8. By default, it assumes the first column in
@@ -327,7 +327,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2(data_file)
     elif data_file_type == 'tsv':
-        df = pd.read_table(data_file, sep='\t', index_col=0)
+        df = pd.read_csv(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
         fid = df.index.tolist()
         data = df.as_matrix().T
@@ -615,7 +615,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
 
     if gnps_file:
         # load the gnps table
-        gnps_data = pd.read_table(gnps_file, sep='\t')
+        gnps_data = pd.read_csv(gnps_file, sep='\t')
         exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
         # use the gnpscalour database interface to get metabolite info from the gnps file
         gnps_db = _get_database_class('gnps', exp=exp)
