@@ -297,7 +297,7 @@ def _read_metadata(ids, f, kwargs):
             kwargs['dtype'] = {index_col: str}
 
         try:
-            metadata = pd.read_table(f, sep='\t', **kwargs)
+            metadata = pd.read_csv(f, sep='\t', **kwargs)
         except Exception as err:
             logger.error('Error reading metadata file %r\nError: %s' % (f, err))
             raise err
@@ -399,7 +399,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
-        df = pd.read_table(data_file, sep='\t', index_col=0)
+        df = pd.read_csv(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
         fid = df.index.tolist()
         data = df.as_matrix().T
@@ -687,7 +687,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
 
     if gnps_file:
         # load the gnps table
-        gnps_data = pd.read_table(gnps_file, sep='\t')
+        gnps_data = pd.read_csv(gnps_file, sep='\t')
         exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
         # use the gnpscalour database interface to get metabolite info from the gnps file
         gnps_db = _get_database_class('gnps', exp=exp)
