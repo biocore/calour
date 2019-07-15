@@ -399,7 +399,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
-        df = pd.read_(data_file, sep='\t', index_col=0)
+        df = pd.read_table(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
         fid = df.index.tolist()
         data = df.as_matrix().T
