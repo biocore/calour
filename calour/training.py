@@ -144,8 +144,9 @@ def split_train_test(exp: Experiment,
     stratify : str or array-like or None
         If it is array-like or None, it is directly passed to
         :func:`sklearn.model_selection.train_test_split`. If it is a
-        str, it must be a valid column name in the sample_metadata and
-        this column will be passed to the function for stratified split.
+        str, it must be a valid column name in the
+        `Experiment.sample_metadata` and this column will be passed to
+        the function for stratified split.
 
     Returns
     -------
