@@ -2,7 +2,7 @@
 
 ## Next version
 
-* Add `read_qiime2()` function to enable reading of qiime2 feature tables artifacts with the associated rep-seqs and taxonomy artifacts.
+* Add `read_qiime2()` function to enable reading of qiime2 feature tables artifacts with the associated representative sequences and taxonomy artifacts (without the need to install qiime2)
 
 ## Version 2019.5.1
 
