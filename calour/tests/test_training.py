@@ -250,7 +250,6 @@ class RTests(Tests):
                     cutoff = i * k + 0.1
                     self.assertEqual(np.sum(y_test <= cutoff), i)
 
-
     def test_rep_sorted_strtified(self):
         n = self.y.shape[0]
         for k in (3, 2):

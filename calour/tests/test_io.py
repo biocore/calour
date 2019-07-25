@@ -230,11 +230,18 @@ class IOTests(Tests):
         self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
 
     def test_read_qiim2(self):
-        # problem with travis and qiime2 install - skipping
+        # test the non-hashed table
+        exp = ca.read_qiime2(self.qiime2table, normalize=None, min_reads=None)
+        self.assertEqual(exp.shape, (104, 658))
 
-        # exp = ca.read(self.qiime2table, data_file_type='qiime2', normalize=None)
-        # self.assertEqual(exp.shape, (104, 658))
-        pass
+        # and the hashed table with rep seqs and taxonomy files
+        exp = ca.read_qiime2(self.q2_cfs_table, sample_metadata_file=self.q2_cfs_map,
+                             rep_seq_file=self.q2_cfs_repseqs, taxonomy_file=self.q2_cfs_taxonomy,
+                             normalize=None, min_reads=None)
+        self.assertEqual(exp.shape, (87, 2130))
+        # test if the index is indeed sequences, and taxonomy is loaded correctly
+        test_seq = 'TACGTAGGGAGCAAGCGTTGTCCGGAATTACTGGGTGTAAAGGGTGCGTAGGCGGGTATGCAAGTCATATGTGAAATACCGGGGCTCAACTCCGGGGCTGCATAAGAAACTGTATATCTTGAGTACAGGAGAGGTAAGCGGAATTCCTAG'
+        self.assertEqual(exp.feature_metadata['Taxon'][test_seq], 'k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Ruminococcaceae; g__; s__')
 
     def test_create_biom_table_from_exp(self):
         exp = ca.read(self.test1_biom, self.test1_samp, normalize=None)

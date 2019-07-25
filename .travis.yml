@@ -11,6 +11,9 @@ env:
   global:
     - secure: "e/VyjGTs9HZGnu+q9ysnOsoUWdokawJGVoiFzFNJCxMgRguihAiJBEpEd1bcitI+y9/RRh+LU8LJWVVSDnQgZ3Z5Xd++xKS0z4O9Jo8zw3t8jcGQvS3BjIufyIirEJvhmz0l9ywPzBTxNMCi3N6PIDl6TZhu3UmURXOWdGFutUCcVPcJisTiNG2Pq2LIUxUSk66MqZGWGkrCpzZ0UXmzMwWx+AhR14uuROBhB8WFkIaUEVDmBmMwDnGZBRXO/joTKrHXNPo+jjXG81VuXn/joN7dWz07ghDNBlaKl/zLPhElcqOY7F/VklpUZRbxvHY/8N3k/BGQ+wFq19jEBVqWJbNFu8ObEW8gW2gcCdzQW8qJzMG2iFiFlXLchpz47WNDmDY77/kMor9Rv8amk3tR2GUOrixE+THfptFsj5hHn33wRp/Ve5gdOAplg66yaWLRdjpF6E0QPZ3Yb6Msdp6olgC37P2KlqhZQJ0Gy9xEfqScLYEDZlh0DBVpr/mpm85dNNeGwnvbUdGTP9Oev8+RN9v4CkfU8RcYfe+aw/hcPAzXW6fMiCZSql8E+21PBhKxsfGMuObxCiA5nHhGZITTEZ/rFseboPgiMe+Py5c9IsUNnjRFT/nVqiOQ4eFi1qvBgOXVMXrHtN0UwAz+wpbURqCk8WV/Huf78weXnijSqyk="
 
+services:
+  - xvfb
+
 before_install:
   - echo "$TRAVIS_OS_NAME"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
@@ -35,7 +38,8 @@ install:
   - pip install . --no-deps
 before_script:
   - export DISPLAY=:99.0
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
+  # changed xvfb init to services section (see https://benlimmer.com/2019/01/14/travis-ci-xvfb/)
+  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
 script:
   - export MPLBACKEND="agg"
   - WITH_COVERAGE=TRUE make all

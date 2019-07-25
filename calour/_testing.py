@@ -54,8 +54,13 @@ class Tests(TestCase):
         self.gnps_cluster_info = join(test_data_dir, 'gnps_clusterinfosummarygroup.txt')
         # a fasta file for testing the AmpliconExperiment
         self.seqs1_fasta = join(test_data_dir, 'seqs1.fasta')
-        # a qiime2 biom table artifact
+        # a qiime2 non-hashed biom table artifact
         self.qiime2table = join(test_data_dir, 'feature-table.qza')
+        # a qiime2 dataset with hashed biom table, rep-seqs and taxonomy
+        self.q2_cfs_table = join(test_data_dir, 'cfs-table.qza')
+        self.q2_cfs_map = join(test_data_dir, 'cfs-map.txt')
+        self.q2_cfs_repseqs = join(test_data_dir, 'cfs-rep-seqs.qza')
+        self.q2_cfs_taxonomy = join(test_data_dir, 'cfs-taxonomy.qza')
 
 
 def assertIsInstance(obj, cls, msg=''):

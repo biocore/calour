@@ -11,6 +11,7 @@ Functions
 
    read
    read_amplicon
+   read_qiime2
    read_ms
    save
    save_biom
@@ -28,10 +29,13 @@ Functions
 
 from logging import getLogger
 import os.path
+import zipfile
+import tempfile
 
 import pandas as pd
 import numpy as np
 import biom
+import skbio
 
 from . import Experiment, AmpliconExperiment, MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
@@ -47,7 +51,7 @@ def _read_biom(fp, transpose=True):
 
     Parameters
     ----------
-    fp : str
+    fp : str or file object
         file path to the biom table
     transpose : bool (True by default)
         Transpose the table or not. The biom table has samples in
@@ -66,7 +70,10 @@ def _read_biom(fp, transpose=True):
         the feature metadata (if availble in table)
     '''
     logger.debug('loading biom table %s' % fp)
-    table = biom.load_table(fp)
+    if hasattr(fp, 'read'):
+        table = biom.parse_table(fp)
+    else:
+        table = biom.load_table(fp)
     sid = table.ids(axis='sample')
     fid = table.ids(axis='observation')
     logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
@@ -80,8 +87,40 @@ def _read_biom(fp, transpose=True):
     return sid, fid, data, feature_md
 
 
-def _read_qiime2(fp, transpose=True):
-    '''Read in a qiime2 .qza biom table file.
+def _file_from_zip(tempdir, data_file, internal_data):
+    '''extract the data file from a regular/qza filename into the tempdir, and return the filename
+
+    Parameters
+    ----------
+    tmpdir: str
+        name of the directory to extract the zip into
+    data_file: str
+        original name of the file (could be '.qza' or not)
+    internale_data: str
+        the internal qiime2 qza file name (i.e. 'data/feature-table.biom' for biom table etc.)
+
+    Returns
+    -------
+    str: name of data file inside the tempdir
+    '''
+    if not zipfile.is_zipfile(data_file):
+        raise ValueError('the qiime2 file %s is not a valid zip file. Is it a qiime2 artifact (.qza) file?' % data_file)
+    with zipfile.ZipFile(data_file) as fl:
+        internal_name = None
+        for fname in fl.namelist():
+            if fname.endswith(internal_data):
+                internal_name = fname
+                break
+        if internal_name is None:
+            raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
+        data_file = fl.extract(internal_name, tempdir)
+    return data_file
+
+
+def _read_qiime2_zip(fp, transpose=True):
+    '''Read in a qiime2 qza biom table
+    NOTE: this function reads2 the qiime2 qza artifacts files using unzip rather than relying on qiime2.
+    This enables reading qiime2 artifacts without activating the qiime2 environment
 
     Parameters
     ----------
@@ -103,23 +142,56 @@ def _read_qiime2(fp, transpose=True):
     feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
-    import qiime2
-    logger.debug('loading qiime2 biom table %s' % fp)
+    logger.debug('loading qiime2 feature table %s' % fp)
 
-    q2table = qiime2.Artifact.load(fp)
-    table = q2table.view(biom.Table)
+    # load the feature table file
+    with tempfile.TemporaryDirectory() as tempdir:
+        oname = _file_from_zip(tempdir, fp, internal_data='data/feature-table.biom')
+        sid, fid, data, fmd = _read_biom(oname, transpose=transpose)
 
-    sid = table.ids(axis='sample')
-    fid = table.ids(axis='observation')
-    logger.info('loaded %d samples, %d observations' % (len(sid), len(fid)))
-    data = table.matrix_data
-    feature_md = _get_md_from_biom(table)
+    return sid, fid, data, fmd
 
-    if transpose:
-        logger.debug('transposing table')
-        data = data.transpose()
 
-    return sid, fid, data, feature_md
+def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=None, **kwargs):
+    '''Read a qiime2 feature table and additional optional artifact files (representative sequences and taxonomy) into a Calour.AmpliconExperiment
+
+    Parameters
+    ----------
+    fp: str
+        name of the qiime2 feature table .qza artifact file
+    sample_metadata_file : None or str, optional
+        None (default) to just use sample names (no additional metadata).
+        if not None, file path to the sample metadata (aka mapping file in QIIME).
+    rep_seq_file: None or str, optional
+        None (default) to use the feature ids in the feature table
+        if not None, file path to the qiime2 representative sequences artifact file (defined by the qiime2 --o-representative-sequences parameter)
+    taxonomy_file: None or str, optional
+        if not None, add taxonomy for each feature using the qiime2 taxonomy artifact file (output of the qiime2 feature-classifier command)
+
+    Keyword Arguments
+    -----------------
+    %(io.read.parameters)s
+    '''
+    newexp = read_amplicon(fp, sample_metadata_file=sample_metadata_file, data_file_type='qiime2', **kwargs)
+    with tempfile.TemporaryDirectory() as tempdir:
+        # if rep-seqs file is supplied, translate hashes to sequences
+        if rep_seq_file is not None:
+            logger.debug('loading rep_seqs file %s' % rep_seq_file)
+            rep_seqs = []
+            rs_name = _file_from_zip(tempdir, rep_seq_file, internal_data='data/dna-sequences.fasta')
+            rep_seqs = [str(cseq).upper() for cseq in skbio.read(rs_name, format='fasta')]
+            newexp.feature_metadata['_hash'] = newexp.feature_metadata['_feature_id']
+            newexp.feature_metadata['_feature_id'] = rep_seqs
+            newexp.feature_metadata.set_index('_feature_id', inplace=True)
+
+        # if taxonomy file is supplied, load it into the feature metadata
+        if taxonomy_file is not None:
+            logger.debug('loading taxonomy file %s' % taxonomy_file)
+            tax_name = _file_from_zip(tempdir, taxonomy_file, internal_data='data/taxonomy.tsv')
+            taxonomy_df = pd.read_table(tax_name)
+            taxonomy_df.set_index('Feature ID', inplace=True)
+            newexp.feature_metadata = pd.concat([newexp.feature_metadata, taxonomy_df], axis=1)
+    return newexp
 
 
 def _get_md_from_biom(table):
@@ -325,7 +397,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'csv':
         sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_table_sep)
     elif data_file_type == 'qiime2':
-        sid, fid, data, fmd = _read_qiime2(data_file)
+        sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
         df = pd.read_csv(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
