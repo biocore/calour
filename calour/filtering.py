@@ -474,7 +474,7 @@ def filter_features(exp: Experiment, field, values, negate=False, inplace=False)
     field : str
         the column name of the feature metadata tables
     values :
-        keep the samples with the values in the given field
+        keep the features with the values in the given field
     negate : bool, optional
         discard instead of keep the samples if set to `True`
     inplace : bool, optional
