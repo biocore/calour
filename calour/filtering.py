@@ -12,6 +12,7 @@ Functions
    filter_by_data
    filter_by_metadata
    filter_samples
+   filter_features
    filter_ids
    filter_prevalence
    filter_abundance
@@ -450,7 +451,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
     negate : bool, optional
         discard instead of keep the samples if set to `True`
     inplace : bool, optional
-        return the filtering on the original :class:`.Experiment` object or a copied one.
+        change the filtering on the original :class:`.Experiment` object or not.
 
     Returns
     -------
@@ -463,6 +464,33 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False):
         values = _to_list(values)
 
     return filter_by_metadata(exp, field=field, select=values, negate=negate, inplace=inplace)
+
+
+def filter_features(exp: Experiment, field, values, negate=False, inplace=False):
+    '''Shortcut for filtering features.
+
+    Parameters
+    ----------
+    field : str
+        the column name of the feature metadata tables
+    values :
+        keep the samples with the values in the given field
+    negate : bool, optional
+        discard instead of keep the samples if set to `True`
+    inplace : bool, optional
+        change the filtering on the original :class:`.Experiment` object or not.
+
+    Returns
+    -------
+    Experiment
+        the filtered object
+
+    '''
+    # if it is None - pass to filter_by_metadata so will remove the NaN samples
+    if values is not None:
+        values = _to_list(values)
+
+    return filter_by_metadata(exp, field=field, select=values, axis=1, negate=negate, inplace=inplace)
 
 
 @ds.with_indent(4)
