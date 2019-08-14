@@ -85,10 +85,10 @@ def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0,
     if newfield in metadata.columns:
         raise ValueError('new field name %s alreay in metadata. Please use different newfield value' % newfield)
 
-    # add the new column
     if align not in [None, '<', '>']:
         raise ValueError("Wrong align value. Please choose from [None, '<', '>']")
 
+    # add the new column
     if align in ['<', '>']:
         len_field1 = metadata[field1].astype(str).str.len().max()
         len_field2 = metadata[field2].astype(str).str.len().max()
