@@ -34,7 +34,7 @@ from .experiment import Experiment
 logger = getLogger(__name__)
 
 
-def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0, sep='_', inplace=True):
+def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0, sep='_', align=None, inplace=True):
     '''Join two sample/feature metadata fields into a single new field
 
     Parameters
@@ -50,6 +50,9 @@ def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0,
         0 or 's' (default) to modify sample metadata fields; 1 or 'f' to modify feature metadata fields
     sep : str, optional
         The separator between the values of the two fields when joining
+    align : None, '<', or '>', optional
+        align the contents of newfield or not
+        None (default) to not align; '<' to left align; '>' to right align
     inplace : bool, optional
         True (default) to add in current experiment, False to create a new Experiment
 
@@ -82,8 +85,16 @@ def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0,
     if newfield in metadata.columns:
         raise ValueError('new field name %s alreay in metadata. Please use different newfield value' % newfield)
 
+    if align not in [None, '<', '>']:
+        raise ValueError("Wrong align value. Please choose from [None, '<', '>']")
+
     # add the new column
-    newcol = [str(i) + sep + str(j) for i, j in zip(metadata[field1], metadata[field2])]
+    if align in ['<', '>']:
+        len_field1 = metadata[field1].astype(str).str.len().max()
+        len_field2 = metadata[field2].astype(str).str.len().max()
+        newcol = ['{:{}{}}'.format(i, align, len_field1) + sep + '{:{}{}}'.format(j, align, len_field2) for i, j in zip(metadata[field1], metadata[field2])]
+    else:
+        newcol = [str(i) + sep + str(j) for i, j in zip(metadata[field1], metadata[field2])]
 
     if axis == 0:
         newexp.sample_metadata[newfield] = newcol

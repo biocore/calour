@@ -19,7 +19,7 @@ from calour._testing import Tests, assert_experiment_equal
 class MTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
 
     def test_join_metadata_fields(self):
         # test the default params
@@ -37,6 +37,16 @@ class MTests(Tests):
         self.assertIn('test', exp.feature_metadata.columns)
         self.assertNotIn('test', exp.sample_metadata.columns)
         self.assertEqual(exp.feature_metadata['test'].iloc[11], 'bad_bacteria;bad_bacteria')
+        # test we didn't change anything besides the new sample metadata column
+        assert_experiment_equal(exp, self.test1, ignore_md_fields=['test'])
+
+        # test join feature fields with new field name, sepparator, inplace and align
+        exp = deepcopy(self.test1)
+        newexp = exp.join_metadata_fields('taxonomy', 'ph', 'test', axis=1, sep=';', align='<', inplace=True)
+        self.assertIs(newexp, exp)
+        self.assertIn('test', exp.feature_metadata.columns)
+        self.assertNotIn('test', exp.sample_metadata.columns)
+        self.assertEqual(exp.feature_metadata.loc['AT', 'test'], 'k__Bacteria; p__Tenericutes; c__Mollicutes; o__Mycoplasmatales; f__Mycoplasmataceae; g__Mycoplasma; s__                         ;4.1')
         # test we didn't change anything besides the new sample metadata column
         assert_experiment_equal(exp, self.test1, ignore_md_fields=['test'])
 
