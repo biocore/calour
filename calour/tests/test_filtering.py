@@ -245,6 +245,53 @@ class FilteringTests(Tests):
         assert_experiment_equal(test.filter_sample_categories('group', 10),
                                 test.filter_samples('group', '1'))
 
+    def test_filter_samples_edge_cases(self):
+        # no group 3 - none filtered
+        test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
+        # group dtype is O
+        obs = test1.filter_samples('group', ['3'])
+        self.assertEqual(obs.shape, (0, 12))
+        obs = test1.filter_samples('group', ['3'], negate=True)
+        assert_experiment_equal(obs, test1)
+
+    def test_filter_samples_na(self):
+        test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
+        # filter na value in group column
+        obs = test1.filter_samples('group', None)
+        self.assertEqual(obs.shape, (20, 12))
+        self.assertEqual(test1.sample_metadata.dropna(axis=0).index.tolist(),
+                         obs.sample_metadata.index.tolist())
+
+    def test_filter_samples(self):
+        for inplace in [True, False]:
+            test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
+            # only filter samples from 11 to 14.
+            obs = test1.filter_samples('id', list(range(11, 15)), inplace=inplace)
+            self.assertEqual(obs.shape, (4, 12))
+            self.assertEqual(obs.sample_metadata.index.tolist(), ['S11', 'S12', 'S13', 'S14'])
+            if inplace:
+                self.assertIs(obs, test1)
+            else:
+                self.assertIsNot(obs, test1)
+
+    def test_filter_features_edge_cases(self):
+        # none filtered
+        obs = self.test2.filter_features('oxygen', ['facultative'])
+        self.assertEqual(obs.shape, (9, 0))
+        obs = self.test2.filter_features('oxygen', ['facultative'], negate=True)
+        assert_experiment_equal(obs, self.test2)
+
+    def test_filter_features(self):
+        for inplace in [True, False]:
+            test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
+            obs = test2.filter_features('oxygen', ['anaerobic'], inplace=inplace)
+            self.assertEqual(obs.shape, (9, 2))
+            self.assertListEqual(obs.feature_metadata.index.tolist(), ['TG', 'TC'])
+            if inplace:
+                self.assertIs(obs, test2)
+            else:
+                self.assertIsNot(obs, test2)
+
 
 if __name__ == '__main__':
     main()

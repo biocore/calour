@@ -42,7 +42,7 @@ conda install -c bioconda calour
 Create a [conda](http://conda.pydata.org/docs/install/quick.html) environment for calour:
 
 ```
-conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn statsmodels
+conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter scikit-learn statsmodels h5py
 ```
 
 and activate it using:
