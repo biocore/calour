@@ -177,12 +177,18 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
         # if rep-seqs file is supplied, translate hashes to sequences
         if rep_seq_file is not None:
             logger.debug('loading rep_seqs file %s' % rep_seq_file)
-            rep_seqs = []
             rs_name = _file_from_zip(tempdir, rep_seq_file, internal_data='data/dna-sequences.fasta')
-            rep_seqs = [str(cseq).upper() for cseq in skbio.read(rs_name, format='fasta')]
-            newexp.feature_metadata['_hash'] = newexp.feature_metadata['_feature_id']
-            newexp.feature_metadata['_feature_id'] = rep_seqs
-            newexp.feature_metadata.set_index('_feature_id', inplace=True)
+            rseqs = []
+            rids = []
+            for cseq in skbio.read(rs_name, format='fasta'):
+                rseqs.append(str(cseq).upper())
+                rids.append(cseq.metadata['id'])
+            rep_seqs = pd.Series(data=rseqs, index=rids, name='_feature_id')
+            if not newexp.feature_metadata.index.equals(rep_seqs.index):
+                logger.info('Rep seqs hashes and table hashes are not equal. Using table hashes.')
+            newexp.feature_metadata.rename(columns={'_feature_id': '_hash'}, inplace=True)
+            newexp.feature_metadata = newexp.feature_metadata.join(other=rep_seqs, on='_hash', how='left')
+            newexp.feature_metadata.set_index('_feature_id', inplace=True, drop=False)
 
         # if taxonomy file is supplied, load it into the feature metadata
         if taxonomy_file is not None:
