@@ -168,7 +168,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
             clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
-            title=None, rect=None, cax=None, ax=None):
+            title=None, figsize=None, rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
 
     Plot either a simple heatmap for the experiment with features in row
@@ -280,7 +280,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     numrows, numcols = exp.shape
 
     if ax is None:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=figsize)
     else:
         fig = ax.get_figure()
 
