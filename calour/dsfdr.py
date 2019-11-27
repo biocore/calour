@@ -292,6 +292,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         # call the user-defined function of statistical test
         t = method(data, labels)
         tstat = t.copy()
+        t = np.abs(tstat)
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
             rlabels = np.random.permutation(labels)
