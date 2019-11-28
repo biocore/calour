@@ -195,7 +195,6 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
     labels = labels.copy()
 
     logger.debug('start permutation')
-
     if method == 'meandiff':
         # fast matrix multiplication based calculation
         method = meandiff
@@ -298,6 +297,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             rlabels = np.random.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
+        u = np.abs(u)
     else:
         print('unsupported method %s' % method)
         return None, None
