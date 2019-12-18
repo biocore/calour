@@ -184,8 +184,11 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
                 rseqs.append(str(cseq).upper())
                 rids.append(cseq.metadata['id'])
             rep_seqs = pd.Series(data=rseqs, index=rids, name='_feature_id')
+
+            # test if all hashes are identical to the rep_seqs file supplied
             if not newexp.feature_metadata.index.equals(rep_seqs.index):
                 logger.info('Rep seqs hashes and table hashes are not equal. Using table hashes.')
+            # switch the columns so now _feature_id (and the index) is the sequence and not the hash. The hash is copied to '_hash'
             newexp.feature_metadata.rename(columns={'_feature_id': '_hash'}, inplace=True)
             newexp.feature_metadata = newexp.feature_metadata.join(other=rep_seqs, on='_hash', how='left')
             newexp.feature_metadata.set_index('_feature_id', inplace=True, drop=False)
