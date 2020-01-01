@@ -199,7 +199,7 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
             tax_name = _file_from_zip(tempdir, taxonomy_file, internal_data='data/taxonomy.tsv')
             taxonomy_df = pd.read_table(tax_name)
             taxonomy_df.set_index('Feature ID', inplace=True)
-            newexp.feature_metadata = pd.concat([newexp.feature_metadata, taxonomy_df], axis=1)
+            newexp.feature_metadata = newexp.feature_metadata.join(other=taxonomy_df, how='left')
     return newexp
 
 
