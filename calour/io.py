@@ -839,15 +839,18 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     table = biom.table.Table(exp.data.transpose(), features, samples, type="OTU table")
     # and add metabolite name as taxonomy:
     if add_metadata is not None:
-        # md has to be a dict of dict, so it needs to be converted from
-        # a DataFrame instead of Series
-        md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
-        # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
-        if to_list:
-            for k, v in md.items():
-                # if isinstance(v[add_metadata], str):
-                v[add_metadata] = v[add_metadata].split(';')
-        table.add_metadata(md, axis='observation')
+        if add_metadata in exp.feature_metadata.columns:
+            # md has to be a dict of dict, so it needs to be converted from
+            # a DataFrame instead of Series
+            md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
+            # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
+            if to_list:
+                for k, v in md.items():
+                    # if isinstance(v[add_metadata], str):
+                    v[add_metadata] = v[add_metadata].split(';')
+            table.add_metadata(md, axis='observation')
+        else:
+            logger.info('Metadata field %s not found. Saving biom table without metadata' % add_metadata)
     return table
 
 
