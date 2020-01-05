@@ -200,6 +200,12 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
             taxonomy_df = pd.read_table(tax_name)
             taxonomy_df.set_index('Feature ID', inplace=True)
             newexp.feature_metadata = newexp.feature_metadata.join(other=taxonomy_df, how='left')
+            if len(newexp.feature_metadata.index.intersection(taxonomy_df.index)) == 0:
+                logger.info('No matching sequences in taxonomy file.')
+                if '_hash' in newexp.feature_metadata.columns:
+                    logger.info('Trying to use hashes for taxonomy')
+                    newexp.feature_metadata = newexp.feature_metadata.drop(taxonomy_df.columns, axis=1)
+                    newexp.feature_metadata = newexp.feature_metadata.join(other=taxonomy_df, on='_hash', how='left')
     return newexp
 
 
