@@ -289,7 +289,7 @@ def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace
                                               total=total, negate=True, inplace=inplace)
     return newexp
 
-
+    
 def random_permute_data(exp: Experiment, normalize=True):
     '''Shuffle independently the reads of each feature
 

@@ -132,6 +132,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
                 % (np.sum(odif[keep] > 0), np.sum(odif[keep] < 0), np.sum(keep)))
 
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals)
+    newexp.feature_metadata[_CALOUR_DIRECTION] = [field if x > 0 else 'Anti-%s' % field for x in newexp.feature_metadata[_CALOUR_STAT]]
     return newexp
 
 
