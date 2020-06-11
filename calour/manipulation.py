@@ -257,7 +257,7 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
         if other_prefix:
             smd2 = other.sample_metadata.rename(lambda x: '{}_{!s}'.format(other_prefix, x), inplace=False)
     # concatenate the sample_metadata
-    smd = pd.concat([smd1, smd2], join='outer')
+    smd = pd.concat([smd1, smd2], join='outer', sort=False)
     if field_name is not None:
         smd[field_name] = np.nan
         smd.loc[smd1.index.values, field_name] = exp.description
