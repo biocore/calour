@@ -406,10 +406,6 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
         sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep='\t')
-        # df = pd.read_csv(data_file, sep='\t', index_col=0)
-        # sid = df.columns.tolist()
-        # fid = df.index.tolist()
-        # data = df.values.T
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
 
