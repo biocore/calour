@@ -267,6 +267,7 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     table.set_index(table.columns[0], drop=True, inplace=True)
     if sample_in_row:
         table = table.transpose()
+        logger.debug('transposed table')
     sid = table.columns
     fid = table.index
     data = table.values.astype(float)
@@ -417,7 +418,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         df = pd.read_csv(data_file, sep='\t', index_col=0)
         sid = df.columns.tolist()
         fid = df.index.tolist()
-        data = df.as_matrix().T
+        data = df.values.T
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
 
