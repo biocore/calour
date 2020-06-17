@@ -233,7 +233,7 @@ def _read_csv(fp, sample_in_row=False, sep=','):
     fp : str
         file path to the biom table
     sample_in_row : bool, optional
-        True to if csv datafile has samples as rows, features as columns
+        True if csv datafile has samples as rows, features as columns
         False (default) if columns are samples (rows are features)
     sep : str, optional
         The separator between entries in the table
