@@ -81,7 +81,6 @@ def _read_biom(fp, transpose=True):
     feature_md = _get_md_from_biom(table)
 
     if transpose:
-        logger.debug('transposing table')
         data = data.transpose()
 
     return sid, fid, data, feature_md
@@ -226,19 +225,15 @@ def _get_md_from_biom(table):
     return md_df
 
 
-def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
+def _read_csv(fp, sample_in_row=False, sep=','):
     '''Read a csv file
 
     Parameters
     ----------
     fp : str
         file path to the biom table
-    transpose : bool (True by default)
-        Transpose the table or not. The biom table has samples in
-        column while sklearn and other packages require samples in
-        row. So you should transpose the data table.
     sample_in_row : bool, optional
-        True to csv datafile has samples as rows,
+        True to if csv datafile has samples as rows, features as columns
         False (default) if columns are samples (rows are features)
     sep : str, optional
         The separator between entries in the table
@@ -250,7 +245,7 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     fid : list of str
         the feature ids
     data : numpy array (2d) of float
-        the table
+        the table (samples in columns, features in rows)
     feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
@@ -258,22 +253,18 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     # use the python engine as the default (c) engine throws an error
     # a known bug in pandas (see #11166)
     table = pd.read_csv(fp, header=0, engine='python', sep=sep)
-
     # if the csv file has an additional sep at the end of each line, it cause
     # pandas to create an empty column at the end. This can cause bugs with the
     # normalization. so we remove it.
     table.dropna(axis='columns', how='all', inplace=True)
-
     table.set_index(table.columns[0], drop=True, inplace=True)
+
     if sample_in_row:
         table = table.transpose()
         logger.debug('transposed table')
     sid = table.columns
     fid = table.index
-    data = table.values.astype(float)
-    if transpose:
-        logger.debug('transposing table')
-        data = data.transpose()
+    data = table.values.astype(float).transpose()
     logger.info('loaded %d samples, %d features' % data.shape)
     return sid, fid, data
 
@@ -369,10 +360,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     data_file_type : str, optional
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
-        'tsv': a tab-separated table with (samples in column and feature in row)
-        'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
-        'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
-        'gnps_ms' : an OpenMS bucket table tsv with samples as columns (exported from GNPS)
+        'tsv': a tab-separated table. By default, samples are columns and features are rows (see sample_in_row parameter)
+        'csv': general comma (or other delimiter, as indicated by the data_table_sep variable) separated file.
+            By default, samples are columns and features are rows (see sample_in_row parameter)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
         keyword arguments passing to :func:`pandas.read_csv` when reading sample metadata
@@ -415,10 +405,11 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
-        df = pd.read_csv(data_file, sep='\t', index_col=0)
-        sid = df.columns.tolist()
-        fid = df.index.tolist()
-        data = df.values.T
+        sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep='\t')
+        # df = pd.read_csv(data_file, sep='\t', index_col=0)
+        # sid = df.columns.tolist()
+        # fid = df.index.tolist()
+        # data = df.values.T
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
 
