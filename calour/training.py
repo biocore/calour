@@ -127,7 +127,7 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     else:
         new.data = np.concatenate([encoded, new.data], axis=1)
     # the order in the concatenation should be consistent with the data table
-    new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata])
+    new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata], sort=False)
     return new
 
 
