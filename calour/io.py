@@ -81,7 +81,6 @@ def _read_biom(fp, transpose=True):
     feature_md = _get_md_from_biom(table)
 
     if transpose:
-        logger.debug('transposing table')
         data = data.transpose()
 
     return sid, fid, data, feature_md
@@ -177,12 +176,21 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
         # if rep-seqs file is supplied, translate hashes to sequences
         if rep_seq_file is not None:
             logger.debug('loading rep_seqs file %s' % rep_seq_file)
-            rep_seqs = []
             rs_name = _file_from_zip(tempdir, rep_seq_file, internal_data='data/dna-sequences.fasta')
-            rep_seqs = [str(cseq).upper() for cseq in skbio.read(rs_name, format='fasta')]
-            newexp.feature_metadata['_hash'] = newexp.feature_metadata['_feature_id']
-            newexp.feature_metadata['_feature_id'] = rep_seqs
-            newexp.feature_metadata.set_index('_feature_id', inplace=True)
+            rseqs = []
+            rids = []
+            for cseq in skbio.read(rs_name, format='fasta'):
+                rseqs.append(str(cseq).upper())
+                rids.append(cseq.metadata['id'])
+            rep_seqs = pd.Series(data=rseqs, index=rids, name='_feature_id')
+
+            # test if all hashes are identical to the rep_seqs file supplied
+            if not newexp.feature_metadata.index.equals(rep_seqs.index):
+                logger.info('Rep seqs hashes and table hashes are not equal. Using table hashes.')
+            # switch the columns so now _feature_id (and the index) is the sequence and not the hash. The hash is copied to '_hash'
+            newexp.feature_metadata.rename(columns={'_feature_id': '_hash'}, inplace=True)
+            newexp.feature_metadata = newexp.feature_metadata.join(other=rep_seqs, on='_hash', how='left')
+            newexp.feature_metadata.set_index('_feature_id', inplace=True, drop=False)
 
         # if taxonomy file is supplied, load it into the feature metadata
         if taxonomy_file is not None:
@@ -190,7 +198,13 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
             tax_name = _file_from_zip(tempdir, taxonomy_file, internal_data='data/taxonomy.tsv')
             taxonomy_df = pd.read_table(tax_name)
             taxonomy_df.set_index('Feature ID', inplace=True)
-            newexp.feature_metadata = pd.concat([newexp.feature_metadata, taxonomy_df], axis=1)
+            newexp.feature_metadata = newexp.feature_metadata.join(other=taxonomy_df, how='left')
+            if len(newexp.feature_metadata.index.intersection(taxonomy_df.index)) == 0:
+                logger.info('No matching sequences in taxonomy file.')
+                if '_hash' in newexp.feature_metadata.columns:
+                    logger.info('Trying to use hashes for taxonomy')
+                    newexp.feature_metadata = newexp.feature_metadata.drop(taxonomy_df.columns, axis=1)
+                    newexp.feature_metadata = newexp.feature_metadata.join(other=taxonomy_df, on='_hash', how='left')
     return newexp
 
 
@@ -211,19 +225,15 @@ def _get_md_from_biom(table):
     return md_df
 
 
-def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
+def _read_csv(fp, sample_in_row=False, sep=','):
     '''Read a csv file
 
     Parameters
     ----------
     fp : str
         file path to the biom table
-    transpose : bool (True by default)
-        Transpose the table or not. The biom table has samples in
-        column while sklearn and other packages require samples in
-        row. So you should transpose the data table.
     sample_in_row : bool, optional
-        True to csv datafile has samples as rows,
+        True if csv datafile has samples as rows, features as columns
         False (default) if columns are samples (rows are features)
     sep : str, optional
         The separator between entries in the table
@@ -235,7 +245,7 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     fid : list of str
         the feature ids
     data : numpy array (2d) of float
-        the table
+        the table (samples in columns, features in rows)
     feature_md : pandas.DataFrame
         the feature metadata (if availble in table)
     '''
@@ -243,21 +253,18 @@ def _read_csv(fp, transpose=True, sample_in_row=False, sep=','):
     # use the python engine as the default (c) engine throws an error
     # a known bug in pandas (see #11166)
     table = pd.read_csv(fp, header=0, engine='python', sep=sep)
-
     # if the csv file has an additional sep at the end of each line, it cause
     # pandas to create an empty column at the end. This can cause bugs with the
     # normalization. so we remove it.
     table.dropna(axis='columns', how='all', inplace=True)
-
     table.set_index(table.columns[0], drop=True, inplace=True)
+
     if sample_in_row:
         table = table.transpose()
+        logger.debug('transposed table')
     sid = table.columns
     fid = table.index
-    data = table.values.astype(float)
-    if transpose:
-        logger.debug('transposing table')
-        data = data.transpose()
+    data = table.values.astype(float).transpose()
     logger.info('loaded %d samples, %d features' % data.shape)
     return sid, fid, data
 
@@ -353,10 +360,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     data_file_type : str, optional
         the data_file format. options:
         'biom' : a biom table (biom-format.org) (default)
-        'tsv': a tab-separated table with (samples in column and feature in row)
-        'openms' : an OpenMS bucket table csv (rows are feature, columns are samples)
-        'openms_transpose' an OpenMS bucket table csv (columns are feature, rows are samples)
-        'gnps_ms' : an OpenMS bucket table tsv with samples as columns (exported from GNPS)
+        'tsv': a tab-separated table. By default, samples are columns and features are rows (see sample_in_row parameter)
+        'csv': general comma (or other delimiter, as indicated by the data_table_sep variable) separated file.
+            By default, samples are columns and features are rows (see sample_in_row parameter)
         'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
     sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
         keyword arguments passing to :func:`pandas.read_csv` when reading sample metadata
@@ -399,10 +405,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
-        df = pd.read_csv(data_file, sep='\t', index_col=0)
-        sid = df.columns.tolist()
-        fid = df.index.tolist()
-        data = df.as_matrix().T
+        sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep='\t')
     else:
         raise ValueError('unkown data_file_type %s' % data_file_type)
 
@@ -830,15 +833,18 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     table = biom.table.Table(exp.data.transpose(), features, samples, type="OTU table")
     # and add metabolite name as taxonomy:
     if add_metadata is not None:
-        # md has to be a dict of dict, so it needs to be converted from
-        # a DataFrame instead of Series
-        md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
-        # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
-        if to_list:
-            for k, v in md.items():
-                # if isinstance(v[add_metadata], str):
-                v[add_metadata] = v[add_metadata].split(';')
-        table.add_metadata(md, axis='observation')
+        if add_metadata in exp.feature_metadata.columns:
+            # md has to be a dict of dict, so it needs to be converted from
+            # a DataFrame instead of Series
+            md = exp.feature_metadata.loc[:, [add_metadata]].to_dict('index')
+            # we need to make it into a list of taxonomy levels otherwise biom save fails for hdf5
+            if to_list:
+                for k, v in md.items():
+                    # if isinstance(v[add_metadata], str):
+                    v[add_metadata] = v[add_metadata].split(';')
+            table.add_metadata(md, axis='observation')
+        else:
+            logger.info('Metadata field %s not found. Saving biom table without metadata' % add_metadata)
     return table
 
 
