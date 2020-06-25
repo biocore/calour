@@ -291,9 +291,9 @@ def normalize_compositional(exp: Experiment, min_frac=0.05, total=10000, inplace
 
 
 def random_permute_data(exp: Experiment, normalize=True):
-    '''Shuffle independently the reads of each feature
+    '''Shuffle independently the abundances of each feature.
 
-    Creates a new experiment with no dependence between the features.
+    This creates a new experiment with no dependency between features.
 
     Parameters
     ----------

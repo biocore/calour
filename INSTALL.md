@@ -34,8 +34,8 @@ You can select all the default options in the installer.
 For Mac/Linux users, you can skip the following manual installation steps and directly install Calour and its required dependencies with conda:
 
 ```python
-conda create -n calour python=3.5
-source activate calour
+conda create -n calour python=3.6
+conda activate calour
 conda install -c bioconda calour
 ```
 
@@ -54,8 +54,7 @@ conda create -n calour python=3.5 matplotlib numpy scipy pandas qt jupyter sciki
 and activate it using:
 
 ```
-activate calour           # on Windows
-source activate calour    # on Mac/Linux
+conda activate calour
 ```
 
 Install additional dependencies
