@@ -540,8 +540,6 @@ def filter_mean_abundance(exp: Experiment, cutoff=0.01, field=None, **kwargs):
 def filter_abundance(exp: Experiment, cutoff=10, **kwargs):
     '''Filter features with sum abundance across all samples less than the cutoff.
 
-    For example, to keep features with mean abundance of 150 use `filter_abundance(cutoff=150)`.
-
     Parameters
     ----------
     cutoff : float, optional
