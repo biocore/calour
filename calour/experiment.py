@@ -342,27 +342,28 @@ class Experiment:
         return exp
 
     def to_pandas(self, sample_field=None, feature_field=None, sparse=None):
-        '''Get a pandas dataframe of the abundances
-        Samples are rows, features are columns. Can specify the metadata fields
+        '''Convert Experiment object to a pandas DataFrame.
+
+        Samples are rows and features are columns. You can specify the metadata fields
         for the index (default is sample_metadata index) and column labels
-        (default is feature_metadata index)
+        (default is feature_metadata index).
 
         Parameters
         ----------
         sample_field : str or None, optional
-            Name of the sample_metadata column to use for index.
+            Column name of the sample_metadata to use as the index for the resulting pandas DataFrame.
             None (default) is the sample_metadata index
         feature_field : str or None, optional
-            Name of the feature_metadata column to use for column names.
+            Column name of the feature_metadata to use for column labels for the resulting pandas DataFrame.
             None (default) is the feature_metadata index
         sparse: bool or None, optional
-            None (default) to get sparsity based on the underlying Experiment sparsity
-            True to force to sparse pandas.Dataframe
-            False to force to standard pandas.Dataframe
+            None (default) to get sparsity based on the underlying Experiment sparsity.
+            True to force to sparse pandas.DataFrame;
+            False to force to standard pandas.DataFrame
 
         Returns
         -------
-        pandas.Dataframe or pandas.SparseDataFrame
+        pandas.Dataframe
         '''
         if sample_field is None:
             ind = self.sample_metadata.index
@@ -373,12 +374,12 @@ class Experiment:
         else:
             cols = self.feature_metadata[feature_field]
 
-        if sparse is not None:
-            self.sparse = sparse
-
-        if self.sparse:
-            # create list of sparse rows
+        if self.sparse and sparse:
             df = pd.DataFrame.sparse.from_spmatrix(self.data, index=ind, columns=cols)
+        elif self.sparse:
+            df = pd.DataFrame(self.data.todense(), index=ind, columns=cols)
+        elif sparse:
+            df = pd.DataFrame(scipy.sparse.csr_matrix(self.data), index=ind, columns=cols)
         else:
             df = pd.DataFrame(self.data, index=ind, columns=cols, copy=True)
         return df
