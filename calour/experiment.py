@@ -378,8 +378,7 @@ class Experiment:
 
         if self.sparse:
             # create list of sparse rows
-            sr = [pd.SparseSeries(self.data[i, :].toarray().ravel(), fill_value=0) for i in np.arange(self.data.shape[0])]
-            df = pd.SparseDataFrame(sr, index=ind, columns=cols)
+            df = pd.DataFrame.sparse.from_spmatrix(self.data, index=ind, columns=cols)
         else:
             df = pd.DataFrame(self.data, index=ind, columns=cols, copy=True)
         return df
