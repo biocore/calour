@@ -49,7 +49,7 @@ class TTests(Tests):
 
     def test_split_train_test(self):
         train, test = self.test2_dense.split_train_test(
-            test_size=3, stratify='categorical', random_state=7)
+            test_size=3, stratify='categorical', shuffle=True, random_state=7)
 
         assert_experiment_equal(
             test, self.test2_dense.filter_ids(['S3', 'S8', 'S1'], axis='s'))
@@ -62,7 +62,7 @@ class TTests(Tests):
         y = diabetes.target[:9]
         smd = pd.DataFrame({'diabetes': y})
         exp = ca.Experiment(X, smd, sparse=False)
-        run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, random_state=0))
+        run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, shuffle=True, random_state=0))
         res = next(run)
         obs = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
         # make sure the column order are the same for comparison
@@ -93,7 +93,7 @@ class TTests(Tests):
         exp = ca.Experiment(X, smd, sparse=False)
         run = exp.classify('plant', KNeighborsClassifier(),
                            predict='predict_proba',
-                           cv=KFold(3, random_state=0))
+                           cv=KFold(3, shuffle=True, random_state=0))
         res = next(run)
         obs = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'), index_col=0)
         pdt.assert_frame_equal(res, obs)
@@ -233,7 +233,7 @@ class RTests(Tests):
     def test_sorted_stratified(self):
         n = self.y.shape[0]
         for k in (3, 2):
-            ssk = SortedStratifiedKFold(k, shuffle=True)
+            ssk = SortedStratifiedKFold(n_splits=k, shuffle=True)
             for train, test in ssk.split(self.X, self.y):
                 # check the size of the test fold
                 ni = int(n / k)
@@ -253,7 +253,7 @@ class RTests(Tests):
     def test_rep_sorted_strtified(self):
         n = self.y.shape[0]
         for k in (3, 2):
-            ssk = RepeatedSortedStratifiedKFold(k, 2)
+            ssk = RepeatedSortedStratifiedKFold(n_splits=k, n_repeats=2)
             for train, test in ssk.split(self.X, self.y):
                 # check the size of the test fold
                 ni = int(n / k)
