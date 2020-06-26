@@ -63,10 +63,11 @@ class TTests(Tests):
         smd = pd.DataFrame({'diabetes': y})
         exp = ca.Experiment(X, smd, sparse=False)
         run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, shuffle=True, random_state=0))
-        res = next(run)
-        obs = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
+        observed = next(run)
+        expected = pd.read_table(join(self.test_data_dir, 'test_regress.txt'), index_col=0)
+
         # make sure the column order are the same for comparison
-        pdt.assert_frame_equal(res.sort_index(axis=1), obs.sort_index(axis=1))
+        pdt.assert_frame_equal(observed.sort_index(axis=1), expected.sort_index(axis=1))
 
     def test_plot_scatter(self):
         res = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
@@ -94,10 +95,10 @@ class TTests(Tests):
         run = exp.classify('plant', KNeighborsClassifier(),
                            predict='predict_proba',
                            cv=KFold(3, shuffle=True, random_state=0))
-        res = next(run)
-        obs = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'), index_col=0)
-        pdt.assert_frame_equal(res, obs)
-        # plot_roc(res)
+        observed = next(run)
+        expected = pd.read_table(join(self.test_data_dir, 'test_classify.txt'), index_col=0)
+        pdt.assert_frame_equal(expected, observed)
+        # plot_roc(observed)
         # from matplotlib import pyplot as plt
         # plt.show()
 
@@ -145,7 +146,7 @@ class TTests(Tests):
                                'neg': prob,
                                'Y_TRUE': ['pos'] * 9 + ['neg'],
                                'CV': [0, 1] * 5})
-        # re-enable logging because it is disabled in parent setUp
+        # re-enable logging because it is disabled in the parent setUp
         logging.disable(logging.NOTSET)
         with self.assertLogs(level='WARNING') as cm:
             plot_roc(result)
@@ -233,7 +234,7 @@ class RTests(Tests):
     def test_sorted_stratified(self):
         n = self.y.shape[0]
         for k in (3, 2):
-            ssk = SortedStratifiedKFold(n_splits=k, shuffle=True)
+            ssk = SortedStratifiedKFold(k, shuffle=True)
             for train, test in ssk.split(self.X, self.y):
                 # check the size of the test fold
                 ni = int(n / k)
