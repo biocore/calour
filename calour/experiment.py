@@ -388,14 +388,15 @@ class Experiment:
     def from_pandas(cls, df, exp=None):
         '''Convert a Pandas DataFrame into an experiment.
 
-        Can use an existing calour Experimebt (exp) (if supplied) to
-        obtain feature and sample metadata.  Note currently only works
-        with non-sparse DataFrame
+        It take an existing Calour Experiment object (if supplied) to
+        obtain its feature and sample metadata while replacing the
+        data with the values from the pandas dataframe. Note currently
+        only works with non-sparse DataFrame
 
         Parameters
         ----------
         df : Pandas.DataFrame
-            The dataframe to use. should contain samples in rows, features in columns.
+            The dataframe to use. should contain samples in rows and features in columns.
             Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
         exp : Experiment, optional
             If not None, use sample and feature metadata from the experiment
@@ -420,7 +421,6 @@ class Experiment:
             feature_metadata = exp.feature_metadata.loc[df.columns.values, ]
             cls = exp.__class__
 
-        # print(sample_metadata)
         newexp = cls(df.values, sample_metadata, feature_metadata,
                      exp_metadata=exp_metadata, description=description, sparse=False)
         return newexp
