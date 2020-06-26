@@ -13,7 +13,7 @@ import logging
 from numpy.testing import assert_array_equal, assert_almost_equal
 import numpy as np
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import KFold

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from skbio import DistanceMatrix, TreeNode
 from scipy.cluster.hierarchy import ward
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 from calour._dendrogram import (Dendrogram, UnrootedDendrogram,
                                 SquareDendrogram)
