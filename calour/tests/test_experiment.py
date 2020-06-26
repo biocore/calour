@@ -12,7 +12,7 @@ from copy import copy, deepcopy
 import numpy as np
 import pandas as pd
 import numpy.testing as npt
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 from scipy import sparse
 
 from calour._testing import Tests, assert_experiment_equal
@@ -177,8 +177,8 @@ class ExperimentTests(Tests):
     def test_to_pandas_sparse(self):
         df = self.test1.to_pandas(sparse=True)
         data = self.test1.get_data(sparse=False)
-        self.assertIsInstance(df, pd.SparseDataFrame)
-        npt.assert_array_almost_equal(df.to_dense().values, data)
+        self.assertTrue(pd.api.types.is_sparse(df.iloc[0, :]))
+        npt.assert_array_almost_equal(df, data)
 
     def test_from_pands(self):
         df = self.test1.to_pandas(sparse=False)
