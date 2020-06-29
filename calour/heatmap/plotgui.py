@@ -139,6 +139,25 @@ class PlotGUI(ABC):
             self.ax_legend = self.figure.add_subplot(gs[7])
             self.gridspec = gs
 
+    def resize_figure (self, *args, **kwargs):
+        '''Resize the figure.
+
+        It is a convenient function that wraps on
+        ``matplotlib.Figure.set_size_inches``.
+
+        Parameters
+        ----------
+        args, kwargs: tuple, dict
+            arguments passing to ``matplotlib.Figure.set_size_inches`` function.
+
+        Examples
+        --------
+        >>> p = exp.plot(sample_field='group', gui='jupyter')   # doctest: +SKIP
+        >>> p.resize_figure(8, 6)                               # doctest: +SKIP
+        >>> p.figure                                            # doctest: +SKIP
+        '''
+        self.figure.set_size_inches(*args, **kwargs)
+
     def save_figure(self, *args, **kwargs):
         '''Save the figure to file.
 
