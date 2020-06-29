@@ -39,7 +39,7 @@ from sklearn.model_selection import (train_test_split,
 from sklearn.model_selection._split import check_cv, _RepeatedSplits
 from sklearn.base import is_classifier, clone
 from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc, confusion_matrix
-from scipy import interp, stats
+from scipy import stats
 from scipy.sparse import hstack
 import pandas as pd
 import numpy as np
@@ -127,7 +127,7 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
     else:
         new.data = np.concatenate([encoded, new.data], axis=1)
     # the order in the concatenation should be consistent with the data table
-    new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata])
+    new.feature_metadata = pd.concat([pd.DataFrame(index=vec.get_feature_names()), new.feature_metadata], sort=False)
     return new
 
 
@@ -166,7 +166,7 @@ class SortedStratifiedKFold(StratifiedKFold):
     '''Stratified K-Fold cross validator.
 
     Please see :class:`sklearn.model_selection.StratifiedKFold` for
-    documentation for parameters, etc. It is very similar to that
+    documentation for parameters, etc. It is very similar to that class
     except this is for regression of numeric values.
 
     This implementation basically assigns a unique label (int here) to
@@ -179,7 +179,7 @@ class SortedStratifiedKFold(StratifiedKFold):
     RepeatedSortedStratifiedKFold
     '''
     def __init__(self, n_splits=3, shuffle=False, random_state=None):
-        super().__init__(n_splits, shuffle, random_state)
+        super().__init__(n_splits=n_splits, shuffle=shuffle, random_state=random_state)
 
     def _sort_partition(self, y):
         n = len(y)
@@ -207,10 +207,10 @@ class RepeatedSortedStratifiedKFold(_RepeatedSplits):
     SortedStratifiedKFold
     '''
     def __init__(self, n_splits=5, n_repeats=10, random_state=None):
-        super().__init__(SortedStratifiedKFold, n_repeats, random_state, n_splits=n_splits)
+        super().__init__(SortedStratifiedKFold, n_splits=n_splits, n_repeats=n_repeats, random_state=random_state)
 
 
-def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(3, 1), params=None):
+def regress(exp: Experiment, field, estimator, cv=RepeatedSortedStratifiedKFold(n_splits=3, n_repeats=1), params=None):
     '''Evaluate regression during cross validation.
 
     Parameters
@@ -327,7 +327,7 @@ def plot_scatter(result, title='', cmap=None, cor=stats.pearsonr, cv=False, ax=N
     return ax
 
 
-def classify(exp: Experiment, fields, estimator, cv=RepeatedStratifiedKFold(3, 1),
+def classify(exp: Experiment, fields, estimator, cv=RepeatedStratifiedKFold(n_splits=3, n_repeats=1),
              predict='predict_proba', params=None):
     '''Evaluate classification during cross validation.
 
@@ -656,7 +656,7 @@ def plot_roc(result, classes=None, title='ROC', cv=True, cmap=None, ax=None):
                         'have either no true positive or no negative samples in this '
                         'cross validation for the class %r' % (grp, cls))
                     continue
-                mean_tpr = interp(mean_fpr, fpr, tpr)
+                mean_tpr = np.interp(mean_fpr, fpr, tpr)
                 tprs.append(mean_tpr)
                 tprs[-1][0] = 0.0
                 roc_auc = auc(mean_fpr, mean_tpr)

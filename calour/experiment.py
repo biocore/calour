@@ -342,27 +342,28 @@ class Experiment:
         return exp
 
     def to_pandas(self, sample_field=None, feature_field=None, sparse=None):
-        '''Get a pandas dataframe of the abundances
-        Samples are rows, features are columns. Can specify the metadata fields
+        '''Convert Experiment object to a pandas DataFrame.
+
+        Samples are rows and features are columns. You can specify the metadata fields
         for the index (default is sample_metadata index) and column labels
-        (default is feature_metadata index)
+        (default is feature_metadata index).
 
         Parameters
         ----------
         sample_field : str or None, optional
-            Name of the sample_metadata column to use for index.
+            Column name of the sample_metadata to use as the index for the resulting pandas DataFrame.
             None (default) is the sample_metadata index
         feature_field : str or None, optional
-            Name of the feature_metadata column to use for column names.
+            Column name of the feature_metadata to use for column labels for the resulting pandas DataFrame.
             None (default) is the feature_metadata index
         sparse: bool or None, optional
-            None (default) to get sparsity based on the underlying Experiment sparsity
-            True to force to sparse pandas.Dataframe
-            False to force to standard pandas.Dataframe
+            None (default) to get sparsity based on the underlying Experiment sparsity.
+            True to force to sparse pandas.DataFrame;
+            False to force to standard pandas.DataFrame
 
         Returns
         -------
-        pandas.Dataframe or pandas.SparseDataFrame
+        pandas.Dataframe
         '''
         if sample_field is None:
             ind = self.sample_metadata.index
@@ -373,13 +374,12 @@ class Experiment:
         else:
             cols = self.feature_metadata[feature_field]
 
-        if sparse is not None:
-            self.sparse = sparse
-
-        if self.sparse:
-            # create list of sparse rows
-            sr = [pd.SparseSeries(self.data[i, :].toarray().ravel(), fill_value=0) for i in np.arange(self.data.shape[0])]
-            df = pd.SparseDataFrame(sr, index=ind, columns=cols)
+        if self.sparse and sparse:
+            df = pd.DataFrame.sparse.from_spmatrix(self.data, index=ind, columns=cols)
+        elif self.sparse:
+            df = pd.DataFrame(self.data.todense(), index=ind, columns=cols)
+        elif sparse:
+            df = pd.DataFrame(scipy.sparse.csr_matrix(self.data), index=ind, columns=cols)
         else:
             df = pd.DataFrame(self.data, index=ind, columns=cols, copy=True)
         return df
@@ -388,14 +388,15 @@ class Experiment:
     def from_pandas(cls, df, exp=None):
         '''Convert a Pandas DataFrame into an experiment.
 
-        Can use an existing calour Experimebt (exp) (if supplied) to
-        obtain feature and sample metadata.  Note currently only works
-        with non-sparse DataFrame
+        It take an existing Calour Experiment object (if supplied) to
+        obtain its feature and sample metadata while replacing the
+        data with the values from the pandas dataframe. Note currently
+        only works with non-sparse DataFrame
 
         Parameters
         ----------
         df : Pandas.DataFrame
-            The dataframe to use. should contain samples in rows, features in columns.
+            The dataframe to use. should contain samples in rows and features in columns.
             Index values will be used for the sample_metadata index and column names will be used for feature_metadata index
         exp : Experiment, optional
             If not None, use sample and feature metadata from the experiment
@@ -420,7 +421,6 @@ class Experiment:
             feature_metadata = exp.feature_metadata.loc[df.columns.values, ]
             cls = exp.__class__
 
-        # print(sample_metadata)
         newexp = cls(df.values, sample_metadata, feature_metadata,
                      exp_metadata=exp_metadata, description=description, sparse=False)
         return newexp

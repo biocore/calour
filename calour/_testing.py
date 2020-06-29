@@ -10,7 +10,7 @@ from unittest import TestCase
 from os.path import join, dirname, abspath
 import logging
 
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 import numpy.testing as npt
 
 import calour as ca

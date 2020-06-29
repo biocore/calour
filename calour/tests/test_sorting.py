@@ -9,7 +9,7 @@
 from unittest import main
 from os.path import join
 
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 import numpy as np
 
 import calour as ca
