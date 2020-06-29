@@ -13,7 +13,7 @@ import logging
 from numpy.testing import assert_array_equal, assert_almost_equal
 import numpy as np
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import KFold
@@ -49,7 +49,7 @@ class TTests(Tests):
 
     def test_split_train_test(self):
         train, test = self.test2_dense.split_train_test(
-            test_size=3, stratify='categorical', random_state=7)
+            test_size=3, stratify='categorical', shuffle=True, random_state=7)
 
         assert_experiment_equal(
             test, self.test2_dense.filter_ids(['S3', 'S8', 'S1'], axis='s'))
@@ -62,11 +62,12 @@ class TTests(Tests):
         y = diabetes.target[:9]
         smd = pd.DataFrame({'diabetes': y})
         exp = ca.Experiment(X, smd, sparse=False)
-        run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, random_state=0))
-        res = next(run)
-        obs = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
+        run = exp.regress('diabetes', KNeighborsRegressor(), KFold(3, shuffle=True, random_state=0))
+        observed = next(run)
+        expected = pd.read_table(join(self.test_data_dir, 'test_regress.txt'), index_col=0)
+
         # make sure the column order are the same for comparison
-        pdt.assert_frame_equal(res.sort_index(axis=1), obs.sort_index(axis=1))
+        pdt.assert_frame_equal(observed.sort_index(axis=1), expected.sort_index(axis=1))
 
     def test_plot_scatter(self):
         res = pd.read_table(join(self.test_data_dir, 'diabetes_pred.txt'), index_col=0)
@@ -93,11 +94,11 @@ class TTests(Tests):
         exp = ca.Experiment(X, smd, sparse=False)
         run = exp.classify('plant', KNeighborsClassifier(),
                            predict='predict_proba',
-                           cv=KFold(3, random_state=0))
-        res = next(run)
-        obs = pd.read_table(join(self.test_data_dir, 'iris_pred.txt'), index_col=0)
-        pdt.assert_frame_equal(res, obs)
-        # plot_roc(res)
+                           cv=KFold(3, shuffle=True, random_state=0))
+        observed = next(run)
+        expected = pd.read_table(join(self.test_data_dir, 'test_classify.txt'), index_col=0)
+        pdt.assert_frame_equal(expected, observed)
+        # plot_roc(observed)
         # from matplotlib import pyplot as plt
         # plt.show()
 
@@ -145,7 +146,7 @@ class TTests(Tests):
                                'neg': prob,
                                'Y_TRUE': ['pos'] * 9 + ['neg'],
                                'CV': [0, 1] * 5})
-        # re-enable logging because it is disabled in parent setUp
+        # re-enable logging because it is disabled in the parent setUp
         logging.disable(logging.NOTSET)
         with self.assertLogs(level='WARNING') as cm:
             plot_roc(result)
@@ -253,7 +254,7 @@ class RTests(Tests):
     def test_rep_sorted_strtified(self):
         n = self.y.shape[0]
         for k in (3, 2):
-            ssk = RepeatedSortedStratifiedKFold(k, 2)
+            ssk = RepeatedSortedStratifiedKFold(n_splits=k, n_repeats=2)
             for train, test in ssk.split(self.X, self.y):
                 # check the size of the test fold
                 ni = int(n / k)

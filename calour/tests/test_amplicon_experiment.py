@@ -9,7 +9,7 @@
 from unittest import main
 from copy import deepcopy
 
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 import numpy as np
 import numpy.testing as npt
 
