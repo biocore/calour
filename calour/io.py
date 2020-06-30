@@ -787,7 +787,7 @@ def save_metadata(exp: Experiment, f, axis=0, **kwargs):
         raise ValueError('Unknown axis: %r' % axis)
 
 
-def save_fasta(exp: Experiment, f, seqs=None, header_type='combined'):
+def save_fasta(exp: Experiment, f, seqs=None, header_type='seq'):
     '''Save a list of sequences to fasta.
 
     Use taxonomy information if available, otherwise just use sequence as header.
@@ -801,9 +801,7 @@ def save_fasta(exp: Experiment, f, seqs=None, header_type='combined'):
         Note: sequences not in exp will not be saved
     header_type: str, optional
         The format for the per-sequence header in the output fasta file. options are:
-        'combined' (default): ">%d %s" % (NUM, SEQ)
-        'seq': ">%s" % SEQ
-        'taxonomy': ">Seq_%d %s" % (NUM, Taxonomy) (if available)
+        'seq' (default): ">%s" % SEQ
         'num': ">Seq_"%d" % NUM
     '''
     logger.debug('Save seq to fasta file %s' % f)
@@ -819,12 +817,8 @@ def save_fasta(exp: Experiment, f, seqs=None, header_type='combined'):
             if cseq not in exp.feature_metadata.index:
                 num_skipped += 1
                 continue
-            if header_type == 'combined':
-                cheader = '%d %s' % (idx, cseq)
-            elif header_type == 'seq':
+            if header_type == 'seq':
                 cheader = cseq
-            elif cheader == 'taxonomy':
-                cheader = 'Seq_%d %s' % (idx, exp.feature_metadata['taxonomy'][cseq])
             elif header_type == 'num':
                 cheader = 'Seq_%d' % idx
             else:
