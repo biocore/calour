@@ -116,7 +116,7 @@ class TestAnalysis(Tests):
         np.random.seed(2017)
         # test on real complex dataset (timeseries) with spearman correlation
         dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='spearman')
-        print(len(dd.feature_metadata))
+        # print(len(dd.feature_metadata))
         self.assertTrue(np.abs(51 - len(dd.feature_metadata)) < 5)
 
     def test_diff_abundance_kw(self):
