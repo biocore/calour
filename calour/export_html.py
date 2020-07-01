@@ -34,14 +34,14 @@ from .heatmap.heatmap import _transition_index
 logger = getLogger(__name__)
 
 
-def _list_to_string(l):
+def _list_to_string(cl):
     '''Convert a list to a string representation of the list
 
     For use in the html javascript
 
     Parameters
     ----------
-    l : list
+    cl : list
 
     Returns
     -------
@@ -49,7 +49,7 @@ def _list_to_string(l):
         ready for embedding into html javascript
     '''
     cstr = '['
-    for cval in l:
+    for cval in cl:
         cstr += '"'
         cstr += str(cval)
         cstr += '",'
