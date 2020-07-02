@@ -36,11 +36,15 @@ class ExperimentTests(Tests):
     def test_gui_interface(self):
         mdb = self.mock_db
         res = mdb.get_seq_annotation_strings(self.s1)
-        print(res)
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[1][1], 'nice')
+        self.assertFalse('_db_interface' in res[0][0])
         gui = _create_plot_gui(self.test1, gui='qt5', databases=[])
         gui.databases.append(mdb)
         res = gui.get_database_annotations(self.s1)
-        print(res)
+        self.assertEqual(len(res), 2)
+        self.assertTrue('_db_interface' in res[0][0])
+        self.assertEqual(res[1][1], 'nice')
 
     def test_get_database_class(self):
         d = mkdtemp()

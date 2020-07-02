@@ -139,7 +139,7 @@ class PlotGUI(ABC):
             self.ax_legend = self.figure.add_subplot(gs[7])
             self.gridspec = gs
 
-    def resize_figure (self, *args, **kwargs):
+    def resize_figure(self, *args, **kwargs):
         '''Resize the figure.
 
         It is a convenient function that wraps on

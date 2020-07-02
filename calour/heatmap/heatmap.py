@@ -304,6 +304,12 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     # logNorm requires positive values. set it to default None if vmin is zero
     if vmin == 0:
         vmin = None
+
+    if norm is not None:
+        norm.vmin = vmin
+        norm.vmax = vmax
+        norm.autoscale(data)
+
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest',
                       norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)
 

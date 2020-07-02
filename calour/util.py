@@ -70,28 +70,28 @@ def compute_prevalence(abundance):
     return cutoffs, prevalences
 
 
-def _transition_index(l):
+def _transition_index(obj):
     '''Return the transition index and current value of the list.
 
     Examples
     -------
-    >>> l = ['a', 'a', 'b']
-    >>> list(_transition_index(l))
+    >>> obj = ['a', 'a', 'b']
+    >>> list(_transition_index(obj))
     [(2, 'a'), (3, 'b')]
-    >>> l = ['a', 'a', 'b', 1, 2, None, None]
-    >>> list(_transition_index(l))
+    >>> obj = ['a', 'a', 'b', 1, 2, None, None]
+    >>> list(_transition_index(obj))
     [(2, 'a'), (3, 'b'), (4, 1), (5, 2), (7, None)]
 
     Parameters
     ----------
-    l : Iterable of arbitrary objects
+    obj : Iterable of arbitrary objects
 
     Yields
     ------
     tuple of (int, arbitrary)
         the transition index, the item value
     '''
-    it = enumerate(l)
+    it = enumerate(obj)
     i, item = next(it)
     item = str(type(item)), item
     for i, current in it:

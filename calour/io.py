@@ -393,6 +393,9 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         the new object created
 
     '''
+    # store the function parameters for call history
+    fparams = locals()
+
     logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
     exp_metadata = {'sample_metadata_md5': '', 'data_md5': ''}
@@ -457,6 +460,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
 
+    # initialize the call history
+    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
+    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
+
     return exp
 
 
@@ -491,6 +498,9 @@ def read_amplicon(data_file, sample_metadata_file=None,
     --------
     read
     '''
+    # store the function parameters for call history
+    fparams = locals()
+
     # don't do normalize before the possible filtering
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
                normalize=None, **kwargs)
@@ -502,6 +512,10 @@ def read_amplicon(data_file, sample_metadata_file=None,
         exp.filter_by_data('abundance', axis=0, cutoff=min_reads, mean_or_sum='sum', inplace=True)
     if normalize is not None:
         exp.normalize(total=normalize, axis='s', inplace=True)
+
+    # initialize the call history
+    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
+    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
 
     return exp
 
@@ -618,6 +632,8 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     --------
     read
     '''
+    # store the function parameters for call history
+    fparams = locals()
 
     default_params = {'mzmine2': {'sample_in_row': False, 'direct_ids': True, 'get_mz_rt_from_feature_id': False, 'ctype': 'csv'},
                       'biom': {'sample_in_row': False, 'direct_ids': False, 'get_mz_rt_from_feature_id': True, 'ctype': 'biom'},
@@ -699,6 +715,10 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         # add gnps names and cluster to the features as feature_metadata fields (gnps_name and gnps_cluster)
         gnps_db._prepare_gnps_names()
 
+    # initialize the call history
+    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
+    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
+
     return exp
 
 
@@ -775,7 +795,7 @@ def save_metadata(exp: Experiment, f, axis=0, **kwargs):
         raise ValueError('Unknown axis: %r' % axis)
 
 
-def save_fasta(exp: Experiment, f, seqs=None):
+def save_fasta(exp: Experiment, f, seqs=None, header_type='seq'):
     '''Save a list of sequences to fasta.
 
     Use taxonomy information if available, otherwise just use sequence as header.
@@ -787,26 +807,30 @@ def save_fasta(exp: Experiment, f, seqs=None):
     seqs : list of str sequences ('ACGT') or None, optional
         None (default) to save all sequences in exp, or list of sequences to only save these sequences.
         Note: sequences not in exp will not be saved
+    header_type: str, optional
+        The format for the per-sequence header in the output fasta file. options are:
+        'seq' (default): ">%s" % SEQ
+        'num': ">Seq_"%d" % NUM
     '''
     logger.debug('Save seq to fasta file %s' % f)
     if seqs is None:
         logger.debug('no sequences supplied - saving all sequences')
         seqs = exp.feature_metadata.index.values
     num_skipped = 0
-    if 'taxonomy' in exp.feature_metadata.columns:
-        add_taxonomy = True
-    else:
-        logger.debug('no taxonomy field in experiment. saving without taxonomy')
-        add_taxonomy = False
+    if header_type == 'taxonomy':
+        if 'taxonomy' not in exp.feature_metadata.columns:
+            raise ValueError('taxonomy field not present in feature_metadata')
     with open(f, 'w') as fasta_file:
         for idx, cseq in enumerate(seqs):
             if cseq not in exp.feature_metadata.index:
                 num_skipped += 1
                 continue
-            if add_taxonomy:
-                cheader = '%d %s' % (idx, exp.feature_metadata['taxonomy'][cseq])
+            if header_type == 'seq':
+                cheader = cseq
+            elif header_type == 'num':
+                cheader = 'Seq_%d' % idx
             else:
-                cheader = '%d %s' % (idx, cseq)
+                raise ValueError('header_type %s not supported' % header_type)
             fasta_file.write('>%s\n%s\n' % (cheader, cseq))
     logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs) - num_skipped, num_skipped))
 
