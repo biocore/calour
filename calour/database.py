@@ -80,7 +80,8 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         if class_name is not None and module_name is not None:
             databases.append(csection)
     if len(databases) == 0:
-        raise ValueError('calour config file %s does not contain any database sections.' % get_config_file())
+        logger.warning('calour config file %s does not contain any database sections. Skipping' % get_config_file())
+        return None
     logger.warning('Database %s not found in config file (%s).\nSkipping.\n'
                    'Current databases in config file: %s' % (dbname, get_config_file(), databases))
     return None
