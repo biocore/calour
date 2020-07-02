@@ -148,9 +148,12 @@ class TTests(Tests):
                                'CV': [0, 1] * 5})
         # re-enable logging because it is disabled in the parent setUp
         logging.disable(logging.NOTSET)
+        # test for calour printed warning message
         with self.assertLogs(level='WARNING') as cm:
-            plot_roc(result)
-            self.assertRegex(cm.output[0], 'no true positive or no negative samples')
+            # test (and capture) scikit-learn printed warning message
+            with self.assertWarnsRegex(UserWarning, 'No positive samples in y_true, true positive value should be meaningless'):
+                plot_roc(result)
+                self.assertRegex(cm.output[0], 'no true positive or no negative samples')
 
     def test_interpolate_precision_recall(self):
         n = 9
@@ -233,7 +236,7 @@ class RTests(Tests):
 
     def test_sorted_stratified(self):
         n = self.y.shape[0]
-        for k in (3, 2):
+        for k in (2, 3, 4):
             ssk = SortedStratifiedKFold(k, shuffle=True)
             for train, test in ssk.split(self.X, self.y):
                 # check the size of the test fold
@@ -245,13 +248,16 @@ class RTests(Tests):
                 idx.sort()
                 assert_array_equal(idx, np.arange(n))
 
+                # print(train, test)
+                # print(np.sort(self.y[train]), np.sort(self.y[test]))
+
                 # check there is a value in each bin in the test fold
                 y_test = self.y[test]
-                for i in range(1, k + 1):
+                for i in range(1, ni + 1):
                     cutoff = i * k + 0.1
                     self.assertEqual(np.sum(y_test <= cutoff), i)
 
-    def test_rep_sorted_strtified(self):
+    def test_rep_sorted_stratified(self):
         n = self.y.shape[0]
         for k in (3, 2):
             ssk = RepeatedSortedStratifiedKFold(n_splits=k, n_repeats=2)
@@ -267,7 +273,7 @@ class RTests(Tests):
 
                 # check there is a value in each bin in the test fold
                 y_test = self.y[test]
-                for i in range(1, k + 1):
+                for i in range(1, ni + 1):
                     cutoff = i * k + 0.1
                     self.assertEqual(np.sum(y_test <= cutoff), i)
 
