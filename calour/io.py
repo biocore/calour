@@ -775,7 +775,7 @@ def save_metadata(exp: Experiment, f, axis=0, **kwargs):
         raise ValueError('Unknown axis: %r' % axis)
 
 
-def save_fasta(exp: Experiment, f, seqs=None):
+def save_fasta(exp: Experiment, f, seqs=None, header_type='seq'):
     '''Save a list of sequences to fasta.
 
     Use taxonomy information if available, otherwise just use sequence as header.
@@ -787,26 +787,30 @@ def save_fasta(exp: Experiment, f, seqs=None):
     seqs : list of str sequences ('ACGT') or None, optional
         None (default) to save all sequences in exp, or list of sequences to only save these sequences.
         Note: sequences not in exp will not be saved
+    header_type: str, optional
+        The format for the per-sequence header in the output fasta file. options are:
+        'seq' (default): ">%s" % SEQ
+        'num': ">Seq_"%d" % NUM
     '''
     logger.debug('Save seq to fasta file %s' % f)
     if seqs is None:
         logger.debug('no sequences supplied - saving all sequences')
         seqs = exp.feature_metadata.index.values
     num_skipped = 0
-    if 'taxonomy' in exp.feature_metadata.columns:
-        add_taxonomy = True
-    else:
-        logger.debug('no taxonomy field in experiment. saving without taxonomy')
-        add_taxonomy = False
+    if header_type == 'taxonomy':
+        if 'taxonomy' not in exp.feature_metadata.columns:
+            raise ValueError('taxonomy field not present in feature_metadata')
     with open(f, 'w') as fasta_file:
         for idx, cseq in enumerate(seqs):
             if cseq not in exp.feature_metadata.index:
                 num_skipped += 1
                 continue
-            if add_taxonomy:
-                cheader = '%d %s' % (idx, exp.feature_metadata['taxonomy'][cseq])
+            if header_type == 'seq':
+                cheader = cseq
+            elif header_type == 'num':
+                cheader = 'Seq_%d' % idx
             else:
-                cheader = '%d %s' % (idx, cseq)
+                raise ValueError('header_type %s not supported' % header_type)
             fasta_file.write('>%s\n%s\n' % (cheader, cseq))
     logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs) - num_skipped, num_skipped))
 
