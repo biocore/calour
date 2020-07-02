@@ -32,8 +32,9 @@ class ExperimentTests(Tests):
         ca.Experiment.foo = ca.Experiment._record_sig(foo)
         self.test1.foo()
         self.test1.foo()
+        self.assertTrue(self.test1._call_history[0].startswith('read_amplicon'))
         self.assertListEqual(
-            self.test1._call_history,
+            self.test1._call_history[1:],
             ['ExperimentTests.test_record_sig.<locals>.foo()'] * 2)
 
     def test_convert_axis_name_other_func(self):
