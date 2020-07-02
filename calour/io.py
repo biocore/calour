@@ -14,6 +14,7 @@ Functions
    read_qiime2
    read_ms
    save
+   save_fasta
    save_biom
    save_metadata
 '''
@@ -795,7 +796,7 @@ def save_metadata(exp: Experiment, f, axis=0, **kwargs):
         raise ValueError('Unknown axis: %r' % axis)
 
 
-def save_fasta(exp: Experiment, f, seqs=None, header_type='seq'):
+def save_fasta(exp: Experiment, f, seqs=None, header='seq'):
     '''Save a list of sequences to fasta.
 
     Use taxonomy information if available, otherwise just use sequence as header.
@@ -807,30 +808,27 @@ def save_fasta(exp: Experiment, f, seqs=None, header_type='seq'):
     seqs : list of str sequences ('ACGT') or None, optional
         None (default) to save all sequences in exp, or list of sequences to only save these sequences.
         Note: sequences not in exp will not be saved
-    header_type: str, optional
+    header: str, optional
         The format for the per-sequence header in the output fasta file. options are:
-        'seq' (default): ">%s" % SEQ
-        'num': ">Seq_"%d" % NUM
+        'seq' (default): use the actual sequence as header
+        'num': use the 'Seq_i' as header (where i is the enumerated index).
     '''
     logger.debug('Save seq to fasta file %s' % f)
     if seqs is None:
         logger.debug('no sequences supplied - saving all sequences')
         seqs = exp.feature_metadata.index.values
     num_skipped = 0
-    if header_type == 'taxonomy':
-        if 'taxonomy' not in exp.feature_metadata.columns:
-            raise ValueError('taxonomy field not present in feature_metadata')
     with open(f, 'w') as fasta_file:
         for idx, cseq in enumerate(seqs):
             if cseq not in exp.feature_metadata.index:
                 num_skipped += 1
                 continue
-            if header_type == 'seq':
+            if header == 'seq':
                 cheader = cseq
-            elif header_type == 'num':
+            elif header == 'num':
                 cheader = 'Seq_%d' % idx
             else:
-                raise ValueError('header_type %s not supported' % header_type)
+                raise ValueError('header %s not supported' % header)
             fasta_file.write('>%s\n%s\n' % (cheader, cseq))
     logger.debug('wrote fasta file with %d sequences. %d sequences skipped' % (len(seqs) - num_skipped, num_skipped))
 
@@ -874,6 +872,7 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
 
 def _split_sample_ids(sid, split_char=None, ignore_split=('row m/z', 'row retention time')):
     '''Split the data table sample id using the split_char returning the first split str.
+
     Used in the read_ms() function, as a callable for the read() function
 
     Parameters

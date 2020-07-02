@@ -30,6 +30,7 @@ Functions
 '''
 
 from logging import getLogger
+import warnings
 import itertools
 
 from sklearn.feature_extraction import DictVectorizer
@@ -193,6 +194,13 @@ class SortedStratifiedKFold(StratifiedKFold):
     def split(self, X, y, groups=None):
         y_cat = self._sort_partition(y)
         return super().split(X, y_cat, groups)
+
+    def _make_test_folds(self, X, y=None):
+        '''The sole purpose of this function is to suppress the specific unintended warning from sklearn.'''
+        with warnings.catch_warnings():
+            # suppress specific warnings
+            warnings.filterwarnings("ignore", message="The least populated class in y has only 1 members, which is less than n_splits=")
+            return super()._make_test_folds(X, y)
 
 
 class RepeatedSortedStratifiedKFold(_RepeatedSplits):
