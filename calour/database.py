@@ -61,7 +61,12 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
             # import the database module
             db_module = importlib.import_module(module_name)
         except ImportError:
-            raise ValueError('Database interface %s not installed. Did you do pip install for it?' % module_name)
+            module_website = get_config_value('website', section=dbname, config_file_name=config_file_name)
+            module_installation = get_config_value('installation', section=dbname, config_file_name=config_file_name)
+            logger.warning('Database interface %s not installed.\nSkipping.\n'
+                           'You can install the database using:\n%s\n'
+                           'For details see: %s' % (module_name, module_installation, module_website))
+            return None
         # get the class
         DBClass = getattr(db_module, class_name)
         cdb = DBClass(exp)
@@ -75,9 +80,11 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         if class_name is not None and module_name is not None:
             databases.append(csection)
     if len(databases) == 0:
-        raise ValueError('calour config file %s does not contain any database sections.' % get_config_file())
-    raise ValueError('Database %s not found in config file (%s).\n'
-                     'Currently contains the databases: %s' % (dbname, get_config_file(), databases))
+        logger.warning('calour config file %s does not contain any database sections. Skipping' % get_config_file())
+        return None
+    logger.warning('Database %s not found in config file (%s).\nSkipping.\n'
+                   'Current databases in config file: %s' % (dbname, get_config_file(), databases))
+    return None
 
 
 def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None, **kwargs):
