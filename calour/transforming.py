@@ -110,12 +110,14 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
 def scale(exp: Experiment, axis=0, inplace=False):
     '''Standardize a dataset along an axis
 
+    This transforms the data into zero mean and unit variance.
+
     .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
 
     Parameters
     ----------
     axis : 0, 1, 's', or 'f'
-        0 or 's'  means scaling occur sample-wise; 1 or 'f' feature-wise.
+        0 or 's'  means scaling occurs sample-wise; 1 or 'f' feature-wise.
 
     Returns
     -------

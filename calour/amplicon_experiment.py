@@ -73,7 +73,7 @@ class AmpliconExperiment(Experiment):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.heatmap_databases = ('dbbact',)
+        self.databases = ('dbbact',)
 
     def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy

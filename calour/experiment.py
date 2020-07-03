@@ -34,11 +34,11 @@ logger = getLogger(__name__)
 
 
 class Experiment:
-    '''This class contains the data for a experiment or a meta experiment.
+    '''This class contains the data for a experiment or a meta-experiment.
 
-    The data set includes a data table (otu table, gene table,
-    metabolomic table, or all those tables combined), a sample
-    metadata table, and a feature metadata.
+    The data set includes 3 aligned tables: a data table (otu table,
+    gene table, metabolomic table, or all those tables combined), a
+    sample metadata table, and a feature metadata table.
 
     Parameters
     ----------
@@ -79,8 +79,9 @@ class Experiment:
     See Also
     --------
     AmpliconExperiment
+    MS1Experiment
     '''
-    def __init__(self, data, sample_metadata, feature_metadata=None,
+    def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
                  exp_metadata=None, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
@@ -94,14 +95,18 @@ class Experiment:
         self.normalized = 0
         # the function calling history list
         self._call_history = []
-        # whether to log to history
+        # whether to log to calling history
         self._log = True
 
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
 
         # the default databases to use for feature information
-        self.heatmap_databases = ()
+        self.databases = databases
+
+    @property
+    def shape(self):
+        return self.data.shape
 
     @property
     def sparse(self):
@@ -287,10 +292,6 @@ class Experiment:
                     return self.data.copy()
                 else:
                     return self.data
-
-    @property
-    def shape(self):
-        return self.data.shape
 
     def reorder(self, new_order, axis=0, inplace=False):
         '''Reorder according to indices in the new order.

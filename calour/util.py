@@ -388,7 +388,7 @@ def _to_list(x):
 def _argsort(values, reverse=False):
     '''Sort a sequence of values of heterogeneous variable types.
 
-    Used to overcome the problem when using numpy.argsort on a pandas
+    This is used to overcome the problem when using numpy.argsort on a pandas
     series values with missing values
 
     Examples
@@ -447,13 +447,18 @@ def _clone_function(f):
 def register_functions(cls, modules=None):
     '''Dynamically register functions to the class as methods.
 
+    This searches all the public functions defined in the given
+    ``modules``. If a function with its 1st argument of ``cls`` type,
+    it will be registered to the ``cls`` class as a method.
+
     Parameters
     ----------
     cls : ``class`` object
-        The class that the functions will be added to
+        The class that functions will be added to as methods.
     modules : iterable of str, optional
-        The module names where the functions are defined. ``None`` means all public
+        The module names where functions are defined. ``None`` means all public
         modules in `calour`.
+
     '''
     # pattern to recognize the Parameters section
     p = re.compile(r"(\n +Parameters\n +-+ *)")
@@ -480,7 +485,7 @@ def register_functions(cls, modules=None):
                         updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
                                    '\\1'
                                    '\n    exp : {0}'
-                                   '\n        Input experiment object.'
+                                   '\n        Input Experiment object.'
                                    '\n')
 
                         if not f.__doc__:
@@ -495,7 +500,7 @@ def deprecated(message):
     Parameters
     ----------
     message : str
-        the message to print together with deprecation info.
+        the message to print together with deprecation warning.
     '''
     def deprecated_decorator(func):
         @wraps(func)

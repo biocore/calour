@@ -70,7 +70,7 @@ class MS1Experiment(Experiment):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.heatmap_databases = ('gnps',)
+        self.databases = ('gnps',)
 
     def __repr__(self):
         '''Return a string representation of this object.'''
