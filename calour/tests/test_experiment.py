@@ -235,6 +235,17 @@ class ExperimentTests(Tests):
     def test_repr(self):
         self.assertEqual(repr(self.test1), 'Experiment ("test1.biom") with 21 samples, 12 features')
 
+    def test_validate_sample(self):
+        with self.assertRaises(ValueError, msg='data table must have the same number of samples with sample_metadata table (2 != 1)'):
+            ca.Experiment(np.array([[1, 2], [3, 4]]),
+                          sample_metadata=pd.DataFrame({'foo': ['a'], 'spam': ['A']}))
+
+    def test_validate_feature(self):
+        with self.assertRaises(ValueError, msg='data table must have the same number of features with feature_metadata table (2 != 1)'):
+            ca.Experiment(np.array([[1, 2], [3, 4]]),
+                          sample_metadata=pd.DataFrame({'foo': ['a', 'b'], 'spam': ['A', 'B']}),
+                          feature_metadata=pd.DataFrame({'ph': [7]}))
+
 
 if __name__ == "__main__":
     main()

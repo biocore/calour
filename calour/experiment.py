@@ -64,7 +64,7 @@ class Experiment:
         The metadata on the samples
     feature_metadata : pandas.DataFrame
         The metadata on the features
-    exp_metadata : dict
+    metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
     shape : tuple of (int, int)
         the dimension of data
@@ -90,6 +90,7 @@ class Experiment:
         self.feature_metadata = feature_metadata
         if exp_metadata is None:
             exp_metadata = {}
+        self.validate()
         self.exp_metadata = exp_metadata
         self.description = description
         self.normalized = 0
@@ -103,6 +104,27 @@ class Experiment:
 
         # the default databases to use for feature information
         self.databases = databases
+
+    def validate(self):
+        '''Validate the Experiment object.
+
+        This simply checks the shape of data table with
+        sample_metadata and feature_metadata.
+
+        Raises
+        ------
+        ValueError
+            If the shapes of the 3 tables do not agree.
+        '''
+        n_sample, n_feature = self.data.shape
+        ns = self.sample_metadata.shape[0]
+        nf = self.feature_metadata.shape[0]
+        if n_sample != ns:
+            raise ValueError(
+                'data table must have the same number of samples with sample_metadata table (%d != %d).' % (n_sample, ns))
+        if n_feature != nf:
+            raise ValueError(
+                'data table must have the same number of features with feature_metadata table (%d != %d).' % (n_feature, nf))
 
     @property
     def shape(self):
@@ -152,7 +174,7 @@ class Experiment:
         return not (self == other)
 
     def __getitem__(self, pos):
-        '''Get the abundance at (sampleid, featureid)
+        '''Get the value from data table for (sample_id, feature_id)
 
         Parameters
         ----------
@@ -162,7 +184,7 @@ class Experiment:
         Returns
         -------
         float
-            The abundance of feature ID in sample ID
+            The value of feature ID in sample ID
         '''
         if not isinstance(pos, tuple) or len(pos) != 2:
             raise SyntaxError('Must supply sample ID, feature ID')
