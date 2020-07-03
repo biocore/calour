@@ -53,8 +53,11 @@ class ExperimentTests(Tests):
         calour.util.set_config_value('module_name', 'calour.tests.mock_database', section='testdb', config_file_name=f)
         db = _get_database_class('testdb', config_file_name=f)
         self.assertEqual(db.database_name, 'mock_db')
-        with self.assertRaises(ValueError):
-            _get_database_class('mock')
+
+        # test None results if database does not exist in config file
+        res = _get_database_class('mock')
+        self.assertEqual(res, None)
+
         shutil.rmtree(d)
 
 
