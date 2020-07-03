@@ -13,7 +13,6 @@ from io import StringIO
 import shutil
 import logging
 
-import skbio
 import scipy.sparse
 import numpy as np
 import pandas as pd
@@ -22,6 +21,7 @@ from numpy.testing import assert_array_almost_equal
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
 from calour.io import _create_biom_table_from_exp
+from calour.util import _iter_fasta
 
 
 class IOTests(Tests):
@@ -258,8 +258,8 @@ class IOTests(Tests):
         f = join(d, 'test1.fasta')
         exp.save_fasta(f)
         seqs = []
-        for seq in skbio.read(f, format='fasta'):
-            seqs.append(str(seq))
+        for chead, cseq in _iter_fasta(f):
+            seqs.append(cseq)
         self.assertCountEqual(seqs, exp.feature_metadata.index.values)
         shutil.rmtree(d)
 
