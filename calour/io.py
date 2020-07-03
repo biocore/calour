@@ -36,10 +36,9 @@ import tempfile
 import pandas as pd
 import numpy as np
 import biom
-import skbio
 
 from . import Experiment, AmpliconExperiment, MS1Experiment
-from .util import get_file_md5, get_data_md5, _get_taxonomy_string
+from .util import get_file_md5, get_data_md5, _get_taxonomy_string, _iter_fasta
 from ._doc import ds
 from .database import _get_database_class
 
@@ -180,9 +179,9 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
             rs_name = _file_from_zip(tempdir, rep_seq_file, internal_data='data/dna-sequences.fasta')
             rseqs = []
             rids = []
-            for cseq in skbio.read(rs_name, format='fasta'):
-                rseqs.append(str(cseq).upper())
-                rids.append(cseq.metadata['id'])
+            for chead, cseq in _iter_fasta(rs_name):
+                rseqs.append(cseq.upper())
+                rids.append(chead)
             rep_seqs = pd.Series(data=rseqs, index=rids, name='_feature_id')
 
             # test if all hashes are identical to the rep_seqs file supplied

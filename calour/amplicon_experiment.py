@@ -23,10 +23,9 @@ Classes
 from logging import getLogger
 
 import numpy as np
-import skbio
 
 from .experiment import Experiment
-from .util import _get_taxonomy_string, _to_list
+from .util import _get_taxonomy_string, _to_list, _iter_fasta
 
 
 logger = getLogger(__name__)
@@ -140,9 +139,10 @@ class AmpliconExperiment(Experiment):
         logger.debug('Filter by sequence using fasta file %s' % filename)
         okpos = []
         tot_seqs = 0
-        for cseq in skbio.read(filename, format='fasta'):
+
+        for chead, cseq in _iter_fasta(filename):
             tot_seqs += 1
-            cseq = str(cseq).upper()
+            cseq = cseq.upper()
             if cseq in exp.feature_metadata.index:
                 pos = exp.feature_metadata.index.get_loc(cseq)
                 okpos.append(pos)

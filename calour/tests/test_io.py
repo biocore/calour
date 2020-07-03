@@ -229,7 +229,7 @@ class IOTests(Tests):
         self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
         self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
 
-    def test_read_qiim2(self):
+    def test_read_qiime2(self):
         # test the non-hashed table
         exp = ca.read_qiime2(self.qiime2table, normalize=None, min_reads=None)
         self.assertEqual(exp.shape, (104, 658))

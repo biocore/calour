@@ -43,6 +43,44 @@ import scipy
 logger = getLogger(__name__)
 
 
+def _iter_fasta(file_name):
+    '''Iterate over fasta file.
+    Fasta file must contain header line (starting with ">") and one or more sequence lines.
+
+    Parameters
+    ----------
+    file_name: str
+        name of the fasta file
+
+    Yields
+    ------
+    (header, sequence)
+    header: str
+        the header line (without ">")
+    sequence: str
+        the sequence ('ACGT')
+    NOTE: header and sequence are stripped (no new line/spaces at beginning or end)
+    '''
+    # skip non-header lines at beginning of file
+    with open(file_name, 'r') as fl:
+        for cline in fl:
+            if cline[0] == ">":
+                title = cline[1:].rstrip()
+                break
+            logger.warning('Fasta file %s has no headers' % file_name)
+            return
+
+        lines = []
+        for cline in fl:
+            if cline[0] == ">":
+                yield title, ''.join(lines)
+                lines = []
+                title = cline[1:].strip()
+                continue
+            lines.append(cline.strip())
+        yield title, "".join(lines)
+
+
 def compute_prevalence(abundance):
     '''Return the prevalence at each abundance cutoffs.
 
