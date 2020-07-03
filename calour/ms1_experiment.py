@@ -68,10 +68,6 @@ class MS1Experiment(Experiment):
     --------
     Experiment
     '''
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.databases = ('gnps',)
-
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'MS1Experiment %s with %d samples, %d features' % (

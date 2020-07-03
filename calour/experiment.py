@@ -75,6 +75,8 @@ class Experiment:
         the normalization factor. it is zero if not normalized
     description : str
         name of the experiment
+    databases : iterable of str
+        databases for fetching and entering feature annotations
 
     See Also
     --------
@@ -125,10 +127,11 @@ class Experiment:
         if n_feature != nf:
             raise ValueError(
                 'data table must have the same number of features with feature_metadata table (%d != %d).' % (n_feature, nf))
+        return ns, nf
 
     @property
     def shape(self):
-        return self.data.shape
+        return self.validate()
 
     @property
     def sparse(self):

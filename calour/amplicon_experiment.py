@@ -35,12 +35,12 @@ logger = getLogger(__name__)
 class AmpliconExperiment(Experiment):
     '''This class stores amplicon data and associated metadata.
 
-    This is a child class of :class:`.Experiment`
+    This is a child class of :class:`.Experiment`.
 
     Parameters
     ----------
     data : numpy.ndarray or scipy.sparse.csr_matrix
-        The abundance table for OTUs, metabolites, genes, etc. Samples
+        The abundance table for OTUs or ASVs. Samples
         are in row and features in column
     sample_metadata : pandas.DataFrame
         The metadata on the samples
@@ -55,7 +55,7 @@ class AmpliconExperiment(Experiment):
     Attributes
     ----------
     data : numpy.ndarray or scipy.sparse.csr_matrix
-        The abundance table for OTUs, metabolites, genes, etc. Samples
+        The abundance table for OTUs or ASVs. Samples
         are in row and features in column
     sample_metadata : pandas.DataFrame
         The metadata on the samples
@@ -69,11 +69,13 @@ class AmpliconExperiment(Experiment):
         store the data as sparse matrix (scipy.sparse.csr_matrix) or dense numpy array.
     description : str
         name of the experiment
+    databases : iterable of str
+        databases for fetching and entering feature annotations
 
+    See Also
+    --------
+    Experiment
     '''
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.databases = ('dbbact',)
 
     def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
