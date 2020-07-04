@@ -43,31 +43,30 @@ import scipy
 logger = getLogger(__name__)
 
 
-def _iter_fasta(file_name):
+def _iter_fasta(fp):
     '''Iterate over fasta file.
+
     Fasta file must contain header line (starting with ">") and one or more sequence lines.
 
     Parameters
     ----------
-    file_name: str
+    fp: str
         name of the fasta file
 
     Yields
     ------
-    (header, sequence)
     header: str
         the header line (without ">")
     sequence: str
-        the sequence ('ACGT')
-    NOTE: header and sequence are stripped (no new line/spaces at beginning or end)
+        the sequence ('ACGT'). Both header and sequence are whitespace stripped.
     '''
     # skip non-header lines at beginning of file
-    with open(file_name, 'r') as fl:
+    with open(fp, 'r') as fl:
         for cline in fl:
             if cline[0] == ">":
                 title = cline[1:].rstrip()
                 break
-            logger.warning('Fasta file %s has no headers' % file_name)
+            logger.warning('Fasta file %s has no headers' % fp)
             return
 
         lines = []
