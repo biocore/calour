@@ -36,7 +36,6 @@ import tempfile
 import pandas as pd
 import numpy as np
 import biom
-import skbio
 
 from . import Experiment, AmpliconExperiment, MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
@@ -45,6 +44,43 @@ from .database import _get_database_class
 
 
 logger = getLogger(__name__)
+
+
+def _iter_fasta(fp):
+    '''Read fasta file into iterator.
+
+    Fasta file must contain header line (starting with ">") and one or more sequence lines.
+
+    Parameters
+    ----------
+    fp: str
+        name of the fasta file
+
+    Yields
+    ------
+    header: str
+        the header line (without ">")
+    sequence: str
+        the sequence ('ACGT'). Both header and sequence are whitespace stripped.
+    '''
+    # skip non-header lines at beginning of file
+    with open(fp, 'r') as fl:
+        for cline in fl:
+            if cline[0] == ">":
+                title = cline[1:].rstrip()
+                break
+            logger.warning('Fasta file %s has no headers' % fp)
+            return
+
+        lines = []
+        for cline in fl:
+            if cline[0] == ">":
+                yield title, ''.join(lines)
+                lines = []
+                title = cline[1:].strip()
+                continue
+            lines.append(cline.strip())
+        yield title, "".join(lines)
 
 
 def _read_biom(fp, transpose=True):
@@ -180,9 +216,9 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
             rs_name = _file_from_zip(tempdir, rep_seq_file, internal_data='data/dna-sequences.fasta')
             rseqs = []
             rids = []
-            for cseq in skbio.read(rs_name, format='fasta'):
-                rseqs.append(str(cseq).upper())
-                rids.append(cseq.metadata['id'])
+            for chead, cseq in _iter_fasta(rs_name):
+                rseqs.append(cseq.upper())
+                rids.append(chead)
             rep_seqs = pd.Series(data=rseqs, index=rids, name='_feature_id')
 
             # test if all hashes are identical to the rep_seqs file supplied

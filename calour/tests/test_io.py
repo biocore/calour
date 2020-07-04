@@ -13,7 +13,6 @@ from io import StringIO
 import shutil
 import logging
 
-import skbio
 import scipy.sparse
 import numpy as np
 import pandas as pd
@@ -21,7 +20,7 @@ from numpy.testing import assert_array_almost_equal
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
-from calour.io import _create_biom_table_from_exp
+from calour.io import _create_biom_table_from_exp, _iter_fasta
 
 
 class IOTests(Tests):
@@ -49,6 +48,15 @@ class IOTests(Tests):
         # test the sample metadata is loaded correctly
         if validate_sample_metadata:
             self.assertEqual(exp.sample_metadata['id'][spos], 12)
+
+    def test_iter_fasta(self):
+        seqs = []
+        heads = []
+        for chead, cseq in _iter_fasta(self.seqs1_fasta):
+            seqs.append(cseq)
+            heads.append(chead)
+        self.assertListEqual(heads, ['real_seq_6', 'not real seq'])
+        self.assertListEqual(seqs, ['TT', 'AACGGAGGATGCGAGCGTTATCTGGAATCATTGGGTTTAAAGGGTCCGTAGGCGGGTTGATAAGTCAGAGGTGAAAGCGCTTAGCTCAACTAAGCAACTGCCTTTGAAACTGTCAGTCTTGAATGATTGTGAAGTAGTTGGAATGTGTAG'])
 
     def test_read_metadata(self):
         # test it's ok to read the IDs of numbers as str
@@ -229,7 +237,7 @@ class IOTests(Tests):
         self.assertAlmostEqual(exp.feature_metadata['MZ'].iloc[1], 118.0869)
         self.assertAlmostEqual(exp.feature_metadata['RT'].iloc[1], 23.9214)
 
-    def test_read_qiim2(self):
+    def test_read_qiime2(self):
         # test the non-hashed table
         exp = ca.read_qiime2(self.qiime2table, normalize=None, min_reads=None)
         self.assertEqual(exp.shape, (104, 658))
@@ -258,8 +266,8 @@ class IOTests(Tests):
         f = join(d, 'test1.fasta')
         exp.save_fasta(f)
         seqs = []
-        for seq in skbio.read(f, format='fasta'):
-            seqs.append(str(seq))
+        for chead, cseq in _iter_fasta(f):
+            seqs.append(cseq)
         self.assertCountEqual(seqs, exp.feature_metadata.index.values)
         shutil.rmtree(d)
 
