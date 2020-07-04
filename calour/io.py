@@ -38,12 +38,49 @@ import numpy as np
 import biom
 
 from . import Experiment, AmpliconExperiment, MS1Experiment
-from .util import get_file_md5, get_data_md5, _get_taxonomy_string, _iter_fasta
+from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 from ._doc import ds
 from .database import _get_database_class
 
 
 logger = getLogger(__name__)
+
+
+def _iter_fasta(fp):
+    '''Read fasta file into iterator.
+
+    Fasta file must contain header line (starting with ">") and one or more sequence lines.
+
+    Parameters
+    ----------
+    fp: str
+        name of the fasta file
+
+    Yields
+    ------
+    header: str
+        the header line (without ">")
+    sequence: str
+        the sequence ('ACGT'). Both header and sequence are whitespace stripped.
+    '''
+    # skip non-header lines at beginning of file
+    with open(fp, 'r') as fl:
+        for cline in fl:
+            if cline[0] == ">":
+                title = cline[1:].rstrip()
+                break
+            logger.warning('Fasta file %s has no headers' % fp)
+            return
+
+        lines = []
+        for cline in fl:
+            if cline[0] == ">":
+                yield title, ''.join(lines)
+                lines = []
+                title = cline[1:].strip()
+                continue
+            lines.append(cline.strip())
+        yield title, "".join(lines)
 
 
 def _read_biom(fp, transpose=True):

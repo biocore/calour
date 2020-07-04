@@ -25,7 +25,7 @@ from logging import getLogger
 import numpy as np
 
 from .experiment import Experiment
-from .util import _get_taxonomy_string, _to_list, _iter_fasta
+from .util import _get_taxonomy_string, _to_list
 
 
 logger = getLogger(__name__)
@@ -118,29 +118,31 @@ class AmpliconExperiment(Experiment):
         logger.info('%s remaining' % np.sum(select))
         return exp.reorder(select, axis=1, inplace=inplace)
 
-    def filter_fasta(exp: Experiment, filename, negate=False, inplace=False):
+    def filter_by_fasta(exp: Experiment, fp, negate=False, inplace=False):
         '''Filter features from experiment based on fasta file
 
         Parameters
         ----------
-        filename : str
-            the fasta filename containing the sequences to use for filtering
-        negate : bool, optional
-            False (default) to keep only sequences matching the fasta file;
+        fp : str
+            the fasta file path containing the sequences to use for filtering
+        negate : bool, default=False
+            False to keep only sequences matching the fasta file;
             True to remove sequences in the fasta file.
-        inplace : bool, optional
-            False (default) to create a copy of the experiment, True to filter inplace
+        inplace : bool, default=False
+            False to create a copy of the experiment; True to filter inplace
 
         Returns
         -------
         newexp : Experiment
             filtered so contains only sequence present in exp and in the fasta file
         '''
-        logger.debug('Filter by sequence using fasta file %s' % filename)
+        from .io import _iter_fasta
+
+        logger.debug('Filter by sequence using fasta file %s' % fp)
         okpos = []
         tot_seqs = 0
 
-        for chead, cseq in _iter_fasta(filename):
+        for chead, cseq in _iter_fasta(fp):
             tot_seqs += 1
             cseq = cseq.upper()
             if cseq in exp.feature_metadata.index:

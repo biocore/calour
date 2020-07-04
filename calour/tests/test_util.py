@@ -23,15 +23,6 @@ class IOTests(Tests):
         super().setUp()
         self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
 
-    def test_iter_fasta(self):
-        seqs = []
-        heads = []
-        for chead, cseq in util._iter_fasta(self.seqs1_fasta):
-            seqs.append(cseq)
-            heads.append(chead)
-        self.assertListEqual(heads, ['real_seq_6', 'not real seq'])
-        self.assertListEqual(seqs, ['TT', 'AACGGAGGATGCGAGCGTTATCTGGAATCATTGGGTTTAAAGGGTCCGTAGGCGGGTTGATAAGTCAGAGGTGAAAGCGCTTAGCTCAACTAAGCAACTGCCTTTGAAACTGTCAGTCTTGAATGATTGTGAAGTAGTTGGAATGTGTAG'])
-
     def test_get_taxonomy_string(self):
         orig_tax = list(self.test1.feature_metadata['taxonomy'].values)
         # test string taxonomy

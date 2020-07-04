@@ -20,8 +20,7 @@ from numpy.testing import assert_array_almost_equal
 
 import calour as ca
 from calour._testing import Tests, assert_experiment_equal
-from calour.io import _create_biom_table_from_exp
-from calour.util import _iter_fasta
+from calour.io import _create_biom_table_from_exp, _iter_fasta
 
 
 class IOTests(Tests):
@@ -49,6 +48,15 @@ class IOTests(Tests):
         # test the sample metadata is loaded correctly
         if validate_sample_metadata:
             self.assertEqual(exp.sample_metadata['id'][spos], 12)
+
+    def test_iter_fasta(self):
+        seqs = []
+        heads = []
+        for chead, cseq in _iter_fasta(self.seqs1_fasta):
+            seqs.append(cseq)
+            heads.append(chead)
+        self.assertListEqual(heads, ['real_seq_6', 'not real seq'])
+        self.assertListEqual(seqs, ['TT', 'AACGGAGGATGCGAGCGTTATCTGGAATCATTGGGTTTAAAGGGTCCGTAGGCGGGTTGATAAGTCAGAGGTGAAAGCGCTTAGCTCAACTAAGCAACTGCCTTTGAAACTGTCAGTCTTGAATGATTGTGAAGTAGTTGGAATGTGTAG'])
 
     def test_read_metadata(self):
         # test it's ok to read the IDs of numbers as str
