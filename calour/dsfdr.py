@@ -153,7 +153,6 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         the p-value (uncorrected) for each feature
     qvals: np array of float (length N)
         the q-value (corrected p-value) for each feature.
-        NOTE: qvals are only calculated for the rejected features. All others get default value of 1 (for speedup of calculation)
     '''
 
     logger.debug('dsfdr using fdr method: %s' % fdr_method)
