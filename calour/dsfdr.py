@@ -345,9 +345,9 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             allfdr.append(fdr)
             allt.append(cp)
             if fdr <= alpha:
-                realcp = cp
-                foundit = True
-                break
+                if not foundit:
+                    realcp = cp
+                    foundit = True
 
         if not foundit:
             # no good threshold was found
