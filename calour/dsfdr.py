@@ -103,7 +103,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     input:
     data : N x S numpy array
-        each column is a sample (S total), each row an OTU (N total)
+        each column is a sample (S total), each row a feature (N total)
     labels : a 1d numpy array (length S)
         the labels of each sample (same order as data) with the group
         (0/1 if binary, 0-G-1 if G groups, or numeric values for correlation)
@@ -112,8 +112,8 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
     transform_type : str or None
         transformation to apply to the data before caluculating
         the test statistic
-        'rankdata' : rank transfrom each OTU reads
-        'log2data' : calculate log2 for each OTU using minimal cutoff of 2
+        'rankdata' : rank transfrom each feature
+        'log2data' : calculate log2 for each feature using minimal cutoff of 2
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
          None : no transformation to perform
@@ -146,11 +146,14 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     output:
     reject : np array of bool (length N)
-        True for OTUs where the null hypothesis is rejected
+        True for features where the null hypothesis is rejected
     tstat : np array of float (length N)
-        the test statistic value for each OTU (for effect size)
+        the test statistic value for each feature (for effect size)
     pvals : np array of float (length N)
-        the p-value for each OTU
+        the p-value (uncorrected) for each feature
+    qvals: np array of float (length N)
+        the q-value (corrected p-value) for each feature.
+        NOTE: qvals are only calculated for the rejected features. All others get default value of 1 (for speedup of calculation)
     '''
 
     logger.debug('dsfdr using fdr method: %s' % fdr_method)
@@ -304,8 +307,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             u[:, cperm] = rt
         u = np.abs(u)
     else:
-        print('unsupported method %s' % method)
-        return None, None
+        raise ValueError('unsupported method %s' % method)
 
     # fix floating point errors (important for permutation values!)
     # https://github.com/numpy/numpy/issues/8116
@@ -315,6 +317,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     # calculate permutation p-vals
     pvals = np.zeros([numbact])  # p-value for original test statistic t
+    qvals = np.ones([numbact])  # q-value (corrected p-value) for each feature.
     pvals_u = np.zeros([numbact, numperm])
     # pseudo p-values for permutated test statistic u
     for crow in range(numbact):
@@ -349,23 +352,30 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         if not foundit:
             # no good threshold was found
             reject = np.repeat([False], numbact)
-            return reject, tstat, pvals
+            return reject, tstat, pvals, qvals
 
         # fill the reject null hypothesis
         reject = np.zeros(numbact, dtype=int)
         reject = (pvals <= realcp)
 
+        # fill the q-values
+        for idx, cfdr in enumerate(allfdr):
+            # fix for qval > 1 (since we count on all features in random permutation)
+            cfdr = np.min([cfdr, 1])
+            cpval = allt[idx]
+            qvals[pvals == cpval] = cfdr
+
     elif fdr_method == 'bhfdr' or fdr_method == 'filterBH':
         t_star = np.array([t, ] * numperm).transpose()
         pvals = (np.sum(u >= t_star, axis=1) + 1) / (numperm + 1)
-        reject = multipletests(pvals, alpha=alpha, method='fdr_bh')[0]
+        reject, qvals, *_ = multipletests(pvals, alpha=alpha, method='fdr_bh')
 
     elif fdr_method == 'byfdr':
         t_star = np.array([t, ] * numperm).transpose()
         pvals = (np.sum(u >= t_star, axis=1) + 1) / (numperm + 1)
-        reject = multipletests(pvals, alpha=alpha, method='fdr_by')[0]
+        reject, qvals, *_ = multipletests(pvals, alpha=alpha, method='fdr_by')
 
     else:
         raise ValueError('fdr method %s not supported' % fdr_method)
 
-    return reject, tstat, pvals
+    return reject, tstat, pvals, qvals

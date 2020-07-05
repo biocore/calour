@@ -126,19 +126,19 @@ class fdr_methodsTests(TestCase):
         res_ds = dsfdr.dsfdr(self.data, self.labels, method='meandiff',
                              transform_type=None, alpha=0.1, numperm=1000,
                              fdr_method='dsfdr')
-        self.assertEqual(np.shape(res_ds)[0], self.data.shape[0])
+        self.assertEqual(np.shape(res_ds[0])[0], self.data.shape[0])
         np.testing.assert_array_equal(res_ds[0], [True, False, False])
 
         res_bh = dsfdr.dsfdr(self.data, self.labels, method='meandiff',
                              transform_type=None, alpha=0.1, numperm=1000,
                              fdr_method='bhfdr')
-        self.assertEqual(np.shape(res_bh)[0], self.data.shape[0])
+        self.assertEqual(np.shape(res_bh[0])[0], self.data.shape[0])
         np.testing.assert_array_equal(res_bh[0], [True, False, False])
 
         res_by = dsfdr.dsfdr(self.data, self.labels, method='meandiff',
                              transform_type=None, alpha=0.1, numperm=1000,
                              fdr_method='byfdr')
-        self.assertEqual(np.shape(res_by)[0], self.data.shape[0])
+        self.assertEqual(np.shape(res_by[0])[0], self.data.shape[0])
         np.testing.assert_array_equal(res_by[0], [True, False, False])
 
         # test on simulated self.data_sim
