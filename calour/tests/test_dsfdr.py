@@ -128,6 +128,8 @@ class fdr_methodsTests(TestCase):
                              fdr_method='dsfdr')
         self.assertEqual(np.shape(res_ds[0])[0], self.data.shape[0])
         np.testing.assert_array_equal(res_ds[0], [True, False, False])
+        # test the qvals behave logically
+        self.assertEqual(np.sum(res_ds[3] <= 0.1), np.sum(res_ds[0] is True))
 
         res_bh = dsfdr.dsfdr(self.data, self.labels, method='meandiff',
                              transform_type=None, alpha=0.1, numperm=1000,
@@ -148,6 +150,8 @@ class fdr_methodsTests(TestCase):
                               alpha=0.1, numperm=1000, fdr_method='dsfdr')[0]
         fdr_ds2 = (np.sum(np.where(res_ds2)[0] >= 100)) / np.sum(res_ds2)
         np.testing.assert_equal(fdr_ds2 <= 0.1, True)
+        # test the qvals behave logically
+        self.assertEqual(np.sum(res_ds2[3] <= 0.1), np.sum(res_ds2[0] is True))
 
         np.random.seed(31)
         res_bh2 = dsfdr.dsfdr(self.data_sim, self.labels_sim,
