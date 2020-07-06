@@ -13,42 +13,13 @@ import numpy as np
 import pandas as pd
 
 import calour as ca
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 
 
 class MTests(Tests):
     def setUp(self):
         super().setUp()
         self.test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
-
-    def test_join_metadata_fields(self):
-        # test the default params
-        newexp = self.test1.join_metadata_fields('id', 'group', inplace=False)
-        self.assertIn('id_group', newexp.sample_metadata.columns)
-        self.assertEqual(newexp.sample_metadata.loc['S12', 'id_group'], '12.0_2')
-        # test we didn't change anything besides the new sample metadata column
-        assert_experiment_equal(newexp, self.test1, ignore_md_fields=['id_group'])
-
-    def test_join_metadata_fields_complex(self):
-        # test join feature fields with new field name, separator and inplace
-        exp = deepcopy(self.test1)
-        newexp = exp.join_metadata_fields('taxonomy', 'taxonomy', 'test', axis=1, sep=';', inplace=True)
-        self.assertIs(newexp, exp)
-        self.assertIn('test', exp.feature_metadata.columns)
-        self.assertNotIn('test', exp.sample_metadata.columns)
-        self.assertEqual(exp.feature_metadata['test'].iloc[11], 'bad_bacteria;bad_bacteria')
-        # test we didn't change anything besides the new sample metadata column
-        assert_experiment_equal(exp, self.test1, ignore_md_fields=['test'])
-
-        # test join feature fields with new field name, sepparator, inplace and align
-        exp = deepcopy(self.test1)
-        newexp = exp.join_metadata_fields('taxonomy', 'ph', 'test', axis=1, sep=';', align='<', inplace=True)
-        self.assertIs(newexp, exp)
-        self.assertIn('test', exp.feature_metadata.columns)
-        self.assertNotIn('test', exp.sample_metadata.columns)
-        self.assertEqual(exp.feature_metadata.loc['AT', 'test'], 'k__Bacteria; p__Tenericutes; c__Mollicutes; o__Mycoplasmatales; f__Mycoplasmataceae; g__Mycoplasma; s__                         ;4.1')
-        # test we didn't change anything besides the new sample metadata column
-        assert_experiment_equal(exp, self.test1, ignore_md_fields=['test'])
 
     def test_join_experiments(self):
         # do the famous join experiment to itself trick
@@ -58,7 +29,7 @@ class MTests(Tests):
         self.assertEqual(len(newexp.feature_metadata), len(self.test1.feature_metadata))
         self.assertEqual(len(newexp.sample_metadata), len(self.test1.sample_metadata)*2)
         fexp = newexp.filter_samples('experiments', ['t2'])
-        assert_experiment_equal(fexp, texp, ignore_md_fields=['experiments'])
+        self.assert_experiment_equal(fexp, texp, ignore_md_fields=['experiments'])
 
     def test_join_experiments_featurewise(self):
         otu1 = ca.Experiment(np.array([[0, 9], [7, 4]]), sparse=False,
@@ -81,7 +52,7 @@ class MTests(Tests):
                                                                    index=['16S1', '16S2', 'ITS1']))
         # reorder the samples
         combined_obs = combined_obs.filter_ids(combined_exp.sample_metadata.index, axis=0)
-        assert_experiment_equal(combined_obs, combined_exp)
+        self.assert_experiment_equal(combined_obs, combined_exp)
 
     def test_agg_by_metadata(self):
         # test default conditions - on samples, not inplace, mean method
@@ -106,25 +77,6 @@ class MTests(Tests):
         self.assertEqual(list(newexp.data[:, 3]), [0, 90, 5])
         self.assertIs(newexp, self.test1)
         self.assertEqual(newexp.shape[1], 12)
-
-    def test_agg_by_metadata_random_unique(self):
-        # test on features, random method, not inplace
-        # since each taxonomy is unique, should have the same as original
-        newexp = self.test1.aggregate_by_metadata('taxonomy', 'random', axis=1)
-        self.assertEqual(newexp.shape, self.test1.shape)
-        self.assertIsNot(newexp, self.test1)
-
-    def test_agg_by_metadata_random(self):
-        # test on samples, random method, not inplace
-        np.random.seed(2017)
-        newexp = self.test1.aggregate_by_metadata('group', 'random')
-        self.assertEqual(newexp.shape[0], 3)
-        self.assertEqual(list(newexp.data[:, 7]), [849, 859, 9])
-        self.assertEqual(newexp.shape[1], self.test1.shape[1])
-        self.assertIsNot(newexp, self.test1)
-        np.random.seed(2018)
-        newexp = self.test1.aggregate_by_metadata('group', 'random')
-        self.assertNotEqual(list(newexp.data[:, 7]), [849, 859, 9])
 
 
 if __name__ == "__main__":

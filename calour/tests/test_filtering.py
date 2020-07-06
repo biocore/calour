@@ -31,6 +31,25 @@ class FTests(Tests):
             uniq, counts = np.unique(d2, return_counts=True)
             self.assertTrue(np.all(counts == n))
 
+    def test_downsample_unique(self):
+        # test on features, random method, not inplace
+        # since each taxonomy is unique, should have the same as original
+        newexp = self.test1.downsample('taxonomy', axis=1)
+        self.assertEqual(newexp.shape, self.test1.shape)
+        self.assertIsNot(newexp, self.test1)
+
+    def test_downsample_keep_1(self):
+        # test on samples, random method, not inplace
+        np.random.seed(2017)
+        newexp = self.test1.downsample('group', keep=1)
+        self.assertEqual(newexp.shape[0], 3)
+        self.assertEqual(list(newexp.data[:, 7].todense().A1), [849, 859, 9])
+        self.assertEqual(newexp.shape[1], self.test1.shape[1])
+        self.assertIsNot(newexp, self.test1)
+        np.random.seed(2018)
+        newexp = self.test1.downsample('group', keep=1)
+        self.assertNotEqual(list(newexp.data[:, 7].todense().A1), [849, 859, 9])
+
     def test_downsample_sample(self):
         obs = self.test2.downsample('group')
         # should be down to 4 samples; feature number is the same

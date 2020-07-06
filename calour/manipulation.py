@@ -34,82 +34,11 @@ from .experiment import Experiment
 logger = getLogger(__name__)
 
 
-def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0, sep='_', align=None, inplace=True):
-    '''Join two sample/feature metadata fields into a single new field
-
-    Parameters
-    ----------
-    field1 : str
-        Name of the first sample metadata field to join
-    field2 : str
-        Name of the second sample metadata field to join
-    newfield : str or None, optional
-        name of the new (joined) sample metadata field
-        None (default) to name it as field1 + sep + field2
-    axis : 0, 1, 's', or 'f', optional
-        0 or 's' (default) to modify sample metadata fields; 1 or 'f' to modify feature metadata fields
-    sep : str, optional
-        The separator between the values of the two fields when joining
-    align : None, '<', or '>', optional
-        align the contents of newfield or not
-        None (default) to not align; '<' to left align; '>' to right align
-    inplace : bool, optional
-        True (default) to add in current experiment, False to create a new Experiment
-
-    Returns
-    -------
-    Experiment
-        with an added sample metadata field
-    '''
-    logger.debug('joining fields %s and %s into %s' % (field1, field2, newfield))
-    if inplace:
-        newexp = exp
-    else:
-        newexp = deepcopy(exp)
-
-    if axis == 0:
-        metadata = newexp.sample_metadata
-    else:
-        metadata = newexp.feature_metadata
-
-    # validate the data
-    if field1 not in metadata.columns:
-        raise ValueError('field %s not in metadata' % field1)
-    if field2 not in metadata.columns:
-        raise ValueError('field %s not in metadata' % field2)
-
-    # get the new column name
-    if newfield is None:
-        newfield = field1 + sep + field2
-
-    if newfield in metadata.columns:
-        raise ValueError('new field name %s alreay in metadata. Please use different newfield value' % newfield)
-
-    if align not in [None, '<', '>']:
-        raise ValueError("Wrong align value. Please choose from [None, '<', '>']")
-
-    # add the new column
-    if align in ['<', '>']:
-        len_field1 = metadata[field1].astype(str).str.len().max()
-        len_field2 = metadata[field2].astype(str).str.len().max()
-        newcol = ['{:{}{}}'.format(i, align, len_field1) + sep + '{:{}{}}'.format(j, align, len_field2) for i, j in zip(metadata[field1], metadata[field2])]
-    else:
-        newcol = [str(i) + sep + str(j) for i, j in zip(metadata[field1], metadata[field2])]
-
-    if axis == 0:
-        newexp.sample_metadata[newfield] = newcol
-    else:
-        newexp.feature_metadata[newfield] = newcol
-
-    return newexp
-
-
-@Experiment._record_sig
-def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=False):
-    '''aggregate all samples/features that have the same value in the given field.
+def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=False) -> Experiment:
+    '''Aggregate all samples or features of the same group.
 
     Group the samples (axis=0) or features (axis=1) that have the same value in the column
-    of given field and then aggregate the data table of the group with the given method.
+    of given field and then aggregate the data table of each group with the given method.
 
     The number of samples/features in each group and their IDs are stored in new metadata columns
     '_calour_merge_number' and '_calour_merge_ids', respectively
@@ -124,13 +53,8 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         aggregate method. Choice includes:
 
         * 'mean' : the mean of the group
-
         * 'median' : the median of the group
-
-        * 'random' : a random selection from the group
-
         * 'sum' : the sum of of the group
-
     axis : 0, 1, 's', or 'f', optional
         0 or 's' (default) to aggregate samples; 1 or 'f' to aggregate features
     inplace : bool, optional
@@ -139,7 +63,6 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
     Returns
     -------
     Experiment
-
     '''
     logger.debug('Merge data using field %s, agg %s' % (field, agg))
     if inplace:
@@ -147,16 +70,14 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
     else:
         newexp = deepcopy(exp)
     if axis == 0:
-        metadata = newexp.sample_metadata
+        col = newexp.sample_metadata[field]
     else:
-        metadata = newexp.feature_metadata
-    if field not in metadata:
-        raise ValueError('Field %s not in metadata' % field)
+        col = newexp.feature_metadata[field]
 
     # convert to dense for efficient slicing
     newexp.sparse = False
 
-    uniq = metadata[field].unique()
+    uniq = col.unique()
     n = len(uniq)
     keep_pos = np.empty(n, dtype=np.uint32)
     merge_number = np.empty(n, dtype=np.uint32)
@@ -165,26 +86,21 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
     for i, val in enumerate(uniq):
         if pd.isnull(val):
-            pos = metadata[field].isnull()
+            pos = col.isnull()
         else:
-            pos = metadata[field] == val
+            pos = col == val
         cdata = newexp.data.compress(pos, axis=axis)
-        which_to_replace = 0
         if agg == 'mean':
             newdat = cdata.mean(axis=axis)
         elif agg == 'median':
             newdat = cdata.median(axis=axis)
         elif agg == 'sum':
             newdat = cdata.sum(axis=axis)
-        elif agg == 'random':
-            random_pos = np.random.randint(np.sum(pos))
-            newdat = cdata.take(random_pos, axis=axis)
-            which_to_replace = random_pos
         else:
             raise ValueError('Unknown aggregation method: %r' % agg)
         merge_number[i] = pos.sum()
-        merge_ids[i] = ';'.join(metadata.index[pos].astype(str))
-        replace_pos = np.where(pos)[0][which_to_replace]
+        merge_ids[i] = ';'.join(col.index[pos].astype(str))
+        replace_pos = np.where(pos)[0][0]
         keep_pos[i] = replace_pos
 
         if axis == 0:
@@ -192,17 +108,18 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         else:
             newexp.data[:, replace_pos] = newdat
 
-    newexp.reorder(keep_pos, inplace=True, axis=axis)
+    newexp.reorder(keep_pos, axis=axis, inplace=True)
 
     if axis == 0:
-        newexp.sample_metadata = newexp.sample_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
+        metadata = newexp.sample_metadata
     else:
-        newexp.feature_metadata = newexp.feature_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
+        metadata = newexp.feature_metadata
+    metadata['_calour_merge_number'] = merge_number
+    metadata['_calour_merge_ids'] = merge_ids
 
     return newexp
 
 
-@Experiment._record_sig
 def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=None):
     '''Combine two :class:`.Experiment` objects into one.
 
@@ -293,7 +210,6 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
     return newexp
 
 
-@Experiment._record_sig
 def join_experiments_featurewise(exp: Experiment, other,
                                  field_name='_feature_origin_', origin_labels=('exp1', 'exp2')):
     '''Combine two :class:`.Experiment` objects into one.
