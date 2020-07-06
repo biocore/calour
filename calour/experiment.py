@@ -46,9 +46,9 @@ class Experiment:
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
     sample_metadata : pandas.DataFrame
-        The metadata on the samples
+        The metadata for the samples
     feature_metadata : pandas.DataFrame
-        The metadata on the features
+        The metadata for the features
     description : str
         name of experiment
     sparse : bool
@@ -84,16 +84,16 @@ class Experiment:
     MS1Experiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
-                 exp_metadata=None, description='', sparse=True):
+                 metadata=None, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
         if feature_metadata is None:
             feature_metadata = pd.DataFrame(np.arange(data.shape[1]))
         self.feature_metadata = feature_metadata
-        if exp_metadata is None:
-            exp_metadata = {}
+        if metadata is None:
+            metadata = {}
         self.validate()
-        self.exp_metadata = exp_metadata
+        self.metadata = metadata
         self.description = description
         self.normalized = 0
         # the function calling history list
@@ -118,6 +118,15 @@ class Experiment:
         ValueError
             If the shapes of the 3 tables do not agree.
         '''
+        duplicates = self.sample_metadata.index.duplicated(keep=False)
+        if duplicates.any():
+            raise ValueError(
+                'Duplicate sample IDs exist in positions %s.' % np.where(duplicates)[0])
+        duplicates = self.feature_metadata.index.duplicated(keep=False)
+        if duplicates.any():
+            raise ValueError(
+                'Duplicate feature IDs exist in positions %s.' % np.where(duplicates)[0])
+
         n_sample, n_feature = self.data.shape
         ns = self.sample_metadata.shape[0]
         nf = self.feature_metadata.shape[0]
@@ -285,10 +294,10 @@ class Experiment:
 
         Parameters
         ----------
-        sparse : None or bool, optional
-            None (default) to pass original data (sparse or dense).
-            True to get as sparse. False to get as dense
-        copy : bool, optional
+        sparse : bool, default=None
+            default to pass original data (sparse or dense).
+            True to get as sparse. False to get as dense.
+        copy : bool, default=False
             True to get a copy of the data; otherwise, it can be
             the original data or a copy (default).
 
@@ -438,15 +447,15 @@ class Experiment:
             sample_metadata['id'] = sample_metadata.index
             feature_metadata = pd.DataFrame(index=df.columns)
             feature_metadata['id'] = feature_metadata.index
-            exp_metadata = {}
+            metadata = {}
             description = 'From Pandas DataFrame'
         else:
             description = exp.description + ' From Pandas'
-            exp_metadata = exp.exp_metadata
+            metadata = exp.metadata
             sample_metadata = exp.sample_metadata.loc[df.index.values, ]
             feature_metadata = exp.feature_metadata.loc[df.columns.values, ]
             cls = exp.__class__
 
         newexp = cls(df.values, sample_metadata, feature_metadata,
-                     exp_metadata=exp_metadata, description=description, sparse=False)
+                     metadata=metadata, description=description, sparse=False)
         return newexp

@@ -22,7 +22,6 @@ Functions
    is_abundant
    is_prevalent
    freq_ratio
-   unique_cut
 '''
 
 # ----------------------------------------------------------------------------
@@ -166,11 +165,13 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0,
         the column name of the sample or feature metadata tables
     select : None, Callable, or list/set/tuple-like
         select what to keep based on the value in the specified field.
+
         * callable: the callable accepts a 1D array and return a
           boolean array of the same length;
         * list/set/tuple-like object: keep the samples with the values in
           the `field` column included in the `select`;
         * ``None``: filter out the NA.
+
     axis : 0, 1, 's', or 'f', optional
         the field is on samples (0 or 's') or features (1 or 'f') metadata
     negate : bool, optional
@@ -619,14 +620,15 @@ def _filter_ids(exp: Experiment, ids, axis):
 def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False) -> Experiment:
     '''Filter samples or features based on a list IDs.
 
-    .. note:: the order of samples or features is updated as the order given `ids`.
+    If ``ids`` has duplicates, the resulting Experiment will also have
+    duplicates. The order of samples or features is updated as the
+    order given `ids`, unless ``ids`` is unordered data type (eg set
+    type), in which case the resulting Experiment is also unordered.
 
     Parameters
     ----------
     ids : sequence of str
-        The ids to put first in the resulting Experiment. If ``ids``
-        is unordered data type (eg set type), the resulting Experiment
-        is also unordered for those ids.
+        The ids to put first in the resulting Experiment.
     axis : {0, 1, 's', 'f'}
         sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column name
         in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
@@ -641,6 +643,7 @@ def filter_ids(exp: Experiment, ids, axis=1, negate=False, inplace=False) -> Exp
     -------
     Experiment
         contains only features/samples present in original experiment and in ids
+
     '''
     ids_pos = _filter_ids(exp, ids, axis)
     if negate:
