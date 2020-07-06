@@ -37,9 +37,9 @@ class ExperimentTests(Tests):
         fids = ['AA', 'AT', 'TT', 'TG', 'GG', 'badfeature']
         self.assertListEqual(fids, exp.feature_metadata.index.tolist())
 
-    def test_filter_fasta(self):
+    def test_filter_by_fasta(self):
         # test keeping the sequences from fasta
-        exp = self.test1.filter_fasta(self.seqs1_fasta)
+        exp = self.test1.filter_by_fasta(self.seqs1_fasta)
         # test we get only 1 sequence and the correct one
         self.assertEqual(len(exp.feature_metadata), 1)
         self.assertEqual(exp.shape[1], 1)
@@ -53,10 +53,10 @@ class ExperimentTests(Tests):
         # and is not inplace
         self.assertIsNot(exp, self.test1)
 
-    def test_filter_fasta_negate(self):
+    def test_filter_by_fasta_negate(self):
         # test removing sequences from fasta and inplace
         orig_exp = deepcopy(self.test1)
-        exp = self.test1.filter_fasta(self.seqs1_fasta, negate=True, inplace=True)
+        exp = self.test1.filter_by_fasta(self.seqs1_fasta, negate=True, inplace=True)
         # test we remove only 1 sequence and the correct one
         self.assertEqual(len(exp.feature_metadata), orig_exp.shape[1] - 1)
         self.assertEqual(exp.shape[1], orig_exp.shape[1] - 1)
