@@ -61,7 +61,7 @@ class AmpliconExperiment(Experiment):
         The metadata on the samples
     feature_metadata : pandas.DataFrame
         The metadata on the features
-    exp_metadata : dict
+    metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
     shape : tuple of (int, int)
         the dimension of data
@@ -76,8 +76,10 @@ class AmpliconExperiment(Experiment):
     --------
     Experiment
     '''
+    def __init__(self, *args, databases=('dbbact',), **kwargs):
+        super().__init__(*args, databases=('dbbact',), **kwargs)
 
-    def filter_taxonomy(exp: Experiment, values, negate=False, inplace=False, substring=True):
+    def filter_taxonomy(self, values, negate=False, inplace=False, substring=True):
         '''filter keeping only observations with taxonomy string matching taxonomy
 
         if substring=True, look for partial match instead of identity.
@@ -98,7 +100,7 @@ class AmpliconExperiment(Experiment):
         Returns
         -------
         AmpliconExperiment
-            With only features with matching taxonomy
+            Containing only features with matching taxonomy
         '''
         if 'taxonomy' not in exp.feature_metadata.columns:
             logger.warning('No taxonomy field in experiment')
@@ -155,8 +157,7 @@ class AmpliconExperiment(Experiment):
         newexp = exp.reorder(okpos, axis=1, inplace=inplace)
         return newexp
 
-    @Experiment._record_sig
-    def sort_taxonomy(exp: Experiment, inplace=False):
+    def sort_by_taxonomy(self, inplace=False):
         '''Sort the features based on the taxonomy
 
         Sort features based on the taxonomy (alphabetical)
@@ -169,17 +170,16 @@ class AmpliconExperiment(Experiment):
 
         Returns
         -------
-        Experiment
+        AmpliconExperiment
             sorted by taxonomy
         '''
         logger.debug('sort features by taxonomies')
-        taxonomy = _get_taxonomy_string(exp, remove_underscore=True)
+        taxonomy = _get_taxonomy_string(self, remove_underscore=True)
         sort_pos = np.argsort(taxonomy, kind='mergesort')
-        exp = exp.reorder(sort_pos, axis=1, inplace=inplace)
-        return exp
 
-    @Experiment._record_sig
-    def filter_orig_reads(exp, minreads, **kwargs):
+        return self.reorder(sort_pos, axis=1, inplace=inplace)
+
+    def filter_orig_reads(self, minreads, **kwargs):
         '''Filter keeping only samples with >= minreads in the original reads column
         Note this function uses the _calour_original_abundance field rather than the current sum of sequences per sample.
         So if you start with a sample with 100 reads, normalizing and filtering with other functions with not change the original reads column

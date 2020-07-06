@@ -71,8 +71,8 @@ class ExperimentTests(Tests):
         # and is inplace
         self.assertIs(exp, self.test1)
 
-    def test_sort_taxonomy(self):
-        obs = self.test1.sort_taxonomy()
+    def test_sort_by_taxonomy(self):
+        obs = self.test1.sort_by_taxonomy()
         self.assertListEqual(
             ['GG', 'badfeature', 'TG', 'AA', 'TT', 'GT', 'TA', 'TC', 'GA', 'AC', 'AG', 'AT'],
             obs.feature_metadata.index.tolist())

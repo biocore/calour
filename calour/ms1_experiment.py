@@ -55,7 +55,7 @@ class MS1Experiment(Experiment):
         The metadata on the samples
     feature_metadata : pandas.DataFrame
         The metadata on the features
-    exp_metadata : dict
+    metadata : dict
         metadata about the experiment (data md5, filenames, etc.)
     shape : tuple of (int, int)
         the dimension of data
@@ -68,6 +68,9 @@ class MS1Experiment(Experiment):
     --------
     Experiment
     '''
+    def __init__(self, *args, databases=('gnps',), **kwargs):
+        super().__init__(*args, databases=('gnps',), **kwargs)
+
     def __repr__(self):
         '''Return a string representation of this object.'''
         return 'MS1Experiment %s with %d samples, %d features' % (

@@ -170,10 +170,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
             clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
-            title=None, rect=None, cax=None, ax=None):
+            rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
 
-    Plot either a simple heatmap for the experiment with features in row
+    Plot a heatmap for the experiment with features in row
     and samples in column.
 
     .. note:: By default it log transforms the abundance values and then plot heatmap.
@@ -207,8 +207,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
     norm : matplotlib.colors.Normalize or None
         passed to ``norm`` parameter of matplotlib.pyplot.imshow. Default is log scale.
-    title : None or str, optional
-        None (default) to not show title. str to set title to str.
     rect : tuple of (int, int, int, int) or None, optional
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
@@ -223,10 +221,11 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     matplotlib.axes.Axes
         The axes for the heatmap
 
-
     Examples
     --------
     .. plot::
+       :context:
+
 
        Let's create a very simple data set:
 
@@ -243,14 +242,20 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        Let's then plot the heatmap:
 
        >>> fig, ax = plt.subplots()
-       >>> exp.heatmap(sample_field='category', feature_field='motile', title='Fig 1 log scale', ax=ax)   # doctest: +SKIP
+       >>> exp.heatmap(sample_field='category', feature_field='motile', ax=ax)   # doctest: +SKIP
+
+    .. plot::
+       :context:
 
        By default, the color is plot in log scale. Let's say we would like to plot heatmap in normal scale instead of log scale:
-
+       >>> plt.close()
        >>> fig, ax = plt.subplots()
        >>> norm = mpl.colors.Normalize()
-       >>> exp.heatmap(sample_field='category', feature_field='motile', title='Fig 2 normal scale',
+       >>> exp.heatmap(sample_field='category', feature_field='motile',
        ...             norm=norm, ax=ax)             # doctest: +SKIP
+
+    .. plot::
+       :context:
 
        Let's say we would like to show the presence/absence of each
        OTUs across samples in heatmap. And we define presence as
@@ -269,10 +274,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        >>> cmap = mpl.colors.ListedColormap(['r', 'k'])
        >>> # create a normalize object the describes the limits of each color
        >>> norm = mpl.colors.BoundaryNorm([0., 0.5, 1.], cmap.N)
+       >>> plt.close()
        >>> fig, ax = plt.subplots()
-       >>> expbin.heatmap(sample_field='category', feature_field='motile', title='Fig 3 binary',
+       >>> expbin.heatmap(sample_field='category', feature_field='motile',
        ...                cmap=cmap, norm=norm, ax=ax)         # doctest: +SKIP
-
     '''
     logger.debug('Plot heatmap')
     # import pyplot is less polite. do it locally
@@ -286,8 +291,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     else:
         fig = ax.get_figure()
 
-    if title is not None:
-        ax.set_title(title)
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim(rect[0], rect[1])
@@ -508,7 +511,7 @@ def plot(exp: Experiment, title=None,
         The title of the figure.
     barx_fields, bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
-        for each column. It doesn't plot color bars by default (None)
+        for each column to show sample / feature grouping. It doesn't plot any bars by default.
     barx_width, bary_width : float or list of float, optional
         The thickness of the each bar along x axis or y axis. The default thickness usually looks good enough.
     barx_colors, bary_colors : dict, matplotlib.colors.ListedColormap, optional

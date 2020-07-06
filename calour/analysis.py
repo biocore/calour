@@ -40,7 +40,6 @@ _CALOUR_PVAL = '_calour_pval'
 _CALOUR_DIRECTION = '_calour_direction'
 
 
-@Experiment._record_sig
 @format_docstring(_CALOUR_PVAL, _CALOUR_STAT)
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Find features with correlation to a numeric metadata field.
@@ -107,7 +106,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     if random_seed is not None:
         np.random.seed(random_seed)
 
-    cexp = exp.filter_abundance(0, strict=True)
+    cexp = exp.filter_sum_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
 
@@ -135,7 +134,6 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     return newexp
 
 
-@Experiment._record_sig
 @format_docstring(_CALOUR_PVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
 def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Differential abundance test between 2 groups of samples for all the features.
@@ -224,7 +222,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         grp2 = 'NOT %s' % grp1
 
     # remove features not present in both groups
-    cexp = cexp.filter_abundance(0, strict=True)
+    cexp = cexp.filter_sum_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels.
@@ -239,7 +237,6 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     return newexp
 
 
-@Experiment._record_sig
 def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Test the differential abundance between multiple sample groups using the Kruskal Wallis test.
 
@@ -288,7 +285,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     logger.debug('diff_abundance_kw for field %s' % field)
 
     # remove features with 0 abundance
-    cexp = exp.filter_abundance(0, strict=True)
+    cexp = exp.filter_sum_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels. If correlation method, get the values, otherwise the group

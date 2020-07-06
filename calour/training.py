@@ -52,8 +52,7 @@ from .amplicon_experiment import AmpliconExperiment
 logger = getLogger(__name__)
 
 
-@Experiment._record_sig
-def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplace=False):
+def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplace=False) -> Experiment:
     '''Add covariates from sample metadata to the data table as features for machine learning.
 
     This will convert the columns of categorical strings using one-hot
@@ -61,7 +60,7 @@ def add_sample_metadata_as_features(exp: Experiment, fields, sparse=None, inplac
 
     .. note:: This is only for numeric and/or nominal covariates in
        sample metadata. If you want to add a ordinal column as a
-       feature, use `pandas.Series.map` to convert ordinal column to
+       feature, use :func:`pandas.Series.map` to convert ordinal column to
        numeric column first.
 
     Examples
@@ -723,7 +722,6 @@ def plot_calibration(y_true, y_prob, bins=10):
     return fig
 
 
-@Experiment._record_sig
 def learning_curve_depths(exp: AmpliconExperiment, field, groups=None,
                           train_depths=np.array([0.1, 0.325, 0.55, 0.775, 1.]),
                           cv=None, scoring=None, exploit_incremental_learning=False,

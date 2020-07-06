@@ -552,10 +552,11 @@ def register_functions(clss, modules=None):
             sig = inspect.signature(f)
             params = sig.parameters
 
+            if fn.startswith('_'): continue
+
             if 'axis' in params.keys():
                 f = _convert_axis_name(f)
 
-            if fn.startswith('_'): continue
             for _, param in params.items():
                 # if the func accepts parameters, ie params is not empty
                 cls = param.annotation
