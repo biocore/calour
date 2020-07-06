@@ -15,8 +15,8 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn import preprocessing
 
 import calour as ca
-from calour._testing import Tests, assert_experiment_equal
-from calour.transforming import log_n, scale
+from calour._testing import Tests
+from calour.transforming import log_n, standardize
 from skbio.stats.composition import clr, centralize
 
 
@@ -34,8 +34,8 @@ class TestTransforming(Tests):
         self.assertIs(obs, self.test2)
 
     def test_transform_real(self):
-        obs = self.test2.transform([log_n, scale], inplace=True,
-                                   log_n__n=2, scale__axis=1)
+        obs = self.test2.transform([log_n, standardize], inplace=True,
+                                   log_n__n=2, standardize__axis=1)
         self.assertIs(obs, self.test2)
         assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
         # column 1, 2 and 6 are constant, so their variances are 0
@@ -51,12 +51,12 @@ class TestTransforming(Tests):
                         [10., 20., 9., 12., 7., 100., 842., 900.]])
         assert_array_almost_equal(obs.data, preprocessing.scale(np.log2(exp), axis=0))
 
-    def test_scale(self):
-        obs = self.test2.scale()
+    def test_standardize(self):
+        obs = self.test2.standardize()
         self.assertIsNot(obs, self.test2)
         assert_array_almost_equal(obs.data.sum(axis=1), [0] * 9)
         assert_array_almost_equal(obs.data.var(axis=1), [1] * 9)
-        obs = self.test2.scale(inplace=True)
+        obs = self.test2.standardize(inplace=True)
         self.assertIs(obs, self.test2)
 
     def test_binarize(self):
@@ -77,7 +77,7 @@ class TestTransforming(Tests):
              [10., 20., 7., 14., 3., 100., 846., 700.],
              [10., 20., 8., 13., 1., 100., 849., 800.],
              [10., 20., 9., 12., 7., 100., 842., 900.]])
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
         obs = self.test2.log_n(inplace=True)

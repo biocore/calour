@@ -71,17 +71,15 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
     '''
     logger.debug('Merge data using field %s, agg %s' % (field, agg))
-    if inplace:
-        newexp = exp
-    else:
-        newexp = deepcopy(exp)
+    if not inplace:
+        exp = deepcopy(exp)
     if axis == 0:
-        col = newexp.sample_metadata[field]
+        col = exp.sample_metadata[field]
     else:
-        col = newexp.feature_metadata[field]
+        col = exp.feature_metadata[field]
 
     # convert to dense for efficient slicing
-    newexp.sparse = False
+    exp.sparse = False
 
     uniq = col.unique()
     n = len(uniq)
@@ -95,7 +93,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
             pos = col.isnull()
         else:
             pos = col == val
-        cdata = newexp.data.compress(pos, axis=axis)
+        cdata = exp.data.compress(pos, axis=axis)
         if agg == 'mean':
             newdat = cdata.mean(axis=axis)
         elif agg == 'median':
@@ -110,18 +108,18 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         keep_pos[i] = replace_pos
 
         # if axis == 1, swap it to the first dimension to change column.
-        newexp.data.swapaxes(0, axis)[replace_pos] = newdat
+        exp.data.swapaxes(0, axis)[replace_pos] = newdat
 
-    newexp.reorder(keep_pos, axis=axis, inplace=True)
+    exp.reorder(keep_pos, axis=axis, inplace=True)
 
     if axis == 0:
-        metadata = newexp.sample_metadata
+        metadata = exp.sample_metadata
     else:
-        metadata = newexp.feature_metadata
+        metadata = exp.feature_metadata
     metadata['_calour_merge_number'] = merge_number
     metadata['_calour_merge_ids'] = merge_ids
 
-    return newexp
+    return exp
 
 
 def join_experiments(exp: Experiment, other, field, labels=('exp', 'other'), prefixes=None) -> Experiment:
