@@ -2,7 +2,7 @@ nose
 pep8
 flake8
 numpy
-scipy<1.3
+scipy
 pyqt>=5
 pandas
 matplotlib
