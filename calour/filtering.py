@@ -262,7 +262,7 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None,
         groups, indices = np.unique(values, return_inverse=True)
 
     # functions that can be applied to 2d matrix
-    func = {'abundance':  is_abundant,
+    func = {'abundance': is_abundant,
             'prevalence': is_prevalent,
             'freq_ratio': freq_ratio}
     pred = func.get(predicate, predicate)

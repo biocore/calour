@@ -29,7 +29,6 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-import os.path
 import zipfile
 import tempfile
 

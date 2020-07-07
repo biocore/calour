@@ -260,7 +260,7 @@ class FTests(Tests):
         self.assert_experiment_equal(test.filter_sample_group('group', 9), test)
         # filter group of 2
         self.assert_experiment_equal(test.filter_sample_group('group', 10),
-                                test.filter_samples('group', '1'))
+                                     test.filter_samples('group', '1'))
 
     def test_filter_samples_edge_cases(self):
         # no group 3 - none filtered

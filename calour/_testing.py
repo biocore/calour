@@ -63,8 +63,8 @@ class Tests(TestCase):
         self.q2_cfs_repseqs = join(test_data_dir, 'cfs-rep-seqs.qza')
         self.q2_cfs_taxonomy = join(test_data_dir, 'cfs-taxonomy.qza')
 
-
-    def assert_experiment_equal(self, exp1, exp2, check_history=False, almost_equal=True, ignore_md_fields=('_calour_original_abundance',)):
+    def assert_experiment_equal(self, exp1, exp2, check_history=False, almost_equal=True,
+                                ignore_md_fields=('_calour_original_abundance',)):
         '''Test if two experiments are equal
 
         Parameters

@@ -6,7 +6,6 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import inspect
 from logging.config import fileConfig
 
 from pkg_resources import resource_filename

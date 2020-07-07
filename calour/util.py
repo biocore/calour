@@ -36,7 +36,6 @@ from logging import getLogger
 from numbers import Real
 from pkg_resources import resource_filename
 
-import pandas as pd
 import numpy as np
 import scipy
 
@@ -68,6 +67,7 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
 
     Examples
     --------
+    >>> import pandas as pd
     >>> df = pd.DataFrame([['dog', 'bone'], ['monkey', 'banana']], columns=['animal', 'food'])
     >>> join_fields(df, 'animal', 'food')
        animal    food    animal_food
@@ -552,7 +552,8 @@ def register_functions(clss, modules=None):
             sig = inspect.signature(f)
             params = sig.parameters
 
-            if fn.startswith('_'): continue
+            if fn.startswith('_'):
+                continue
 
             if 'axis' in params.keys():
                 f = _convert_axis_name(f)

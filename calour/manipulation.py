@@ -242,7 +242,6 @@ def join_experiments_featurewise(exp: Experiment, other, field, labels=('exp', '
     # merge features
     fmd1 = exp.feature_metadata
     fmd2 = other.feature_metadata
-    intersect = fmd1.index.intersection(fmd2.index)
 
     newexp.feature_metadata = _check_id_overlap_then_concat(fmd1, fmd2, prefixes, field, labels)
     # assume exp and other have the same sample metadata because they
