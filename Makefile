@@ -9,9 +9,9 @@
 .DEFAULT_GOAL := help
 
 ifeq ($(WITH_COVERAGE), TRUE)
-	TEST_COMMAND = COVERAGE_FILE=.coverage coverage run --rcfile .coveragerc setup.py nosetests --with-doctest --verbosity=2
+	TEST_COMMAND = pytest -svv --doctest-modules --cov calour --cov-report term-missing --cov-report html:cov_html
 else
-	TEST_COMMAND = nosetests --with-doctest --verbosity=2
+	TEST_COMMAND = pytest -svv --doctest-modules calour
 endif
 
 

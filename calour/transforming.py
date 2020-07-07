@@ -119,7 +119,7 @@ def normalize_by_subset_features(exp: Experiment, features, total=10000,
     # a[:, None] is the same with a[:, np.newaxis]
     exp.data = total * data / use_reads[:, None]
     # store the normalization depth into the experiment metadata
-    exp.metadata['normalized'] = total
+    exp.normalized = total
     return exp
 
 
