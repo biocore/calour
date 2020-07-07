@@ -34,7 +34,7 @@ Functions
 
 from heapq import nlargest
 from logging import getLogger
-from collections import Callable
+from collections.abc import Callable
 import reprlib
 
 import numpy as np

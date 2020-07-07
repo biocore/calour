@@ -40,14 +40,12 @@ class FTests(Tests):
 
     def test_downsample_keep_1(self):
         # test on samples, random method, not inplace
-        np.random.seed(2017)
-        newexp = self.test1.downsample('group', keep=1)
+        newexp = self.test1.downsample('group', keep=1, random_state=2017)
         self.assertEqual(newexp.shape[0], 3)
         self.assertEqual(list(newexp.data[:, 7].todense().A1), [849, 859, 9])
         self.assertEqual(newexp.shape[1], self.test1.shape[1])
         self.assertIsNot(newexp, self.test1)
-        np.random.seed(2018)
-        newexp = self.test1.downsample('group', keep=1)
+        newexp = self.test1.downsample('group', keep=1, random_state=2018)
         self.assertNotEqual(list(newexp.data[:, 7].todense().A1), [849, 859, 9])
 
     def test_downsample_sample(self):
