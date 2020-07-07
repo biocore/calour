@@ -301,7 +301,7 @@ class Database(ABC):
         logger.debug('Generic function for add_annotations')
         raise NotImplementedError
 
-    def upadte_annotation(self, annotation, exp=None):
+    def update_annotation(self, annotation, exp=None):
         '''Update an existing annotation
         This is an optional function for databases that support manual annotations (level L4).
         supporting this option is indicated by the "annotate" method in __init__().

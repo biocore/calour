@@ -23,7 +23,7 @@ import calour as ca
 class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, description='test1', normalize=None)
 
     def test_record_sig(self):
         def foo(exp, axis=1, inplace=True):
@@ -233,7 +233,7 @@ class ExperimentTests(Tests):
                                self.test1.data.toarray()[:, 1])
 
     def test_repr(self):
-        self.assertEqual(repr(self.test1), 'Experiment ("test1.biom") with 21 samples, 12 features')
+        self.assertEqual(repr(self.test1), 'Experiment ("test1") with 21 samples, 12 features')
 
     def test_validate_sample(self):
         with self.assertRaises(ValueError, msg='data table must have the same number of samples with sample_metadata table (2 != 1)'):

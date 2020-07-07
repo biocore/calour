@@ -69,15 +69,15 @@ def _file_from_zip(tempdir, data_file, internal_data):
         for fname in fl.namelist():
             if fname.endswith(internal_data):
                 internal_name = fname
-                break
-        if internal_name is None:
-            raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
-        data_file = fl.extract(internal_name, tempdir)
-    return data_file
+                data_file = fl.extract(internal_name, tempdir)
+                return data_file
+
+        raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
 
 
 def _read_qiime2_zip(fp, transpose=True):
     '''Read in a qiime2 qza biom table
+
     NOTE: this function reads2 the qiime2 qza artifacts files using unzip rather than relying on qiime2.
     This enables reading qiime2 artifacts without activating the qiime2 environment
 

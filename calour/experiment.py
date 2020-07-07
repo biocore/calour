@@ -74,7 +74,7 @@ class Experiment:
     normalized : int
         the normalization factor. it is zero if not normalized
     description : str
-        name of the experiment
+        a short description of the experiment
     databases : iterable of str
         databases for fetching and entering feature annotations
 
