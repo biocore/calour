@@ -204,7 +204,7 @@ def _convert_axis_name(func):
 def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     '''Get a nice taxonomy string.
 
-    Convert the taxonomy list stored (from biom.read_table) to a single string per feature
+    Convert the taxonomy list stored (from biom.read_table) to a single string per feature.
 
     Parameters
     ----------
@@ -213,7 +213,7 @@ def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     sep : str, optional
         the output separator to use between the taxonomic levels
     remove_underscore : bool, optional
-        True (default) to remove the 'g__' entries and missing values
+        True (default) to remove the entries like 'g__' and missing values
         False to keep them
     to_lower : bool, optional
         False (default) to keep case
