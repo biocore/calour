@@ -21,6 +21,7 @@ Classes
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from copy import deepcopy
 
 import numpy as np
 
@@ -78,11 +79,11 @@ class AmpliconExperiment(Experiment):
     def __init__(self, *args, databases=('dbbact',), **kwargs):
         super().__init__(*args, databases=('dbbact',), **kwargs)
 
-    def filter_taxonomy(self, values, negate=False, inplace=False, substring=True):
-        '''filter keeping only observations with taxonomy string matching taxonomy
+    def filter_by_taxonomy(self, values, field='taxonomy', substring=True, negate=False, inplace=False):
+        '''Filter keeping only observations with taxonomy string matching taxonomy
 
-        if substring=True, look for partial match instead of identity.
-        Matching is case insensitive
+        If substring=True, look for partial match instead of identity.
+        Matching is case insensitive.
 
         Parameters
         ----------
@@ -94,20 +95,16 @@ class AmpliconExperiment(Experiment):
             do the filtering on the original :class:`.Experiment` object or a copied one.
         substring : bool, optional
             True (default) to do partial (substring) matching for the taxonomy string,
-            False to do exact matching
+            False to do exact matching.
 
         Returns
         -------
         AmpliconExperiment
             Containing only features with matching taxonomy
         '''
-        if 'taxonomy' not in exp.feature_metadata.columns:
-            logger.warning('No taxonomy field in experiment')
-            return None
-
         values = _to_list(values)
 
-        taxstr = exp.feature_metadata['taxonomy'].str.lower()
+        taxstr = self.feature_metadata[field].str.lower()
 
         select = np.zeros(len(taxstr), dtype=bool)
         for cval in values:
@@ -119,10 +116,10 @@ class AmpliconExperiment(Experiment):
         if negate is True:
             select = ~ select
 
-        logger.info('%s remaining' % np.sum(select))
-        return exp.reorder(select, axis=1, inplace=inplace)
+        logger.info('%s features remain.' % np.sum(select))
+        return self.reorder(select, axis=1, inplace=inplace)
 
-    def filter_by_fasta(exp: Experiment, fp, negate=False, inplace=False):
+    def filter_by_fasta(self, fp, negate=False, inplace=False):
         '''Filter features from experiment based on fasta file
 
         Parameters
@@ -140,6 +137,7 @@ class AmpliconExperiment(Experiment):
         newexp : Experiment
             filtered so contains only sequence present in exp and in the fasta file
         '''
+        # put import here to avoid circular import
         from .io import _iter_fasta
 
         logger.debug('Filter by sequence using fasta file %s' % fp)
@@ -149,18 +147,17 @@ class AmpliconExperiment(Experiment):
         for chead, cseq in _iter_fasta(fp):
             tot_seqs += 1
             cseq = cseq.upper()
-            if cseq in exp.feature_metadata.index:
-                pos = exp.feature_metadata.index.get_loc(cseq)
+            if cseq in self.feature_metadata.index:
+                pos = self.feature_metadata.index.get_loc(cseq)
                 okpos.append(pos)
         logger.debug('loaded %d sequences. found %d sequences in experiment' % (tot_seqs, len(okpos)))
         if negate:
-            okpos = np.setdiff1d(np.arange(len(exp.feature_metadata.index)), okpos, assume_unique=True)
+            okpos = np.setdiff1d(np.arange(len(self.feature_metadata.index)), okpos, assume_unique=True)
 
-        newexp = exp.reorder(okpos, axis=1, inplace=inplace)
-        return newexp
+        return self.reorder(okpos, axis=1, inplace=inplace)
 
     def sort_by_taxonomy(self, inplace=False):
-        '''Sort the features based on the taxonomy
+        '''Sort the features based on the taxonomy.
 
         Sort features based on the taxonomy (alphabetical)
 
@@ -181,31 +178,38 @@ class AmpliconExperiment(Experiment):
 
         return self.reorder(sort_pos, axis=1, inplace=inplace)
 
-    def filter_orig_reads(self, minreads, **kwargs):
-        '''Filter keeping only samples with >= minreads in the original reads column
-        Note this function uses the _calour_original_abundance field rather than the current sum of sequences per sample.
-        So if you start with a sample with 100 reads, normalizing and filtering with other functions with not change the original reads column
-        (which will remain 100).
-        If you want to filter based on current total reads, use ``filter_by_data()`` instead
+    def filter_orig_reads(self, min_reads, **kwargs):
+        '''Filter to keep only samples with >= min_reads in the original reads column.
+
+        Note this function uses the `_calour_original_abundance` field
+        rather than the current sum of abundance per sample. This
+        field is auto created in sample_metadata when the experiment
+        is loaded with :fun:`read_amplicon`. If you want to filter
+        based on current total reads, use :func:`filter_by_data()`
+        instead.
+
+        The purpose of this function is to remove samples with too few
+        data for insufficient stat power.
 
         Parameters
         ----------
-        minreads : numeric
-            Keep only samples with >= minreads reads (when loaded - not affected by normalization)
+        min_reads : numeric
+            Keep only samples with >= min_reads reads (not affected by normalization)
 
         Returns
         -------
-        AmpliconExperiment - with only samples with enough original reads
+        AmpliconExperiment
+            with only samples with enough original reads
+
         '''
-        origread_field = '_calour_original_abundance'
-        if origread_field not in exp.sample_metadata.columns:
-            raise ValueError('%s field not initialzed. Did you load the data with calour.read_amplicon() ?' % origread_field)
+        field = '_calour_original_abundance'
+        if field not in self.sample_metadata.columns:
+            raise ValueError('%s field not initialzed. Did you load the data with calour.read_amplicon() ?' % field)
 
-        good_pos = (exp.sample_metadata[origread_field] >= minreads).values
-        newexp = exp.reorder(good_pos, axis=0, **kwargs)
-        return newexp
+        good_pos = (self.sample_metadata[field] >= min_reads).values
+        return self.reorder(good_pos, axis=0, **kwargs)
 
-    def collapse_taxonomy(exp: Experiment, level='genus', inplace=False):
+    def collapse_taxonomy(self, level='genus', inplace=False):
         '''Collapse all features sharing the same taxonomy up to level into a single feature
 
         Sums abundances of all features sharing the same taxonomy up to level.
@@ -226,14 +230,14 @@ class AmpliconExperiment(Experiment):
                       'family': 4, 'f': 4,
                       'genus': 5, 'g': 5,
                       'species': 6, 's': 6}
-        if not isinstance(level, int):
-            if level not in level_dict:
-                raise ValueError('Unsupported taxonomy level %s. Please use out of %s' % (level, list(level_dict.keys())))
-            level = level_dict[level]
+        if not (isinstance(level, int) or level in level_dict):
+            raise ValueError(
+                'Unsupported taxonomy level %s. Please use out of %s' % (level, list(level_dict.keys())))
+        level = level_dict.get(level, level)
         if inplace:
-            newexp = exp
+            newexp = self
         else:
-            newexp = exp.copy()
+            newexp = deepcopy(self)
 
         def _tax_level(tax_str, level):
             # local function to get taxonomy up to given level
@@ -252,9 +256,6 @@ class AmpliconExperiment(Experiment):
                        names=['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']):
         '''Split taxonomy column into individual column per level.
 
-        Assume the taxonomy string is in QIIME style:
-        "k__Bacteria;p__Firmicutes;c__Bacilli;o__Bacillales;f__Staphylococcaceae;g__Staphylococcus;s__"
-
         Parameters
         ----------
         sep : str
@@ -265,6 +266,13 @@ class AmpliconExperiment(Experiment):
         Returns
         -------
         AmpliconExperiment
+
+        Examples
+        --------
+        Assume the taxonomy string is in QIIME style:
+        "k__Bacteria;p__Firmicutes;c__Bacilli;o__Bacillales;f__Staphylococcaceae;g__Staphylococcus;s__",
+        You can split each taxonomy level to its own column by running:
+        >>> exp.split_taxonomy()  #doctest: +SKIP
         '''
         self.feature_metadata[names] = self.feature_metadata[field].str.split(sep, expand=True)
         # return so you can chain the functions

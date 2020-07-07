@@ -15,7 +15,7 @@ import numpy.testing as npt
 import pandas.testing as pdt
 from scipy import sparse
 
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 from calour.util import _convert_axis_name
 import calour as ca
 
@@ -103,21 +103,21 @@ class ExperimentTests(Tests):
         new.reorder(rev_perm_features, axis=1, inplace=True)
         new.reorder(rev_perm_samples, axis=0, inplace=True)
 
-        assert_experiment_equal(new, exp)
+        self.assert_experiment_equal(new, exp)
 
     def test_copy_experiment(self):
         exp = copy(self.test1)
-        assert_experiment_equal(exp, self.test1)
+        self.assert_experiment_equal(exp, self.test1)
         self.assertIsNot(exp, self.test1)
 
     def test_deep_copy_experiment(self):
         exp = deepcopy(self.test1)
-        assert_experiment_equal(exp, self.test1)
+        self.assert_experiment_equal(exp, self.test1)
         self.assertIsNot(exp, self.test1)
 
     def test_copy(self):
         exp = self.test1.copy()
-        assert_experiment_equal(exp, self.test1)
+        self.assert_experiment_equal(exp, self.test1)
         self.assertIsNot(exp, self.test1)
         # make sure it is a deep copy - not sharing the data
         exp.data[0, 0] = exp.data[0, 0] + 1
@@ -192,7 +192,7 @@ class ExperimentTests(Tests):
     def test_from_pandas_with_experiment(self):
         df = self.test1.to_pandas(sparse=False)
         res = ca.Experiment.from_pandas(df, self.test1)
-        assert_experiment_equal(res, self.test1)
+        self.assert_experiment_equal(res, self.test1)
 
     def test_from_pandas_reorder(self):
         df = self.test1.to_pandas(sparse=False)
@@ -203,7 +203,7 @@ class ExperimentTests(Tests):
         # we need to reorder the original experiment
         exp = self.test1.sort_by_data(subset=[10], key=np.mean)
         exp = exp.sort_by_data(subset=[0], key=np.mean, axis=1)
-        assert_experiment_equal(res, exp)
+        self.assert_experiment_equal(res, exp)
 
     def test_from_pandas_round_trip(self):
         data = np.array([[1, 2], [3, 4]])

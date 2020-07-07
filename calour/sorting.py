@@ -157,9 +157,9 @@ def cluster_features(exp: Experiment, cutoff=0, inplace=False, log_n__n=1) -> Ex
 
     Parameters
     ----------
-    cutoff : Number, optional
+    cutoff : numeric, optional
         filter away features with sum abundance less than ``cutoff``. Default to 0.
-    log_n__n : Number, optional
+    log_n__n : numeric, optional
         argument passing to the transformer ``log_n``.
 
     Returns
