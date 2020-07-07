@@ -390,39 +390,7 @@ class ApplicationWindow(QMainWindow):
         for cdb in self.gui.databases:
             if not cdb.can_do_enrichment:
                 continue
-            logger.debug('Database: %s' % cdb.database_name)
-            enriched, term_feature_scores, efeatures = cdb.enrichment(exp, group1_seqs, term_type='term')
-            # enriched = cdb.enrichment(exp, group1_seqs, term_type='annotation')
-            logger.debug('Got %d enriched terms' % len(enriched))
-            if len(enriched) == 0:
-                QtWidgets.QMessageBox.information(self, "No enriched terms found",
-                                                  "No enriched annotations found when comparing\n%d selected sequences to %d "
-                                                  "other sequences" % (len(group1_seqs), len(group2_seqs)))
-                return
-            enriched = enriched.sort_values('odif')
-            listwin = SListWindow(listname='enriched ontology terms')
-            for idx, cres in enriched.iterrows():
-                if cres['odif'] > 0:
-                    ccolor = 'blue'
-                else:
-                    ccolor = 'red'
-                cname = cres['term']
-                # For each enriched term, double clicking will display a heatmap
-                # where all annotations containing the term are the features,
-                # and bacteria (from the two compared groups) are the samples.
-                # This enables seeing where does the enrichment for this term come from.
-                # i.e. which bacteria are present in each annotation containing this term.
-                dblclick_data = {}
-                dblclick_data['database'] = cdb
-                dblclick_data['term'] = cname
-                dblclick_data['exp'] = exp
-                g1_seqs = set(group1_seqs)
-                ordered_g1_seqs = [s for s in exp.feature_metadata.index.values[::-1] if s in g1_seqs]
-                ordered_g2_seqs = [s for s in exp.feature_metadata.index.values[::-1] if s in group2_seqs]
-                dblclick_data['features1'] = ordered_g1_seqs
-                dblclick_data['features2'] = ordered_g2_seqs
-                listwin.add_item('%s - effect %f, pval %f ' % (cname, cres['odif'], cres['pvals']), color=ccolor, dblclick_data=dblclick_data)
-            listwin.exec_()
+            cdb.show_enrichment_qt5(group1_seqs, group2=group2_seqs, exp=exp, max_id=None, group1_name='selected', group2_name='unselected', term_type='term', ignore_exp=True)
 
     def double_click_annotation(self, item):
         '''Show database information about the double clicked item in the list.
