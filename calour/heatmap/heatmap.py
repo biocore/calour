@@ -169,7 +169,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
-            clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
+            norm=None, clim=(None, None), cmap='viridis',
             rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
 
@@ -199,14 +199,17 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         max number of ticks to render on the heatmap. If ``None``,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
+    norm : matplotlib.colors.Normalize or None
+        passed to ``norm`` parameter of matplotlib.pyplot.imshow. For
+        exponentially growing things, like bacterial abundance, you
+        may want to use log color scale by providing
+        `matplotlib.colors.LogNorm()`. Default is linear scale.
     clim : tuple of (float, float), optional
         the min and max values for the heatmap color limits. It uses the min
         and max values in the input :attr:`.Experiment.data` array by default.
     cmap : str or matplotlib.colors.ListedColormap
         str to indicate the colormap name. Default is "viridis" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
-    norm : matplotlib.colors.Normalize or None
-        passed to ``norm`` parameter of matplotlib.pyplot.imshow. Default is log scale.
     rect : tuple of (int, int, int, int) or None, optional
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
@@ -308,11 +311,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     # logNorm requires positive values. set it to default None if vmin is zero
     if vmin == 0:
         vmin = None
-
-    if norm is not None:
-        norm.vmin = vmin
-        norm.vmax = vmax
-        norm.autoscale(data)
 
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest',
                       norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)

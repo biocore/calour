@@ -69,6 +69,7 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
     Examples
     --------
     >>> import pandas as pd
+    >>> pd.set_option('display.max_colwidth', None)
     >>> df = pd.DataFrame([['dog', 'bone'], ['monkey', 'banana']], columns=['animal', 'food'])
     >>> join_fields(df, 'animal', 'food')
        animal    food    animal_food
