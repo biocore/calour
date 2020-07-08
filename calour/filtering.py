@@ -441,7 +441,7 @@ def freq_ratio_1d(x, ratio=2):
 
 
 def filter_samples(exp: Experiment, field, values, negate=False, inplace=False) -> Experiment:
-    '''A convenient function for filtering samples.
+    '''A convenience function for filtering samples.
 
     Parameters
     ----------
@@ -469,7 +469,7 @@ def filter_samples(exp: Experiment, field, values, negate=False, inplace=False) 
 
 
 def filter_features(exp: Experiment, field, values, negate=False, inplace=False):
-    '''A convenient function for filtering features.
+    '''A convenience function for filtering features.
 
     Parameters
     ----------
