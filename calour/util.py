@@ -537,7 +537,7 @@ def register_functions(clss, modules=None):
        type of its 1st argument.
 
     3. for each public function that accepts its 1st argument of type
-       defined in ``clss`` AND returns value of the same type,
+       defined in ``clss`` **and** returns value of the same type,
        also decorate it with :meth:`.Experiment._record_sig`.
 
     Parameters
@@ -564,6 +564,7 @@ def register_functions(clss, modules=None):
             sig = inspect.signature(f)
             params = sig.parameters
 
+            # ski private function
             if fn.startswith('_'):
                 continue
 
@@ -571,7 +572,6 @@ def register_functions(clss, modules=None):
                 f = _convert_axis_name(f)
 
             for _, param in params.items():
-                # if the func accepts parameters, ie params is not empty
                 cls = param.annotation
                 if cls in clss:
                     # make a copy of the function because we want
@@ -581,8 +581,8 @@ def register_functions(clss, modules=None):
                     if hasattr(cls, fn):
                         # python can't distinguish defined and
                         # imported functions. If a function is defined
-                        # in a module and imported in another, it will
-                        # get process twice without this check.
+                        # in a module and imported in another, without
+                        # this check, it will get processed twice.
                         continue
                     if sig.return_annotation is cls:
                         setattr(cls, fn, cls._record_sig(_clone_function(f)))

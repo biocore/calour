@@ -378,15 +378,31 @@ def is_prevalent(data, axis, cutoff=1, fraction=0.1):
     return res
 
 
-def freq_ratio(data, axis, ratio=2):
-    '''
+def freq_ratio(data, axis, ratio=19):
+    '''Check if frequency ratios is not too big.
+
+    Frequency ratio is defined as the frequency of the most prevalent
+    value over the second most frequent value for a 1D array. This
+    function compute the frequency ratios along the given `axis` and
+    compare them against the `ratio` (True if it is smaller than
+    `ratio`).
+
+    This is modeled after R package `caret`.
+
     Parameters
     ----------
-    data : 1D or 2D numpy.ndarray or scipy.sparse.csr_matrix
+    data : 2D numpy.ndarray or scipy.sparse.csr_matrix
     axis : int
         compute prevalence of each column (0) or row (1).
     ratio : float
 
+    Returns
+    -------
+    1D np.ndarray of bools
+        It is the same size of input array rows or columns depending on axis.
+
+    Examples
+    --------
     >>> data = np.array([[0, 0, 1, 2],
     ...                  [0, 0, 1, 1]])
     >>> x = freq_ratio(data, 1, 1.01)
@@ -400,6 +416,7 @@ def freq_ratio(data, axis, ratio=2):
     >>> x = freq_ratio(data, 0, 1.01)
     >>> x.tolist()
     [False, False, False, True]
+
     '''
     if issparse(data):
         res = np.ones(data.shape[1-axis], dtype='?')
@@ -413,7 +430,7 @@ def freq_ratio(data, axis, ratio=2):
     return res
 
 
-def freq_ratio_1d(x, ratio=2):
+def freq_ratio_1d(x, ratio):
     '''Check the ratio of the counts of the most common value to the second most common value.
 
     Return True if the ratio is not greater than "ratio".
@@ -423,6 +440,10 @@ def freq_ratio_1d(x, ratio=2):
     x : 1D array
     ratio : float
 
+    Return
+    ------
+    bool
+
     Examples
     --------
     >>> freq_ratio_1d([0, 0, 1, 2], 2)
@@ -431,6 +452,10 @@ def freq_ratio_1d(x, ratio=2):
     True
     >>> freq_ratio_1d([0, 0, 1, 2], 1.99)
     False
+
+    See Also
+    --------
+    freq_ratio
     '''
     unique, counts = np.unique(np.array(x), return_counts=True)
     if len(unique) == 1:
