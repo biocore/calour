@@ -12,11 +12,9 @@ from unittest import main, skipIf
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal, assert_array_equal
-from sklearn import preprocessing
 
 import calour as ca
 from calour._testing import Tests
-from calour.transforming import log_n, standardize
 from skbio.stats.composition import clr, centralize
 
 
@@ -24,32 +22,6 @@ class TestTransforming(Tests):
     def setUp(self):
         super().setUp()
         self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
-
-    def test_transform(self):
-        obs = self.test2.transform()
-        self.assertEqual(obs, self.test2)
-        self.assertIsNot(obs, self.test2)
-
-        obs = self.test2.transform(inplace=True)
-        self.assertIs(obs, self.test2)
-
-    def test_transform_real(self):
-        obs = self.test2.transform([log_n, standardize], inplace=True,
-                                   log_n__n=2, standardize__axis=1)
-        self.assertIs(obs, self.test2)
-        assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
-        # column 1, 2 and 6 are constant, so their variances are 0
-        assert_array_almost_equal(obs.data.var(axis=0), [0, 0, 1, 1, 1, 0, 1, 1])
-        exp = np.array([[10., 20., 2., 20., 5., 100., 844., 100.],
-                        [10., 20., 2., 19., 2., 100., 849., 200.],
-                        [10., 20., 3., 18., 5., 100., 844., 300.],
-                        [10., 20., 4., 17., 2., 100., 849., 400.],
-                        [10., 20., 5., 16., 4., 100., 845., 500.],
-                        [10., 20., 6., 15., 2., 100., 849., 600.],
-                        [10., 20., 7., 14., 3., 100., 846., 700.],
-                        [10., 20., 8., 13., 2., 100., 849., 800.],
-                        [10., 20., 9., 12., 7., 100., 842., 900.]])
-        assert_array_almost_equal(obs.data, preprocessing.scale(np.log2(exp), axis=0))
 
     def test_standardize(self):
         obs = self.test2.standardize()

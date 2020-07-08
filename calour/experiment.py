@@ -24,6 +24,7 @@ Classes
 from logging import getLogger
 from copy import deepcopy, copy
 from functools import wraps
+from collections import defaultdict
 
 import pandas as pd
 import numpy as np
@@ -374,6 +375,42 @@ class Experiment:
             exp.data = exp.data[:, new_order]
             if exp.feature_metadata is not None:
                 exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
+        return exp
+
+    def chain(self, steps=[], inplace=False, **kwargs):
+        '''Perform multiple operations sequentially.
+
+        Parameters
+        ----------
+        steps : list of callables
+            Each callable is a class method that has a boolean
+            parameter of ``inplace``, and returns an
+            :class:`.Experiment` object.
+        inplace : bool, default=False
+            change occurs in place or not.
+        kwargs : dict
+            keyword arguments to pass to each class method. The dict
+            key should be in the form of
+            "<method_name>__<param_name>". For example,
+            "exp.chain(steps=[filter_samples, log_n], log_n__n=3)"
+            will call :func:`filter_samples` first and then
+            :func:`log_n` while setting its parameter `n=3`.
+
+        Returns
+        -------
+        Experiment
+
+        '''
+        exp = self if inplace else deepcopy(self)
+        params = defaultdict(dict)
+        for k, v in kwargs.items():
+            transformer, param_name = k.split('__')
+            if param_name == 'inplace':
+                raise ValueError(
+                    'You can not set `inplace` for individual transformation.')
+            params[transformer][param_name] = v
+        for step in steps:
+            step(exp, inplace=True, **params[step.__name__])
         return exp
 
     def to_pandas(self, sample_field=None, feature_field=None, sparse=None):

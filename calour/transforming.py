@@ -2,6 +2,8 @@
 transforming (:mod:`calour.transforming`)
 =========================================
 
+This module contains functions that transform the data table - :attr:`Experiment.data`.
+
 .. warning:: Some of the functions require dense matrix and thus will change ``Experiment.data`` to dense matrix.
 
 .. currentmodule:: calour.transforming
@@ -14,11 +16,10 @@ Functions
    normalize
    normalize_by_subset_features
    normalize_compositional
-   scale
+   standardize
    permute_data
    binarize
    log_n
-   transform
    center_log_ratio
    subsample_count
 '''
@@ -33,7 +34,6 @@ Functions
 
 from logging import getLogger
 from copy import deepcopy
-from collections import defaultdict
 
 import numpy as np
 from sklearn import preprocessing
@@ -41,7 +41,6 @@ from skbio.stats.composition import clr, centralize as skbio_centralize
 from skbio.stats import subsample_counts
 
 from . import Experiment
-from ._doc import ds
 
 
 logger = getLogger(__name__)
@@ -157,7 +156,7 @@ def normalize_compositional(exp: Experiment, frac=0.05, total=10000, inplace=Fal
     return newexp
 
 
-def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
+def rescale(exp: Experiment, total=10000, axis=0, inplace=False) -> Experiment:
     '''Rescale the data to mean sum of all samples (axis=0) or features (axis=1) to be total.
 
     This function rescales by multiplying ALL entries in :attr:`.Experiment.data` by same number.
@@ -184,8 +183,8 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False):
     return exp
 
 
-def standardize(exp: Experiment, axis=0, inplace=False):
-    '''Standardize a dataset along an axis
+def standardize(exp: Experiment, axis=0, inplace=False) -> Experiment:
+    '''Standardize a dataset along an axis.
 
     This transforms the data into zero mean and unit variance. It
     calls :func:`sklearn.preprocessing.scale` to do the real work.
@@ -249,44 +248,6 @@ def log_n(exp: Experiment, n=1, inplace=False) -> Experiment:
     exp.data[exp.data < n] = n
     exp.data = np.log2(exp.data)
 
-    return exp
-
-
-@ds.get_sectionsf('transforming.transform')
-def transform(exp: Experiment, steps=[], inplace=False, **kwargs) -> Experiment:
-    '''Perform multiple transformation operations sequentially.
-
-    Parameters
-    ----------
-    steps : list of callable
-        each callable is a transformer that takes :class:`.Experiment` object as
-        its 1st argument, has a boolean parameter of ``inplace``, and returns
-        an :class:`.Experiment` object.
-    inplace : bool, default=False
-        transformation occuring in the original data or a copy
-    kwargs : dict
-        keyword arguments to pass to each transformers. The dict key should
-        be in the form of "<transformer_name>__<param_name>". For
-        example, "transform(exp, steps=[log_n], log_n__n=3)" will call :func:`log_n`
-        and set its parameter ``n``=3 to do transformation.
-
-    Returns
-    -------
-    Experiment
-        with its data transformed
-
-    '''
-    if not inplace:
-        exp = deepcopy(exp)
-    params = defaultdict(dict)
-    for k, v in kwargs.items():
-        transformer, param_name = k.split('__')
-        if param_name == 'inplace':
-            raise ValueError(
-                'You can not set `inplace` for individual transformation.')
-        params[transformer][param_name] = v
-    for step in steps:
-        step(exp, inplace=True, **params[step.__name__])
     return exp
 
 

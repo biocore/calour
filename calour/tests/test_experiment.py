@@ -10,13 +10,15 @@ from unittest import main
 from copy import copy, deepcopy
 
 import numpy as np
-import pandas as pd
 import numpy.testing as npt
+import pandas as pd
 import pandas.testing as pdt
 from scipy import sparse
+from sklearn import preprocessing
 
 from calour._testing import Tests
 from calour.util import _convert_axis_name
+from calour.transforming import log_n, standardize
 import calour as ca
 
 
@@ -24,6 +26,7 @@ class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
         self.test1 = ca.read(self.test1_biom, self.test1_samp, description='test1', normalize=None)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
 
     def test_record_sig(self):
         def foo(exp, axis=1, inplace=True):
@@ -104,6 +107,32 @@ class ExperimentTests(Tests):
         new.reorder(rev_perm_samples, axis=0, inplace=True)
 
         self.assert_experiment_equal(new, exp)
+
+    def test_chain(self):
+        obs = self.test2.chain()
+        self.assertEqual(obs, self.test2)
+        self.assertIsNot(obs, self.test2)
+
+        obs = self.test2.chain(inplace=True)
+        self.assertIs(obs, self.test2)
+
+    def test_chain_real(self):
+        obs = self.test2.chain([log_n, standardize], inplace=True,
+                               log_n__n=2, standardize__axis=1)
+        self.assertIs(obs, self.test2)
+        npt.assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
+        # column 1, 2 and 6 are constant, so their variances are 0
+        npt.assert_array_almost_equal(obs.data.var(axis=0), [0, 0, 1, 1, 1, 0, 1, 1])
+        exp = np.array([[10., 20., 2., 20., 5., 100., 844., 100.],
+                        [10., 20., 2., 19., 2., 100., 849., 200.],
+                        [10., 20., 3., 18., 5., 100., 844., 300.],
+                        [10., 20., 4., 17., 2., 100., 849., 400.],
+                        [10., 20., 5., 16., 4., 100., 845., 500.],
+                        [10., 20., 6., 15., 2., 100., 849., 600.],
+                        [10., 20., 7., 14., 3., 100., 846., 700.],
+                        [10., 20., 8., 13., 2., 100., 849., 800.],
+                        [10., 20., 9., 12., 7., 100., 842., 900.]])
+        npt.assert_array_almost_equal(obs.data, preprocessing.scale(np.log2(exp), axis=0))
 
     def test_copy_experiment(self):
         exp = copy(self.test1)
