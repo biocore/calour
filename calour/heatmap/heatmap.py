@@ -181,7 +181,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     sample_field : str or None, optional
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
     feature_field : str or None (optional)
-        The field of feature meadata to display on the y-axis.
+        The field of feature metadata to display on the y-axis.
         None (default) to not show y axis.
     xticklabel_kwargs :
     yticklabel_kwargs : dict or None, optional
@@ -196,14 +196,14 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         taking too much space. None indicates no shortening
     xticks_max :
     yticks_max : int or None
-        max number of ticks to render on the heatmap. If ``None``,
+        max number of ticks to render on the heatmap. If `None`,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
     norm : matplotlib.colors.Normalize or None
         passed to ``norm`` parameter of matplotlib.pyplot.imshow. For
         exponentially growing things, like bacterial abundance, you
         may want to use log color scale by providing
-        `matplotlib.colors.LogNorm()`. Default is linear scale.
+        `matplotlib.colors.LogNorm()`. `None` is linear color scale.
     clim : tuple of (float, float), optional
         the min and max values for the heatmap color limits. It uses the min
         and max values in the input :attr:`.Experiment.data` array by default.

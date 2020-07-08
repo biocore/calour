@@ -24,6 +24,7 @@ from logging import getLogger
 from copy import deepcopy
 
 import numpy as np
+import matplotlib as mpl
 
 from .experiment import Experiment
 from .util import _get_taxonomy_string, _to_list
@@ -61,12 +62,12 @@ class AmpliconExperiment(Experiment):
         The metadata on the samples
     feature_metadata : pandas.DataFrame
         The metadata on the features
-    metadata : dict
-        metadata about the experiment (data md5, filenames, etc.)
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
         store the data as sparse matrix (scipy.sparse.csr_matrix) or dense numpy array.
+    info : dict
+        information about the experiment (data md5, filenames, etc.)
     description : str
         name of the experiment
     databases : iterable of str
@@ -78,6 +79,34 @@ class AmpliconExperiment(Experiment):
     '''
     def __init__(self, *args, databases=('dbbact',), **kwargs):
         super().__init__(*args, databases=('dbbact',), **kwargs)
+
+    def heatmap(self, *args, **kwargs):
+        '''Plot a heatmap for the amplicon experiment.
+
+        This method accepts exactly the same parameters as input with
+        its parent class method and does exactly the sample plotting.
+
+        The only difference is that by default, its color scale is **in
+        log** as its `norm` parameter is set to
+        `matplotlib.colors.LogNorm()`. It makes more sense to show the
+        microbial abundances in color of log scale because they grow
+        exponentially. You can always set it to other scale as
+        explained in :meth:`.Experiment.heatmap`.
+
+        See Also
+        --------
+        Experiment.heatmap
+
+        '''
+        # set this default value inside the function instead of on the
+        # function API (like the __init__) because we don't wanna to
+        # define mpl.colors.LogNorm() on the API; otherwise, vmin and
+        # vmax are set the same once for all AmpliconExperiment
+        # objects (which we don't want) because python initializes
+        # the function arguments when it reads in its definition.
+        if 'norm' not in kwargs:
+            kwargs['norm'] = mpl.colors.LogNorm()
+        super().heatmap(*args, **kwargs)
 
     def filter_by_taxonomy(self, values, field='taxonomy', substring=True, negate=False, inplace=False):
         '''Filter keeping only observations with taxonomy string matching taxonomy
