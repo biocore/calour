@@ -178,13 +178,13 @@ class AmpliconExperiment(Experiment):
 
         return self.reorder(sort_pos, axis=1, inplace=inplace)
 
-    def filter_orig_reads(self, min_reads, **kwargs):
+    def filter_orig_reads(self, min_reads, inplace=False):
         '''Filter to keep only samples with >= min_reads in the original reads column.
 
         Note this function uses the `_calour_original_abundance` field
         rather than the current sum of abundance per sample. This
         field is auto created in sample_metadata when the experiment
-        is loaded with :fun:`read_amplicon`. If you want to filter
+        is loaded with :func:`read_amplicon`. If you want to filter
         based on current total reads, use :func:`filter_by_data()`
         instead.
 
@@ -207,7 +207,7 @@ class AmpliconExperiment(Experiment):
             raise ValueError('%s field not initialzed. Did you load the data with calour.read_amplicon() ?' % field)
 
         good_pos = (self.sample_metadata[field] >= min_reads).values
-        return self.reorder(good_pos, axis=0, **kwargs)
+        return self.reorder(good_pos, axis=0, inplace=inplace)
 
     def collapse_taxonomy(self, level='genus', inplace=False):
         '''Collapse all features sharing the same taxonomy up to level into a single feature

@@ -584,7 +584,7 @@ def plot_roc(result, classes=None, title='ROC', cv=True, cmap=None, ax=None):
     '''Plot ROC curve.
 
     .. note:: You may want to consider using precision-recall curve
-       (`:func:plot_prc`) instead of ROC curve. If your model needs to
+       (:func:`plot_prc`) instead of ROC curve. If your model needs to
        perform equally well on the negative class as the positive
        class, you would use the ROC AUC. For example, for classifying
        images between cats and dogs, if you would like the model to

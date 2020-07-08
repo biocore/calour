@@ -9,6 +9,7 @@ Functions
 .. autosummary::
    :toctree: generated
 
+   join_fields
    compute_prevalence
    register_functions
    set_log_level
@@ -566,6 +567,12 @@ def register_functions(clss, modules=None):
                     # to update the docstring of the original
                     # function but not that of the registered
                     # version
+                    if hasattr(cls, fn):
+                        # python can't distinguish defined and
+                        # imported functions. If a function is defined
+                        # in a module and imported in another, it will
+                        # get process twice without this check.
+                        continue
                     if sig.return_annotation is cls:
                         setattr(cls, fn, cls._record_sig(_clone_function(f)))
                     else:

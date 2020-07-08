@@ -16,7 +16,6 @@ Functions
    save
    save_fasta
    save_biom
-   save_metadata
 '''
 
 

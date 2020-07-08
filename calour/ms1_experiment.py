@@ -1,11 +1,11 @@
 '''
 ms1 experiment (:mod:`calour.ms1_experiment`)
-=======================================================
+=============================================
 
 .. currentmodule:: calour.ms1_experiment
 
 Classes
-^^^^^^^^
+^^^^^^^
 .. autosummary::
    :toctree: generated
 

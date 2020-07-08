@@ -224,7 +224,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     Examples
     --------
     .. plot::
-       :context:
+       :context: close-figs
 
 
        Let's create a very simple data set:
@@ -242,20 +242,22 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        Let's then plot the heatmap:
 
        >>> fig, ax = plt.subplots()
-       >>> exp.heatmap(sample_field='category', feature_field='motile', ax=ax)   # doctest: +SKIP
+       >>> ax = exp.heatmap(sample_field='category', feature_field='motile', ax=ax)   # doctest: +SKIP
+       >>> plt.show()
 
     .. plot::
-       :context:
+       :context: close-figs
 
        By default, the color is plot in log scale. Let's say we would like to plot heatmap in normal scale instead of log scale:
-       >>> plt.close()
+
        >>> fig, ax = plt.subplots()
        >>> norm = mpl.colors.Normalize()
-       >>> exp.heatmap(sample_field='category', feature_field='motile',
+       >>> ax = exp.heatmap(sample_field='category', feature_field='motile',
        ...             norm=norm, ax=ax)             # doctest: +SKIP
+       >>> plt.show()
 
     .. plot::
-       :context:
+       :context: close-figs
 
        Let's say we would like to show the presence/absence of each
        OTUs across samples in heatmap. And we define presence as
@@ -274,10 +276,11 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        >>> cmap = mpl.colors.ListedColormap(['r', 'k'])
        >>> # create a normalize object the describes the limits of each color
        >>> norm = mpl.colors.BoundaryNorm([0., 0.5, 1.], cmap.N)
-       >>> plt.close()
        >>> fig, ax = plt.subplots()
-       >>> expbin.heatmap(sample_field='category', feature_field='motile',
+       >>> ax = expbin.heatmap(sample_field='category', feature_field='motile',
        ...                cmap=cmap, norm=norm, ax=ax)         # doctest: +SKIP
+       >>> ax
+
     '''
     logger.debug('Plot heatmap')
     # import pyplot is less polite. do it locally

@@ -35,7 +35,7 @@ from scipy import cluster, spatial
 
 from . import Experiment
 from .filtering import _filter_ids
-from .transforming import log_n, transform, standardize
+from .transforming import log_n, standardize
 from .util import _argsort
 from ._doc import ds
 
@@ -72,7 +72,6 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs) -> 
 
     See Also
     --------
-    transform
     log_n
     '''
     logger.debug('sorting features by center of mass')
@@ -105,9 +104,10 @@ def cluster_data(exp: Experiment, transform=None, axis=1,
     aixs : 0, 1, 's', or 'f', optional
         'f' or 1 (default) means clustering features; 's' or 0 means clustering samples
     transform : Callable
-        a callable transform on a 2-d matrix. Input and output of transform are :class:`.Experiment`.
-        The transform function can modify ``Experiment.data`` (it is a copy).
-        It should not change the dimension of :attr:`.Experiment.data`.
+        a callable that transforms on a 2-d matrix. Its 1st argument
+        and return should be both :class:`.Experiment` type. It can
+        modify a copy of `Experiment.data` (but should not change its
+        dimension.) for clustering.
     metric : str or callable
         the clustering metric to use. It should be able to be passed to
         ``scipy.spatial.distance.pdist``.
@@ -124,7 +124,8 @@ def cluster_data(exp: Experiment, transform=None, axis=1,
 
     See Also
     --------
-    transform
+    cluster_features
+
     '''
     logger.debug('clustering data on axis %s' % axis)
     if transform is None:
@@ -144,14 +145,14 @@ def cluster_data(exp: Experiment, transform=None, axis=1,
     return exp.reorder(sort_order, axis=axis, inplace=inplace)
 
 
-def cluster_features(exp: Experiment, cutoff=0, inplace=False, log_n__n=1) -> Experiment:
+def cluster_features(exp: Experiment, cutoff=0, inplace=False) -> Experiment:
     '''Cluster features.
 
     This function does these things in order:
 
     1. filter away features that have sum abundance less than cutoff;
 
-    2. transform data with log_n and standardize.
+    2. transform data with :func:`.log_n` and :func:`.standardize`.
 
     3. cluster features with :func:`.cluster_data`.
 
@@ -159,30 +160,23 @@ def cluster_features(exp: Experiment, cutoff=0, inplace=False, log_n__n=1) -> Ex
     ----------
     cutoff : numeric, optional
         filter away features with sum abundance less than ``cutoff``. Default to 0.
-    log_n__n : numeric, optional
-        argument passing to the transformer ``log_n``.
 
     Returns
     -------
     Experiment
 
-
     See Also
     --------
     cluster_data
-    transform
     log_n
     standardize
 
     '''
     newexp = exp.filter_sum_abundance(cutoff, inplace=inplace)
-    return newexp.cluster_data(
-        transform=transform,
-        axis=1,
-        steps=[log_n, standardize],
-        log_n__n=log_n__n,
-        standardize__axis=1,
-        inplace=inplace)
+    newexp = newexp.chain(steps=[log_n, standardize],
+                          standardize__axis=1,
+                          inplace=True)
+    return newexp.cluster_data(axis=1, inplace=True)
 
 
 @ds.get_sectionsf('sorting.sort_by_metadata')
