@@ -111,22 +111,32 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
 def compute_prevalence(abundance):
     '''Return the prevalence at each abundance cutoffs.
 
-    Each sample that has the OTU above the cutoff (exclusive) will
+    Each sample that has the feature above the cutoff (exclusive) will
     be counted.
 
     Parameters
     ----------
-    abundance : iterable of numeric
-        The abundance of a species across samples.
+    abundance : 1d array-like of numeric
+        The abundance of a feature across samples.
+
+    Returns
+    -------
+    np.ndarray
+        1d sorted array that contains the unique abundance values in the input array.
+    np.ndarray
+        same size with the 1st 1d array. Each value in the array is
+        the feature prevalence defined as its abundance > each unique
+        value in the 1st array.
 
     Examples
     --------
-    >>> abund = [0, 0, 1, 2, 4]
+    >>> abund = [0, 1, 0, 2, 4]
     >>> x, y = compute_prevalence(abund)
     >>> x   #doctest: +SKIP
     array([0, 1, 2, 4])
     >>> y   #doctest: +SKIP
     array([0.6, 0.4, 0.2, 0.])
+
     '''
     # unique values are sorted
     cutoffs, counts = np.unique(abundance, return_counts=True)
@@ -517,7 +527,7 @@ def register_functions(clss, modules=None):
     This searches all the functions defined in the given
     ``modules`` and modify functions as following:
 
-    1. for each function with ``axis`` parameter, decorate it with
+    1. for each public function with ``axis`` parameter, decorate it with
        :func:`._convert_axis_name` to convert "s" and "f" to 0 or
        1 for the ``axis`` parameter.
 

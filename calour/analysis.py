@@ -42,7 +42,8 @@ _CALOUR_DIRECTION = '_calour_direction'
 
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
-def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None, numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
+def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None,
+                numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
     '''Find features with correlation to a numeric metadata field.
 
     The permutation based p-values and multiple hypothesis correction is implemented.
@@ -56,7 +57,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
         * 'spearman': spearman correlation
         * 'pearson': pearson correlation
-        * callable: thecallable to calculate the statistic (its input are
+        * callable: the callable to calculate the statistic (its input are
           sample-by-feature numeric numpy.array and 1D numeric
           numpy.array of sample metadata; output is a numpy.array of float)
     nonzero : bool, optional

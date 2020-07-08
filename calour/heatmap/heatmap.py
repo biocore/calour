@@ -173,11 +173,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
 
-    Plot a heatmap for the experiment with features in row
+    Plot a heatmap for the :attr:`.Experiment.data` with features in row
     and samples in column.
-
-    .. note:: By default it log transforms the abundance values and then plot heatmap.
-       The original object is not modified.
 
     Parameters
     ----------
@@ -186,16 +183,19 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     feature_field : str or None (optional)
         The field of feature meadata to display on the y-axis.
         None (default) to not show y axis.
-    xticklabel_kwargs, yticklabel_kwargs : dict or None, optional
+    xticklabel_kwargs :
+    yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
         ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
         'family': 'serif', 'size'=7}``
-    xticklabel_len, yticklabel_len : int or None
+    xticklabel_len :
+    yticklabel_len : int or None
         The maximal length for the tick labels on x axis and y axis (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no shortening
-    xticks_max, yticks_max : int or None
+    xticks_max :
+    yticks_max : int or None
         max number of ticks to render on the heatmap. If ``None``,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
@@ -226,7 +226,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     .. plot::
        :context: close-figs
 
-
        Let's create a very simple data set:
 
        >>> from calour import Experiment
@@ -242,8 +241,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        Let's then plot the heatmap:
 
        >>> fig, ax = plt.subplots()
-       >>> ax = exp.heatmap(sample_field='category', feature_field='motile', ax=ax)   # doctest: +SKIP
-       >>> plt.show()
+       >>> exp.heatmap(sample_field='category', feature_field='motile', ax=ax)   # doctest: +SKIP
 
     .. plot::
        :context: close-figs
@@ -252,9 +250,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
 
        >>> fig, ax = plt.subplots()
        >>> norm = mpl.colors.Normalize()
-       >>> ax = exp.heatmap(sample_field='category', feature_field='motile',
+       >>> exp.heatmap(sample_field='category', feature_field='motile',
        ...             norm=norm, ax=ax)             # doctest: +SKIP
-       >>> plt.show()
 
     .. plot::
        :context: close-figs
@@ -277,9 +274,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        >>> # create a normalize object the describes the limits of each color
        >>> norm = mpl.colors.BoundaryNorm([0., 0.5, 1.], cmap.N)
        >>> fig, ax = plt.subplots()
-       >>> ax = expbin.heatmap(sample_field='category', feature_field='motile',
+       >>> expbin.heatmap(sample_field='category', feature_field='motile',
        ...                cmap=cmap, norm=norm, ax=ax)         # doctest: +SKIP
-       >>> ax
 
     '''
     logger.debug('Plot heatmap')
@@ -399,6 +395,8 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
         whether to label the color bars with text
     label_kwargs: dict
         keyword arguments to pass in for :func:`matplotlib.axes.Axes.annotate`
+    axis : 0 or 1
+        plot bar along x or y axis
 
     Returns
     -------
