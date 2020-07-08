@@ -408,7 +408,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
-    metadata = {'sample_metadata_md5': '', 'data_md5': ''}
+
     # load the data table
     fmd = None
     if data_file_type == 'biom':
@@ -452,16 +452,16 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         # combine it with the feature metadata
         feature_metadata = pd.concat([feature_metadata, fmd], axis=1)
 
-    # init the experiment metadata details
-    metadata['data_file'] = data_file
-    metadata['data_md5'] = get_data_md5(data)
-    metadata['sample_metadata_file'] = sample_metadata_file
-    metadata['sample_metadata_md5'] = get_file_md5(sample_metadata_file)
-    metadata['feature_metadata_file'] = feature_metadata_file
-    metadata['feature_metadata_md5'] = get_file_md5(feature_metadata_file)
+    # init the experiment details
+    info = {'data_file': data_file,
+            'data_md5': get_data_md5(data),
+            'sample_metadata_file': sample_metadata_file,
+            'sample_metadata_md5': get_file_md5(sample_metadata_file),
+            'feature_metadata_file': feature_metadata_file,
+            'feature_metadata_md5': get_file_md5(feature_metadata_file)}
 
     exp = cls(data, sample_metadata, feature_metadata,
-              metadata=metadata, description=description, sparse=sparse)
+              info=info, description=description, sparse=sparse)
 
     if normalize is not None:
         exp.normalize(total=normalize, inplace=True)
@@ -708,7 +708,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     if gnps_file:
         # load the gnps table
         gnps_data = pd.read_csv(gnps_file, sep='\t')
-        exp.metadata['_calour_metabolomics_gnps_table'] = gnps_data
+        exp.info['_calour_metabolomics_gnps_table'] = gnps_data
         # use the gnpscalour database interface to get metabolite info from the gnps file
         gnps_db = _get_database_class('gnps', exp=exp)
         # link each feature to the gnps ids based on MZ/RT or direct_id

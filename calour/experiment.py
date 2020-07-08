@@ -65,8 +65,6 @@ class Experiment:
         The metadata on the samples
     feature_metadata : pandas.DataFrame
         The metadata on the features
-    metadata : dict
-        metadata about the experiment (data md5, filenames, etc.)
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
@@ -74,6 +72,8 @@ class Experiment:
         or :class:`numpy.ndarray`
     normalized : int
         the normalization factor. it is zero if not normalized
+    info : dict
+        information about the experiment (data md5, filenames, etc.)
     description : str
         a short description of the experiment
     databases : iterable of str
@@ -85,16 +85,14 @@ class Experiment:
     MS1Experiment
     '''
     def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
-                 metadata=None, description='', sparse=True):
+                 info=None, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
         if feature_metadata is None:
             feature_metadata = pd.DataFrame(np.arange(data.shape[1]))
         self.feature_metadata = feature_metadata
-        if metadata is None:
-            metadata = {}
         self.validate()
-        self.metadata = metadata
+        self.info = {} if info is None else info
         self.description = description
         self.normalized = 0
         # the function calling history list
@@ -484,15 +482,15 @@ class Experiment:
             sample_metadata['id'] = sample_metadata.index
             feature_metadata = pd.DataFrame(index=df.columns)
             feature_metadata['id'] = feature_metadata.index
-            metadata = {}
+            info = {}
             description = 'From Pandas DataFrame'
         else:
             description = exp.description + ' From Pandas'
-            metadata = exp.metadata
+            info = exp.info
             sample_metadata = exp.sample_metadata.loc[df.index.values, ]
             feature_metadata = exp.feature_metadata.loc[df.columns.values, ]
             cls = exp.__class__
 
         newexp = cls(df.values, sample_metadata, feature_metadata,
-                     metadata=metadata, description=description, sparse=False)
+                     info=info, description=description, sparse=False)
         return newexp
