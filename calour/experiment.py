@@ -76,15 +76,16 @@ class Experiment:
         information about the experiment (data md5, filenames, etc.)
     description : str
         a short description of the experiment
-    databases : iterable of str
-        databases for fetching and entering feature annotations
+    databases : dict
+        keys are the database names (i.e. 'dbbact' / 'gnps')
+        values are the database specific data for the experiment (i.e. annotations for dbbact)
 
     See Also
     --------
     AmpliconExperiment
     MS1Experiment
     '''
-    def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
+    def __init__(self, data, sample_metadata, feature_metadata=None, databases={},
                  info=None, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
@@ -103,7 +104,7 @@ class Experiment:
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
 
-        # the default databases to use for feature information
+        # the database local specific data (to use for feature information)
         self.databases = databases
 
     def validate(self):

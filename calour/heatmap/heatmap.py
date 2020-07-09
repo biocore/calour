@@ -546,7 +546,7 @@ def plot(exp: Experiment, title=None,
     '''
     # set the databases if default requested
     if databases is None:
-        databases = exp.databases
+        databases = list(exp.databases.keys())
 
     if tree is None:
         gui_obj = _create_plot_gui(exp, gui, databases)

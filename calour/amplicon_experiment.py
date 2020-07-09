@@ -70,15 +70,16 @@ class AmpliconExperiment(Experiment):
         information about the experiment (data md5, filenames, etc.)
     description : str
         name of the experiment
-    databases : iterable of str
-        databases for fetching and entering feature annotations
+    databases : dict
+        keys are the database names (i.e. 'dbbact' / 'gnps')
+        values are the database specific data for the experiment (i.e. annotations for dbbact)
 
     See Also
     --------
     Experiment
     '''
-    def __init__(self, *args, databases=('dbbact',), **kwargs):
-        super().__init__(*args, databases=('dbbact',), **kwargs)
+    def __init__(self, *args, databases={'dbbact': {}}, **kwargs):
+        super().__init__(*args, databases=databases, **kwargs)
 
     def heatmap(self, *args, **kwargs):
         '''Plot a heatmap for the amplicon experiment.
