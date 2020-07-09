@@ -9,6 +9,7 @@ Functions
 .. autosummary::
    :toctree: generated
 
+   join_metadata_fields
    join_experiments
    join_experiments_featurewise
    aggregate_by_metadata
@@ -29,9 +30,47 @@ import pandas as pd
 import numpy as np
 
 from .experiment import Experiment
+from .util import join_fields
 
 
 logger = getLogger(__name__)
+
+
+def join_metadata_fields(exp: Experiment, field1, field2, new_field=None,
+                         axis='s', inplace=True, **kwargs) -> Experiment:
+    '''Join 2 fields in sample or feature metadata into 1.
+
+    Parameters
+    ----------
+    field1 : str
+        Name of the first field to join. The value in this column can be any data type.
+    field2 : str
+        Name of the field to join. The value in this column can be any data type.
+    new_field : str, default=None
+        name of the new (joined) field. Default to name it as field1 + sep + field2
+    sep : str, optional
+        The separator between the values of the two fields when joining
+    kwargs : dict
+        Other parameters passing to :func:`join_fields`.
+
+    Returns
+    -------
+    Experiment
+
+    See Also
+    --------
+    join_fields
+    '''
+    if not inplace:
+        exp = deepcopy(exp)
+    if axis == 0:
+        md = exp.sample_metadata
+    else:
+        md = exp.feature_metadata
+
+    join_fields(md, field1, field2, new_field, **kwargs)
+
+    return exp
 
 
 def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=False) -> Experiment:

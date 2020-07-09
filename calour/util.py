@@ -44,7 +44,7 @@ import scipy
 logger = getLogger(__name__)
 
 
-def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
+def join_fields(df, field1, field2, new_field=None, sep='_', pad=None):
     '''Join two fields into a single new field
 
     Parameters
@@ -54,7 +54,7 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
         Name of the first field to join. The value in this column can be any data type.
     field2 : str
         Name of the field to join. The value in this column can be any data type.
-    joined_field : str, default=None
+    new_field : str, default=None
         name of the new (joined) field. Default to name it as field1 + sep + field2
     sep : str, optional
         The separator between the values of the two fields when joining
@@ -71,16 +71,17 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
     >>> import pandas as pd
     >>> pd.set_option('display.max_colwidth', None)
     >>> df = pd.DataFrame([['dog', 'bone'], ['monkey', 'banana']], columns=['animal', 'food'])
-    >>> join_fields(df, 'animal', 'food')
+    >>> # pandas display on Mac is problematic with ellipsis, skip it for now.
+    >>> join_fields(df, 'animal', 'food')                            #doctest: +SKIP
        animal    food    animal_food
     0     dog    bone       dog_bone
     1  monkey  banana  monkey_banana
-    >>> join_fields(df, 'animal', 'food', joined_field='new', pad='-')
+    >>> join_fields(df, 'animal', 'food', new_field='new', pad='-')  #doctest: +SKIP
        animal    food    animal_food            new
     0     dog    bone       dog_bone  dog---_--bone
     1  monkey  banana  monkey_banana  monkey_banana
     '''
-    logger.debug('joining fields %s and %s into %s' % (field1, field2, joined_field))
+    logger.debug('joining fields %s and %s into %s' % (field1, field2, new_field))
 
     # validate the data
     if field1 not in df.columns:
@@ -89,11 +90,11 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
         raise ValueError('field %s not in the data frame' % field2)
 
     # get the new column name
-    if joined_field is None:
-        joined_field = field1 + sep + field2
+    if new_field is None:
+        new_field = field1 + sep + field2
 
-    if joined_field in df.columns:
-        raise ValueError('new field name %s already exists in df. Please use different joined_field value' % joined_field)
+    if new_field in df.columns:
+        raise ValueError('new field name %s already exists in df. Please use different new_field value' % new_field)
 
     col1 = df[field1].astype(str)
     max1 = col1.str.len().max()
@@ -104,7 +105,7 @@ def join_fields(df, field1, field2, joined_field=None, sep='_', pad=None):
         col1 = col1.str.pad(width=max1, side='right', fillchar=pad)
         col2 = col2.str.pad(width=max2, side='left', fillchar=pad)
 
-    df[joined_field] = col1 + sep + col2
+    df[new_field] = col1 + sep + col2
 
     return df
 

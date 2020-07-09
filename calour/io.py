@@ -749,12 +749,16 @@ def _split_sample_ids(sid, split_char=None, ignore_split=('row m/z', 'row retent
 def save(exp: Experiment, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
 
+    This saves data table, sample metadata, and feature metadata to 3
+    different files with the same file prefix.
+
     Parameters
     ----------
     prefix : str
-        file path (suffices auto added for the 3 tables) to save to.
+        file path (suffixes auto added for the 3 files) to save to.
     fmt : str
         format for the data table. could be 'hdf5', 'txt', or 'json'.
+
     '''
     exp.save_biom('%s.biom' % prefix, fmt=fmt)
     exp.sample_metadata.to_csv('%s_sample.txt' % prefix, sep='\t')

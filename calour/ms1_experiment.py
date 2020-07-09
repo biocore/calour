@@ -22,6 +22,8 @@ Classes
 
 from logging import getLogger
 
+import matplotlib as mpl
+
 from .experiment import Experiment
 
 
