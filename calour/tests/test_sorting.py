@@ -8,15 +8,16 @@
 
 from unittest import main
 from os.path import join
+import logging
 
 import pandas.testing as pdt
 import numpy as np
 
 import calour as ca
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 
 
-class SortingTests(Tests):
+class STests(Tests):
     def setUp(self):
         super().setUp()
         # load the simple experiment as sparse
@@ -28,7 +29,7 @@ class SortingTests(Tests):
     def test_cluster_data(self):
         def log_and_scale(exp):
             exp.log_n(inplace=True)
-            exp.scale(inplace=True, axis=1)
+            exp.standardize(inplace=True, axis=1)
             return exp
         # no minimal filtering
         clustered = self.test1.cluster_data(transform=log_and_scale, axis=0)
@@ -52,7 +53,7 @@ class SortingTests(Tests):
         exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'),
                       join(self.test_data_dir, 'timeseries.sample'),
                       normalize=None)
-        assert_experiment_equal(obs, exp, almost_equal=True)
+        self.assert_experiment_equal(obs, exp, almost_equal=True)
         self.assertListEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'].tolist(), list(range(1, 96)))
 
     def test_sort_samples(self):
@@ -63,7 +64,7 @@ class SortingTests(Tests):
         exp = ca.read(join(self.test_data_dir, 'timeseries.sorted.time.biom'),
                       join(self.test_data_dir, 'timeseries.sample'),
                       normalize=None)
-        assert_experiment_equal(obs, exp, almost_equal=True)
+        self.assert_experiment_equal(obs, exp, almost_equal=True)
         self.assertListEqual(obs.sample_metadata['MF_SAMPLE_NUMBER'].tolist(), list(range(1, 96)))
 
     def test_sort_by_metadata_feature(self):
@@ -71,7 +72,7 @@ class SortingTests(Tests):
             field='level2', axis=1).sort_by_metadata(
                 field='level1', axis=1)
         self.assertIsNot(obs, self.test2)
-        assert_experiment_equal(
+        self.assert_experiment_equal(
             obs, self.test2.reorder(obs.feature_metadata['ori.order'], axis=1))
         self.assertListEqual(obs.feature_metadata['new.order'].tolist(), list(range(8)))
 
@@ -79,10 +80,10 @@ class SortingTests(Tests):
         # sort sample based on the first and last features
         obs = self.test2.sort_by_data(subset=[0, 7])
         # the order is the same with original
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
 
         obs = self.test2.sort_by_data(subset=[0, 3])
-        assert_experiment_equal(
+        self.assert_experiment_equal(
             obs, self.test2.reorder(obs.sample_metadata['ori.order'], axis=0))
         self.assertListEqual(obs.sample_metadata['new.order'].tolist(), list(range(9)))
 
@@ -91,7 +92,7 @@ class SortingTests(Tests):
         exp = ca.read_amplicon(join(self.test_data_dir, 'timeseries.sorted.freq.biom'),
                                join(self.test_data_dir, 'timeseries.sample'),
                                normalize=None, min_reads=0)
-        assert_experiment_equal(obs, exp, almost_equal=True)
+        self.assert_experiment_equal(obs, exp, almost_equal=True)
 
     def test_sort_centroid(self):
         exp = self.test1.sort_centroid()
@@ -120,10 +121,13 @@ class SortingTests(Tests):
         self.assertListEqual(exp.feature_metadata.index.tolist(), new_ids)
         self.assertEqual(exp.shape, self.test1.shape)
 
-    def test_sort_ids_raise(self):
-        fids = ['GG', 'pita']
-        with self.assertRaisesRegex(ValueError, 'pita'):
+    def test_sort_ids_warning(self):
+        fids = ['GG', 'pita', 'pitta']
+        # re-enable logging because it is disabled in the parent setUp
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='WARNING') as cm:
             self.test1.sort_ids(fids)
+        self.assertRegex(cm.output[0], '2 ids were not')
 
     def test_sort_ids(self):
         # keep only samples S6 and S5
@@ -138,6 +142,11 @@ class SortingTests(Tests):
         fpos = new.feature_metadata.index.get_loc(fid)
         self.assertEqual(new.data[0, fpos], 600)
         self.assertEqual(new.data[1, fpos], 500)
+
+    def test_sort_ids_duplicates(self):
+        fids = ['GG', 'GG']
+        new = self.test1.sort_ids(fids)
+        self.assertListEqual(fids, new.feature_metadata.index[:2].tolist())
 
 
 if __name__ == "__main__":

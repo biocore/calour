@@ -11,6 +11,7 @@ Functions
 
    join_metadata_fields
    join_experiments
+   join_experiments_featurewise
    aggregate_by_metadata
 '''
 
@@ -29,92 +30,64 @@ import pandas as pd
 import numpy as np
 
 from .experiment import Experiment
+from .util import join_fields
 
 
 logger = getLogger(__name__)
 
 
-def join_metadata_fields(exp: Experiment, field1, field2, newfield=None, axis=0, sep='_', align=None, inplace=True):
-    '''Join two sample/feature metadata fields into a single new field
+def join_metadata_fields(exp: Experiment, field1, field2, new_field=None,
+                         axis='s', inplace=True, **kwargs) -> Experiment:
+    '''Join 2 fields in sample or feature metadata into 1.
 
     Parameters
     ----------
     field1 : str
-        Name of the first sample metadata field to join
+        Name of the first field to join. The value in this column can be any data type.
     field2 : str
-        Name of the second sample metadata field to join
-    newfield : str or None, optional
-        name of the new (joined) sample metadata field
-        None (default) to name it as field1 + sep + field2
-    axis : 0, 1, 's', or 'f', optional
-        0 or 's' (default) to modify sample metadata fields; 1 or 'f' to modify feature metadata fields
+        Name of the field to join. The value in this column can be any data type.
+    new_field : str, default=None
+        name of the new (joined) field. Default to name it as field1 + sep + field2
     sep : str, optional
         The separator between the values of the two fields when joining
-    align : None, '<', or '>', optional
-        align the contents of newfield or not
-        None (default) to not align; '<' to left align; '>' to right align
-    inplace : bool, optional
-        True (default) to add in current experiment, False to create a new Experiment
+    kwargs : dict
+        Other parameters passing to :func:`join_fields`.
 
     Returns
     -------
     Experiment
-        with an added sample metadata field
+
+    See Also
+    --------
+    join_fields
     '''
-    logger.debug('joining fields %s and %s into %s' % (field1, field2, newfield))
-    if inplace:
-        newexp = exp
-    else:
-        newexp = deepcopy(exp)
-
+    if not inplace:
+        exp = deepcopy(exp)
     if axis == 0:
-        metadata = newexp.sample_metadata
+        md = exp.sample_metadata
     else:
-        metadata = newexp.feature_metadata
+        md = exp.feature_metadata
 
-    # validate the data
-    if field1 not in metadata.columns:
-        raise ValueError('field %s not in metadata' % field1)
-    if field2 not in metadata.columns:
-        raise ValueError('field %s not in metadata' % field2)
+    join_fields(md, field1, field2, new_field, **kwargs)
 
-    # get the new column name
-    if newfield is None:
-        newfield = field1 + sep + field2
-
-    if newfield in metadata.columns:
-        raise ValueError('new field name %s alreay in metadata. Please use different newfield value' % newfield)
-
-    if align not in [None, '<', '>']:
-        raise ValueError("Wrong align value. Please choose from [None, '<', '>']")
-
-    # add the new column
-    if align in ['<', '>']:
-        len_field1 = metadata[field1].astype(str).str.len().max()
-        len_field2 = metadata[field2].astype(str).str.len().max()
-        newcol = ['{:{}{}}'.format(i, align, len_field1) + sep + '{:{}{}}'.format(j, align, len_field2) for i, j in zip(metadata[field1], metadata[field2])]
-    else:
-        newcol = [str(i) + sep + str(j) for i, j in zip(metadata[field1], metadata[field2])]
-
-    if axis == 0:
-        newexp.sample_metadata[newfield] = newcol
-    else:
-        newexp.feature_metadata[newfield] = newcol
-
-    return newexp
+    return exp
 
 
-@Experiment._record_sig
-def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=False):
-    '''aggregate all samples/features that have the same value in the given field.
+def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=False) -> Experiment:
+    '''Aggregate all samples or features of the same group.
 
-    Group the samples (axis=0) or features (axis=1) that have the same value in the column
-    of given field and then aggregate the data table of the group with the given method.
+    Group the samples (axis=0) or features (axis=1) that have the same
+    value in the column of given field and then aggregate the data
+    table of each group with the given method.
 
-    The number of samples/features in each group and their IDs are stored in new metadata columns
-    '_calour_merge_number' and '_calour_merge_ids', respectively
+    The number of samples/features in each group and their IDs are
+    stored in new metadata columns '_calour_merge_number' and
+    '_calour_merge_ids', respectively. For other metadata, the first
+    one in the metadata table in each group is kept in the final
+    returned experiment object.
 
-    .. warning:: It will convert the ``Experiment.data`` from the sparse matrix to dense array.
+    .. warning:: It will convert the ``Experiment.data`` from the
+       sparse matrix to dense array.
 
     Parameters
     ----------
@@ -124,13 +97,8 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         aggregate method. Choice includes:
 
         * 'mean' : the mean of the group
-
         * 'median' : the median of the group
-
-        * 'random' : a random selection from the group
-
         * 'sum' : the sum of of the group
-
     axis : 0, 1, 's', or 'f', optional
         0 or 's' (default) to aggregate samples; 1 or 'f' to aggregate features
     inplace : bool, optional
@@ -142,21 +110,17 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
     '''
     logger.debug('Merge data using field %s, agg %s' % (field, agg))
-    if inplace:
-        newexp = exp
-    else:
-        newexp = deepcopy(exp)
+    if not inplace:
+        exp = deepcopy(exp)
     if axis == 0:
-        metadata = newexp.sample_metadata
+        col = exp.sample_metadata[field]
     else:
-        metadata = newexp.feature_metadata
-    if field not in metadata:
-        raise ValueError('Field %s not in metadata' % field)
+        col = exp.feature_metadata[field]
 
     # convert to dense for efficient slicing
-    newexp.sparse = False
+    exp.sparse = False
 
-    uniq = metadata[field].unique()
+    uniq = col.unique()
     n = len(uniq)
     keep_pos = np.empty(n, dtype=np.uint32)
     merge_number = np.empty(n, dtype=np.uint32)
@@ -165,64 +129,61 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
 
     for i, val in enumerate(uniq):
         if pd.isnull(val):
-            pos = metadata[field].isnull()
+            pos = col.isnull()
         else:
-            pos = metadata[field] == val
-        cdata = newexp.data.compress(pos, axis=axis)
-        which_to_replace = 0
+            pos = col == val
+        cdata = exp.data.compress(pos, axis=axis)
         if agg == 'mean':
             newdat = cdata.mean(axis=axis)
         elif agg == 'median':
             newdat = cdata.median(axis=axis)
         elif agg == 'sum':
             newdat = cdata.sum(axis=axis)
-        elif agg == 'random':
-            random_pos = np.random.randint(np.sum(pos))
-            newdat = cdata.take(random_pos, axis=axis)
-            which_to_replace = random_pos
         else:
             raise ValueError('Unknown aggregation method: %r' % agg)
         merge_number[i] = pos.sum()
-        merge_ids[i] = ';'.join(metadata.index[pos].astype(str))
-        replace_pos = np.where(pos)[0][which_to_replace]
+        merge_ids[i] = ';'.join(col.index[pos].astype(str))
+        replace_pos = np.where(pos)[0][0]
         keep_pos[i] = replace_pos
 
-        if axis == 0:
-            newexp.data[replace_pos, :] = newdat
-        else:
-            newexp.data[:, replace_pos] = newdat
+        # if axis == 1, swap it to the first dimension to change column.
+        exp.data.swapaxes(0, axis)[replace_pos] = newdat
 
-    newexp.reorder(keep_pos, inplace=True, axis=axis)
+    exp.reorder(keep_pos, axis=axis, inplace=True)
 
     if axis == 0:
-        newexp.sample_metadata = newexp.sample_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
+        metadata = exp.sample_metadata
     else:
-        newexp.feature_metadata = newexp.feature_metadata.assign(_calour_merge_number=merge_number, _calour_merge_ids=merge_ids)
+        metadata = exp.feature_metadata
+    metadata['_calour_merge_number'] = merge_number
+    metadata['_calour_merge_ids'] = merge_ids
 
-    return newexp
+    return exp
 
 
-@Experiment._record_sig
-def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=None):
+def join_experiments(exp: Experiment, other, field, labels=('exp', 'other'), prefixes=None) -> Experiment:
     '''Combine two :class:`.Experiment` objects into one.
 
-    A new column will be added to the combined
+    This assumes the same feature in the 2 joining experiments has
+    the same ID. A new column will be added to the combined
     :attr:`.Experiment.sample_metadata` to store which of the 2
-    combined objects it is from.
+    combined objects every sample is from.
 
     Parameters
     ----------
     other : Experiment
-        The ``Experiment`` object to combine with the current one.  If
+        The ``Experiment`` object to combine with the current one. If
         both experiments contain the same feature metadata column and
         there is a conflict between the two, the value will be taken
         from exp and not from other.
-    field_name : None or str, optional
+    field : None or str
         Name of the new ``sample_metdata`` field containing the experiment each sample is coming from.
-        If it is None, don't add such column.
+        If it is None, don't add such column. The values in this column will be "exp" and "other".
+    labels : tuple of (str, str)
+        Only used if `field` is not `None`. Label which experiments each sample is from.
     prefixes : tuple of (str, str), optional
-        Prefix to append to the sample_metadata index for identical samples in the 2 experiments.
-        Required only if the two experiments share any identical sample ID
+        Prefix to prepend to the sample_metadata index for identical samples in the 2 experiments.
+        Required only if the two experiments share any identical sample ID.
 
     Returns
     -------
@@ -232,44 +193,28 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
 
     '''
     logger.debug('Join 2 experiments:\n{!r}\n{!r}'.format(exp, other))
-    # create an empty object
+    # create an empty object of the same class type
     newexp = exp.__class__(np.empty(shape=[0, 0]), pd.DataFrame(),
                            description='join %s & %s' % (exp.description, other.description))
 
     if exp.normalized != other.normalized:
-        raise ValueError('Experiments not normalized to same depth. Use exp.normalize() on both')
+        raise ValueError(
+            'Experiments are not normalized to same depth. Use exp.normalize() to normalize both first.')
 
     newexp.normalized = exp.normalized
 
     # merge sample metadata
     smd1 = exp.sample_metadata
     smd2 = other.sample_metadata
-    # when both experiments contain the same sample ids)
-    if len(exp.sample_metadata.index.intersection(other.sample_metadata.index)) > 0:
-        if prefixes is None:
-            raise ValueError('You need provide the prefixes parameter to add to sample IDs, '
-                             'because the two experiments have some identical '
-                             'sample IDs:\n%r' % exp.sample_metadata.index.intersection(other.sample_metadata.index))
-        exp_prefix, other_prefix = prefixes
-        logger.info('Both experiments contain same sample IDs - adding prefixes')
-        if exp_prefix:
-            smd1 = exp.sample_metadata.rename(lambda x: '{}_{!s}'.format(exp_prefix, x), inplace=False)
-        if other_prefix:
-            smd2 = other.sample_metadata.rename(lambda x: '{}_{!s}'.format(other_prefix, x), inplace=False)
-    # concatenate the sample_metadata
-    smd = pd.concat([smd1, smd2], join='outer', sort=False)
-    if field_name is not None:
-        smd[field_name] = np.nan
-        smd.loc[smd1.index.values, field_name] = exp.description
-        smd.loc[smd2.index.values, field_name] = other.description
+    smd = _check_id_overlap_then_concat(smd1, smd2, prefixes, field, labels)
     newexp.sample_metadata = smd
 
-    # merge the feature metadata
+    # merge feature metadata
     suffix = '__OTHER__'
     fmd = pd.merge(exp.feature_metadata, other.feature_metadata,
                    how='outer', left_index=True, right_index=True,
                    suffixes=['', suffix])
-    # merge and remove duplicate columns
+    # combine and remove duplicate columns
     keep_cols = []
     for ccol in fmd.columns:
         if ccol.endswith(suffix):
@@ -287,18 +232,20 @@ def join_experiments(exp: Experiment, other, field_name='experiments', prefixes=
     idx = [all_features.index(i) for i in exp.feature_metadata.index]
     all_data[0:len(smd1), idx] = exp.get_data(sparse=False)
     idx = [all_features.index(i) for i in other.feature_metadata.index]
-    all_data[len(smd1):(len(smd1) + len(smd2)), idx] = other.get_data(sparse=False)
+    all_data[len(smd1):len(smd), idx] = other.get_data(sparse=False)
     newexp.data = all_data
 
+    # validate the combined experiment at last
+    newexp.validate()
     return newexp
 
 
-@Experiment._record_sig
-def join_experiments_featurewise(exp: Experiment, other,
-                                 field_name='_feature_origin_', origin_labels=('exp1', 'exp2')):
+def join_experiments_featurewise(exp: Experiment, other, field, labels=('exp', 'other'), prefixes=None) -> Experiment:
     '''Combine two :class:`.Experiment` objects into one.
 
-    An example of user cases is to combine the 16S and ITS amplicon data together.
+    An example of use cases is to combine the 16S and ITS amplicon
+    data together. If a sample only exist in one experiment, it will
+    be dropped.
 
     .. warning:: If a sample has only features in one :class:`.Experiment`
        object and not the other, the sample will be dropped from joining.
@@ -306,34 +253,64 @@ def join_experiments_featurewise(exp: Experiment, other,
     Parameters
     ----------
     other : :class:`.Experiment`
-        The ``Experiment`` object to combine with the current one.  If
-        both experiments contain the same feature metadata column and
-        there is a conflict between the two, the value will be taken
-        from exp and not from other.
-    field_name : ``None`` or str (optional)
+        The ``Experiment`` object to combine with the current one.
+    field : ``None`` or str
         Name of the new ``feature_metdata`` field containing the experiment each feature is coming from.
-        If it is None, don't add such column.
-    labels : tuple of (str, str) (optional)
-        The text to label which experiment the feature is originated from.
+        If it is None, don't add such column. The values in this column will be "exp" and "other".
+    labels : tuple of (str, str)
+        Only used if `field` is not `None`. Label which experiments each features is from.
+    prefixes : tuple of (str, str), optional
+        Prefix to prepend to the feature_metadata index for identical feature IDs in the 2 experiments.
+        Required only if the two experiments share any identical feature ID.
 
     Returns
     -------
     :class:`.Experiment`
-        A new experiment with samples from both experiments concatenated, features from both
-        experiments merged.
+        A new experiment with features from both experiments concatenated
+
     '''
     logger.debug('Join 2 experiments featurewise:\n{!r}\n{!r}'.format(exp, other))
     # create an empty object
     newexp = exp.__class__(np.empty(shape=[0, 0]), pd.DataFrame(),
                            description='join %s & %s' % (exp.description, other.description))
+    # intersect samples
     sid = exp.sample_metadata.index.intersection(other.sample_metadata.index)
     exp = exp.filter_ids(sid, axis=0)
     other = other.filter_ids(sid, axis=0)
-    fmd = pd.concat([exp.feature_metadata, other.feature_metadata], join='outer')
-    fmd[field_name] = [origin_labels[0]] * exp.shape[1] + [origin_labels[1]] * other.shape[1]
+
+    # merge features
+    fmd1 = exp.feature_metadata
+    fmd2 = other.feature_metadata
+
+    newexp.feature_metadata = _check_id_overlap_then_concat(fmd1, fmd2, prefixes, field, labels)
+    # assume exp and other have the same sample metadata because they
+    # are the same set of samples.
     newexp.sample_metadata = exp.sample_metadata
-    newexp.feature_metadata = fmd
     # merge data table
     newexp.data = np.c_[exp.data, other.data]
 
     return newexp
+
+
+def _check_id_overlap_then_concat(df1, df2, prefixes, field, labels):
+    intersect = df1.index.intersection(df2.index)
+    if len(intersect) > 0:
+        if prefixes is None:
+            raise ValueError('You need provide the prefixes parameter to add to IDs, '
+                             'because the two experiments have some identical '
+                             'IDs:\n%r' % intersect)
+        prefix1, prefix2 = prefixes
+        logger.info('Both experiments contain same sample IDs - adding prefixes')
+        if prefix1:
+            df1.rename(lambda x: '{}_{!s}'.format(prefix1, x), inplace=True)
+        if prefix2:
+            df2.rename(lambda x: '{}_{!s}'.format(prefix2, x), inplace=True)
+
+    df = pd.concat([df1, df2], join='outer')
+    if field is not None:
+        if field in df.columns:
+            raise ValueError(
+                'Column name %s already exists in the metadata - '
+                'please give a different name' % field)
+        df[field] = [labels[0]] * df1.shape[0] + [labels[1]] * df2.shape[0]
+    return df

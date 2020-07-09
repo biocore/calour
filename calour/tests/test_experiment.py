@@ -10,20 +10,23 @@ from unittest import main
 from copy import copy, deepcopy
 
 import numpy as np
-import pandas as pd
 import numpy.testing as npt
+import pandas as pd
 import pandas.testing as pdt
 from scipy import sparse
+from sklearn import preprocessing
 
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 from calour.util import _convert_axis_name
+from calour.transforming import log_n, standardize
 import calour as ca
 
 
 class ExperimentTests(Tests):
     def setUp(self):
         super().setUp()
-        self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
+        self.test1 = ca.read(self.test1_biom, self.test1_samp, description='test1', normalize=None)
+        self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
 
     def test_record_sig(self):
         def foo(exp, axis=1, inplace=True):
@@ -103,21 +106,47 @@ class ExperimentTests(Tests):
         new.reorder(rev_perm_features, axis=1, inplace=True)
         new.reorder(rev_perm_samples, axis=0, inplace=True)
 
-        assert_experiment_equal(new, exp)
+        self.assert_experiment_equal(new, exp)
+
+    def test_chain(self):
+        obs = self.test2.chain()
+        self.assertEqual(obs, self.test2)
+        self.assertIsNot(obs, self.test2)
+
+        obs = self.test2.chain(inplace=True)
+        self.assertIs(obs, self.test2)
+
+    def test_chain_real(self):
+        obs = self.test2.chain([log_n, standardize], inplace=True,
+                               log_n__n=2, standardize__axis=1)
+        self.assertIs(obs, self.test2)
+        npt.assert_array_almost_equal(obs.data.sum(axis=0), [0] * 8)
+        # column 1, 2 and 6 are constant, so their variances are 0
+        npt.assert_array_almost_equal(obs.data.var(axis=0), [0, 0, 1, 1, 1, 0, 1, 1])
+        exp = np.array([[10., 20., 2., 20., 5., 100., 844., 100.],
+                        [10., 20., 2., 19., 2., 100., 849., 200.],
+                        [10., 20., 3., 18., 5., 100., 844., 300.],
+                        [10., 20., 4., 17., 2., 100., 849., 400.],
+                        [10., 20., 5., 16., 4., 100., 845., 500.],
+                        [10., 20., 6., 15., 2., 100., 849., 600.],
+                        [10., 20., 7., 14., 3., 100., 846., 700.],
+                        [10., 20., 8., 13., 2., 100., 849., 800.],
+                        [10., 20., 9., 12., 7., 100., 842., 900.]])
+        npt.assert_array_almost_equal(obs.data, preprocessing.scale(np.log2(exp), axis=0))
 
     def test_copy_experiment(self):
         exp = copy(self.test1)
-        assert_experiment_equal(exp, self.test1)
+        self.assert_experiment_equal(exp, self.test1)
         self.assertIsNot(exp, self.test1)
 
     def test_deep_copy_experiment(self):
         exp = deepcopy(self.test1)
-        assert_experiment_equal(exp, self.test1)
+        self.assert_experiment_equal(exp, self.test1)
         self.assertIsNot(exp, self.test1)
 
     def test_copy(self):
         exp = self.test1.copy()
-        assert_experiment_equal(exp, self.test1)
+        self.assert_experiment_equal(exp, self.test1)
         self.assertIsNot(exp, self.test1)
         # make sure it is a deep copy - not sharing the data
         exp.data[0, 0] = exp.data[0, 0] + 1
@@ -192,7 +221,7 @@ class ExperimentTests(Tests):
     def test_from_pandas_with_experiment(self):
         df = self.test1.to_pandas(sparse=False)
         res = ca.Experiment.from_pandas(df, self.test1)
-        assert_experiment_equal(res, self.test1)
+        self.assert_experiment_equal(res, self.test1)
 
     def test_from_pandas_reorder(self):
         df = self.test1.to_pandas(sparse=False)
@@ -203,7 +232,7 @@ class ExperimentTests(Tests):
         # we need to reorder the original experiment
         exp = self.test1.sort_by_data(subset=[10], key=np.mean)
         exp = exp.sort_by_data(subset=[0], key=np.mean, axis=1)
-        assert_experiment_equal(res, exp)
+        self.assert_experiment_equal(res, exp)
 
     def test_from_pandas_round_trip(self):
         data = np.array([[1, 2], [3, 4]])
@@ -233,7 +262,18 @@ class ExperimentTests(Tests):
                                self.test1.data.toarray()[:, 1])
 
     def test_repr(self):
-        self.assertEqual(repr(self.test1), 'Experiment ("test1.biom") with 21 samples, 12 features')
+        self.assertEqual(repr(self.test1), 'Experiment ("test1") with 21 samples, 12 features')
+
+    def test_validate_sample(self):
+        with self.assertRaises(ValueError, msg='data table must have the same number of samples with sample_metadata table (2 != 1)'):
+            ca.Experiment(np.array([[1, 2], [3, 4]]),
+                          sample_metadata=pd.DataFrame({'foo': ['a'], 'spam': ['A']}))
+
+    def test_validate_feature(self):
+        with self.assertRaises(ValueError, msg='data table must have the same number of features with feature_metadata table (2 != 1)'):
+            ca.Experiment(np.array([[1, 2], [3, 4]]),
+                          sample_metadata=pd.DataFrame({'foo': ['a', 'b'], 'spam': ['A', 'B']}),
+                          feature_metadata=pd.DataFrame({'ph': [7]}))
 
 
 if __name__ == "__main__":

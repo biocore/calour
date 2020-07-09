@@ -9,7 +9,7 @@
 import unittest
 
 import calour as ca
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 
 
 class TestTesting(Tests):
@@ -22,31 +22,31 @@ class TestTesting(Tests):
 
     def test_assert_experiment_equal(self):
         # basic testing
-        assert_experiment_equal(self.test1, self.test1)
+        self.assert_experiment_equal(self.test1, self.test1)
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.test1, self.timeseries)
+            self.assert_experiment_equal(self.test1, self.timeseries)
 
         # is copy working?
         newexp = self.test1.copy()
-        assert_experiment_equal(self.test1, newexp)
+        self.assert_experiment_equal(self.test1, newexp)
 
         # just data
         newexp = self.test1.copy()
         newexp.data[2, 2] = 43
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.test1, newexp)
+            self.assert_experiment_equal(self.test1, newexp)
 
         # just sample metadata
         newexp = self.test1.copy()
         newexp.sample_metadata.loc[newexp.sample_metadata.index[0], 'id'] = 42
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.test1, newexp)
+            self.assert_experiment_equal(self.test1, newexp)
 
         # just feature metadata
         newexp = self.test1.copy()
         newexp.feature_metadata.loc[newexp.feature_metadata.index[0], 'taxonomy'] = '42'
         with self.assertRaises(AssertionError):
-            assert_experiment_equal(self.test1, newexp)
+            self.assert_experiment_equal(self.test1, newexp)
 
 
 if __name__ == "__main__":

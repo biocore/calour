@@ -19,7 +19,7 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.model_selection import KFold
 
 import calour as ca
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 from calour.training import (
     plot_cm, plot_roc, plot_prc, plot_scatter,
     SortedStratifiedKFold, RepeatedSortedStratifiedKFold,
@@ -51,9 +51,9 @@ class TTests(Tests):
         train, test = self.test2_dense.split_train_test(
             test_size=3, stratify='categorical', shuffle=True, random_state=7)
 
-        assert_experiment_equal(
+        self.assert_experiment_equal(
             test, self.test2_dense.filter_ids(['S3', 'S8', 'S1'], axis='s'))
-        assert_experiment_equal(
+        self.assert_experiment_equal(
             train, self.test2_dense.filter_ids(['S9', 'S6', 'S5', 'S2', 'S4', 'S7'], axis='s'))
 
     def test_regress(self):

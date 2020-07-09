@@ -199,9 +199,9 @@ napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = True
 napoleon_use_admonition_for_references = False
 napoleon_use_ivar = True
-napoleon_use_param = False
+napoleon_use_param = True
 napoleon_use_keyword = True
-napoleon_use_rtype = True
+napoleon_use_rtype = False
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -431,7 +431,7 @@ matplotlib.rcParams.update(plot_rcparams)
 # -----------------------------------------------------------------------------
 intersphinx_mapping = {
     'https://docs.python.org/dev': None,
-    'https://docs.scipy.org/doc/numpy': None,
+    'https://numpy.org/doc/stable': None,
     'https://docs.scipy.org/doc/scipy/reference': None,
     'https://matplotlib.org': None,
     'https://pandas.pydata.org/pandas-docs/stable': None,
@@ -517,5 +517,5 @@ linkcheck_timeout = 30
 # Add the 'copybutton' javascript, to hide/show the prompt in code
 # examples, originally taken from scikit-learn's doc/conf.py
 def setup(app):
-    app.add_javascript('copybutton.js')
+    app.add_js_file('copybutton.js')
 

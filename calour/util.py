@@ -9,6 +9,7 @@ Functions
 .. autosummary::
    :toctree: generated
 
+   join_fields
    compute_prevalence
    register_functions
    set_log_level
@@ -43,25 +44,101 @@ import scipy
 logger = getLogger(__name__)
 
 
+def join_fields(df, field1, field2, new_field=None, sep='_', pad=None):
+    '''Join two fields into a single new field
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+    field1 : str
+        Name of the first field to join. The value in this column can be any data type.
+    field2 : str
+        Name of the field to join. The value in this column can be any data type.
+    new_field : str, default=None
+        name of the new (joined) field. Default to name it as field1 + sep + field2
+    sep : str, optional
+        The separator between the values of the two fields when joining
+    pad : str, default=None
+        Padding char. Align and pad the text in field1 and field2 before joining. Default to join without padding.
+
+    Returns
+    -------
+    pandas.DataFrame
+        the original data frame with new joined field.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> pd.set_option('display.max_colwidth', None)
+    >>> df = pd.DataFrame([['dog', 'bone'], ['monkey', 'banana']], columns=['animal', 'food'])
+    >>> # pandas display on Mac is problematic with ellipsis, skip it for now.
+    >>> join_fields(df, 'animal', 'food')                            #doctest: +SKIP
+       animal    food    animal_food
+    0     dog    bone       dog_bone
+    1  monkey  banana  monkey_banana
+    >>> join_fields(df, 'animal', 'food', new_field='new', pad='-')  #doctest: +SKIP
+       animal    food    animal_food            new
+    0     dog    bone       dog_bone  dog---_--bone
+    1  monkey  banana  monkey_banana  monkey_banana
+    '''
+    logger.debug('joining fields %s and %s into %s' % (field1, field2, new_field))
+
+    # validate the data
+    if field1 not in df.columns:
+        raise ValueError('field %s not in the data frame' % field1)
+    if field2 not in df.columns:
+        raise ValueError('field %s not in the data frame' % field2)
+
+    # get the new column name
+    if new_field is None:
+        new_field = field1 + sep + field2
+
+    if new_field in df.columns:
+        raise ValueError('new field name %s already exists in df. Please use different new_field value' % new_field)
+
+    col1 = df[field1].astype(str)
+    max1 = col1.str.len().max()
+    col2 = df[field2].astype(str)
+    max2 = col2.str.len().max()
+
+    if pad is not None:
+        col1 = col1.str.pad(width=max1, side='right', fillchar=pad)
+        col2 = col2.str.pad(width=max2, side='left', fillchar=pad)
+
+    df[new_field] = col1 + sep + col2
+
+    return df
+
+
 def compute_prevalence(abundance):
     '''Return the prevalence at each abundance cutoffs.
 
-    Each sample that has the OTU above the cutoff (exclusive) will
+    Each sample that has the feature above the cutoff (exclusive) will
     be counted.
 
     Parameters
     ----------
-    abundance : iterable of numeric
-        The abundance of a species across samples.
+    abundance : 1d array-like of numeric
+        The abundance of a feature across samples.
+
+    Returns
+    -------
+    np.ndarray
+        1d sorted array that contains the unique abundance values in the input array.
+    np.ndarray
+        same size with the 1st 1d array. Each value in the array is
+        the feature prevalence defined as its abundance > each unique
+        value in the 1st array.
 
     Examples
     --------
-    >>> abund = [0, 0, 1, 2, 4]
+    >>> abund = [0, 1, 0, 2, 4]
     >>> x, y = compute_prevalence(abund)
     >>> x   #doctest: +SKIP
     array([0, 1, 2, 4])
     >>> y   #doctest: +SKIP
     array([0.6, 0.4, 0.2, 0.])
+
     '''
     # unique values are sorted
     cutoffs, counts = np.unique(abundance, return_counts=True)
@@ -105,11 +182,13 @@ def _transition_index(obj):
 def _convert_axis_name(func):
     '''Convert str value of axis to 0/1.
 
-    This allows the decorated function with ``axis`` parameter
-    to accept "sample" and "feature" as value for ``axis`` parameter.
+    This allows the decorated function with ``axis`` parameter to
+    accept "sample"/"s" and "feature"/"f" as value for ``axis``
+    parameter.
 
     This should be always the closest decorator to the function if
     you have multiple decorators for this function.
+
     '''
     conversion = {'sample': 0,
                   's': 0,
@@ -138,7 +217,7 @@ def _convert_axis_name(func):
 def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     '''Get a nice taxonomy string.
 
-    Convert the taxonomy list stored (from biom.read_table) to a single string per feature
+    Convert the taxonomy list stored (from biom.read_table) to a single string per feature.
 
     Parameters
     ----------
@@ -147,7 +226,7 @@ def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
     sep : str, optional
         the output separator to use between the taxonomic levels
     remove_underscore : bool, optional
-        True (default) to remove the 'g__' entries and missing values
+        True (default) to remove the entries like 'g__' and missing values
         False to keep them
     to_lower : bool, optional
         False (default) to keep case
@@ -388,8 +467,8 @@ def _to_list(x):
 def _argsort(values, reverse=False):
     '''Sort a sequence of values of heterogeneous variable types.
 
-    Used to overcome the problem when using numpy.argsort on a pandas
-    series values with missing values
+    This is useful to overcome the problem when using numpy.argsort on a pandas
+    series values with missing values or different data types.
 
     Examples
     --------
@@ -444,19 +523,37 @@ def _clone_function(f):
     return new_f
 
 
-def register_functions(cls, modules=None):
-    '''Dynamically register functions to the class as methods.
+def register_functions(clss, modules=None):
+    '''Search and modify functions in the modules.
+
+    This searches all the functions defined in the given
+    ``modules`` and modify functions as following:
+
+    1. for each public function with ``axis`` parameter, decorate it with
+       :func:`._convert_axis_name` to convert "s" and "f" to 0 or
+       1 for the ``axis`` parameter.
+
+    2. for each public function that accepts its 1st argument of type
+       defined in ``clss``, register it as a class method to the class
+       type of its 1st argument.
+
+    3. for each public function that accepts its 1st argument of type
+       defined in ``clss`` **and** returns value of the same type,
+       also decorate it with :meth:`.Experiment._record_sig`.
 
     Parameters
     ----------
-    cls : ``class`` object
-        The class that the functions will be added to
-    modules : iterable of str, optional
-        The module names where the functions are defined. ``None`` means all public
+    clss : tuple of ``class`` objects
+        The class that functions will .
+    modules : iterable of str, default=None
+        The module names where functions are defined. ``None`` means all public
         modules in `calour`.
+
     '''
+
     # pattern to recognize the Parameters section
     p = re.compile(r"(\n +Parameters\n +-+ *)")
+
     if modules is None:
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
@@ -465,28 +562,43 @@ def register_functions(cls, modules=None):
         module = import_module(module_name)
         functions = inspect.getmembers(module, inspect.isfunction)
         for fn, f in functions:
-            # skip private functions
-            if not fn.startswith('_'):
-                params = inspect.signature(f).parameters
-                if params:
-                    # if the func accepts parameters, ie params is not empty
-                    first = next(iter(params.values()))
-                    if first.annotation is cls:
-                        # make a copy of the function because we want
-                        # to update the docstring of the original
-                        # function but not that of the registered
-                        # version
+            sig = inspect.signature(f)
+            params = sig.parameters
+
+            # ski private function
+            if fn.startswith('_'):
+                continue
+
+            if 'axis' in params.keys():
+                f = _convert_axis_name(f)
+
+            for _, param in params.items():
+                cls = param.annotation
+                if cls in clss:
+                    # make a copy of the function because we want
+                    # to update the docstring of the original
+                    # function but not that of the registered
+                    # version
+                    if hasattr(cls, fn):
+                        # python can't distinguish defined and
+                        # imported functions. If a function is defined
+                        # in a module and imported in another, without
+                        # this check, it will get processed twice.
+                        continue
+                    if sig.return_annotation is cls:
+                        setattr(cls, fn, cls._record_sig(_clone_function(f)))
+                    else:
                         setattr(cls, fn, _clone_function(f))
-                        updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
-                                   '\\1'
-                                   '\n    exp : {0}'
-                                   '\n        Input experiment object.'
-                                   '\n')
+                    updated = ('\n    .. note:: This function is also available as a class method :meth:`.{0}.{1}`\n'
+                               '\\1'
+                               '\n    exp : {0}'
+                               '\n        Input {0} object.'
+                               '\n')
 
-                        if not f.__doc__:
-                            f.__doc__ = ''
-
-                        f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__)
+                    # use `or` in case f.__doc__ is None
+                    f.__doc__ = p.sub(updated.format(cls.__name__, fn), f.__doc__ or '')
+                # only check the first func parameter
+                break
 
 
 def deprecated(message):
@@ -495,7 +607,7 @@ def deprecated(message):
     Parameters
     ----------
     message : str
-        the message to print together with deprecation info.
+        the message to print together with deprecation warning.
     '''
     def deprecated_decorator(func):
         @wraps(func)

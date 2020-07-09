@@ -23,16 +23,16 @@ class ExperimentTests(Tests):
         self.test1 = ca.read_amplicon(self.test1_biom, self.test1_samp,
                                       min_reads=1000, normalize=10000)
 
-    def test_filter_taxonomy(self):
+    def test_filter_by_taxonomy(self):
         # default - substring and keep matching
-        exp = self.test1.filter_taxonomy('proteobacteria')
+        exp = self.test1.filter_by_taxonomy('proteobacteria')
         self.assertEqual(exp.shape[1], 2)
         self.assertEqual(set(exp.feature_metadata.index), set(self.test1.feature_metadata.index[[2, 3]]))
         # check we didn't change the samples
         pdt.assert_frame_equal(exp.sample_metadata, self.test1.sample_metadata)
 
         # test with list of values and negate
-        exp = self.test1.filter_taxonomy(['Firmicutes', 'proteobacteria'], negate=True)
+        exp = self.test1.filter_by_taxonomy(['Firmicutes', 'proteobacteria'], negate=True)
         # should have all these sequences
         fids = ['AA', 'AT', 'TT', 'TG', 'GG', 'badfeature']
         self.assertListEqual(fids, exp.feature_metadata.index.tolist())
@@ -71,8 +71,8 @@ class ExperimentTests(Tests):
         # and is inplace
         self.assertIs(exp, self.test1)
 
-    def test_sort_taxonomy(self):
-        obs = self.test1.sort_taxonomy()
+    def test_sort_by_taxonomy(self):
+        obs = self.test1.sort_by_taxonomy()
         self.assertListEqual(
             ['GG', 'badfeature', 'TG', 'AA', 'TT', 'GT', 'TA', 'TC', 'GA', 'AC', 'AG', 'AT'],
             obs.feature_metadata.index.tolist())

@@ -48,6 +48,7 @@ Main classes and utility functions
 
    experiment
    amplicon_experiment
+   ms1_experiment
    io
    util
 

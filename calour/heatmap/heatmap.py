@@ -169,46 +169,47 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
-            clim=(None, None), cmap='viridis', norm=mpl.colors.LogNorm(),
-            title=None, rect=None, cax=None, ax=None):
+            norm=None, clim=(None, None), cmap='viridis',
+            rect=None, cax=None, ax=None):
     '''Plot a heatmap for the experiment.
 
-    Plot either a simple heatmap for the experiment with features in row
+    Plot a heatmap for the :attr:`.Experiment.data` with features in row
     and samples in column.
-
-    .. note:: By default it log transforms the abundance values and then plot heatmap.
-       The original object is not modified.
 
     Parameters
     ----------
     sample_field : str or None, optional
         The field of sample metadata to display on the x-axis or None (default) to not show x axis.
     feature_field : str or None (optional)
-        The field of feature meadata to display on the y-axis.
+        The field of feature metadata to display on the y-axis.
         None (default) to not show y axis.
-    xticklabel_kwargs, yticklabel_kwargs : dict or None, optional
+    xticklabel_kwargs :
+    yticklabel_kwargs : dict or None, optional
         keyword arguments passing as properties to :class:`matplotlib.text.Text` for
         tick labels on x axis and y axis. As an example,
         ``xticklabel_kwargs={'color': 'r', 'ha': 'center', 'rotation': 90,
         'family': 'serif', 'size'=7}``
-    xticklabel_len, yticklabel_len : int or None
+    xticklabel_len :
+    yticklabel_len : int or None
         The maximal length for the tick labels on x axis and y axis (will be cut to
         this length if longer). Used to prevent long labels from
         taking too much space. None indicates no shortening
-    xticks_max, yticks_max : int or None
-        max number of ticks to render on the heatmap. If ``None``,
+    xticks_max :
+    yticks_max : int or None
+        max number of ticks to render on the heatmap. If `None`,
         allow all ticks for each sample (xticks_max) or feature (yticks_max) in the table,
         which can be very slow if there are a large number of samples or features.
+    norm : matplotlib.colors.Normalize or None
+        passed to ``norm`` parameter of matplotlib.pyplot.imshow. For
+        exponentially growing things, like bacterial abundance, you
+        may want to use log color scale by providing
+        `matplotlib.colors.LogNorm()`. `None` is linear color scale.
     clim : tuple of (float, float), optional
         the min and max values for the heatmap color limits. It uses the min
         and max values in the input :attr:`.Experiment.data` array by default.
     cmap : str or matplotlib.colors.ListedColormap
         str to indicate the colormap name. Default is "viridis" colormap.
         For all available colormaps in matplotlib: https://matplotlib.org/users/colormaps.html
-    norm : matplotlib.colors.Normalize or None
-        passed to ``norm`` parameter of matplotlib.pyplot.imshow. Default is log scale.
-    title : None or str, optional
-        None (default) to not show title. str to set title to str.
     rect : tuple of (int, int, int, int) or None, optional
         None (default) to set initial zoom window to the whole experiment.
         [x_min, x_max, y_min, y_max] to set initial zoom window
@@ -223,10 +224,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     matplotlib.axes.Axes
         The axes for the heatmap
 
-
     Examples
     --------
     .. plot::
+       :context: close-figs
 
        Let's create a very simple data set:
 
@@ -243,14 +244,20 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        Let's then plot the heatmap:
 
        >>> fig, ax = plt.subplots()
-       >>> exp.heatmap(sample_field='category', feature_field='motile', title='Fig 1 log scale', ax=ax)   # doctest: +SKIP
+       >>> exp.heatmap(sample_field='category', feature_field='motile', ax=ax)   # doctest: +SKIP
+
+    .. plot::
+       :context: close-figs
 
        By default, the color is plot in log scale. Let's say we would like to plot heatmap in normal scale instead of log scale:
 
        >>> fig, ax = plt.subplots()
        >>> norm = mpl.colors.Normalize()
-       >>> exp.heatmap(sample_field='category', feature_field='motile', title='Fig 2 normal scale',
+       >>> exp.heatmap(sample_field='category', feature_field='motile',
        ...             norm=norm, ax=ax)             # doctest: +SKIP
+
+    .. plot::
+       :context: close-figs
 
        Let's say we would like to show the presence/absence of each
        OTUs across samples in heatmap. And we define presence as
@@ -270,7 +277,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
        >>> # create a normalize object the describes the limits of each color
        >>> norm = mpl.colors.BoundaryNorm([0., 0.5, 1.], cmap.N)
        >>> fig, ax = plt.subplots()
-       >>> expbin.heatmap(sample_field='category', feature_field='motile', title='Fig 3 binary',
+       >>> expbin.heatmap(sample_field='category', feature_field='motile',
        ...                cmap=cmap, norm=norm, ax=ax)         # doctest: +SKIP
 
     '''
@@ -286,8 +293,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     else:
         fig = ax.get_figure()
 
-    if title is not None:
-        ax.set_title(title)
     # set the initial zoom window if supplied
     if rect is not None:
         ax.set_xlim(rect[0], rect[1])
@@ -306,11 +311,6 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     # logNorm requires positive values. set it to default None if vmin is zero
     if vmin == 0:
         vmin = None
-
-    if norm is not None:
-        norm.vmin = vmin
-        norm.vmax = vmax
-        norm.autoscale(data)
 
     image = ax.imshow(data.transpose(), aspect='auto', interpolation='nearest',
                       norm=norm, vmin=vmin, vmax=vmax, cmap=cmap)
@@ -393,6 +393,8 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
         whether to label the color bars with text
     label_kwargs: dict
         keyword arguments to pass in for :func:`matplotlib.axes.Axes.annotate`
+    axis : 0 or 1
+        plot bar along x or y axis
 
     Returns
     -------
@@ -508,7 +510,7 @@ def plot(exp: Experiment, title=None,
         The title of the figure.
     barx_fields, bary_fields : str or list of str, optional
         column name(s) in sample metadata (barx) / feature metadata (bary). It plots a bar
-        for each column. It doesn't plot color bars by default (None)
+        for each column to show sample / feature grouping. It doesn't plot any bars by default.
     barx_width, bary_width : float or list of float, optional
         The thickness of the each bar along x axis or y axis. The default thickness usually looks good enough.
     barx_colors, bary_colors : dict, matplotlib.colors.ListedColormap, optional
@@ -544,7 +546,7 @@ def plot(exp: Experiment, title=None,
     '''
     # set the databases if default requested
     if databases is None:
-        databases = exp.heatmap_databases
+        databases = exp.databases
 
     if tree is None:
         gui_obj = _create_plot_gui(exp, gui, databases)

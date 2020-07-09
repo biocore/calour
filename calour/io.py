@@ -16,7 +16,6 @@ Functions
    save
    save_fasta
    save_biom
-   save_metadata
 '''
 
 
@@ -29,7 +28,6 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-import os.path
 import zipfile
 import tempfile
 
@@ -44,83 +42,6 @@ from .database import _get_database_class
 
 
 logger = getLogger(__name__)
-
-
-def _iter_fasta(fp):
-    '''Read fasta file into iterator.
-
-    Fasta file must contain header line (starting with ">") and one or more sequence lines.
-
-    Parameters
-    ----------
-    fp: str
-        name of the fasta file
-
-    Yields
-    ------
-    header: str
-        the header line (without ">")
-    sequence: str
-        the sequence ('ACGT'). Both header and sequence are whitespace stripped.
-    '''
-    # skip non-header lines at beginning of file
-    with open(fp, 'r') as fl:
-        for cline in fl:
-            if cline[0] == ">":
-                title = cline[1:].rstrip()
-                break
-            logger.warning('Fasta file %s has no headers' % fp)
-            return
-
-        lines = []
-        for cline in fl:
-            if cline[0] == ">":
-                yield title, ''.join(lines)
-                lines = []
-                title = cline[1:].strip()
-                continue
-            lines.append(cline.strip())
-        yield title, "".join(lines)
-
-
-def _read_biom(fp, transpose=True):
-    '''Read in a biom table file.
-
-    Parameters
-    ----------
-    fp : str or file object
-        file path to the biom table
-    transpose : bool (True by default)
-        Transpose the table or not. The biom table has samples in
-        column while sklearn and other packages require samples in
-        row. So you should transpose the data table.
-
-    Returns
-    -------
-    sid : list of str
-        the sample ids
-    fid : list of str
-        the feature ids
-    data : numpy array (2d) of float
-        the table
-    feature_md : pandas.DataFrame
-        the feature metadata (if availble in table)
-    '''
-    logger.debug('loading biom table %s' % fp)
-    if hasattr(fp, 'read'):
-        table = biom.parse_table(fp)
-    else:
-        table = biom.load_table(fp)
-    sid = table.ids(axis='sample')
-    fid = table.ids(axis='observation')
-    logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
-    data = table.matrix_data
-    feature_md = _get_md_from_biom(table)
-
-    if transpose:
-        data = data.transpose()
-
-    return sid, fid, data, feature_md
 
 
 def _file_from_zip(tempdir, data_file, internal_data):
@@ -146,15 +67,15 @@ def _file_from_zip(tempdir, data_file, internal_data):
         for fname in fl.namelist():
             if fname.endswith(internal_data):
                 internal_name = fname
-                break
-        if internal_name is None:
-            raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
-        data_file = fl.extract(internal_name, tempdir)
-    return data_file
+                data_file = fl.extract(internal_name, tempdir)
+                return data_file
+
+        raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
 
 
 def _read_qiime2_zip(fp, transpose=True):
     '''Read in a qiime2 qza biom table
+
     NOTE: this function reads2 the qiime2 qza artifacts files using unzip rather than relying on qiime2.
     This enables reading qiime2 artifacts without activating the qiime2 environment
 
@@ -189,12 +110,16 @@ def _read_qiime2_zip(fp, transpose=True):
 
 
 def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=None, **kwargs):
-    '''Read a qiime2 feature table and additional optional artifact files (representative sequences and taxonomy) into a Calour.AmpliconExperiment
+    '''Read a qiime2 artifact files into an amplicon experiment.
+
+
+    .. note:: It converts feature metadata index (sequences) to
+       upper case.
 
     Parameters
     ----------
     fp: str
-        name of the qiime2 feature table .qza artifact file
+        file path of the qiime2 feature table .qza artifact file
     sample_metadata_file : None or str, optional
         None (default) to just use sample names (no additional metadata).
         if not None, file path to the sample metadata (aka mapping file in QIIME).
@@ -243,6 +168,46 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
                     newexp.feature_metadata = newexp.feature_metadata.drop(taxonomy_df.columns, axis=1)
                     newexp.feature_metadata = newexp.feature_metadata.join(other=taxonomy_df, on='_hash', how='left')
     return newexp
+
+
+def _read_biom(fp, transpose=True):
+    '''Read in a biom table file.
+
+    Parameters
+    ----------
+    fp : str or file object
+        file path to the biom table
+    transpose : bool (True by default)
+        Transpose the table or not. The biom table has samples in
+        column while sklearn and other packages require samples in
+        row. So you should transpose the data table.
+
+    Returns
+    -------
+    sid : list of str
+        the sample ids
+    fid : list of str
+        the feature ids
+    data : numpy array (2d) of float
+        the table
+    feature_md : pandas.DataFrame
+        the feature metadata (if availble in table)
+    '''
+    logger.debug('loading biom table %s' % fp)
+    if hasattr(fp, 'read'):
+        table = biom.parse_table(fp)
+    else:
+        table = biom.load_table(fp)
+    sid = table.ids(axis='sample')
+    fid = table.ids(axis='observation')
+    logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
+    data = table.matrix_data
+    feature_md = _get_md_from_biom(table)
+
+    if transpose:
+        data = data.transpose()
+
+    return sid, fid, data, feature_md
 
 
 def _get_md_from_biom(table):
@@ -372,57 +337,65 @@ def _read_metadata(ids, f, kwargs):
 
 @ds.get_sectionsf('io.read')
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
-         description='', sparse=True, data_file_type='biom',
+         description='', sparse=True,
+         data_file_type='biom', data_file_sep=',', sample_in_row=False,
+         sample_id_proc=None, feature_id_proc=None,
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,
-         cls=Experiment, table_sample_id_proc=None, table_feature_id_proc=None, data_table_sep=',',
-         sample_in_row=False, *, normalize):
-    '''Read the files for the experiment.
+         cls=Experiment,
+         *, normalize):
+    '''Read in an experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
-       to align with biom table.
+       to align with data table.
 
     Parameters
     ----------
-    data_file : str
-        file path to the biom table.
-    sample_metadata_file : None or str, optional
-        None (default) to just use sample names (no additional metadata).
-        if not None, file path to the sample metadata (aka mapping file in QIIME).
-    feature_metadata_file : None or str, optional
-        file path to the feature metadata.
+    data_file : str or file-like object.
+        file path to the data table containing abundance values.
+    sample_metadata_file : str, default=None
+        File path to sample metadata (aka mapping file in
+        QIIME). Default to just use sample names (no additional
+        metadata).
+    feature_metadata_file : str, default=None
+        File path to feature metadata.
     description : str
         description of the experiment
     sparse : bool
         read the biom table into sparse or dense array
-    data_file_type : str, optional
+    data_file_type : str, default='biom'
         the data_file format. options:
-        'biom' : a biom table (biom-format.org) (default)
-        'tsv': a tab-separated table. By default, samples are columns and features are rows (see sample_in_row parameter)
-        'csv': general comma (or other delimiter, as indicated by the data_table_sep variable) separated file.
-            By default, samples are columns and features are rows (see sample_in_row parameter)
-        'qiime2' : a qiime2 biom table artifact (need to have qiime2 installed)
-    sample_metadata_kwargs, feature_metadata_kwargs : dict or None, optional
-        keyword arguments passing to :func:`pandas.read_csv` when reading sample metadata
-        or feature metadata. For example, you can set ``sample_metadata_kwargs={'dtype':
-        {'ph': int}, 'encoding': 'latin-8'}`` to read the column of ph in the sample metadata
-        as int and parse the file as latin-8 instead of utf-8. By default, it assumes the first column in
-        the metadata files is sample/feature IDs and is read in as row index. To avoid this, please provide
-        {'index_col': False}.
-    cls : ``class``, optional
-        what class object to read the data into (:class:`.Experiment` by default)
-    table_sample_id_proc, table_feature_id_proc: None or callable, optional
-        if not None, modify each sample/feature id in the table using
-        the callable function.  The callable accepts a list of str and
-        returns a list of str (sample/feature ids after processing).
-        Useful in metabolomics experiments, where the sampleIDs in the
+
+        * 'biom': a biom table (biom-format.org)
+        * 'csv': a comma-, tab-, or other delimiter- (as indicated by the
+          `data_file_sep` parameter) separated table. By default,
+          samples are in columns and features are in rows (see `sample_in_row` parameter).
+        * 'qiime2': a qiime2 biom table artifact
+    data_file_sep : str, default='\t'
+        column delimitor for the data table if it is a 'csv' file.
+    sample_in_row : bool, optional
+        False if data table columns are sample, True if rows are samples
+    sample_id_proc, feature_id_proc: callable, default=None
+        If not `None`, modify each sample/feature id in the data table using
+        the callable function. The callable accepts a list of str and
+        returns a list of str (sample or feature ids after processing).
+        Useful in metabolomics experiments, where the sample IDs in the
         data table contain additional information compared to the
         mapping file (using a '_' separator), and this needs to be
-        removed in order to sync the sampleIDs between table and
-        mapping file.
-    sample_in_row: bool, optional
-        False if data table columns are sample, True if rows are samples
+        removed in order to sync the sample IDs between data table and
+        metadata file.
+    sample_metadata_kwargs, feature_metadata_kwargs : dict, default=None
+        keyword arguments passing to :func:`pandas.read_csv` when
+        reading sample metadata or feature metadata. For example, you
+        can set ``sample_metadata_kwargs={'dtype': {'pH': int},
+        'encoding': 'latin-8'}`` to read the pH column in the sample
+        metadata as int and parse the file as latin-8 instead of
+        utf-8. By default, it assumes the first column in the metadata
+        files is sample/feature IDs and is read in as row index. To
+        avoid this, please provide {'index_col': False}.
+    cls : ``class``, optional
+        what class object to read the data into (:class:`.Experiment` by default)
     normalize : int or None
-        normalize each sample to the specified read count. ``None`` to not normalize
+        normalize each sample to the specified read count. `None` to not normalize
 
     Returns
     -------
@@ -435,13 +408,13 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
     logger.debug('Reading experiment (%s, %s, %s)' % (
         data_file, sample_metadata_file, feature_metadata_file))
-    exp_metadata = {'sample_metadata_md5': '', 'data_md5': ''}
+
     # load the data table
     fmd = None
     if data_file_type == 'biom':
         sid, fid, data, fmd = _read_biom(data_file)
     elif data_file_type == 'csv':
-        sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_table_sep)
+        sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_file_sep)
     elif data_file_type == 'qiime2':
         sid, fid, data, fmd = _read_qiime2_zip(data_file)
     elif data_file_type == 'tsv':
@@ -452,10 +425,10 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     sid = [str(x) for x in sid]
 
     # if we need to process the table sample/feature IDs
-    if table_sample_id_proc is not None:
-        sid = table_sample_id_proc(sid)
-    if table_feature_id_proc is not None:
-        fid = table_feature_id_proc(fid)
+    if sample_id_proc is not None:
+        sid = sample_id_proc(sid)
+    if feature_id_proc is not None:
+        fid = feature_id_proc(fid)
 
     sample_metadata = _read_metadata(sid, sample_metadata_file, sample_metadata_kwargs)
     feature_metadata = _read_metadata(fid, feature_metadata_file, feature_metadata_kwargs)
@@ -479,22 +452,18 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         # combine it with the feature metadata
         feature_metadata = pd.concat([feature_metadata, fmd], axis=1)
 
-    # init the experiment metadata details
-    exp_metadata['data_file'] = data_file
-    exp_metadata['data_md5'] = get_data_md5(data)
-    exp_metadata['sample_metadata_file'] = sample_metadata_file
-    exp_metadata['sample_metadata_md5'] = get_file_md5(sample_metadata_file)
-    exp_metadata['feature_metadata_file'] = feature_metadata_file
-    exp_metadata['feature_metadata_md5'] = get_file_md5(feature_metadata_file)
-
-    if description == '':
-        description = os.path.basename(data_file)
+    # init the experiment details
+    info = {'data_file': data_file,
+            'data_md5': get_data_md5(data),
+            'sample_metadata_file': sample_metadata_file,
+            'sample_metadata_md5': get_file_md5(sample_metadata_file),
+            'feature_metadata_file': feature_metadata_file,
+            'feature_metadata_md5': get_file_md5(feature_metadata_file)}
 
     exp = cls(data, sample_metadata, feature_metadata,
-              exp_metadata=exp_metadata, description=description, sparse=sparse)
+              info=info, description=description, sparse=sparse)
 
     if normalize is not None:
-        # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
 
     # initialize the call history
@@ -507,20 +476,14 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 @ds.with_indent(4)
 def read_amplicon(data_file, sample_metadata_file=None,
                   *, min_reads, normalize, **kwargs):
-    '''Load an amplicon experiment.
+    '''Read in an amplicon experiment.
 
-    Fix taxonomy, normalize reads, and filter low abundance
-    samples. This wraps :func:`read`.  Also convert feature metadata
-    index (sequences) to upper case
+    This wraps :func:`read`.
 
     Parameters
     ----------
-    sample_metadata_file : None or str, optional
-        None (default) to just use samplenames (no additional metadata).
     min_reads : int or None
         remove all samples with less than `min_reads`. `None` to keep all samples
-    normalize : int or None
-        normalize each sample to the specified count. `None` to not normalize
 
     Keyword Arguments
     -----------------
@@ -529,11 +492,12 @@ def read_amplicon(data_file, sample_metadata_file=None,
     Returns
     -------
     AmpliconExperiment
-        after removing low read sampls and normalizing
+        after removing low read sampls and normalization
 
     See Also
     --------
     read
+
     '''
     # store the function parameters for call history
     fparams = locals()
@@ -548,7 +512,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
     if min_reads is not None:
         exp.filter_by_data('abundance', axis=0, cutoff=min_reads, mean_or_sum='sum', inplace=True)
     if normalize is not None:
-        exp.normalize(total=normalize, axis='s', inplace=True)
+        exp.normalize(total=normalize, axis=0, inplace=True)
 
     # initialize the call history
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
@@ -692,7 +656,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     exp = read(data_file, sample_metadata_file, feature_metadata_file,
                data_file_type=default_params[data_file_type]['ctype'], sparse=sparse,
                normalize=None, cls=MS1Experiment,
-               table_sample_id_proc=lambda x: _split_sample_ids(x, split_char=cut_sample_id_sep),
+               sample_id_proc=lambda x: _split_sample_ids(x, split_char=cut_sample_id_sep),
                sample_in_row=sample_in_row, **kwargs)
     # get the MZ/RT data
     if data_file_type == 'mzmine2':
@@ -744,7 +708,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     if gnps_file:
         # load the gnps table
         gnps_data = pd.read_csv(gnps_file, sep='\t')
-        exp.exp_metadata['_calour_metabolomics_gnps_table'] = gnps_data
+        exp.info['_calour_metabolomics_gnps_table'] = gnps_data
         # use the gnpscalour database interface to get metabolite info from the gnps file
         gnps_db = _get_database_class('gnps', exp=exp)
         # link each feature to the gnps ids based on MZ/RT or direct_id
@@ -759,19 +723,46 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     return exp
 
 
+def _split_sample_ids(sid, split_char=None, ignore_split=('row m/z', 'row retention time')):
+    '''Split the sample id in data table using the split_char returning the first split str.
+
+    Used in the read_ms() function, as a callable for the read() function
+
+    Parameters
+    ----------
+    sid : list of str
+        the list of sample ids to process
+    split_char: str or None, optional
+        None to not split the sampleids
+        str to split sample id using this string
+
+    Returns
+    -------
+    list of str: the split sample ids
+    '''
+    if split_char is None:
+        return sid
+    logger.info('splitting table sample ids using separator %s. use "data_table_params={\'cut_sample_id_sep\'=None}" to disable cutting.' % split_char)
+    return [x.split(split_char)[0] if x not in ignore_split else x for x in sid]
+
+
 def save(exp: Experiment, prefix, fmt='hdf5'):
     '''Save the experiment data to disk.
+
+    This saves data table, sample metadata, and feature metadata to 3
+    different files with the same file prefix.
 
     Parameters
     ----------
     prefix : str
-        file path to save to.
+        file path (suffixes auto added for the 3 files) to save to.
     fmt : str
         format for the data table. could be 'hdf5', 'txt', or 'json'.
+
     '''
     exp.save_biom('%s.biom' % prefix, fmt=fmt)
-    exp.save_metadata('%s_sample.txt' % prefix, axis=0)
-    exp.save_metadata('%s_feature.txt' % prefix, axis=1)
+    exp.sample_metadata.to_csv('%s_sample.txt' % prefix, sep='\t')
+    exp.feature_metadata.to_csv('%s_feature.txt' % prefix, sep='\t')
 
 
 def save_biom(exp: Experiment, f, fmt='hdf5', add_metadata='taxonomy'):
@@ -808,28 +799,8 @@ def save_biom(exp: Experiment, f, fmt='hdf5', add_metadata='taxonomy'):
         with open(f, 'w') as f:
             f.write(s)
     else:
-        raise ValueError('Unknwon file format %s for save' % fmt)
+        raise ValueError('Unknown file format %s for save' % fmt)
     logger.debug('biom table saved to file %s' % f)
-
-
-def save_metadata(exp: Experiment, f, axis=0, **kwargs):
-    '''Save sample/feature metadata to file.
-
-    Parameters
-    ----------
-    f : str
-        file path to save to
-    axis : 0 ('s') or 1 ('f')
-        0 or 's' to save sample metadata; 1 or 'f' to save feature metadata
-    kwargs : dict
-        keyword arguments passing to :func:`pandas.DataFrame.to_csv`
-    '''
-    if axis == 0:
-        exp.sample_metadata.to_csv(f, sep='\t', **kwargs)
-    elif axis == 1:
-        exp.feature_metadata.to_csv(f, sep='\t', **kwargs)
-    else:
-        raise ValueError('Unknown axis: %r' % axis)
 
 
 def save_fasta(exp: Experiment, f, seqs=None, header='seq'):
@@ -906,24 +877,38 @@ def _create_biom_table_from_exp(exp, add_metadata='taxonomy', to_list=False):
     return table
 
 
-def _split_sample_ids(sid, split_char=None, ignore_split=('row m/z', 'row retention time')):
-    '''Split the data table sample id using the split_char returning the first split str.
+def _iter_fasta(fp):
+    '''Read fasta file into iterator.
 
-    Used in the read_ms() function, as a callable for the read() function
+    Fasta file must contain header line (starting with ">") and one or more sequence lines.
 
     Parameters
     ----------
-    sid : list of str
-        the list of sample ids to process
-    split_char: str or None, optional
-        None to not split the sampleids
-        str to split sample id using this string
+    fp: str
+        name of the fasta file
 
-    Returns
-    -------
-    list of str: the split sample ids
+    Yields
+    ------
+    header: str
+        the header line (without ">")
+    sequence: str
+        the sequence ('ACGT'). Both header and sequence are whitespace stripped.
     '''
-    if split_char is None:
-        return sid
-    logger.info('splitting table sample ids using separator %s. use "data_table_params={\'cut_sample_id_sep\'=None}" to disable cutting.' % split_char)
-    return [x.split(split_char)[0] if x not in ignore_split else x for x in sid]
+    # skip non-header lines at beginning of file
+    with open(fp, 'r') as fl:
+        for cline in fl:
+            if cline[0] == ">":
+                title = cline[1:].rstrip()
+                break
+            logger.warning('Fasta file %s has no headers' % fp)
+            return
+
+        lines = []
+        for cline in fl:
+            if cline[0] == ">":
+                yield title, ''.join(lines)
+                lines = []
+                title = cline[1:].strip()
+                continue
+            lines.append(cline.strip())
+        yield title, "".join(lines)

@@ -29,13 +29,13 @@ Functions
 
 from logging import getLogger
 from copy import deepcopy
-import reprlib
 
 import numpy as np
 from scipy import cluster, spatial
 
 from . import Experiment
-from .transforming import log_n, transform, scale
+from .filtering import _filter_ids
+from .transforming import log_n, standardize
 from .util import _argsort
 from ._doc import ds
 
@@ -43,42 +43,36 @@ from ._doc import ds
 logger = getLogger(__name__)
 
 
-@ds.with_indent(4)
-@Experiment._record_sig
-def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
-    r'''Sort the features based on the center of mass
+def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs) -> Experiment:
+    r'''Sort the features based on the center of mass.
 
-    Assuming that samples are already sorted by some continuous field
-    (eg pH), this function will sort features based on their center of
-    mass along this field. Specifically, it calculates the center of
-    mass for each feature and sort features by their center of mass.
+    Assuming that samples are already sorted by a field of continuous
+    value in sample metadata (eg pH), this function will sort features
+    based on their center of mass along this field. Specifically, it
+    calculates the center of mass for each feature and sort features
+    by their center of mass.
 
     Parameters
     ----------
     transform : callable, optional
         a callable transform on a 2-d matrix. Input and output of
         transform are :class:`.Experiment`.  The transform function
-        modifies ``Experiment.data`` (it is a copy) but not change the
+        modifies :attr:`.Experiment.data` but does not change the
         dimension of :attr:`.Experiment.data`.
     inplace : bool, optional
         False (default) to create a copy
         True to Replace data in exp
-    kwargs : dict
-        additional keyword parameters passed to ``transform``.
-
-    Keyword Arguments
-    -----------------
-    %(transforming.transform.parameters)s
+    kwargs : dict, optional
+        keyword arguments passing to the transformer.
 
     Returns
     -------
     Experiment
-        features sorted by center of mass
+        with features sorted by center of mass
 
     See Also
     --------
-    transform
-
+    log_n
     '''
     logger.debug('sorting features by center of mass')
     if transform is None:
@@ -98,10 +92,9 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs):
 
 
 @ds.get_sectionsf('sorting.cluster_data')
-@ds.with_indent(4)
-@Experiment._record_sig
-def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', inplace=False, **kwargs):
-    '''Cluster the samples/features.
+def cluster_data(exp: Experiment, transform=None, axis=1,
+                 metric='euclidean', inplace=False, **kwargs) -> Experiment:
+    r'''Cluster the samples/features.
 
     Reorder the features/samples so that ones with similar behavior (pattern
     across samples/features) are close to each other
@@ -111,19 +104,18 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
     aixs : 0, 1, 's', or 'f', optional
         'f' or 1 (default) means clustering features; 's' or 0 means clustering samples
     transform : Callable
-        a callable transform on a 2-d matrix. Input and output of transform are :class:`.Experiment`.
-        The transform function can modify ``Experiment.data`` (it is a copy).
-        It should not change the dimension of :attr:`.Experiment.data`.
+        a callable that transforms on a 2-d matrix. Its 1st argument
+        and return should be both :class:`.Experiment` type. It can
+        modify a copy of `Experiment.data` (but should not change its
+        dimension.) for clustering.
     metric : str or callable
         the clustering metric to use. It should be able to be passed to
         ``scipy.spatial.distance.pdist``.
     inplace : bool, optional
         False (default) to create a copy.
         True to Replace data in exp.
-
-    Keyword Arguments
-    -----------------
-    %(transforming.transform.parameters)s
+    kwargs : dict, optional
+        keyword arguments passing to the transformer.
 
     Returns
     -------
@@ -132,13 +124,14 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
 
     See Also
     --------
-    transform
+    cluster_features
+
     '''
     logger.debug('clustering data on axis %s' % axis)
     if transform is None:
         data = exp.get_data(sparse=False)
     else:
-        logger.debug('tansforming data using %r' % transform)
+        logger.debug('transforming data using %r' % transform)
         newexp = deepcopy(exp)
         data = transform(newexp, **kwargs).get_data(sparse=False)
 
@@ -152,55 +145,48 @@ def cluster_data(exp: Experiment, transform=None, axis=1, metric='euclidean', in
     return exp.reorder(sort_order, axis=axis, inplace=inplace)
 
 
-@ds.with_indent(4)
-@Experiment._record_sig
-def cluster_features(exp: Experiment, min_abundance=0, inplace=False, **kwargs):
+def cluster_features(exp: Experiment, cutoff=0, inplace=False) -> Experiment:
     '''Cluster features.
 
-    Cluster is done after filtering of minimal abundance, log
-    transforming, and scaling on features.
+    This function does these things in order:
+
+    1. filter away features that have sum abundance less than cutoff;
+
+    2. transform data with :func:`.log_n` and :func:`.standardize`.
+
+    3. cluster features with :func:`.cluster_data`.
 
     Parameters
     ----------
-    min_abundance : Number, optional
-        filter away features less than ``min_abundance``. Default to 0.
-
-    Keyword Arguments
-    -----------------
-    %(sorting.cluster_data.parameters)s
+    cutoff : numeric, optional
+        filter away features with sum abundance less than ``cutoff``. Default to 0.
 
     Returns
     -------
     Experiment
-        object with features filtered, log transformed and scaled.
 
     See Also
     --------
     cluster_data
-    transform
     log_n
-    scale
+    standardize
 
     '''
-    newexp = exp.filter_abundance(min_abundance, inplace=inplace)
-    return newexp.cluster_data(
-        transform=transform,
-        axis=1,
-        steps=[log_n, scale],
-        scale__axis=1,
-        inplace=inplace,
-        **kwargs)
+    newexp = exp.filter_sum_abundance(cutoff, inplace=inplace)
+    newexp = newexp.chain(steps=[log_n, standardize],
+                          standardize__axis=1,
+                          inplace=True)
+    return newexp.cluster_data(axis=1, inplace=True)
 
 
 @ds.get_sectionsf('sorting.sort_by_metadata')
-@Experiment._record_sig
-def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False, reverse=False):
-    '''Sort samples or features based on metadata values in the field.
+def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False, reverse=False) -> Experiment:
+    '''Sort samples or features based on metadata values in the given field.
 
     Parameters
     ----------
     field : str
-        Name of the field to sort by
+        column name of the sample or feature metadata to sort by.
     axis : 0, 1, 's', or 'f'
         sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
         in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
@@ -217,16 +203,42 @@ def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False, reverse=Fals
         x = exp.sample_metadata
     elif axis == 1:
         x = exp.feature_metadata
-    else:
-        raise ValueError('unknown axis %s' % axis)
+
     idx = _argsort(x[field].values, reverse)
     return exp.reorder(idx, axis=axis, inplace=inplace)
 
 
+@ds.with_indent(4)
+def sort_samples(exp: Experiment, field, **kwargs) -> Experiment:
+    '''Sort samples by sample metadata.
+
+    A convenience function wrapping on :func:`sort_by_metadata`.
+
+    Parameters
+    ----------
+    field : str
+        The column name in sample metadata to sort the samples by.
+
+    Keyword Arguments
+    -----------------
+    %(sorting.sort_by_metadata.parameters)s
+
+    Returns
+    -------
+    Experiment
+        with samples sorted according to values in field.
+
+    See Also
+    --------
+    sort_by_metadata
+    '''
+    return exp.sort_by_metadata(field=field, axis='s', **kwargs)
+
+
 @ds.get_sectionsf('sorting.sort_by_data')
-@Experiment._record_sig
-def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=False, reverse=False, **kwargs):
-    '''Sort features based on their mean frequency.
+def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean',
+                 inplace=False, reverse=False, **kwargs) -> Experiment:
+    '''Sort features based on their values in the data table.
 
     Sort the 2-d array by sample (axis=0) or feature (axis=0). ``key``
     will be applied to ``subset`` of each feature (axis=0) or sample
@@ -236,21 +248,21 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
     ----------
     axis : 0, 1, 's', or 'f'
         Apply ``key`` function on row (sort the samples) (0 or 's') or column (sort the features) (1 or 'f')
-    subset : None, boolean mask, :class:`slice`, or int indices, optional
+    subset : {boolean mask, :class:`slice`, int indices}, default=None
         Sorting using only subset of the data. The subsetting occurs on the opposite of
         the specified axis. Default is to use the whole data set.
     key : str or callable
         If it is a callable, it should be a function accepts 1-D array
-        of numeric and returns a comparative value (like ``key`` in
-        builtin :func:`sorted`. For example, you can use :func:`numpy.mean` or
+        of numeric and returns a comparative value (like ``key`` in the
+        builtin :func:`sorted`). For example, you can use :func:`numpy.mean` or
         :func:`numpy.media`. Alternatively it accepts the
-        following strings:
+        following strings for pre-defined functions:
 
         * 'log_mean': sort by the mean of the log;
-
         * 'prevalence': sort by the prevalence;
-    inplace : bool, optional
-        False (default) to create a copy. True to modify in place.
+
+    inplace : bool, default=False
+        False to create a copy. True to modify in place.
     reverse : bool, optional
         True to reverse the order of the sort. Similar to :func:`sorted`
     kwargs : dict
@@ -269,10 +281,10 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
         else:
             data_subset = exp.data[subset, :]
 
-    func = {'log_mean': _log_mean,
-            'prevalence': _prevalence}
-    if isinstance(key, str):
-        key = func[key]
+    func = {'log_mean': _log_n_1d,
+            'prevalence': _prevalence_1d}
+    key = func.get(key, key)
+
     if exp.sparse:
         n = data_subset.shape[axis]
         values = np.zeros(n, dtype=float)
@@ -293,78 +305,42 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean', inplace=F
     return exp
 
 
-def _log_mean(x, logit=1):
+def _log_n_1d(x, n=1):
     '''Log transform and then return the mean.
-
-    It caps the small value to the `logit` on the lower end before it does
-    log2 transform.
 
     Examples
     --------
     >>> x = np.array([0, 0, 2, 4])
-    >>> _log_mean(x)
+    >>> _log_n_1d(x)
     0.75
-    >>> _log_mean(x, 2)
+    >>> _log_n_1d(x, 2)
     1.25
-    >>> _log_mean(x, None)  # don't log transform
-    1.5
     '''
-    if logit is None:
-        return np.mean(x)
-    else:
-        try:
-            x = x.toarray()
-        except AttributeError:
-            # make a copy because it's changed inplace
-            x = x.copy()
-        x[x < logit] = logit
-        return np.log2(x).mean()
+    try:
+        x = x.todense().A1
+    except AttributeError:
+        # make a copy because it changes inplace
+        x = np.copy(x)
+    x[x < n] = n
+    return np.log2(x).mean()
 
 
-def _prevalence(x, cutoff=0):
+def _prevalence_1d(x, cutoff=0):
     return np.sum(i >= cutoff for i in x) / len(x)
 
 
 @ds.with_indent(4)
-@Experiment._record_sig
-def sort_samples(exp: Experiment, field, **kwargs):
-    '''Sort samples by field
-    A convenience function for sort_by_metadata
-
-    Parameters
-    ----------
-    field : str
-        The field to sort the samples by
-
-    Keyword Arguments
-    -----------------
-    %(sorting.sort_by_metadata.parameters)s
-
-    Returns
-    -------
-    Experiment with samples sorted according to values in field
-
-    See Also
-    --------
-    sort_by_metadata
-    '''
-    newexp = exp.sort_by_metadata(field=field, **kwargs)
-    return newexp
-
-
-@ds.with_indent(4)
-@Experiment._record_sig
-def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
-    '''Sort features based on their abundance in a subset of the samples.
+def sort_abundance(exp: Experiment, subgroup=None, **kwargs) -> Experiment:
+    '''Sort features based on their abundances in a subset of the samples.
 
     This is a convenience wrapper for :func:`sort_by_data`.
 
     Parameters
     ----------
-    subgroup : dict or None (default)
-        None (default) to sort on all samples. Subset samples by
+    subgroup : dict, default=None
+        ``None`` to sort based on all samples. Subset samples by
         columns (specified by dict keys) in sample metadata matching
-        the dict values (a list). sorting is only on samples matching this list
+        the dict values (a list). sorting is only on samples matching this list.
 
     Keyword Arguments
     -----------------
@@ -375,6 +351,13 @@ def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
     Experiment
         with features sorted by abundance
 
+    Examples
+    --------
+    This selects the samples of week 6 treated either with drugA or drugB
+    and use these samples for sorting:
+    >>> exp.sort_abundance(subgroup={'treatment': ['drugA', 'drugB'],
+    ...                              'week'     : [6]})    # doctest: +SKIP
+
     See Also
     --------
     sort_by_data
@@ -382,43 +365,41 @@ def sort_abundance(exp: Experiment, subgroup=None, **kwargs):
     if subgroup is None:
         select = None
     else:
-        select = np.ones(exp.shape[0])
+        select = np.ones(exp.shape[0], dtype='?')
         for k, v in subgroup.items():
-            select = np.logical_and(select, exp.sample_metadata[k].isin(v).values)
+            select_i = np.logical_and(select, exp.sample_metadata[k].isin(v).values)
+            select = select & select_i
     return exp.sort_by_data(axis=1, subset=select, **kwargs)
 
 
-@Experiment._record_sig
-def sort_ids(exp: Experiment, ids, axis=1, inplace=False):
+def sort_ids(exp: Experiment, ids, axis=1, inplace=False) -> Experiment:
     '''Sort the features or samples by the given ids.
 
-    If ids are not cover the all the features (samples), the rest will be unsorted and appended.
+    If ``ids`` does not cover the all the features (samples), the rest
+    will be unsorted and appended.  If ``ids`` has duplicates, the
+    resulting Experiment will also have duplicates. If ``ids`` is
+    unordered data type (eg set type), the resulting Experiment is
+    also unordered.
 
     Parameters
     ----------
-    ids : list of str
-        The ids to put first in the new experiment
-    axis : 0, 1, 's', or 'f'
-        sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column
+    ids : sequence of str
+        The ids to put first in the resulting Experiment. If ``ids``
+        is unordered data type (eg set type), the resulting Experiment
+        is also unordered for those ids.
+    axis : {0, 1, 's', 'f'}
+        sort by samples (0 or 's') or by features (1 or 'f'), i.e. the ``field`` is a column name
         in ``sample_metadata`` (0 or 's') or ``feature_metadata`` (1 or 'f')
-    inplace : bool, optional
-        False (default) to create a copy of the experiment, True to filter inplace
+    inplace : bool, default=False
+        False to create a copy of the experiment; True to filter inplace
 
     Returns
     -------
     Experiment
-        with features/samples first according to the ids list and then the rest
+        with features/samples first according to ``ids`` and then the rest.
+
     '''
-    if axis == 0:
-        index = exp.sample_metadata.index
-    else:
-        index = exp.feature_metadata.index
-    try:
-        ids_pos = [index.get_loc(i) for i in ids]
-    except KeyError as e:
-        raise ValueError('Unknown IDs provided: %s' % str(e))
-    # use reprlib to shorten the list if it is too long
-    logger.debug('Sort by IDs %s on axis %d' % (reprlib.repr(ids), axis))
-    rest_pos = np.setdiff1d(np.arange(len(index)), ids_pos, assume_unique=True)
+    ids_pos = _filter_ids(exp, ids, axis)
+    rest_pos = np.setdiff1d(np.arange(exp.shape[axis]), ids_pos, assume_unique=True)
     newexp = exp.reorder(np.concatenate([ids_pos, rest_pos]), axis=axis, inplace=inplace)
     return newexp

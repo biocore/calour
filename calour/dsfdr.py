@@ -1,7 +1,3 @@
-# From serenejiang DescreteFDR
-# https://github.com/serenejiang/DiscreteFDR
-
-
 from logging import getLogger
 import types
 import numpy as np

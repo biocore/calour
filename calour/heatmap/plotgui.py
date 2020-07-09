@@ -142,7 +142,7 @@ class PlotGUI(ABC):
     def resize_figure(self, *args, **kwargs):
         '''Resize the figure.
 
-        It is a convenient function that wraps on
+        It is a convenience function that wraps on
         ``matplotlib.Figure.set_size_inches``.
 
         Parameters

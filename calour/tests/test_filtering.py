@@ -11,12 +11,12 @@ from unittest import main
 from numpy.testing import assert_array_equal
 import numpy as np
 
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 from calour.filtering import _balanced_subsample
 import calour as ca
 
 
-class FilteringTests(Tests):
+class FTests(Tests):
     def setUp(self):
         super().setUp()
         self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=None)
@@ -31,6 +31,23 @@ class FilteringTests(Tests):
             uniq, counts = np.unique(d2, return_counts=True)
             self.assertTrue(np.all(counts == n))
 
+    def test_downsample_unique(self):
+        # test on features, random method, not inplace
+        # since each taxonomy is unique, should have the same as original
+        newexp = self.test1.downsample('taxonomy', axis=1)
+        self.assertEqual(newexp.shape, self.test1.shape)
+        self.assertIsNot(newexp, self.test1)
+
+    def test_downsample_keep_1(self):
+        # test on samples, random method, not inplace
+        newexp = self.test1.downsample('group', keep=1, random_state=2017)
+        self.assertEqual(newexp.shape[0], 3)
+        self.assertEqual(list(newexp.data[:, 7].todense().A1), [849, 859, 9])
+        self.assertEqual(newexp.shape[1], self.test1.shape[1])
+        self.assertIsNot(newexp, self.test1)
+        newexp = self.test1.downsample('group', keep=1, random_state=2018)
+        self.assertNotEqual(list(newexp.data[:, 7].todense().A1), [849, 859, 9])
+
     def test_downsample_sample(self):
         obs = self.test2.downsample('group')
         # should be down to 4 samples; feature number is the same
@@ -39,7 +56,7 @@ class FilteringTests(Tests):
         sid = obs.sample_metadata.index.tolist()
         all_sid = self.test2.sample_metadata.index.tolist()
         exp = self.test2.reorder([all_sid.index(i) for i in sid])
-        assert_experiment_equal(obs, exp)
+        self.assert_experiment_equal(obs, exp)
 
     def test_downsample_feature(self):
         obs = self.test2.downsample('oxygen', axis=1)
@@ -50,9 +67,9 @@ class FilteringTests(Tests):
         exp = self.test2.reorder([all_sid.index(i) for i in sid], axis=1)
         self.assertEqual(obs, exp)
 
-    def test_downsample_num_keep(self):
+    def test_downsample_keep(self):
         # test keeping num_keep samples, and inplace
-        obs = self.test1.downsample('group', num_keep=9, inplace=True)
+        obs = self.test1.downsample('group', keep=9, inplace=True)
         # should be down to 2 groups (18 samples); feature number is the same
         self.assertEqual(obs.shape, (18, 12))
         self.assertEqual(set(obs.sample_metadata['group']), set(['1', '2']))
@@ -63,11 +80,11 @@ class FilteringTests(Tests):
         obs = self.test2.filter_by_metadata('group', [3])
         self.assertEqual(obs.shape, (0, 8))
         obs = self.test2.filter_by_metadata('group', [3], negate=True)
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
 
         # all samples are filtered
         obs = self.test2.filter_by_metadata('group', [1, 2])
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
         obs = self.test2.filter_by_metadata('group', [1, 2], negate=True)
         self.assertEqual(obs.shape, (0, 8))
 
@@ -90,7 +107,7 @@ class FilteringTests(Tests):
         obs = self.test2.filter_by_metadata('oxygen', ['facultative'], axis=1)
         self.assertEqual(obs.shape, (9, 0))
         obs = self.test2.filter_by_metadata('oxygen', ['facultative'], axis=1, negate=True)
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
 
     def test_filter_by_metadata_feature(self):
         for sparse, inplace in [(True, False), (True, True), (False, False), (False, True)]:
@@ -119,7 +136,7 @@ class FilteringTests(Tests):
         self.assertEqual(obs.shape, (0, 8))
         # none is filtered out
         obs = self.test2.filter_by_data('abundance', axis=0, cutoff=1, mean_or_sum='sum')
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
     def test_filter_by_data_sample(self):
@@ -144,7 +161,7 @@ class FilteringTests(Tests):
 
         # none is filtered out
         obs = self.test2.filter_by_data('abundance', axis=1, cutoff=1, mean_or_sum='sum')
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
         self.assertIsNot(obs, self.test2)
 
     def test_filter_by_data_feature(self):
@@ -183,8 +200,8 @@ class FilteringTests(Tests):
             x = self.test1.filter_prevalence(fraction=frac, field=i)
             self.assertLessEqual(x.shape[1], n)
 
-    def test_filter_abundance(self):
-        exp = self.test1.filter_abundance(17008)
+    def test_filter_sum_abundance(self):
+        exp = self.test1.filter_sum_abundance(17008)
         self.assertEqual(exp.shape[1], 2)
         fids = ['TC', 'GG']
         self.assertListEqual(exp.feature_metadata.index.tolist(), fids)
@@ -237,13 +254,13 @@ class FilteringTests(Tests):
         self.assertCountEqual(list(exp.sample_metadata.index.values), oksamples)
         self.assertIs(exp, self.test1)
 
-    def test_filter_sample_categories(self):
+    def test_filter_sample_group(self):
         test = self.test1.filter_ids(['badsample'], axis=0, negate=True)
         # does not filter anything
-        assert_experiment_equal(test.filter_sample_categories('group', 9), test)
+        self.assert_experiment_equal(test.filter_sample_group('group', 9), test)
         # filter group of 2
-        assert_experiment_equal(test.filter_sample_categories('group', 10),
-                                test.filter_samples('group', '1'))
+        self.assert_experiment_equal(test.filter_sample_group('group', 10),
+                                     test.filter_samples('group', '1'))
 
     def test_filter_samples_edge_cases(self):
         # no group 3 - none filtered
@@ -252,7 +269,7 @@ class FilteringTests(Tests):
         obs = test1.filter_samples('group', ['3'])
         self.assertEqual(obs.shape, (0, 12))
         obs = test1.filter_samples('group', ['3'], negate=True)
-        assert_experiment_equal(obs, test1)
+        self.assert_experiment_equal(obs, test1)
 
     def test_filter_samples_na(self):
         test1 = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
@@ -279,7 +296,7 @@ class FilteringTests(Tests):
         obs = self.test2.filter_features('oxygen', ['facultative'])
         self.assertEqual(obs.shape, (9, 0))
         obs = self.test2.filter_features('oxygen', ['facultative'], negate=True)
-        assert_experiment_equal(obs, self.test2)
+        self.assert_experiment_equal(obs, self.test2)
 
     def test_filter_features(self):
         for inplace in [True, False]:

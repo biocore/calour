@@ -24,6 +24,7 @@ Classes
 from logging import getLogger
 from copy import deepcopy, copy
 from functools import wraps
+from collections import defaultdict
 
 import pandas as pd
 import numpy as np
@@ -34,11 +35,11 @@ logger = getLogger(__name__)
 
 
 class Experiment:
-    '''This class contains the data for a experiment or a meta experiment.
+    '''This class contains the data for a experiment or a meta-experiment.
 
-    The data set includes a data table (otu table, gene table,
-    metabolomic table, or all those tables combined), a sample
-    metadata table, and a feature metadata.
+    The data set includes 3 aligned tables: a data table (otu table,
+    gene table, metabolomic table, or all those tables combined), a
+    sample metadata table, and a feature metadata table.
 
     Parameters
     ----------
@@ -46,9 +47,9 @@ class Experiment:
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
     sample_metadata : pandas.DataFrame
-        The metadata on the samples
+        The metadata for the samples
     feature_metadata : pandas.DataFrame
-        The metadata on the features
+        The metadata for the features
     description : str
         name of experiment
     sparse : bool
@@ -64,8 +65,6 @@ class Experiment:
         The metadata on the samples
     feature_metadata : pandas.DataFrame
         The metadata on the features
-    exp_metadata : dict
-        metadata about the experiment (data md5, filenames, etc.)
     shape : tuple of (int, int)
         the dimension of data
     sparse : bool
@@ -73,35 +72,74 @@ class Experiment:
         or :class:`numpy.ndarray`
     normalized : int
         the normalization factor. it is zero if not normalized
+    info : dict
+        information about the experiment (data md5, filenames, etc.)
     description : str
-        name of the experiment
+        a short description of the experiment
+    databases : iterable of str
+        databases for fetching and entering feature annotations
 
     See Also
     --------
     AmpliconExperiment
+    MS1Experiment
     '''
-    def __init__(self, data, sample_metadata, feature_metadata=None,
-                 exp_metadata=None, description='', sparse=True):
+    def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
+                 info=None, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
         if feature_metadata is None:
             feature_metadata = pd.DataFrame(np.arange(data.shape[1]))
         self.feature_metadata = feature_metadata
-        if exp_metadata is None:
-            exp_metadata = {}
-        self.exp_metadata = exp_metadata
+        self.validate()
+        self.info = {} if info is None else info
         self.description = description
         self.normalized = 0
         # the function calling history list
         self._call_history = []
-        # whether to log to history
+        # whether to log to calling history
         self._log = True
 
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
 
         # the default databases to use for feature information
-        self.heatmap_databases = ()
+        self.databases = databases
+
+    def validate(self):
+        '''Validate the Experiment object.
+
+        This simply checks the shape of data table with
+        sample_metadata and feature_metadata.
+
+        Raises
+        ------
+        ValueError
+            If the shapes of the 3 tables do not agree.
+        '''
+        duplicates = self.sample_metadata.index.duplicated(keep=False)
+        if duplicates.any():
+            raise ValueError(
+                'Duplicate sample IDs exist in positions %s.' % np.where(duplicates)[0])
+        duplicates = self.feature_metadata.index.duplicated(keep=False)
+        if duplicates.any():
+            raise ValueError(
+                'Duplicate feature IDs exist in positions %s.' % np.where(duplicates)[0])
+
+        n_sample, n_feature = self.data.shape
+        ns = self.sample_metadata.shape[0]
+        nf = self.feature_metadata.shape[0]
+        if n_sample != ns:
+            raise ValueError(
+                'data table must have the same number of samples with sample_metadata table (%d != %d).' % (n_sample, ns))
+        if n_feature != nf:
+            raise ValueError(
+                'data table must have the same number of features with feature_metadata table (%d != %d).' % (n_feature, nf))
+        return ns, nf
+
+    @property
+    def shape(self):
+        return self.validate()
 
     @property
     def sparse(self):
@@ -147,7 +185,7 @@ class Experiment:
         return not (self == other)
 
     def __getitem__(self, pos):
-        '''Get the abundance at (sampleid, featureid)
+        '''Get the value from data table for (sample_id, feature_id)
 
         Parameters
         ----------
@@ -157,7 +195,7 @@ class Experiment:
         Returns
         -------
         float
-            The abundance of feature ID in sample ID
+            The value of feature ID in sample ID
         '''
         if not isinstance(pos, tuple) or len(pos) != 2:
             raise SyntaxError('Must supply sample ID, feature ID')
@@ -255,10 +293,10 @@ class Experiment:
 
         Parameters
         ----------
-        sparse : None or bool, optional
-            None (default) to pass original data (sparse or dense).
-            True to get as sparse. False to get as dense
-        copy : bool, optional
+        sparse : bool, default=None
+            default to pass original data (sparse or dense).
+            True to get as sparse. False to get as dense.
+        copy : bool, default=False
             True to get a copy of the data; otherwise, it can be
             the original data or a copy (default).
 
@@ -287,10 +325,6 @@ class Experiment:
                     return self.data.copy()
                 else:
                     return self.data
-
-    @property
-    def shape(self):
-        return self.data.shape
 
     def reorder(self, new_order, axis=0, inplace=False):
         '''Reorder according to indices in the new order.
@@ -339,6 +373,42 @@ class Experiment:
             exp.data = exp.data[:, new_order]
             if exp.feature_metadata is not None:
                 exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
+        return exp
+
+    def chain(self, steps=[], inplace=False, **kwargs):
+        '''Perform multiple operations sequentially.
+
+        Parameters
+        ----------
+        steps : list of callables
+            Each callable is a class method that has a boolean
+            parameter of ``inplace``, and returns an
+            :class:`.Experiment` object.
+        inplace : bool, default=False
+            change occurs in place or not.
+        kwargs : dict
+            keyword arguments to pass to each class method. The dict
+            key should be in the form of
+            "<method_name>__<param_name>". For example,
+            "exp.chain(steps=[filter_samples, log_n], log_n__n=3)"
+            will call :func:`filter_samples` first and then
+            :func:`log_n` while setting its parameter `n=3`.
+
+        Returns
+        -------
+        Experiment
+
+        '''
+        exp = self if inplace else deepcopy(self)
+        params = defaultdict(dict)
+        for k, v in kwargs.items():
+            transformer, param_name = k.split('__')
+            if param_name == 'inplace':
+                raise ValueError(
+                    'You can not set `inplace` for individual transformation.')
+            params[transformer][param_name] = v
+        for step in steps:
+            step(exp, inplace=True, **params[step.__name__])
         return exp
 
     def to_pandas(self, sample_field=None, feature_field=None, sparse=None):
@@ -412,15 +482,15 @@ class Experiment:
             sample_metadata['id'] = sample_metadata.index
             feature_metadata = pd.DataFrame(index=df.columns)
             feature_metadata['id'] = feature_metadata.index
-            exp_metadata = {}
+            info = {}
             description = 'From Pandas DataFrame'
         else:
             description = exp.description + ' From Pandas'
-            exp_metadata = exp.exp_metadata
+            info = exp.info
             sample_metadata = exp.sample_metadata.loc[df.index.values, ]
             feature_metadata = exp.feature_metadata.loc[df.columns.values, ]
             cls = exp.__class__
 
         newexp = cls(df.values, sample_metadata, feature_metadata,
-                     exp_metadata=exp_metadata, description=description, sparse=False)
+                     info=info, description=description, sparse=False)
         return newexp

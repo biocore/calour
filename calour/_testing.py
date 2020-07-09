@@ -18,7 +18,8 @@ import calour as ca
 
 class Tests(TestCase):
     def setUp(self):
-        # disable logging
+        # disable logging; otherwise, the tests will print all the
+        # logging in the functions
         logging.disable(logging.CRITICAL)
 
         test_data_dir = join(dirname(abspath(__file__)), 'tests', 'data')
@@ -62,58 +63,48 @@ class Tests(TestCase):
         self.q2_cfs_repseqs = join(test_data_dir, 'cfs-rep-seqs.qza')
         self.q2_cfs_taxonomy = join(test_data_dir, 'cfs-taxonomy.qza')
 
+    def assert_experiment_equal(self, exp1, exp2, check_history=False, almost_equal=True,
+                                ignore_md_fields=('_calour_original_abundance',)):
+        '''Test if two experiments are equal
 
-def assertIsInstance(obj, cls, msg=''):
-    """Test that obj is an instance of cls
-    (which can be a class or a tuple of classes,
-    as supported by isinstance()).
-    (copied From Pandas unit testing module)"""
-    if not isinstance(obj, cls):
-        err_msg = "{0}Expected type {1}, found {2} instead"
-        raise AssertionError(err_msg.format(msg, cls, type(obj)))
+        Parameters
+        ----------
+        exp1 : Experiment
+        exp2 : Experiment
+        check_history : bool, optional
+            False (default) to skip testing the command history, True to compare also the command history
+        almost_equal : bool, optional
+            True (default) to test for almost identical, False to test the data matrix for exact identity
+        ignore_md_fields : tuple of str or None
+            list of metadata fields to ignore in the comparison. Default is ignoring the original read count (when sample loaded)
+        '''
+        self.assertIsInstance(exp1, ca.Experiment, 'exp1 not a calour Experiment class')
+        self.assertIsInstance(exp2, ca.Experiment, 'exp2 not a calour Experiment class')
 
+        # test the metadata
+        sample_columns = exp1.sample_metadata.columns.union(exp1.sample_metadata.columns)
+        feature_columns = exp1.feature_metadata.columns.union(exp2.feature_metadata.columns)
+        if ignore_md_fields is not None:
+            for cignore in ignore_md_fields:
+                if cignore in sample_columns:
+                    sample_columns = sample_columns.delete(sample_columns.get_loc(cignore))
+                if cignore in feature_columns:
+                    feature_columns = feature_columns.delete(feature_columns.get_loc(cignore))
+        self.assertEqual(len(sample_columns.difference(exp1.sample_metadata.columns)), 0)
+        self.assertEqual(len(sample_columns.difference(exp2.sample_metadata.columns)), 0)
+        self.assertEqual(len(feature_columns.difference(exp1.feature_metadata.columns)), 0)
+        self.assertEqual(len(feature_columns.difference(exp2.feature_metadata.columns)), 0)
 
-def assert_experiment_equal(exp1, exp2, check_history=False, almost_equal=True, ignore_md_fields=('_calour_original_abundance',)):
-    '''Test if two experiments are equal
+        pdt.assert_frame_equal(exp1.feature_metadata[feature_columns], exp2.feature_metadata[feature_columns])
+        pdt.assert_frame_equal(exp1.sample_metadata[sample_columns], exp2.sample_metadata[sample_columns])
 
-    Parameters
-    ----------
-    exp1 : Experiment
-    exp2 : Experiment
-    check_history : bool, optional
-        False (default) to skip testing the command history, True to compare also the command history
-    almost_equal : bool, optional
-        True (default) to test for almost identical, False to test the data matrix for exact identity
-    ignore_md_fields : tuple of str or None
-        list of metadata fields to ignore in the comparison. Default is ignoring the original read count (when sample loaded)
-    '''
-    assertIsInstance(exp1, ca.Experiment, 'exp1 not a calour Experiment class')
-    assertIsInstance(exp2, ca.Experiment, 'exp2 not a calour Experiment class')
-
-    # test the metadata
-    sample_columns = exp1.sample_metadata.columns.union(exp1.sample_metadata.columns)
-    feature_columns = exp1.feature_metadata.columns.union(exp2.feature_metadata.columns)
-    if ignore_md_fields is not None:
-        for cignore in ignore_md_fields:
-            if cignore in sample_columns:
-                sample_columns = sample_columns.delete(sample_columns.get_loc(cignore))
-            if cignore in feature_columns:
-                feature_columns = feature_columns.delete(feature_columns.get_loc(cignore))
-    assert(len(sample_columns.difference(exp1.sample_metadata.columns)) == 0)
-    assert(len(sample_columns.difference(exp2.sample_metadata.columns)) == 0)
-    assert(len(feature_columns.difference(exp1.feature_metadata.columns)) == 0)
-    assert(len(feature_columns.difference(exp2.feature_metadata.columns)) == 0)
-
-    pdt.assert_frame_equal(exp1.feature_metadata[feature_columns], exp2.feature_metadata[feature_columns])
-    pdt.assert_frame_equal(exp1.sample_metadata[sample_columns], exp2.sample_metadata[sample_columns])
-
-    # test the data
-    if almost_equal:
-        dat1 = exp1.get_data(sparse=False, copy=True)
-        dat2 = exp2.get_data(sparse=False, copy=True)
-        npt.assert_array_almost_equal(dat1, dat2)
-    else:
-        npt.assert_array_equal(exp1.data, exp2.data)
-    if check_history:
-        if not exp1._call_history == exp2._call_history:
-            raise AssertionError('histories are different between exp1 and exp2')
+        # test the data
+        if almost_equal:
+            dat1 = exp1.get_data(sparse=False, copy=True)
+            dat2 = exp2.get_data(sparse=False, copy=True)
+            npt.assert_array_almost_equal(dat1, dat2)
+        else:
+            npt.assert_array_equal(exp1.data, exp2.data)
+        if check_history:
+            if not exp1._call_history == exp2._call_history:
+                raise AssertionError('histories are different between exp1 and exp2')

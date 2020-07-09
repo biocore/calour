@@ -19,7 +19,7 @@ import pandas as pd
 from numpy.testing import assert_array_almost_equal
 
 import calour as ca
-from calour._testing import Tests, assert_experiment_equal
+from calour._testing import Tests
 from calour.io import _create_biom_table_from_exp, _iter_fasta
 
 
@@ -148,7 +148,7 @@ class IOTests(Tests):
         exp2 = ca.read(self.test1_biom, normalize=None)
         exp2.filter_by_data('abundance', axis=0, cutoff=1000, inplace=True, mean_or_sum='sum')
         exp2.normalize(inplace=True)
-        assert_experiment_equal(exp1, exp2)
+        self.assert_experiment_equal(exp1, exp2)
         self.assertIn('taxonomy', exp1.feature_metadata.columns)
 
     def test_read_openms_bucket_table(self):
@@ -280,16 +280,16 @@ class IOTests(Tests):
         # test the json biom format
         exp.save_biom(f, fmt='hdf5')
         newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, min_reads=None)
-        assert_experiment_equal(newexp, exp)
+        self.assert_experiment_equal(newexp, exp)
         # test the txt biom format
         exp.save_biom(f, fmt='txt')
         newexp = ca.read_amplicon(f, self.test1_samp, normalize=None, min_reads=None)
-        assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
+        self.assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         # test the hdf5 biom format with no taxonomy
         exp.save_biom(f, add_metadata=None)
         newexp = ca.read(f, self.test1_samp, normalize=None)
         self.assertTrue('taxonomy' not in newexp.feature_metadata)
-        assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
+        self.assert_experiment_equal(newexp, exp, ignore_md_fields=['taxonomy'])
         shutil.rmtree(d)
 
     def test_save(self):
@@ -299,7 +299,7 @@ class IOTests(Tests):
         # test the json biom format
         exp.save(f, fmt='json')
         newexp = ca.read(f+'.biom', f+'_sample.txt', normalize=None)
-        assert_experiment_equal(newexp, exp, ignore_md_fields=['#SampleID.1'])
+        self.assert_experiment_equal(newexp, exp, ignore_md_fields=['#SampleID.1'])
         shutil.rmtree(d)
 
 
