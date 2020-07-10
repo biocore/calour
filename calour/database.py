@@ -56,10 +56,15 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
     '''
     class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
     module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
+    min_version = float(get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0'))
+
     if class_name is not None and module_name is not None:
         try:
             # import the database module
             db_module = importlib.import_module(module_name)
+            if min_version > 0:
+                if db_module.version < min_version:
+                    logger.warning('Please update database %s module. Version (%f) not supported (minimal version %f)' % (dbname, db_module.version, min_version))
         except ImportError:
             module_website = get_config_value('website', section=dbname, config_file_name=config_file_name)
             module_installation = get_config_value('installation', section=dbname, config_file_name=config_file_name)
