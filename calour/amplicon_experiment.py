@@ -52,6 +52,9 @@ class AmpliconExperiment(Experiment):
     sparse : bool
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
+    databases: iterable of str, optional
+        database interface names to show by default in heatmap() function
+        by default use 'dbbact'
 
     Attributes
     ----------
@@ -78,7 +81,7 @@ class AmpliconExperiment(Experiment):
     --------
     Experiment
     '''
-    def __init__(self, *args, databases={'dbbact': {}}, **kwargs):
+    def __init__(self, *args, databases=('dbbact'), **kwargs):
         super().__init__(*args, databases=databases, **kwargs)
 
     def heatmap(self, *args, **kwargs):

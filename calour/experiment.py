@@ -55,6 +55,8 @@ class Experiment:
     sparse : bool
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
+    databases: iterable of str, optional
+        database interface names to show by default in heatmap() function
 
     Attributes
     ----------
