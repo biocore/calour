@@ -76,7 +76,7 @@ class Experiment:
         information about the experiment (data md5, filenames, etc.)
     description : str
         a short description of the experiment
-    databases : dict
+    databases : defaultdict(dict)
         keys are the database names (i.e. 'dbbact' / 'gnps')
         values are the database specific data for the experiment (i.e. annotations for dbbact)
 
@@ -105,7 +105,7 @@ class Experiment:
         self.sparse = sparse
 
         # the database local specific data (to use for feature information)
-        self.databases = databases
+        self.databases = defaultdict(dict, databases)
 
     def validate(self):
         '''Validate the Experiment object.

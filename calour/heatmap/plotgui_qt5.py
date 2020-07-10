@@ -26,7 +26,8 @@ class PlotGUI_QT5(PlotGUI):
     figure : ``matplotlib.figure.Figure``
     app : QT5 App created
     app_window : Windows belonging to the QT5 App
-    databases :
+    databases : list of str
+        The databases to interact with
     '''
 
     @ds.with_indent(8)
