@@ -85,7 +85,7 @@ class Experiment:
     AmpliconExperiment
     MS1Experiment
     '''
-    def __init__(self, data, sample_metadata, feature_metadata=None, databases={},
+    def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
                  info=None, description='', sparse=True):
         self.data = data
         self.sample_metadata = sample_metadata
@@ -105,7 +105,9 @@ class Experiment:
         self.sparse = sparse
 
         # the database local specific data (to use for feature information)
-        self.databases = defaultdict(dict, databases)
+        self.databases = defaultdict(dict)
+        for cdatabase in databases:
+            self.databases[cdatabase] = {}
 
     def validate(self):
         '''Validate the Experiment object.
