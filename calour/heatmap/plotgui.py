@@ -76,7 +76,7 @@ class PlotGUI(ABC):
     ax_legend : matplotlib.axes.Axes
         Axes for the color legend
     databases : list on None, optional
-        the databases to interact with. If None, 
+        the databases to interact with.
 
     Parameters
     ----------
