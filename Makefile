@@ -9,9 +9,9 @@
 .DEFAULT_GOAL := help
 
 ifeq ($(WITH_COVERAGE), TRUE)
-	TEST_COMMAND = pytest -svv --doctest-modules --cov calour --cov-report term-missing --cov-report html:cov_html
+	TEST_COMMAND = pytest -svv --doctest-modules --doctest-continue-on-failure --cov calour --cov-report term-missing --cov-report html:cov_html
 else
-	TEST_COMMAND = pytest -svv --doctest-modules calour
+	TEST_COMMAND = pytest -svv --doctest-modules --doctest-continue-on-failure calour
 endif
 
 

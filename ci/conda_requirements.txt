@@ -19,3 +19,7 @@ flake8
 pytest
 coverage
 pytest-cov
+# parallelize test running with "-n"
+#pytest-xdist
+# randomly order tests and control random.seed.
+#pytest-randomly
