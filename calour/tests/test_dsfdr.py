@@ -82,9 +82,9 @@ class StatisticsTests(TestCase):
     def test_mannwhitney(self):
         res = dsfdr.mannwhitney(self.data, self.labels)
         self.assertEqual(len(res), self.data.shape[0])
-        self.assertEqual(res[0], 0)
+        self.assertEqual(res[0], 16)
         self.assertEqual(res[1], 8)
-        self.assertEqual(res[2], 5.5)
+        self.assertEqual(res[2], 10.5)
 
     def test_kruwallis(self):
         res = dsfdr.kruwallis(self.data2, self.labels2)

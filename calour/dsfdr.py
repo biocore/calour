@@ -61,7 +61,7 @@ def stdmeandiff(data, labels):
 def mannwhitney(data, labels):
     group0 = data[:, labels == 0]
     group1 = data[:, labels == 1]
-    tstat = np.array([scipy.stats.mannwhitneyu(group0[i, :], group1[i, :])
+    tstat = np.array([scipy.stats.mannwhitneyu(group0[i, :], group1[i, :], alternative='two-sided')
                       .statistic for i in range(np.shape(data)[0])])
     return tstat
 
