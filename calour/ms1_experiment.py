@@ -23,9 +23,10 @@ Classes
 from logging import getLogger
 
 import matplotlib as mpl
+import numpy as np
 
 from .experiment import Experiment
-
+from .util import _to_list
 
 logger = getLogger(__name__)
 
@@ -97,3 +98,34 @@ class MS1Experiment(Experiment):
         '''Return a string representation of this object.'''
         return 'MS1Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
+
+    def filter_mz(self, mz, tolerance=0.001, inplace=False, negate=False):
+        '''Filter metabolites based on m/z
+
+        Parameters
+        ----------
+        mz: float or list of float
+            the M/Z to filter
+        tolerance: float, optional
+            the M/Z tolerance. filter metabolites with abs(metabolite_mz - mz) <= tolerance
+        inplace: bool, optional
+            True to replace current experiment, False to create new experiment with results
+        negate: bool, optional
+            If False, keep only metabolites matching mz
+            If True, remove metabolites matching mz
+
+        Returns
+        -------
+        calour.MS1Experiment
+            features filtered based on mz
+        '''
+        if 'MZ' not in self.feature_metadata.columns:
+            raise ValueError('The Experiment does not contain the column "MZ". cannot filter by mz')
+        mz = _to_list(mz)
+        keep = set()
+        for cmz in mz:
+            mzdiff = np.abs(self.feature_metadata['MZ'] - cmz)
+            keep = keep.union(set(np.where(mzdiff <= tolerance)[0]))
+        if negate:
+            keep = set(np.arange(len(self.feature_metadata))).difference(keep)
+        return self.reorder(list(keep).sort(), axis='f', inplace=inplace)
