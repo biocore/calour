@@ -98,13 +98,13 @@ class PlotTests(Tests):
                          [2, 4, 0, 4, 2, 0, 1, 0],
                          [3, 3, 5, 3, 1, 0, 0, 1]])
 
-        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=0.1, frac=1, random_state=1)
-        assert_array_almost_equal(frac, np.array([0, 0.25, 4/7]))
+        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=0.1, frac=1, random_seed=1)
+        assert_array_almost_equal(frac, np.array([0, 0.375, 5 / 7]))
 
-        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=0.1, frac=0.00001, random_state=1)
+        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=0.1, frac=0.00001, random_seed=1)
         assert_array_almost_equal(frac, np.array([1, 1, 1]))
 
-        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=5, frac=1, random_state=1)
+        frac = _compute_frac_nonzero(data, [5, 3, 2], cutoff=5, frac=1, random_seed=1)
         assert_array_almost_equal(frac, np.array([0, 0, 0]))
 
     def test_plot_box(self):

@@ -26,7 +26,7 @@ class TestAnalysis(Tests):
 
     def test_diff_abundance(self):
         # test using defulat values
-        dd = diff_abundance(self.test1, 'group', val1='1', val2='2', random_state=2017)
+        dd = diff_abundance(self.test1, 'group', val1='1', val2='2', random_seed=2017)
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
@@ -52,7 +52,7 @@ class TestAnalysis(Tests):
 
     def test_correlation_default(self):
         # test using spearman correlation
-        dd = self.test1.correlation('id', random_state=2017)
+        dd = self.test1.correlation('id', random_seed=2017)
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
@@ -60,7 +60,7 @@ class TestAnalysis(Tests):
 
     def test_correlation_nonzero_spearman(self):
         # test using non zero spearman correlation
-        dd = self.test1.correlation('id', method='spearman', nonzero=True, random_state=2017)
+        dd = self.test1.correlation('id', method='spearman', nonzero=True, random_seed=2017)
         expected_ids = [1, 2, 4, 5, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 6)
         for cid in expected_ids:
@@ -68,7 +68,7 @@ class TestAnalysis(Tests):
 
     def test_correlation_pearson(self):
         # test using pearson correlation
-        dd = self.test1.correlation('id', method='pearson', random_state=2017)
+        dd = self.test1.correlation('id', method='pearson', random_seed=2017)
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
@@ -76,7 +76,7 @@ class TestAnalysis(Tests):
 
     def test_correlation_nonzero_pearson(self):
         # test using non zero pearson correlation
-        dd = self.test1.correlation('id', method='pearson', nonzero=True, random_state=2017)
+        dd = self.test1.correlation('id', method='pearson', nonzero=True, random_seed=2017)
         expected_ids = [1, 2, 4, 5, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 6)
         for cid in expected_ids:
@@ -85,15 +85,14 @@ class TestAnalysis(Tests):
     def test_correlation_complex(self):
         # test on real complex dataset (timeseries)
         # after rank transforming the reads, should get
-        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson', transform='rankdata', random_state=2017)
-        print(len(dd.feature_metadata))
-        self.assertTrue(np.abs(101 - len(dd.feature_metadata)) < 5)
+        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson', transform='rankdata', random_seed=2017)
+        self.assertEqual(len(dd.feature_metadata), 46)
         goodseq = 'TACGGAGGATGCGAGCGTTATTCGGAATCATTGGGTTTAAAGGGTCTGTAGGCGGGCTATTAAGTCAGGGGTGAAAGGTTTCAGCTTAACTGAGAAATTGCCTTTGATACTGGTAGTCTTGAATATCTGTGAAGTTCTTGGAATGTGTAG'
         self.assertIn(goodseq, dd.feature_metadata.index)
         goodseq = 'TACGTAGGTGGCAAGCGTTGTCCGGAATTATTGGGCGTAAAGCGCGCGCAGGCGGATCAGTCAGTCTGTCTTAAAAGTTCGGGGCTTAACCCCGTGATGGGATGGAAACTGCTGATCTAGAGTATCGGAGAGGAAAGTGGAATTCCTAGT'
         self.assertIn(goodseq, dd.feature_metadata.index)
         # with no transform
-        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson', random_state=2017)
+        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='pearson', random_seed=2017)
         # print(len(dd.feature_metadata))
         # print(dd.feature_metadata)
         # self.assertTrue(np.abs(26 - len(dd.feature_metadata)) < 5)
@@ -101,12 +100,12 @@ class TestAnalysis(Tests):
 
     def test_correlation_complex_spearman(self):
         # test on real complex dataset (timeseries) with spearman correlation
-        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='spearman', random_state=2017)
+        dd = self.complex.correlation('MF_SAMPLE_NUMBER', method='spearman', random_seed=2017)
         # print(len(dd.feature_metadata))
         self.assertTrue(np.abs(51 - len(dd.feature_metadata)) < 5)
 
     def test_diff_abundance_kw(self):
-        dd = self.test1.diff_abundance_kw(field='group', random_state=2017)
+        dd = self.test1.diff_abundance_kw(field='group', random_seed=2017)
         expected_ids = [0, 1, 2, 3, 4, 7, 10]
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:

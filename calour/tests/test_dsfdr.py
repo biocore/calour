@@ -146,7 +146,7 @@ class fdr_methodsTests(TestCase):
         # test on simulated self.data_sim
         res_ds2 = dsfdr.dsfdr(self.data_sim, self.labels_sim,
                               method='meandiff', transform_type=None,
-                              alpha=0.1, numperm=1000, fdr_method='dsfdr', random_state=31)[0]
+                              alpha=0.1, numperm=1000, fdr_method='dsfdr', random_seed=31)[0]
         fdr_ds2 = (np.sum(np.where(res_ds2)[0] >= 100)) / np.sum(res_ds2)
         np.testing.assert_equal(fdr_ds2 <= 0.1, True)
         # test the qvals behave logically
@@ -154,14 +154,14 @@ class fdr_methodsTests(TestCase):
 
         res_bh2 = dsfdr.dsfdr(self.data_sim, self.labels_sim,
                               method='meandiff', transform_type=None,
-                              alpha=0.1, numperm=1000, fdr_method='bhfdr', random_state=31)[0]
+                              alpha=0.1, numperm=1000, fdr_method='bhfdr', random_seed=31)[0]
         self.assertEqual(np.shape(res_bh2)[0], self.data_sim.shape[0])
         fdr_bh2 = (np.sum(np.where(res_bh2)[0] >= 100)) / np.sum(res_bh2)
         np.testing.assert_equal(fdr_bh2 <= 0.1, True)
 
         res_by2 = dsfdr.dsfdr(self.data_sim, self.labels_sim,
                               method='meandiff', transform_type=None,
-                              alpha=0.1, numperm=1000, fdr_method='byfdr', random_state=31)[0]
+                              alpha=0.1, numperm=1000, fdr_method='byfdr', random_seed=31)[0]
         self.assertEqual(np.shape(res_by2)[0], self.data_sim.shape[0])
         fdr_by2 = (np.sum(np.where(res_by2)[0] >= 100)) / np.sum(res_by2)
         np.testing.assert_equal(fdr_by2 <= 0.1, True)

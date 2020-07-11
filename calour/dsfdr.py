@@ -93,7 +93,7 @@ def spearman(data, labels):
 
 # new fdr method
 def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
-          alpha=0.1, numperm=1000, fdr_method='dsfdr', random_state=None):
+          alpha=0.1, numperm=1000, fdr_method='dsfdr', random_seed=None):
     '''
     calculate the Discrete FDR for the data
 
@@ -135,12 +135,11 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'bhfdr' : Benjamini-Hochberg FDR method
         'byfdr' : Benjamini-Yekutielli FDR method
         'filterBH' : Benjamini-Hochberg FDR method with filtering
-    random_state : int, RandomState instance or None, optional, default=None
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
-        If int, random_state is the seed used by the random number generator;
-        If RandomState instance, random_state is the random number generator;
-        If None, the random number generator is the RandomState instance used
-        by `np.random`.
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
     Returns
     -------
@@ -156,9 +155,8 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     logger.debug('dsfdr using fdr method: %s' % fdr_method)
 
-    # if random_state is supplied, create a numpy RandomState
-    # (if random seed is None, use the numpy seed)
-    random_state = np.random.RandomState(random_state)
+    # create the numpy.random.Generator
+    rng = np.random.default_rng(random_seed)
 
     data = data.copy()
 
@@ -210,7 +208,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         k1 = 1 / np.sum(labels == 0)
         k2 = 1 / np.sum(labels == 1)
         for cperm in range(numperm):
-            random_state.shuffle(labels)
+            rng.shuffle(labels)
             p[labels == 0, cperm] = k1
         p2 = np.ones(p.shape) * k2
         p2[p > 0] = 0
@@ -231,7 +229,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         t = np.abs(tstat)
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
-            rlabels = random_state.permutation(labels)
+            rlabels = rng.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
 
@@ -265,7 +263,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         permlabels = np.zeros([len(labels), numperm])
         for cperm in range(numperm):
-            rlabels = random_state.permutation(labels)
+            rlabels = rng.permutation(labels)
             permlabels[:, cperm] = rlabels
         u = np.abs(np.dot(data, permlabels))
 
@@ -291,7 +289,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             tstat[i] = tstat[i] / (np.std(sample_nonzero) * np.std(label_nonzero) * len(sample_nonzero))
             permlabels = np.zeros([len(label_nonzero), numperm])
             for cperm in range(numperm):
-                rlabels = random_state.permutation(label_nonzero)
+                rlabels = rng.permutation(label_nonzero)
                 permlabels[:, cperm] = rlabels
             u[i, :] = np.abs(np.dot(sample_nonzero, permlabels))
 
@@ -304,7 +302,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
-            rlabels = random_state.permutation(labels)
+            rlabels = rng.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
         u = np.abs(u)

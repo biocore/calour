@@ -49,7 +49,7 @@ logger = getLogger(__name__)
 
 
 def downsample(exp: Experiment, field, axis=0, keep=None,
-               inplace=False, random_state=None) -> Experiment:
+               inplace=False, random_seed=None) -> Experiment:
     '''Downsample the data set.
 
     This down samples all the samples/features to have the same number of
@@ -68,6 +68,11 @@ def downsample(exp: Experiment, field, axis=0, keep=None,
         samples/features smaller than ``keep``, the whole group is dropped.
         Default to downsample to minimal group size.
     inplace : bool, optional
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
+        set the random number generator seed
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
     See Also
     --------
@@ -87,23 +92,24 @@ def downsample(exp: Experiment, field, axis=0, keep=None,
     # convert to string type because nan values, if they exist in the column,
     # will fail `np.unique`
     values = x[field].astype(str).values
-    keep = _balanced_subsample(values, keep, random_state)
+    keep = _balanced_subsample(values, keep, random_seed)
     return exp.reorder(keep, axis=axis, inplace=inplace)
 
 
-def _balanced_subsample(x, n=None, random_state=None):
+def _balanced_subsample(x, n=None, random_seed=None):
     '''subsample the array to have equal number count for each unique values.
 
     Parameters
     ----------
     x : array
     n : int. count
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
 
     Returns
     -------
     array of bool
     '''
-    rand = np.random.RandomState(random_state)
+    rng = np.random.default_rng(random_seed)
     keep = np.zeros(x.shape[0], dtype='?')
     unique, counts = np.unique(x, return_counts=True)
     if n is None:
@@ -111,7 +117,7 @@ def _balanced_subsample(x, n=None, random_state=None):
     for value in unique:
         i_indice = np.where(x == value)[0]
         if i_indice.shape[0] >= n:
-            idx = rand.choice(i_indice, n, replace=False)
+            idx = rng.choice(i_indice, n, replace=False)
             keep[idx] = True
     return keep
 

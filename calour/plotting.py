@@ -303,7 +303,7 @@ def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0
     return ax
 
 
-def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_state=None):
+def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_seed=None):
     '''iteratively compute the fraction of non-zeros in each column after subsampling rows.
 
     Parameters
@@ -317,11 +317,11 @@ def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_state=Non
     frac : numeric
         Must between 0 and 1. The feature would be considered as a core feature
         if it is present in ``fac`` faction of samples.
-    random_state : int, RandomState instance or None, optional, default=None
-        If int, random_state is the seed used by the random number generator;
-        If RandomState instance, random_state is the random number generator;
-        If None, the random number generator is the RandomState instance used
-        by `np.random`.
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
+        set the random number generator seed
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
     Return
     ------
@@ -338,13 +338,13 @@ def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_state=Non
     logger.debug('steps are filtered and sorted to %r' % steps)
 
     shared = np.zeros(len(steps))
-    rand = np.random.RandomState(random_state)
+    rng = np.random.default_rng(random_seed)
     if cutoff <= 0:
         raise ValueError('You need to provide a positive value for `cutoff`: %r' % cutoff)
     if frac <= 0 or frac > 1:
         raise ValueError('You need to provide a value among (0, 1] for `frac`: %r' % frac)
     for n, i in enumerate(steps):
-        data = data[rand.choice(n_samples, i, replace=False), :]
+        data = data[rng.choice(n_samples, i, replace=False), :]
         x = data >= cutoff
         # the count of samples that have the given feature
         counts = x.sum(axis=0)
