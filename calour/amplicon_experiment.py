@@ -81,7 +81,7 @@ class AmpliconExperiment(Experiment):
     --------
     Experiment
     '''
-    def __init__(self, *args, databases=('dbbact'), **kwargs):
+    def __init__(self, *args, databases=('dbbact',), **kwargs):
         super().__init__(*args, databases=databases, **kwargs)
 
     def heatmap(self, *args, **kwargs):
