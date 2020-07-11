@@ -52,6 +52,9 @@ class AmpliconExperiment(Experiment):
     sparse : bool
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
+    databases: iterable of str, optional
+        database interface names to show by default in heatmap() function
+        by default use 'dbbact'
 
     Attributes
     ----------
@@ -70,15 +73,16 @@ class AmpliconExperiment(Experiment):
         information about the experiment (data md5, filenames, etc.)
     description : str
         name of the experiment
-    databases : iterable of str
-        databases for fetching and entering feature annotations
+    databases : dict
+        keys are the database names (i.e. 'dbbact' / 'gnps')
+        values are the database specific data for the experiment (i.e. annotations for dbbact)
 
     See Also
     --------
     Experiment
     '''
     def __init__(self, *args, databases=('dbbact',), **kwargs):
-        super().__init__(*args, databases=('dbbact',), **kwargs)
+        super().__init__(*args, databases=databases, **kwargs)
 
     def heatmap(self, *args, **kwargs):
         '''Plot a heatmap for the amplicon experiment.

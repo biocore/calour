@@ -55,6 +55,8 @@ class Experiment:
     sparse : bool
         store the data array in :class:`scipy.sparse.csr_matrix`
         or :class:`numpy.ndarray`
+    databases: iterable of str, optional
+        database interface names to show by default in heatmap() function
 
     Attributes
     ----------
@@ -76,8 +78,9 @@ class Experiment:
         information about the experiment (data md5, filenames, etc.)
     description : str
         a short description of the experiment
-    databases : iterable of str
-        databases for fetching and entering feature annotations
+    databases : defaultdict(dict)
+        keys are the database names (i.e. 'dbbact' / 'gnps')
+        values are the database specific data for the experiment (i.e. annotations for dbbact)
 
     See Also
     --------
@@ -103,8 +106,10 @@ class Experiment:
         # flag if data array is sparse (True) or dense (False)
         self.sparse = sparse
 
-        # the default databases to use for feature information
-        self.databases = databases
+        # the database local specific data (to use for feature information)
+        self.databases = defaultdict(dict)
+        for cdatabase in databases:
+            self.databases[cdatabase] = {}
 
     def validate(self):
         '''Validate the Experiment object.

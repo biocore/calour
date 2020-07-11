@@ -10,6 +10,7 @@ from unittest import main
 from os.path import join
 from tempfile import mkdtemp
 import shutil
+import logging
 
 from calour._testing import Tests
 from calour.tests.mock_database import MockDatabase
@@ -58,6 +59,20 @@ class ExperimentTests(Tests):
         res = _get_database_class('mock')
         self.assertEqual(res, None)
 
+        shutil.rmtree(d)
+
+    def test_get_database_class_version(self):
+        d = mkdtemp()
+        f = join(d, 'config.txt')
+        calour.util.set_config_value('class_name', 'MockDatabase', section='testdb', config_file_name=f)
+        calour.util.set_config_value('module_name', 'calour.tests.mock_database', section='testdb', config_file_name=f)
+        calour.util.set_config_value('min_version', '9999.9999', section='testdb', config_file_name=f)
+        # re-enable logging because it is disabled in setUp
+        logging.disable(logging.NOTSET)
+        with self.assertLogs(level='WARNING') as cm:
+            db = _get_database_class('testdb', config_file_name=f)
+            self.assertEqual(db.database_name, 'mock_db')
+            self.assertRegex(cm.output[0], 'Please update')
         shutil.rmtree(d)
 
 

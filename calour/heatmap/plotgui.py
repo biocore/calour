@@ -75,8 +75,8 @@ class PlotGUI(ABC):
         Axes for the dendrogram/tree
     ax_legend : matplotlib.axes.Axes
         Axes for the color legend
-    databases : list
-        the databases to interact with
+    databases : list on None, optional
+        the databases to interact with.
 
     Parameters
     ----------
@@ -86,7 +86,8 @@ class PlotGUI(ABC):
         the scaling factor for zooming
     scroll_offset : float
         The amount of columns/rows to scroll when arrow key pressed
-    databases : the databases to interact with
+    databases : list of str or None
+        the databases to interact with.
     tree_size : int (>= 0)
         the width of the axes to plot a tree. 7 is a good value to start.
 

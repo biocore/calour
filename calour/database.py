@@ -56,12 +56,14 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
     '''
     class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
     module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
+    min_version = float(get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0'))
+    module_website = get_config_value('website', section=dbname, config_file_name=config_file_name, fallback='NA')
+
     if class_name is not None and module_name is not None:
         try:
             # import the database module
             db_module = importlib.import_module(module_name)
         except ImportError:
-            module_website = get_config_value('website', section=dbname, config_file_name=config_file_name)
             module_installation = get_config_value('installation', section=dbname, config_file_name=config_file_name)
             logger.warning('Database interface %s not installed.\nSkipping.\n'
                            'You can install the database using:\n%s\n'
@@ -70,6 +72,11 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         # get the class
         DBClass = getattr(db_module, class_name)
         cdb = DBClass(exp)
+        # test if database version is compatible
+        if min_version > 0:
+            db_version = cdb.version()
+            if db_version < min_version:
+                logger.warning('Please update %s database module. Current version (%f) not supported (minimal version %f).\nFor details see %s' % (dbname, db_version, min_version, module_website))
         return cdb
     # not found, so print available database names
     databases = []

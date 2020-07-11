@@ -77,3 +77,8 @@ class MockDatabase(Database):
             for cstr in cterms:
                 feature_terms[cseq].append(cstr)
         return feature_terms
+
+    def version(self):
+        '''return the current database version
+        '''
+        return 2020.0709
