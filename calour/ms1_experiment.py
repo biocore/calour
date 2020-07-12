@@ -92,6 +92,14 @@ class MS1Experiment(Experiment):
         '''
         if 'norm' not in kwargs:
             kwargs['norm'] = mpl.colors.LogNorm()
+        if 'mz_rt' not in self.feature_metadata.columns:
+            self.feature_metadata['mz_rt'] = ['%08.4f_%05.2f' % (x[1]['MZ'], x[1]['RT']) for x in self.feature_metadata.iterrows()]
+        if 'yticklabel_len' not in kwargs:
+            kwargs['yticklabel_len'] = None
+        if 'feature_field' not in kwargs:
+            kwargs['feature_field'] = 'mz_rt'
+        if 'yticklabel_kwargs' not in kwargs:
+            kwargs['yticklabel_kwargs'] = {'size': 6, 'rotation': 0}
         super().heatmap(*args, **kwargs)
 
     def __repr__(self):
@@ -128,4 +136,59 @@ class MS1Experiment(Experiment):
             keep = keep.union(set(np.where(mzdiff <= tolerance)[0]))
         if negate:
             keep = set(np.arange(len(self.feature_metadata))).difference(keep)
-        return self.reorder(list(keep).sort(), axis='f', inplace=inplace)
+        logger.info('after filtering %d features remaining' % len(keep))
+        return self.reorder(sorted(list(keep)), axis='f', inplace=inplace)
+
+    def get_bad_features(self, mz_tolerance=0.001, rt_tolerance=2, corr_thresh=0.8, inplace=False, negate=False):
+        '''Get metabolites that have similar m/z and rt, and are correlated/anti-correlated.
+        These are usually due to incorrect feature detection.
+        correlation could be due to incomplete removal of isotopes or same metabolite in multiple RTs
+        anti-correlation could be due to RT drift (splitting of one true metabolite)
+        Metabolites in the new experiment are ordered by correlation clusters
+
+        Parameters
+        ----------
+        mz_tolerance: float, optional
+            the M/Z tolerance. Metabolites are similar if abs(metabolite_mz - mz) <= mz_tolerance
+        rt_tolerance: float, optional
+            the retention time tolerance. Metabolites are similar if abs(metabolite_rt - rt) <= rt_tolerance
+        corr_threshold: float, optional
+            the minimal (abs) correlation/anti-correlation value in order to call features correlated
+        inplace: bool, optional
+            True to replace current experiment, False to create new experiment with results
+        negate: bool, optional
+            If False, keep only metabolites that show a correlation with another metabolite
+            If True, remove metabolites showing correlation
+
+        Returns
+        -------
+        calour.MS1Experiment
+            features filtered and ordered basen on m/z and rt similarity and correlation
+        '''
+        features = self.feature_metadata.copy()
+        keep_features = []
+        data = self.get_data(sparse=False)
+        while len(features) > 0:
+            # get the first feature
+            cfeature = features.iloc[0]
+            features.drop(index=cfeature.name, inplace=True)
+            # find all mz/rt neighbors of the feature
+            mzdist = np.abs(features['MZ'] - cfeature['MZ'])
+            rtdist = np.abs(features['RT'] - cfeature['RT'])
+            okf = features[np.logical_and(mzdist < mz_tolerance, rtdist < rt_tolerance)]
+            if len(okf) == 0:
+                continue
+            # test the correlation of each neighbor
+            odat = data[:, self.feature_metadata.index.get_loc(cfeature.name)]
+            ckeep = []
+            for cf, *_ in okf.iterrows():
+                cdat = data[:, self.feature_metadata.index.get_loc(cf)]
+                corrcf = np.corrcoef(odat, cdat)[0, 1]
+                if np.abs(corrcf) >= corr_thresh:
+                    ckeep.append(cf)
+            # store the result and remove all the correlated features from the features left to process
+            if len(ckeep) > 0:
+                keep_features.append(cfeature.name)
+                keep_features.extend(ckeep)
+                features.drop(index=ckeep, inplace=True)
+        return self.filter_ids(keep_features, negate=negate, inplace=inplace)
