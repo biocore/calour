@@ -138,7 +138,7 @@ def split_train_test(exp: Experiment,
 
     Parameters
     ----------
-    test_size, train_size, shuffle, random_state :
+    test_size, train_size, shuffle, random_seed :
         They are passed to :func:`sklearn.model_selection.train_test_split`.
         Please check documentation there.
     stratify : str or array-like or None

@@ -83,9 +83,11 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         * 'bhfdr': Benjamini-Hochberg FDR method
         * 'byfdr' : Benjamini-Yekutielli FDR method
         * 'filterBH' : Benjamini-Hochberg FDR method with filtering
-    random_seed : int or None (optional)
-        int to set the numpy random seed to this number before running the random permutation test.
-        None to not set the numpy random seed
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
+        set the random number generator seed for the random permutations
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
     Returns
     -------
@@ -103,11 +105,6 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     '''
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
-
-    # if random seed is supplied, set the numpy random.seed
-    # (if random seed is None, we don't change the numpy seed)
-    if random_seed is not None:
-        np.random.seed(random_seed)
 
     cexp = exp.filter_sum_abundance(0, strict=True)
 
@@ -129,7 +126,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         else:
             raise ValueError('Cannot use nonzero=True on methods except "pearson" or "spearman"')
     # find the significant features
-    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
+    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, random_seed=random_seed)
     logger.info('Positive correlated features : %d. Negative correlated features : %d. total %d'
                 % (np.sum(odif[keep] > 0), np.sum(odif[keep] < 0), np.sum(keep)))
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals)
@@ -185,9 +182,11 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
           alpha (e.g. a feature that appears in only 1 sample can
           obtain a minimal p-value of 0.5 and will therefore be
           removed when say alpha=0.1)
-    random_seed : int or None (optional)
-        int to set the numpy random seed to this number before running the random permutation test.
-        None to not set the numpy random seed
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
+        set the random number generator seed for the random permutations
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
     Returns
     -------
@@ -207,11 +206,6 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     '''
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
-
-    # if random seed is supplied, set the numpy random.seed
-    # (if random seed is None, we don't change the numpy seed)
-    if random_seed is not None:
-        np.random.seed(random_seed)
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     val1 = _to_list(val1)
@@ -233,7 +227,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     labels = np.zeros(len(cexp.sample_metadata))
     labels[cexp.sample_metadata[field].isin(val1).values] = 1
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
-    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
+    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, random_seed=random_seed)
     logger.info('number of higher in {}: {}. number of higher in {} : {}. total {}'.format(
         grp1, np.sum(odif[keep] > 0), grp2, np.sum(odif[keep] < 0), np.sum(keep)))
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals)
@@ -264,9 +258,11 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
         the desired FDR control level
     numperm : int
         number of permutations to perform
-    random_seed : int or None (optional)
-        int to set the numpy random seed to this number before running the random permutation test.
-        None to not set the numpy random seed
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
+        set the random number generator seed for the random permutations
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
     Returns
     -------
@@ -281,11 +277,6 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
 
-    # if random seed is supplied, set the numpy random.seed
-    # (if random seed is None, we don't change the numpy seed)
-    if random_seed is not None:
-        np.random.seed(random_seed)
-
     logger.debug('diff_abundance_kw for field %s' % field)
 
     # remove features with 0 abundance
@@ -297,7 +288,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
     for idx, clabel in enumerate(exp.sample_metadata[field].unique()):
         labels[exp.sample_metadata[field].values == clabel] = idx
     logger.debug('Found %d unique sample labels' % (idx + 1))
-    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method)
+    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method='kruwallis', transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, random_seed=random_seed)
 
     logger.info('Found %d significant features' % (np.sum(keep)))
     return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals)

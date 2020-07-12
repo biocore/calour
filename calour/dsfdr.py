@@ -93,18 +93,17 @@ def spearman(data, labels):
 
 # new fdr method
 def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
-          alpha=0.1, numperm=1000, fdr_method='dsfdr'):
+          alpha=0.1, numperm=1000, fdr_method='dsfdr', random_seed=None):
     '''
     calculate the Discrete FDR for the data
 
-    input:
+    Parameters
+    ----------
     data : N x S numpy array
         each column is a sample (S total), each row a feature (N total)
     labels : a 1d numpy array (length S)
         the labels of each sample (same order as data) with the group
         (0/1 if binary, 0-G-1 if G groups, or numeric values for correlation)
-
-
     transform_type : str or None
         transformation to apply to the data before caluculating
         the test statistic
@@ -113,7 +112,6 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'normdata' : normalize the data to constant sum per samples
         'binarydata' : convert to binary absence/presence
          None : no transformation to perform
-
     method : str or function
         the method to use for calculating test statistics:
         'meandiff' : mean(A)-mean(B) (binary)
@@ -127,20 +125,24 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'nonzeropearson' : pearson correlation only non-zero entries (numeric)
         function : use this function to calculate the test statistic
         (input is data,labels, output is array of float)
-
     alpha : float
         the desired FDR control level
     numperm : int
         number of permutations to perform
-
     fdr_method : str
         the FDR procedure to determine significant bacteria
         'dsfdr' : discrete FDR method
         'bhfdr' : Benjamini-Hochberg FDR method
         'byfdr' : Benjamini-Yekutielli FDR method
         'filterBH' : Benjamini-Hochberg FDR method with filtering
+    random_seed : int, np.radnom.Generator instance or None, optional, default=None
+        set the random number generator seed for the random permutations
+        If int, random_seed is the seed used by the random number generator;
+        If Generator instance, random_seed is set to the random number generator;
+        If None, then fresh, unpredictable entropy will be pulled from the OS
 
-    output:
+    Returns
+    -------
     reject : np array of bool (length N)
         True for features where the null hypothesis is rejected
     tstat : np array of float (length N)
@@ -152,6 +154,9 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
     '''
 
     logger.debug('dsfdr using fdr method: %s' % fdr_method)
+
+    # create the numpy.random.Generator
+    rng = np.random.default_rng(random_seed)
 
     data = data.copy()
 
@@ -203,7 +208,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         k1 = 1 / np.sum(labels == 0)
         k2 = 1 / np.sum(labels == 1)
         for cperm in range(numperm):
-            np.random.shuffle(labels)
+            rng.shuffle(labels)
             p[labels == 0, cperm] = k1
         p2 = np.ones(p.shape) * k2
         p2[p > 0] = 0
@@ -224,7 +229,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         t = np.abs(tstat)
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
-            rlabels = np.random.permutation(labels)
+            rlabels = rng.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
 
@@ -258,7 +263,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         permlabels = np.zeros([len(labels), numperm])
         for cperm in range(numperm):
-            rlabels = np.random.permutation(labels)
+            rlabels = rng.permutation(labels)
             permlabels[:, cperm] = rlabels
         u = np.abs(np.dot(data, permlabels))
 
@@ -284,7 +289,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             tstat[i] = tstat[i] / (np.std(sample_nonzero) * np.std(label_nonzero) * len(sample_nonzero))
             permlabels = np.zeros([len(label_nonzero), numperm])
             for cperm in range(numperm):
-                rlabels = np.random.permutation(label_nonzero)
+                rlabels = rng.permutation(label_nonzero)
                 permlabels[:, cperm] = rlabels
             u[i, :] = np.abs(np.dot(sample_nonzero, permlabels))
 
@@ -297,7 +302,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
-            rlabels = np.random.permutation(labels)
+            rlabels = rng.permutation(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
         u = np.abs(u)

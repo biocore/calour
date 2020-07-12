@@ -108,7 +108,7 @@ class TestTransforming(Tests):
         newexp = exp.normalize_by_subset_features(features, 10000, negate=True, inplace=False)
         # see the mean of the features we want (without 6,7) is 10k
         good_features = list(set(range(exp.data.shape[1])).difference(set(bad_features)))
-        assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]])*10000)
+        assert_array_almost_equal(newexp.data[:, good_features].sum(axis=1), np.ones([exp.data.shape[0]]) * 10000)
         self.assertTrue(np.all(newexp.data[:, bad_features] > exp.data[:, bad_features]))
 
     @skipIf(sys.platform.startswith("win"), "skip this test for Windows")
