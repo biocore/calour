@@ -700,6 +700,8 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         # mz and rt are numbers
         exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].astype(float)
         exp.feature_metadata['RT'] = exp.feature_metadata['RT'].astype(float)
+        # and create the combined field for easy sorting/plotting
+        exp.feature_metadata['mz_rt'] = ['%08.4f_%05.2f' % (x[1]['MZ'], x[1]['RT']) for x in exp.feature_metadata.iterrows()]
 
     if normalize is not None:
         # record the original total read count into sample metadata

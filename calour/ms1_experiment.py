@@ -92,14 +92,13 @@ class MS1Experiment(Experiment):
         '''
         if 'norm' not in kwargs:
             kwargs['norm'] = mpl.colors.LogNorm()
-        if 'mz_rt' not in self.feature_metadata.columns:
-            self.feature_metadata['mz_rt'] = ['%08.4f_%05.2f' % (x[1]['MZ'], x[1]['RT']) for x in self.feature_metadata.iterrows()]
-        if 'yticklabel_len' not in kwargs:
-            kwargs['yticklabel_len'] = None
-        if 'feature_field' not in kwargs:
-            kwargs['feature_field'] = 'mz_rt'
-        if 'yticklabel_kwargs' not in kwargs:
-            kwargs['yticklabel_kwargs'] = {'size': 6, 'rotation': 0}
+        if 'mz_rt' in self.feature_metadata.columns:
+            if 'yticklabel_len' not in kwargs:
+                kwargs['yticklabel_len'] = None
+            if 'feature_field' not in kwargs:
+                kwargs['feature_field'] = 'mz_rt'
+            if 'yticklabel_kwargs' not in kwargs:
+                kwargs['yticklabel_kwargs'] = {'size': 6, 'rotation': 0}
         super().heatmap(*args, **kwargs)
 
     def __repr__(self):
