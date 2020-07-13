@@ -700,12 +700,14 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         # mz and rt are numbers
         exp.feature_metadata['MZ'] = exp.feature_metadata['MZ'].astype(float)
         exp.feature_metadata['RT'] = exp.feature_metadata['RT'].astype(float)
-        # and create the combined field for easy sorting/plotting
-        exp.feature_metadata['mz_rt'] = ['%08.4f_%05.2f' % (x[1]['MZ'], x[1]['RT']) for x in exp.feature_metadata.iterrows()]
 
     if normalize is not None:
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
+
+    # Create the combined field for easy sorting/plotting
+    if 'MZ' in exp.feature_metadata and 'RT' in exp.feature_metadata:
+        exp.feature_metadata['mz_rt'] = ['%08.4f_%05.2f' % (x[1]['MZ'], x[1]['RT']) for x in exp.feature_metadata.iterrows()]
 
     if gnps_file:
         # load the gnps table
@@ -721,7 +723,6 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     # initialize the call history
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
     exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
-
     return exp
 
 

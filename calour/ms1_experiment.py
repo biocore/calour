@@ -174,7 +174,7 @@ class MS1Experiment(Experiment):
             # find all mz/rt neighbors of the feature
             mzdist = np.abs(features['MZ'] - cfeature['MZ'])
             rtdist = np.abs(features['RT'] - cfeature['RT'])
-            okf = features[np.logical_and(mzdist < mz_tolerance, rtdist < rt_tolerance)]
+            okf = features[np.logical_and(mzdist <= mz_tolerance, rtdist <= rt_tolerance)]
             if len(okf) == 0:
                 continue
             # test the correlation of each neighbor
