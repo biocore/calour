@@ -6,11 +6,6 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from unittest import main
-from copy import deepcopy
-
-import pandas.testing as pdt
-import numpy as np
 import numpy.testing as npt
 
 from calour._testing import Tests
@@ -48,7 +43,7 @@ class ExperimentTests(Tests):
         exp = ca.read_ms(self.mzmine2_csv, sample_metadata_file=self.gnps_map,
                          data_file_type='mzmine2', use_gnps_id_from_AllFiles=False, normalize=None)
         # get rid of the all 0s metabolite (to get rid of std=0 warning)
-        exp = exp.filter_sum_abundance(0)
+        exp = exp.filter_sum_abundance(0.1)
 
         res = exp.get_bad_features()
         # no samples filtered away
