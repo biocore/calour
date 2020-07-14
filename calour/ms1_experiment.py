@@ -106,41 +106,6 @@ class MS1Experiment(Experiment):
         return 'MS1Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
-    def filter_mz(self, mz, tolerance=0.001, inplace=False, negate=False):
-        '''Filter metabolites based on m/z
-
-        Keep (or remove if negate=True) metabolites that have an m/z close (up to tolerance)
-        to the requested mz (or list of mz).
-
-        Parameters
-        ----------
-        mz: float or list of float
-            the M/Z to filter
-        tolerance: float, optional
-            the M/Z tolerance. filter metabolites with abs(metabolite_mz - mz) <= tolerance
-        inplace: bool, optional
-            True to replace current experiment, False to create new experiment with results
-        negate: bool, optional
-            If False, keep only metabolites matching mz
-            If True, remove metabolites matching mz
-
-        Returns
-        -------
-        calour.MS1Experiment
-            features filtered based on mz
-        '''
-        if 'MZ' not in self.feature_metadata.columns:
-            raise ValueError('The Experiment does not contain the column "MZ". cannot filter by mz')
-        mz = _to_list(mz)
-        keep = set()
-        for cmz in mz:
-            mzdiff = np.abs(self.feature_metadata['MZ'] - cmz)
-            keep = keep.union(set(np.where(mzdiff <= tolerance)[0]))
-        if negate:
-            keep = set(np.arange(len(self.feature_metadata))).difference(keep)
-        logger.info('after filtering %d features remaining' % len(keep))
-        return self.reorder(sorted(list(keep)), axis='f', inplace=inplace)
-
     def get_bad_features(self, mz_tolerance=0.001, rt_tolerance=2, corr_thresh=0.8, inplace=False, negate=False):
         '''Get subgroups of metabolites that are suspected ms1 alignment artifacts.
 
@@ -196,3 +161,129 @@ class MS1Experiment(Experiment):
                 keep_features.extend(ckeep)
                 features.drop(index=ckeep, inplace=True)
         return self.filter_ids(keep_features, negate=negate, inplace=inplace)
+
+    def merge_similar_features(self, mz_tolerance=0.001, rt_tolerance=0.5):
+        '''Merge metabolites with similar mz/rt to a single metabolite
+
+        metabolites are initially sorted by frequency and a greefy clustering algorithm (starting from the highest freq.) is used to join together
+        metabolites that are close in m/z and r/t.
+
+        Parameters
+        ----------
+        mz_tolerance: float, optional
+            metabolites with abs(metabolite_mz - mz) <= mz_tolerance are joined
+        rt_tolerance: float, optional
+            metabolites with abs(metabolite_rt - rt) <= rt_tolerance are joined
+
+        Returns
+        -------
+        calour.MS1Experiment with  close metabolites joined to a single metabolite.
+        The m/z and rt of the new metabolite are the m/z and rt of the highest freq. metabolite.
+        new feature_metadata fields: _calour_merge_number, _calour_merge_ids are added listing the number and ids of the metabolites joined for each new metabolite
+        '''
+        exp = self.sort_abundance(reverse=False)
+        features = exp.feature_metadata
+        features['_metabolite_group'] = np.zeros(len(features)) - 1
+        gpos = list(features.columns).index('_metabolite_group')
+        cgroup = 0
+        for cgroup, cfeature in features.iterrows():
+            mzdist = np.abs(features['MZ'] - cfeature['MZ'])
+            rtdist = np.abs(features['RT'] - cfeature['RT'])
+            ok = np.logical_and(mzdist <= mz_tolerance, rtdist <= rt_tolerance)
+            ok = np.logical_and(ok, features['_metabolite_group'] == -1)
+            okpos = np.where(ok)[0]
+            for cpos in okpos:
+                features.iat[cpos, gpos] = cgroup
+        exp = exp.aggregate_by_metadata('_metabolite_group', agg='sum', axis='f')
+        exp.feature_metadata.drop('_metabolite_group', axis='columns', inplace=True)
+        logger.info('%d metabolites remaining after merge' % len(exp.feature_metadata))
+        return exp
+
+    def filter_mz_rt(self, mz=None, rt=None, mz_tolerance=0.05, rt_tolerance=0.2, inplace=False, negate=False):
+        '''Filter metabolites based on m/z and/or retention time
+
+        Keep (or remove if negate=True) metabolites that have an m/z and/or retention time close (up to tolerance)
+        to the requested mz and/or rt (or list of mz and/or rt).
+
+        Parameters
+        ----------
+        mz: float or list of float or None, optional
+            the M/Z to filter
+            if None, do not filter based on M/Z
+        rt: float or list of float or None, optional
+            the retention time to filter
+            if None, do not filter based on rt
+        mz_tolerance: float, optional
+            the M/Z tolerance. filter metabolites with abs(metabolite_mz - mz) <= mz_tolerance
+        rt_tolerance: float, optional
+            the rt tolerance. filter metabolites with abs(metabolite_rt - rt) <= rt_tolerance
+        inplace: bool, optional
+            True to replace current experiment, False to create new experiment with results
+        negate: bool, optional
+            If False, keep only metabolites matching mz
+            If True, remove metabolites matching mz
+
+        Returns
+        -------
+        calour.MS1Experiment
+            features filtered based on mz
+        '''
+        if mz is None and rt is None:
+            raise ValueError('at least one of "mz" and "rt" must not be None')
+        if mz is not None:
+            if 'MZ' not in self.feature_metadata.columns:
+                raise ValueError('The Experiment does not contain the column "MZ". cannot filter by mz')
+            else:
+                mz = _to_list(mz)
+        if rt is not None:
+            if 'RT' not in self.feature_metadata.columns:
+                raise ValueError('The Experiment does not contain the column "RT". cannot filter by rt')
+            else:
+                rt = _to_list(rt)
+
+        keep = set()
+        notfound = 0
+        if mz is None:
+            mz = [None] * len(rt)
+        if rt is None:
+            rt = [None] * len(mz)
+        if len(mz) != len(rt):
+            raise ValueError('mz and rt must have same length')
+
+        for cmz, crt in zip(mz, rt):
+            if cmz is not None:
+                mzdiff = np.abs(self.feature_metadata['MZ'] - cmz)
+                keepmz = mzdiff <= mz_tolerance
+            else:
+                keepmz = np.full([len(self.feature_metadata)], True)
+            if crt is not None:
+                rtdiff = np.abs(self.feature_metadata['RT'] - crt)
+                keeprt = rtdiff <= rt_tolerance
+            else:
+                keeprt = np.full([len(self.feature_metadata)], True)
+            bothok = np.logical_and(keepmz, keeprt)
+            if bothok.sum() == 0:
+                notfound += 1
+            keep = keep.union(set(np.where(bothok)[0]))
+
+        logger.info('total from mz/rt list not found: %d' % notfound)
+        if negate:
+            keep = set(np.arange(len(self.feature_metadata))).difference(keep)
+        return self.reorder(sorted(list(keep)), axis='f', inplace=inplace)
+
+    def sort_mz_rt(self, inplace=False):
+        '''Sort features according to m/z and retention time.
+
+        This is a convenience function wrapping calour.sort_by_metadata()
+
+        Parameters
+        ----------
+        inplace: bool, optional
+            True to replace current experiment, False to create new experiment with results
+
+        Returns
+        -------
+        calour.MS1Experiment
+        Sorted according to m/z and retention time
+        '''
+        return self.sort_by_metadata('mz_rt', axis='f', inplace=inplace)
