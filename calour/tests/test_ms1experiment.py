@@ -52,29 +52,29 @@ class ExperimentTests(Tests):
         res = exp.filter_mz_rt([101, 200, 400, 505], [1, 3, 4, 5], mz_tolerance=2)
         self.assertEqual(res.shape[1], 2)
 
-    def test_get_bad_features(self):
+    def test_get_spurious_duplicates(self):
         # load an mzmine2 metabolomics table, and associated gnps clusterinfo file
         exp = ca.read_ms(self.mzmine2_csv, sample_metadata_file=self.gnps_map,
                          data_file_type='mzmine2', use_gnps_id_from_AllFiles=False, normalize=None)
         # get rid of the all 0s metabolite (to get rid of std=0 warning)
         exp = exp.filter_sum_abundance(0.1)
 
-        res = exp.get_bad_features()
+        res = exp.get_spurious_duplicates()
         # no samples filtered away
         self.assertEqual(res.shape[0], 6)
         # default parameters don't identify and suspicious features
         self.assertEqual(res.shape[1], 0)
 
-        res = exp.get_bad_features(mz_tolerance=100, rt_tolerance=0.5)
+        res = exp.get_spurious_duplicates(mz_tolerance=100, rt_tolerance=0.5)
         self.assertEqual(res.shape[1], 0)
 
-        res = exp.get_bad_features(rt_tolerance=1)
+        res = exp.get_spurious_duplicates(rt_tolerance=1)
         self.assertEqual(res.shape[1], 0)
 
-        res = exp.get_bad_features(mz_tolerance=100, rt_tolerance=1)
+        res = exp.get_spurious_duplicates(mz_tolerance=100, rt_tolerance=1)
         self.assertEqual(res.shape[1], 2)
 
-        res = exp.get_bad_features(mz_tolerance=100, rt_tolerance=1, corr_thresh=0.2)
+        res = exp.get_spurious_duplicates(mz_tolerance=100, rt_tolerance=1, corr_thresh=0.2)
         self.assertEqual(res.shape[1], 4)
 
     def test_merge_similar_features(self):

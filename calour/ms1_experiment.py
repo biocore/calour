@@ -106,7 +106,7 @@ class MS1Experiment(Experiment):
         return 'MS1Experiment %s with %d samples, %d features' % (
             self.description, self.data.shape[0], self.data.shape[1])
 
-    def get_bad_features(self, mz_tolerance=0.001, rt_tolerance=2, corr_thresh=0.8, inplace=False, negate=False):
+    def get_spurious_duplicates(self, mz_tolerance=0.001, rt_tolerance=2, corr_thresh=0.8, inplace=False, negate=False):
         '''Get subgroups of metabolites that are suspected ms1 alignment artifacts.
 
         The function returns a calour.MS1Experiment with groups of metabolites that (within each group) have similar m/z and rt, and are highly
