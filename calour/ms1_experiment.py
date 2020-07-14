@@ -109,6 +109,9 @@ class MS1Experiment(Experiment):
     def filter_mz(self, mz, tolerance=0.001, inplace=False, negate=False):
         '''Filter metabolites based on m/z
 
+        Keep (or remove if negate=True) metabolites that have an m/z close (up to tolerance)
+        to the requested mz (or list of mz).
+
         Parameters
         ----------
         mz: float or list of float
@@ -139,8 +142,10 @@ class MS1Experiment(Experiment):
         return self.reorder(sorted(list(keep)), axis='f', inplace=inplace)
 
     def get_bad_features(self, mz_tolerance=0.001, rt_tolerance=2, corr_thresh=0.8, inplace=False, negate=False):
-        '''Get metabolites that have similar m/z and rt, and are correlated/anti-correlated.
-        These are usually due to incorrect feature detection.
+        '''Get subgroups of metabolites that are suspected ms1 alignment artifacts.
+
+        The function returns a calour.MS1Experiment with groups of metabolites that (within each group) have similar m/z and rt, and are highly
+        correlated/anti-correlated. These are usually due to incorrect feature detection/alignment and can be used to optimize the feature selection parameters.
         correlation could be due to incomplete removal of isotopes or same metabolite in multiple RTs
         anti-correlation could be due to RT drift (splitting of one true metabolite)
         Metabolites in the new experiment are ordered by correlation clusters
