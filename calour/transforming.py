@@ -370,3 +370,17 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False, random
     exp.reorder([i not in drops for i in range(exp.data.shape[0])], inplace=True)
     exp.normalized = total
     return exp
+
+
+def _subsample(data, depth):
+    for csamp in range(data.shape[0]):
+        totreads = data[csamp, :].sum()
+        reads = np.zeros([totreads], dtype=int)
+        cpos = 0
+        for idx in range(data.shape[1]):
+            reads[cpos:cpos + data[csamp, idx]] = idx
+            cpos += data[csamp, idx]
+        new_reads = np.random.permutation(reads)[: depth]
+        # res = np.unique(new_reads, return_counts=True)
+        res = np.bincount(new_reads)
+    return res

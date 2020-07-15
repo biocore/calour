@@ -243,7 +243,7 @@ class MS1Experiment(Experiment):
             else:
                 rt = _to_list(rt)
 
-        keep = set()
+        select = np.zeros(len(self.feature_metadata), dtype='?')
         notfound = 0
         if mz is None:
             mz = [None] * len(rt)
@@ -266,12 +266,12 @@ class MS1Experiment(Experiment):
             bothok = np.logical_and(keepmz, keeprt)
             if bothok.sum() == 0:
                 notfound += 1
-            keep = keep.union(set(np.where(bothok)[0]))
+            select = np.logical_or(select, bothok)
 
-        logger.info('total from mz/rt list not found: %d' % notfound)
+        logger.info('Total from mz/rt list with no match: %d' % notfound)
         if negate:
-            keep = set(np.arange(len(self.feature_metadata))).difference(keep)
-        return self.reorder(sorted(list(keep)), axis='f', inplace=inplace)
+            select = np.logical_not(select)
+        return self.reorder(select, axis='f', inplace=inplace)
 
     def sort_mz_rt(self, inplace=False):
         '''Sort features according to m/z and retention time.
