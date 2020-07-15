@@ -38,7 +38,6 @@ from copy import deepcopy
 import numpy as np
 from sklearn import preprocessing
 from skbio.stats.composition import clr, centralize as skbio_centralize
-from skbio.stats import subsample_counts
 
 from . import Experiment
 
@@ -350,6 +349,13 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False, random
     :func:`skbio.stats.subsample_counts`
 
     """
+    # import here to make skbio optional dependency
+    try:
+        from skbio.stats import subsample_counts
+    except ModuleNotFoundError as err:
+        logger.error('scikit-bio must be installed in order to use this function')
+        raise err
+
     if not inplace:
         exp = deepcopy(exp)
     if exp.sparse:
