@@ -131,7 +131,7 @@ class MS1Experiment(Experiment):
 
         Returns
         -------
-        calour.MS1Experiment
+        MS1Experiment
             features filtered and ordered basen on m/z and rt similarity and correlation
         '''
         features = self.feature_metadata.copy()
@@ -165,8 +165,8 @@ class MS1Experiment(Experiment):
     def merge_similar_features(self, mz_tolerance=0.001, rt_tolerance=0.5):
         '''Merge metabolites with similar mz/rt to a single metabolite
 
-        metabolites are initially sorted by frequency and a greefy clustering algorithm (starting from the highest freq.) is used to join together
-        metabolites that are close in m/z and r/t.
+        Metabolites are initially sorted by frequency and a greedy clustering algorithm (starting from the highest freq.) is used to join together
+        metabolites that are close in m/z and r/t, combining them to a signle metabolite with freq=sum(freq) of all metabolites in the cluster.
 
         Parameters
         ----------
@@ -177,9 +177,11 @@ class MS1Experiment(Experiment):
 
         Returns
         -------
-        calour.MS1Experiment with  close metabolites joined to a single metabolite.
-        The m/z and rt of the new metabolite are the m/z and rt of the highest freq. metabolite.
-        new feature_metadata fields: _calour_merge_number, _calour_merge_ids are added listing the number and ids of the metabolites joined for each new metabolite
+        MS1Experiment
+            With  close metabolites joined to a single metabolite.
+            The m/z and rt of the new metabolite are the m/z and rt of the highest freq. metabolite. Frequency of the new metabolite is the sum of frequencies
+            of all joined metabolites.
+            New feature_metadata fields: _calour_merge_number, _calour_merge_ids are added listing the number and ids of the metabolites joined for each new metabolite
         '''
         exp = self.sort_abundance(reverse=False)
         features = exp.feature_metadata
@@ -189,8 +191,7 @@ class MS1Experiment(Experiment):
         for cgroup, cfeature in features.iterrows():
             mzdist = np.abs(features['MZ'] - cfeature['MZ'])
             rtdist = np.abs(features['RT'] - cfeature['RT'])
-            ok = np.logical_and(mzdist <= mz_tolerance, rtdist <= rt_tolerance)
-            ok = np.logical_and(ok, features['_metabolite_group'] == -1)
+            ok = (mzdist <= mz_tolerance) & (rtdist <= rt_tolerance) & (features['_metabolite_group'] == -1)
             okpos = np.where(ok)[0]
             for cpos in okpos:
                 features.iat[cpos, gpos] = cgroup
@@ -204,6 +205,7 @@ class MS1Experiment(Experiment):
 
         Keep (or remove if negate=True) metabolites that have an m/z and/or retention time close (up to tolerance)
         to the requested mz and/or rt (or list of mz and/or rt).
+        If both mz and rt are provided, they should be matched (i.e. filtering is performed using each mz and rt pair with same index)
 
         Parameters
         ----------
@@ -225,7 +227,7 @@ class MS1Experiment(Experiment):
 
         Returns
         -------
-        calour.MS1Experiment
+        MS1Experiment
             features filtered based on mz
         '''
         if mz is None and rt is None:
@@ -283,7 +285,7 @@ class MS1Experiment(Experiment):
 
         Returns
         -------
-        calour.MS1Experiment
-        Sorted according to m/z and retention time
+        MS1Experiment
+            Sorted according to m/z and retention time
         '''
         return self.sort_by_metadata('mz_rt', axis='f', inplace=inplace)
