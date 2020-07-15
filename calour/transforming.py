@@ -37,7 +37,6 @@ from copy import deepcopy
 
 import numpy as np
 from sklearn import preprocessing
-from skbio.stats.composition import clr, centralize as skbio_centralize
 
 from . import Experiment
 
@@ -301,6 +300,12 @@ def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centrali
     skbio.stats.composition.clr
     skbio.stats.composition.centralize
     """
+    try:
+        from skbio.stats.composition import clr, centralize as skbio_centralize
+    except ModuleNotFoundError as err:
+        logger.error('scikit-bio must be installed in order to use this function')
+        raise err
+
     logger.debug('clr transforming the data')
     if not inplace:
         exp = deepcopy(exp)
