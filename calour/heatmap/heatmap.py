@@ -170,7 +170,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
             norm=None, clim=(None, None), cmap='viridis',
-            rect=None, cax=None, ax=None):
+            rect=None, cax=None, ax=None, bad_color='black'):
     '''Plot a heatmap for the experiment.
 
     Plot a heatmap for the :attr:`.Experiment.data` with features in row
@@ -218,6 +218,8 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     ax : matplotlib.axes.Axes or None (default), optional
         The axes where the heatmap is plotted. None (default) to create a new figure and
         axes to plot the heatmap
+    bad_color: str or matplotlib color, optional
+        The heatmap color to use for masked / NaN values
 
     Returns
     -------
@@ -304,7 +306,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     if isinstance(cmap, str):
         cmap = plt.get_cmap(cmap)
     # this set cells of zero value.
-    cmap.set_bad('black')
+    cmap.set_bad(bad_color)
 
     # plot the heatmap
     vmin, vmax = clim
