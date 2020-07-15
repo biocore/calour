@@ -1,5 +1,19 @@
 # calour changelog
 
+## Version 2020.???
+Incompatible changes:
+* Change random_seed to work with numpy.random.default_rng. This may cause different random numbers compared to the old versions using numpy.random.seed().
+* Change parameter names in some functions
+* Rename filter_abundance() to filter_sum(abundance)
+
+New features:
+* Add bad_color parameter to heatmap() and derivative functions
+* Add more methods for MS1Experiment
+* Add q-values (correted p-values) to dsfdr and derivative functions. This is manifested in a new feature_metadata field ("qval") for results of diff_abundance() / correlation()
+* improved GUI for qt5 heatmap database enrichment results.
+
+
+
 ## Version 2020.8.6
 
 * Add `read_qiime2()` function to enable reading of qiime2 feature tables artifacts with the associated representative sequences and taxonomy artifacts (without the need to install qiime2)
