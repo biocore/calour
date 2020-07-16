@@ -1,28 +1,27 @@
 # calour changelog
 
-## Version 2020.???
+
+
+
+
+## Version 2020.8.6
+
 Incompatible changes:
 * Change random_seed to work with numpy.random.default_rng. This may cause different random numbers compared to the old versions using numpy.random.seed().
 * Change parameter names in some functions
 * Rename filter_abundance() to filter_sum(abundance)
+* Other backwards incompatible function API changes and code refactoring.
 
 New features:
 * Add bad_color parameter to heatmap() and derivative functions
 * Add more methods for MS1Experiment
 * Add q-values (correted p-values) to dsfdr and derivative functions. This is manifested in a new feature_metadata field ("qval") for results of diff_abundance() / correlation()
 * improved GUI for qt5 heatmap database enrichment results.
-
-
-
-## Version 2020.8.6
-
 * Add `read_qiime2()` function to enable reading of qiime2 feature tables artifacts with the associated representative sequences and taxonomy artifacts (without the need to install qiime2)
 * Add `Experiment.validate()`.
 * Change default color scale in heatmap plot to linear scale for `Experiment` and log scale for `AmpliconExperiment` and `MS1Experiment`.
-* Add adjusted p-value after correlation and differential abundance analyses.
 * Move to pytest for unit tests and doctests.
 * Add new mechanism to register a function to a class as a method automatically. In order for a function to be registerred to a class, it must be a public function and has type hint of the class type for its first function parameter and return value.
-* Other backwards incompatible function API changes and code refactoring.
 * Clean and improve API documentation.
 
 ## Version 2019.5.1
