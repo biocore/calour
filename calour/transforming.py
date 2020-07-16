@@ -300,11 +300,7 @@ def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centrali
     skbio.stats.composition.clr
     skbio.stats.composition.centralize
     """
-    try:
-        from skbio.stats.composition import clr, centralize as skbio_centralize
-    except ModuleNotFoundError as err:
-        logger.error('scikit-bio must be installed in order to use this function')
-        raise err
+    from skbio.stats.composition import clr, centralize as skbio_centralize
 
     logger.debug('clr transforming the data')
     if not inplace:
@@ -355,11 +351,7 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False, random
 
     """
     # import here to make skbio optional dependency
-    try:
-        from skbio.stats import subsample_counts
-    except ModuleNotFoundError as err:
-        logger.error('scikit-bio must be installed in order to use this function')
-        raise err
+    from skbio.stats import subsample_counts
 
     if not inplace:
         exp = deepcopy(exp)
