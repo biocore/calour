@@ -37,8 +37,6 @@ from copy import deepcopy
 
 import numpy as np
 from sklearn import preprocessing
-from skbio.stats.composition import clr, centralize as skbio_centralize
-from skbio.stats import subsample_counts
 
 from . import Experiment
 
@@ -302,6 +300,8 @@ def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centrali
     skbio.stats.composition.clr
     skbio.stats.composition.centralize
     """
+    from skbio.stats.composition import clr, centralize as skbio_centralize
+
     logger.debug('clr transforming the data')
     if not inplace:
         exp = deepcopy(exp)
@@ -350,6 +350,9 @@ def subsample_count(exp: Experiment, total, replace=False, inplace=False, random
     :func:`skbio.stats.subsample_counts`
 
     """
+    # import here to make skbio optional dependency
+    from skbio.stats import subsample_counts
+
     if not inplace:
         exp = deepcopy(exp)
     if exp.sparse:

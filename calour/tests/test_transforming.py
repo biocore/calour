@@ -15,7 +15,6 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 import calour as ca
 from calour._testing import Tests
-from skbio.stats.composition import clr, centralize
 
 
 class TestTransforming(Tests):
@@ -56,6 +55,8 @@ class TestTransforming(Tests):
         self.assertIs(obs, self.test2)
 
     def test_center_log_ration(self):
+        from skbio.stats.composition import clr, centralize
+
         dat = np.array(
             [[10, 20, 1, 20, 5, 100, 844, 100],
              [10, 20, 2, 19, 0, 100, 849, 200],
