@@ -518,11 +518,11 @@ class Experiment:
             With all samples or features containing each unique value in field (or a single sample if field=None)
         '''
         if axis == 0:
-            metadata = self.sample_metadata.copy()
+            metadata = self.sample_metadata
             if field is None:
                 field = '_sample_id'
         else:
-            metadata = self.feature_metadata.copy()
+            metadata = self.feature_metadata
             if field is None:
                 field = '_feature_id'
 
