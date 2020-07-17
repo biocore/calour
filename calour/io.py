@@ -705,6 +705,10 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
         # record the original total read count into sample metadata
         exp.normalize(total=normalize, inplace=True)
 
+    # Create the combined field for easy sorting/plotting
+    if 'MZ' in exp.feature_metadata and 'RT' in exp.feature_metadata:
+        exp.feature_metadata['mz_rt'] = ['%08.4f_%05.2f' % (x[1]['MZ'], x[1]['RT']) for x in exp.feature_metadata.iterrows()]
+
     if gnps_file:
         # load the gnps table
         gnps_data = pd.read_csv(gnps_file, sep='\t')
@@ -719,7 +723,6 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
     # initialize the call history
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
     exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
-
     return exp
 
 
