@@ -25,6 +25,7 @@ Functions
 
 from copy import deepcopy
 from logging import getLogger
+from collections import defaultdict
 
 import pandas as pd
 import numpy as np
@@ -34,6 +35,43 @@ from .util import join_fields
 
 
 logger = getLogger(__name__)
+
+
+def chain(exp: Experiment, steps=[], inplace=False, **kwargs) -> Experiment:
+    '''Perform multiple operations sequentially.
+
+    Parameters
+    ----------
+    steps : list of callables
+        Each callable is a class method that has a boolean
+        parameter of ``inplace``, and returns an
+        :class:`.Experiment` object.
+    inplace : bool, default=False
+        change occurs in place or not.
+    kwargs : dict
+        keyword arguments to pass to each class method. The dict
+        key should be in the form of
+        "<method_name>__<param_name>". For example,
+        "exp.chain(steps=[filter_samples, log_n], log_n__n=3)"
+        will call :func:`filter_samples` first and then
+        :func:`log_n` while setting its parameter `n=3`.
+
+    Returns
+    -------
+    Experiment
+
+    '''
+    exp = exp if inplace else deepcopy(exp)
+    params = defaultdict(dict)
+    for k, v in kwargs.items():
+        transformer, param_name = k.split('__')
+        if param_name == 'inplace':
+            raise ValueError(
+                'You can not set `inplace` for individual transformation.')
+        params[transformer][param_name] = v
+    for step in steps:
+        step(exp, inplace=True, **params[step.__name__])
+    return exp
 
 
 def join_metadata_fields(exp: Experiment, field1, field2, new_field=None,
