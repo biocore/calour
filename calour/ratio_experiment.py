@@ -21,15 +21,15 @@ Classes
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
-from copy import deepcopy
 
 import numpy as np
-import matplotlib as mpl
 import pandas as pd
+import scipy.stats
+from statsmodels.stats.multitest import multipletests
 
 from .experiment import Experiment
-from .util import _get_taxonomy_string, _to_list
-
+from .util import _to_list
+from .analysis import _new_experiment_from_pvals, _CALOUR_DIRECTION, _CALOUR_STAT
 
 logger = getLogger(__name__)
 
@@ -111,7 +111,7 @@ class RatioExperiment(Experiment):
         super().heatmap(*args, **kwargs)
 
     @classmethod
-    def from_exp(self, exp, common_field, group_field, value1, value2=None, threshold=None):
+    def from_exp(self, exp, common_field, group_field, value1, value2=None, threshold=5):
         '''Create a RatioExperiment from two groups of samples in an experiment
 
         Parameters
@@ -205,41 +205,49 @@ class RatioExperiment(Experiment):
         alpha: float, optional
             The required FDR control level
         min_present: int, optional
-            The minimal number of samples where the ratio is not nan in order to include in the test
+            The minimal number of samples where the ratio is not nan or zero in order to include in the test.
+            Used as filtering to achieve better FDR power (less hypothesis to test)
+
+        Returns
+        -------
+        RatioExperiment
+            Only features with higher than random number of positive or negative ratios.
+            Features are sorted by the effect size (and by p-value for similar effect size).
+            The feature_metadata contains 4 new fields: '__calour_stat', '_calour_pval', '_calour_qval', '_calour_direction'
+            , similar to calour.analysis.diff_abundance().
         '''
         exp = self.copy()
-        # get rid of bacteria that don't have enough non-zero ratios
         keep = []
+        pvals = np.ones(exp.shape[1])
+        esize = np.zeros(exp.shape[1])
+        npos = np.zeros(exp.shape[1])
+        nneg = np.zeros(exp.shape[1])
         for idx in range(exp.shape[1]):
             cdat = exp.data[:, idx]
-            npos = np.sum(cdat > 0)
-            nneg = np.sum(cdat < 0)
-            if npos + nneg >= min_present:
+            cnpos = np.sum(cdat[np.isfinite(cdat)] > 0)
+            cnneg = np.sum(cdat[np.isfinite(cdat)] < 0)
+            npos[idx] = cnpos
+            nneg[idx] = cnneg
+            # test if we have enough non-zero samples
+            if npos[idx] + nneg[idx] >= min_present:
+                # calculate the binomial p-value and effect size for the feature
+                pvals[idx] = scipy.stats.binom_test(cnpos, cnpos + cnneg)
+                esize[idx] = (cnpos - cnneg) / (cnpos + cnneg)
                 keep.append(idx)
-        print('keeping %d features with enough ratios' % len(keep))
+        logger.debug('keeping %d features with enough ratios' % len(keep))
         exp = exp.reorder(keep, axis='f')
-        pvals = []
-        esize = []
-        for idx in range(exp.data.shape[1]):
-            cdat = exp.data[:, idx]
-            npos = np.sum(cdat > 0)
-            nneg = np.sum(cdat < 0)
-            pvals.append(scipy.stats.binom_test(npos, npos + nneg))
-            esize.append((npos - nneg) / (npos + nneg))
-        # plt.figure()
-        # sp = np.sort(pvals)
-        # plt.plot(np.arange(len(sp)),sp)
-        # plt.plot([0,len(sp)],[0,1],'k')
-        reject = multipletests(pvals, alpha=alpha, method='fdr_bh')[0]
-        index = np.arange(len(reject))
-        esize = np.array(esize)
-        pvals = np.array(pvals)
-        exp.feature_metadata['esize'] = esize
-        exp.feature_metadata['pval'] = pvals
-        index = index[reject]
-        okesize = esize[reject]
-        new_order = np.argsort(okesize)
-        new_order = np.argsort((1 - pvals[reject]) * np.sign(okesize))
-        newexp = exp.reorder(index[new_order], axis='f', inplace=False)
-        print('found %d significant' % len(newexp.feature_metadata))
+        if len(keep) == 0:
+            logger.warning('No significant features found')
+            return exp
+
+        pvals = pvals[keep]
+        esize = esize[keep]
+
+        # multiple testing correction using Benjamini-Hochberg FDR
+        reject, qvals, *_ = multipletests(pvals, alpha=alpha, method='fdr_bh')
+        newexp = _new_experiment_from_pvals(exp, None, reject, esize, pvals, qvals)
+        # set the effect direction field
+        newexp.feature_metadata[_CALOUR_DIRECTION] = ['positive' if x > 0 else 'negative' for x in newexp.feature_metadata[_CALOUR_STAT]]
+
+        logger.info('found %d significant' % len(newexp.feature_metadata))
         return newexp

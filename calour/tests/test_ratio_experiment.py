@@ -7,11 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from unittest import main
-from copy import deepcopy
 
-import pandas.testing as pdt
 import numpy as np
-import numpy.testing as npt
 
 from calour._testing import Tests
 import calour as ca
@@ -43,6 +40,17 @@ class ExperimentTests(Tests):
         self.assertTrue(np.isnan(rexp['S1', 'AA']))
         # and D3 300 is corrected to 400
         self.assertEqual(rexp['S3', 'AA'], np.log2(400 / 500))
+
+    def test_get_sign_pvals(self):
+        rexp = RatioExperiment.from_exp(self.test1, 'subj', 'time', '1', '2')
+        da_exp = rexp.get_sign_pvals(alpha=0.5, min_present=2)
+        self.assertEqual(da_exp.shape[1], 3)
+        self.assertEqual(da_exp.feature_metadata.loc['AA', '_calour_stat'], -1)
+        self.assertEqual(da_exp.feature_metadata.loc['TA', '_calour_direction'], 'positive')
+
+        da_exp = rexp.get_sign_pvals(alpha=1, min_present=1)
+        self.assertEqual(da_exp.shape[1], 4)
+        self.assertEqual(da_exp.feature_metadata.loc['AT', '_calour_pval'], 1)
 
 
 if __name__ == "__main__":

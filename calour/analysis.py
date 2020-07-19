@@ -303,8 +303,9 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals):
     ----------
     cexp : Experiment
         The experiment used for the actual diff. abundance (filtered for relevant samples/non-zero features)
-    exp : Experiment
+    exp : Experiment or None
         The original experiment being analysed (with all samples/features)
+        if None, keep only the samples from cexp
     keep : np.array of bool
         One entry per exp feature. True for the features which are significant (following FDR correction)
     odif : np.array of float
@@ -330,11 +331,20 @@ def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals):
     odif = odif[keep[0]]
     pvals = pvals[keep[0]]
     qvals = qvals[keep[0]]
-    si = np.argsort(odif, kind='mergesort')
-    odif = odif[si]
-    pvals = pvals[si]
-    newexp = newexp.reorder(si, axis=1)
+
+    # this is for the p-value sorting in reverse order
+    # it is fixed after the p-value sorting
+    pvals[odif > 0] *= -1
+
     newexp.feature_metadata[_CALOUR_STAT] = odif
     newexp.feature_metadata[_CALOUR_PVAL] = pvals
     newexp.feature_metadata[_CALOUR_QVAL] = qvals
+
+    # first sort by p-value (so within same effect size will be sorted)
+    newexp.sort_by_metadata(_CALOUR_PVAL, axis='f', inplace=True)
+    # fix the negative p-values used for the sort
+    newexp.feature_metadata[_CALOUR_PVAL] = np.abs(newexp.feature_metadata[_CALOUR_PVAL])
+    # now sort by effect size
+    newexp.sort_by_metadata(_CALOUR_STAT, axis='f', inplace=True)
+
     return newexp
