@@ -191,8 +191,8 @@ class RatioExperiment(Experiment):
 
         # keep only samples that were actually added to the ratio_mat
         ratio_mat = ratio_mat[found_indices, :]
-        ratio_exp = RatioExperiment(data=ratio_mat, sample_metadata=new_sample_metadata, feature_metadata=exp.feature_metadata, sparse=False,
-                                    databases=exp.databases, description=exp.description, info=exp.info)
+        ratio_exp = RatioExperiment(data=ratio_mat, sample_metadata=new_sample_metadata, feature_metadata=exp.feature_metadata,
+                                    sparse=False, databases=exp.databases, description=exp.description, info=exp.info)
         return ratio_exp
 
     def get_sign_pvals(self, alpha=0.1, min_present=5):
@@ -244,6 +244,7 @@ class RatioExperiment(Experiment):
         esize = esize[keep]
 
         # multiple testing correction using Benjamini-Hochberg FDR
+        # note we cannot use dsFDR as this is not a 2 group test
         reject, qvals, *_ = multipletests(pvals, alpha=alpha, method='fdr_bh')
         newexp = _new_experiment_from_pvals(exp, None, reject, esize, pvals, qvals)
         # set the effect direction field
