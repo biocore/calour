@@ -499,3 +499,33 @@ class Experiment:
         newexp = cls(df.values, sample_metadata, feature_metadata,
                      info=info, description=description, sparse=False)
         return newexp
+
+    def iterate(self, field=None, axis='s'):
+        '''Iterate over all samples or features in the experiment (optionally grouped by the value in metadata field).
+
+        Iterate over all unique values of metadata field. Each iteration yields an experiment with all samples containing the value.
+        If field is None, iterate over all samples or features one at a time.
+
+        Parameters
+        ----------
+        field: str or None, optional
+            If None, each iteration yields an Experiment with a single sample or feature.
+            If not None, iterate over all unique values of metadata field, with each iteration yielding an Experiment with all samples/features with this value.
+
+        Yields
+        -------
+        Experiment
+            With all samples or features containing each unique value in field (or a single sample if field=None)
+        '''
+        if axis == 0:
+            metadata = self.sample_metadata
+            if field is None:
+                field = '_sample_id'
+        else:
+            metadata = self.feature_metadata
+            if field is None:
+                field = '_feature_id'
+
+        vals = metadata[field].unique()
+        for cval in vals:
+            yield self.filter_by_metadata(field, [cval], axis=axis)
