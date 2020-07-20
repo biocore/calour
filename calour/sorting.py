@@ -36,6 +36,7 @@ from scipy import cluster, spatial
 from . import Experiment
 from .filtering import _filter_ids
 from .transforming import log_n, standardize
+from .manipulation import chain
 from .util import _argsort
 from ._doc import ds
 
@@ -132,8 +133,7 @@ def cluster_data(exp: Experiment, transform=None, axis=1,
         data = exp.get_data(sparse=False)
     else:
         logger.debug('transforming data using %r' % transform)
-        newexp = deepcopy(exp)
-        data = transform(newexp, **kwargs).get_data(sparse=False)
+        data = transform(exp, **kwargs, inplace=False).get_data(sparse=False)
 
     if axis == 1:
         data = data.T
@@ -152,9 +152,13 @@ def cluster_features(exp: Experiment, cutoff=0, inplace=False) -> Experiment:
 
     1. filter away features that have sum abundance less than cutoff;
 
-    2. transform data with :func:`.log_n` and :func:`.standardize`.
+    2. cluster features based on transformed data with :func:`.log_n` and :func:`.standardize`.
 
-    3. cluster features with :func:`.cluster_data`.
+    3. return the experiment with features clustered.
+
+    .. note:: The transformation is done on a copy of data and used
+    for clustering computation. The real :attr:`Experiment.data` is
+    not transformed.
 
     Parameters
     ----------
@@ -173,10 +177,9 @@ def cluster_features(exp: Experiment, cutoff=0, inplace=False) -> Experiment:
 
     '''
     newexp = exp.filter_sum_abundance(cutoff, inplace=inplace)
-    newexp = newexp.chain(steps=[log_n, standardize],
-                          standardize__axis=1,
-                          inplace=True)
-    return newexp.cluster_data(axis=1, inplace=True)
+    return newexp.cluster_data(transform=chain, steps=[log_n, standardize],
+                               standardize__axis=1,
+                               axis=1, inplace=True)
 
 
 @ds.get_sectionsf('sorting.sort_by_metadata')

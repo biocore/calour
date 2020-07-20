@@ -11,6 +11,7 @@ from os.path import join
 import logging
 
 import pandas.testing as pdt
+import numpy.testing as npt
 import numpy as np
 
 import calour as ca
@@ -27,7 +28,7 @@ class STests(Tests):
         self.timeseries = ca.read(self.timeseries_biom, self.timeseries_samp, normalize=None)
 
     def test_cluster_data(self):
-        def log_and_scale(exp):
+        def log_and_scale(exp, inplace=False):
             exp.log_n(inplace=True)
             exp.standardize(inplace=True, axis=1)
             return exp
@@ -40,8 +41,12 @@ class STests(Tests):
 
     def test_cluster_features(self):
         exp = self.test1.cluster_features()
+        # test the features are sorted
         new_ids = ['AC', 'AT', 'AA', 'TA', 'TG', 'TC', 'AG', 'GG', 'TT', 'GT', 'GA', 'badfeature']
         self.assertListEqual(exp.feature_metadata.index.tolist(), new_ids)
+        # test the data is not transformed after clustering
+        for i in new_ids:
+            npt.assert_array_equal(exp[:, i], self.test1[:, i])
 
     def test_sort_by_metadata_sample(self):
         # test sorting various fields (keeping the order)
