@@ -29,7 +29,8 @@ class ExperimentTests(Tests):
         # no features removed
         self.assertEqual(rexp.shape[1], self.test1.shape[1])
         # the 2 subjects are 1, 2
-        self.assertListEqual(list(rexp.sample_metadata['subj']), [1, 2])
+        self.assertListEqual(list(rexp.sample_metadata['subj_1']), [1, 2])
+        print(rexp.sample_metadata)
         self.assertEqual(rexp['S1', 'AA'], -1)
         self.assertEqual(rexp['S3', 'AG'], np.log2(600 / 100))
         self.assertTrue(np.isnan(rexp['S1', 'AC']))

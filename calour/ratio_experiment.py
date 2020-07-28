@@ -160,7 +160,7 @@ class RatioExperiment(Experiment):
         ratio_mat = np.zeros([len(exp.sample_metadata[common_field].unique()), exp.shape[1]])
         # new_sample_metadata = pd.DataFrame()
         if sample_md_suffix is None:
-            sample_md_suffix = (",".join(value1), ".".join(value2))
+            sample_md_suffix = (".".join(value1), ".".join(value2))
         new_columns = [x + '_%s' % sample_md_suffix[0] for x in exp.sample_metadata.columns]
         new_columns.extend([x + '_%s' % sample_md_suffix[1] for x in exp.sample_metadata.columns])
         new_sample_metadata = pd.DataFrame(columns=new_columns)
@@ -186,26 +186,30 @@ class RatioExperiment(Experiment):
             if threshold is not None:
                 ratios[np.logical_and(mean_g1 == threshold, mean_g2 == threshold)] = np.nan
             ratio_mat[idx, :] = ratios
-            cmetadata = cexp.sample_metadata.iloc[0]
+            cmetadata = pd.DataFrame(columns=new_columns)
+
+            # the new index for this ratio is the sampleID of the nominator sample
+            csamp_id = group1.sample_metadata['_sample_id'][0]
+
             for ccol in group1.sample_metadata.columns:
                 u1 = group1.sample_metadata[ccol].unique()
                 if len(u1) == 1:
-                    cmetadata.at[ccol + '_%s' % sample_md_suffix[0]] = u1[0]
+                    cmetadata.at[csamp_id, ccol + '_%s' % sample_md_suffix[0]] = u1[0]
                 else:
-                    cmetadata.at[ccol + '_%s' % sample_md_suffix[0]] = 'NA (multiple values)'
+                    cmetadata.at[csamp_id, ccol + '_%s' % sample_md_suffix[0]] = 'NA (multiple values)'
 
                 u2 = group2.sample_metadata[ccol].unique()
                 if len(u2) == 1:
-                    cmetadata.at[ccol + '_%s' % sample_md_suffix[1]] = u2[0]
+                    cmetadata.at[csamp_id, ccol + '_%s' % sample_md_suffix[1]] = u2[0]
                 else:
-                    cmetadata.at[ccol + '_%s' % sample_md_suffix[1]] = 'NA (multiple values)'
-
-            cmetadata.at[group_field] = new_field_val
+                    cmetadata.at[csamp_id, ccol + '_%s' % sample_md_suffix[1]] = 'NA (multiple values)'
+            # cmetadata.at[group_field] = new_field_val
             new_sample_metadata = new_sample_metadata.append(cmetadata)
             found_indices.append(idx)
 
         # keep only samples that were actually added to the ratio_mat
         ratio_mat = ratio_mat[found_indices, :]
+        logger.info('Calculated ratios for %d unique sample groups' % len(found_indices))
         ratio_exp = RatioExperiment(data=ratio_mat, sample_metadata=new_sample_metadata, feature_metadata=exp.feature_metadata,
                                     sparse=False, databases=exp.databases, description=exp.description, info=exp.info)
         return ratio_exp
