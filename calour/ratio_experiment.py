@@ -111,7 +111,7 @@ class RatioExperiment(Experiment):
         super().heatmap(*args, **kwargs)
 
     @classmethod
-    def from_exp(self, exp, common_field, group_field, value1, value2=None, threshold=5):
+    def from_exp(self, exp, common_field, group_field, value1, value2=None, threshold=5, sample_md_suffix=None):
         '''Create a RatioExperiment from two groups of samples in an experiment
 
         Parameters
@@ -135,6 +135,11 @@ class RatioExperiment(Experiment):
             If not None, assign each data value<threshold to threshold. If both nominator and denominator are < threshold,
             the resulting ratio will assigned be np.nan.
             For example, in an AmpliconExperiment, ratios calculated between low read numbers are not reliable. So it is advised to set threshold to approx. 10
+        sample_md_suffix: tuple of (str, str) or None, optional
+            The suffix to add to the ratio experiment for each sample metadata column name, indicating if it is from value1 or value2 group.
+            If none, append value1 or value2 to the column name respectively.
+            In the ratio experiment, since each sample is the ratio of 2 sample groups, the sample metadata can originate from the first or second group. Therefore
+            the 2 values will be stored in 2 columns for each original metadata column.
 
         Returns
         -------
@@ -154,7 +159,11 @@ class RatioExperiment(Experiment):
 
         ratio_mat = np.zeros([len(exp.sample_metadata[common_field].unique()), exp.shape[1]])
         # new_sample_metadata = pd.DataFrame()
-        new_sample_metadata = pd.DataFrame(columns=exp.sample_metadata.columns)
+        if sample_md_suffix is None:
+            sample_md_suffix = (",".join(value1), ".".join(value2))
+        new_columns = [x + '_%s' % sample_md_suffix[0] for x in exp.sample_metadata.columns]
+        new_columns.extend([x + '_%s' % sample_md_suffix[1] for x in exp.sample_metadata.columns])
+        new_sample_metadata = pd.DataFrame(columns=new_columns)
 
         # used to count the number of samples that have values in both groups
         # we then keep only these columns in the ratio_mat
@@ -180,11 +189,17 @@ class RatioExperiment(Experiment):
             cmetadata = cexp.sample_metadata.iloc[0]
             for ccol in group1.sample_metadata.columns:
                 u1 = group1.sample_metadata[ccol].unique()
-                u2 = group2.sample_metadata[ccol].unique()
-                if len(u1) == 1 and u1 == u2:
-                    cmetadata.at[ccol] = u1[0]
+                if len(u1) == 1:
+                    cmetadata.at[ccol + '_%s' % sample_md_suffix[0]] = u1[0]
                 else:
-                    cmetadata.at[ccol] = 'NA (multiple values)'
+                    cmetadata.at[ccol + '_%s' % sample_md_suffix[0]] = 'NA (multiple values)'
+
+                u2 = group2.sample_metadata[ccol].unique()
+                if len(u2) == 1:
+                    cmetadata.at[ccol + '_%s' % sample_md_suffix[1]] = u2[0]
+                else:
+                    cmetadata.at[ccol + '_%s' % sample_md_suffix[1]] = 'NA (multiple values)'
+
             cmetadata.at[group_field] = new_field_val
             new_sample_metadata = new_sample_metadata.append(cmetadata)
             found_indices.append(idx)
