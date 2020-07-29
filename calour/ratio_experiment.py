@@ -42,8 +42,8 @@ class RatioExperiment(Experiment):
     Parameters
     ----------
     data : numpy.ndarray or scipy.sparse.csr_matrix
-        The abundance table for OTUs or ASVs. Samples
-        are in row and features in column
+        The log ratio table for OTUs or ASVs.
+        Samples are in rows and features in columns
     sample_metadata : pandas.DataFrame
         The metadata on the samples
     feature_metadata : pandas.DataFrame
