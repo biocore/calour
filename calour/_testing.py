@@ -62,9 +62,12 @@ class Tests(TestCase):
         self.q2_cfs_map = join(test_data_dir, 'cfs-map.txt')
         self.q2_cfs_repseqs = join(test_data_dir, 'cfs-rep-seqs.qza')
         self.q2_cfs_taxonomy = join(test_data_dir, 'cfs-taxonomy.qza')
-        # an experiment used to create a RatioExperiment
-        self.rat1_biom = join(test_data_dir, 'ratio_exp_table.biom')
-        self.rat1_samp = join(test_data_dir, 'ratio_exp_sample_metadata.txt')
+        # An experiment used to create the ratio experiment using from_exp()
+        self.rat_pre_biom = join(test_data_dir, 'ratio_exp_pre_table.biom')
+        self.rat_pre_samp = join(test_data_dir, 'ratio_exp_pre_sample_metadata.txt')
+        # A ratio experiment table created from the ratio_pre experiment
+        self.rat_biom = join(test_data_dir, 'ratio-exp.biom')
+        self.rat_samp = join(test_data_dir, 'ratio-exp_sample_metadata.txt')
 
     def assert_experiment_equal(self, exp1, exp2, check_history=False, almost_equal=True,
                                 ignore_md_fields=('_calour_original_abundance',)):

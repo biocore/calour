@@ -60,8 +60,9 @@ class RatioExperiment(Experiment):
     Attributes
     ----------
     data : numpy.ndarray or scipy.sparse.csr_matrix
-        The abundance table for OTUs or ASVs. Samples
-        are in row and features in column
+        The log ratio table for OTUs or ASVs.
+        Samples are in row and features in column. values are float (can be negative)
+        with nan indicating ratio for the specific feature does not exist in the sample
     sample_metadata : pandas.DataFrame
         The metadata on the samples
     feature_metadata : pandas.DataFrame
@@ -114,22 +115,25 @@ class RatioExperiment(Experiment):
     def from_exp(self, exp, common_field, group_field, value1, value2=None, threshold=5, sample_md_suffix=None):
         '''Create a RatioExperiment from two groups of samples in an experiment
 
+        ratios are calculated for each unique value of common_field. For each such value, 2 groups of samples (group1/group2) are created by selecting all samples with value1/value2
+        in the group_field. The ratio for the common field value for each feature is calculated by taking the log2 of mean(group1)/mean(group2) for the feature.
+
         Parameters
         ----------
         exp: calour.Experiment
             The experiment to take the 2 groups of samples from.
         common_field: str
             Name of the sample metadata field to calculate the ratio within.
-            For example, to calculate the ratio between 2 timepoints for each individual,
+            For example, to calculate the ratio between 2 timepoints (e.g. before and after treatment) for each individual,
             common_field with be 'subject_id'
         group_field: str
             Name of the sample metadata field on which to divide to 2 groups for ratio calculation.
-            For example, to calculate the ratio between 2 timepoints for each individual,
-            group_field with be 'time_point'
+            For example, to calculate the ratio between before and after treatment for each individual,
+            group_field with be 'treatment'
         value1 : str or iterable of str
-            Values for field that will be assigned to the first (nominator) sample group
+            Values for field that will be assigned to the first (nominator) sample group. for example 'before_treatment'
         value2: str or iterable of str or None, optional
-            If not None, values for field that will be assigned to the second (denominator) sample group.
+            If not None, values for field that will be assigned to the second (denominator) sample group. for example 'after_treatment'
             If None, use all samples not in the first sample group as the second sample group.
         threshold: float or None, optional
             If not None, assign each data value<threshold to threshold. If both nominator and denominator are < threshold,
@@ -144,8 +148,11 @@ class RatioExperiment(Experiment):
         Returns
         -------
         RatioExperiment
-        The samples are all the unique values of common_field
-        The data values for each feature are the ratio of mean data values in samples of value1 in group_field / data values in samples of value2 in group_field
+            The samples are all the unique values of common_field
+            The data values for each feature are the ratio of mean data values in samples of value1 in
+            group_field / data values in samples of value2 in group_field
+            sample_metadata contains two columns for each original sample_metadata column: the value for group1 and for group2
+            The index for each ratio sample is the index of the group1 sample
         '''
         new_field_val = '%s / ' % value1
         exp.sparse = False
@@ -217,7 +224,11 @@ class RatioExperiment(Experiment):
     def get_sign_pvals(self, alpha=0.1, min_present=5):
         '''Get FDR corrected p-values for rejecting the null hypothesis that the signs of the ratios originate from a p=0.5 binomial distribution.
 
-        The test is performed only on the non nan feature values.
+        This test is used in order to identify features that increase/decrease significantly. For example, if the RatioExperiments is created for
+        pre- and post-treatment samples of individuals (ratio is pre/post), get_sign_pvals can be used to identify features that significantly
+        increase/decrease following the treatment.
+
+        NOTE: The test is performed only on the non nan feature values.
 
         Parameters
         ----------
@@ -236,6 +247,10 @@ class RatioExperiment(Experiment):
             , similar to calour.analysis.diff_abundance().
         '''
         exp = self.copy()
+
+        # need to convert to non-sparse in order to use np.isfinite()
+        exp.sparse = False
+
         keep = []
         pvals = np.ones(exp.shape[1])
         esize = np.zeros(exp.shape[1])
