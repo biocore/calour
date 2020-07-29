@@ -380,42 +380,6 @@ class Experiment:
                 exp.feature_metadata = exp.feature_metadata.iloc[new_order, :]
         return exp
 
-    def chain(self, steps=[], inplace=False, **kwargs):
-        '''Perform multiple operations sequentially.
-
-        Parameters
-        ----------
-        steps : list of callables
-            Each callable is a class method that has a boolean
-            parameter of ``inplace``, and returns an
-            :class:`.Experiment` object.
-        inplace : bool, default=False
-            change occurs in place or not.
-        kwargs : dict
-            keyword arguments to pass to each class method. The dict
-            key should be in the form of
-            "<method_name>__<param_name>". For example,
-            "exp.chain(steps=[filter_samples, log_n], log_n__n=3)"
-            will call :func:`filter_samples` first and then
-            :func:`log_n` while setting its parameter `n=3`.
-
-        Returns
-        -------
-        Experiment
-
-        '''
-        exp = self if inplace else deepcopy(self)
-        params = defaultdict(dict)
-        for k, v in kwargs.items():
-            transformer, param_name = k.split('__')
-            if param_name == 'inplace':
-                raise ValueError(
-                    'You can not set `inplace` for individual transformation.')
-            params[transformer][param_name] = v
-        for step in steps:
-            step(exp, inplace=True, **params[step.__name__])
-        return exp
-
     def to_pandas(self, sample_field=None, feature_field=None, sparse=None):
         '''Convert Experiment object to a pandas DataFrame.
 
@@ -501,21 +465,26 @@ class Experiment:
         return newexp
 
     def iterate(self, field=None, axis='s'):
-        '''Iterate over all samples or features in the experiment (optionally grouped by the value in metadata field).
+        '''Iterate over all sample or feature groups.
 
-        Iterate over all unique values of metadata field. Each iteration yields an experiment with all samples containing the value.
-        If field is None, iterate over all samples or features one at a time.
+        Iterate over all unique values of metadata field. Each
+        iteration yields an experiment with all samples containing the
+        value. If field is None, iterate over all samples or features
+        one at a time.
 
         Parameters
         ----------
         field: str or None, optional
-            If None, each iteration yields an Experiment with a single sample or feature.
-            If not None, iterate over all unique values of metadata field, with each iteration yielding an Experiment with all samples/features with this value.
+            If None, each iteration yields an Experiment with a single
+            sample or feature.  If not None, iterate over all unique
+            values of metadata field, with each iteration yielding an
+            Experiment with all samples/features with this value.
 
         Yields
         -------
         Experiment
             With all samples or features containing each unique value in field (or a single sample if field=None)
+
         '''
         if axis == 0:
             metadata = self.sample_metadata

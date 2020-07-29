@@ -14,6 +14,7 @@ Incompatible changes:
 
 New features:
 * Add RatioExperiment for working with ratios between two groups of features
+* Add random_seed option to tranforming.permute_data()
 * Add bad_color parameter to heatmap() and derivative functions
 * Add more methods for MS1Experiment
 * Add q-values (correted p-values) to dsfdr and derivative functions. This is manifested in a new feature_metadata field ("qval") for results of diff_abundance() / correlation()
