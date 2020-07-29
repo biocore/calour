@@ -42,8 +42,10 @@ class RatioExperiment(Experiment):
     Parameters
     ----------
     data : numpy.ndarray or scipy.sparse.csr_matrix
-        The log ratio table for OTUs or ASVs.
+        The log-ratio table for OTUs or ASVs.
         Samples are in rows and features in columns
+        Note: values can be negative or np.nan as this is log-ratio.
+        np.nan indicates ratio is not available for this feature/sample combination
     sample_metadata : pandas.DataFrame
         The metadata on the samples
     feature_metadata : pandas.DataFrame
