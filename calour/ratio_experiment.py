@@ -164,7 +164,7 @@ class RatioExperiment(Experiment):
         value1 = _to_list(value1)
         if value2 is None:
             new_field_val += 'Other'
-            value2 = list(set(exp.sample_metadata[group_field].unique()).difference(set(value1)))
+            value2 = [str(x) for x in set(exp.sample_metadata[group_field].unique()).difference(set(value1))]
         else:
             new_field_val += '%s' % value2
             value2 = _to_list(value2)
