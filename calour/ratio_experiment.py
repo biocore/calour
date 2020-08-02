@@ -133,10 +133,13 @@ class RatioExperiment(Experiment):
             For example, to calculate the ratio between before and after treatment for each individual,
             group_field with be 'treatment'
         value1 : str or iterable of str
-            Values for field that will be assigned to the first (nominator) sample group. for example 'before_treatment'
+            Values for field that will be assigned to the first (nominator) sample group. for example 'before_treatment'.
+            If more than one sample matches value1 in field group_field (for a given common_field value), use the mean of the frequency
+            (of each feature) as the nominator value for the sample group.
         value2: str or iterable of str or None, optional
             If not None, values for field that will be assigned to the second (denominator) sample group. for example 'after_treatment'
             If None, use all samples not in the first sample group as the second sample group.
+            Similar to value1, if more than 1 sample matches, use the mean frequency as the denominator value.
         threshold: float or None, optional
             If not None, assign each data value<threshold to threshold. If both nominator and denominator are < threshold,
             the resulting ratio will assigned be np.nan.
@@ -150,7 +153,7 @@ class RatioExperiment(Experiment):
         Returns
         -------
         RatioExperiment
-            The samples are all the unique values of common_field
+            The samples are all the unique values of common_field (that have >= 1 sample matching value1 and value2 in group_field).
             The data values for each feature are the ratio of mean data values in samples of value1 in
             group_field / data values in samples of value2 in group_field
             sample_metadata contains two columns for each original sample_metadata column: the value for group1 and for group2
