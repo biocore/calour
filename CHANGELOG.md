@@ -13,6 +13,7 @@ Incompatible changes:
 * Other backwards incompatible function API changes and code refactoring.
 
 New features:
+* Add RatioExperiment for working with ratios between two groups of features
 * Add random_seed option to tranforming.permute_data()
 * Add bad_color parameter to heatmap() and derivative functions
 * Add more methods for MS1Experiment
