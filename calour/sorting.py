@@ -9,6 +9,7 @@ Functions
 .. autosummary::
    :toctree: generated
 
+   reorder
    sort_by_data
    sort_by_metadata
    sort_samples
@@ -42,6 +43,56 @@ from ._doc import ds
 
 
 logger = getLogger(__name__)
+
+
+def reorder(exp: Experiment, new_order, axis=0, inplace=False) -> Experiment:
+    '''Reorder according to indices in the new order.
+
+    Note that we can also drop samples in new order.
+
+    Parameters
+    ----------
+    new_order : Iterable of int or boolean mask
+        the order of new indices
+    axis : 0, 1, 's', or 'f'
+        the axis where the reorder occurs. 0 or 's' means reodering samples;
+        1 or 'f' means reordering features.
+    inplace : bool, optional
+        reorder in place.
+
+    Returns
+    -------
+    Experiment
+        experiment with reordered samples
+    '''
+    if inplace is False:
+        exp2 = exp.copy()
+    else:
+        exp2 = exp
+    # make it a np array; otherwise the slicing won't work if the new_order is
+    # a list of boolean and data is sparse matrix. For example:
+    # from scipy.sparse import csr_matrix
+    # a = csr_matrix((3, 4), dtype=np.int8)
+    # In [125]: a[[False, False, False], :]
+    # Out[125]:
+    # <3x4 sparse matrix of type '<class 'numpy.int8'>'
+
+    # In [126]: a[np.array([False, False, False]), :]
+    # Out[126]:
+    # <0x4 sparse matrix of type '<class 'numpy.int8'>'
+
+    # if new_order is empty, we want to return empty exp2eriment
+    # it doesn't work for dense data if we use np.array([]) for the indexing
+    if len(new_order) > 0:
+        new_order = np.array(new_order)
+    if axis == 0:
+        exp2.data = exp2.data[new_order, :]
+        exp2.sample_metadata = exp2.sample_metadata.iloc[new_order, :]
+    else:
+        exp2.data = exp2.data[:, new_order]
+        if exp2.feature_metadata is not None:
+            exp2.feature_metadata = exp2.feature_metadata.iloc[new_order, :]
+    return exp2
 
 
 def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs) -> Experiment:

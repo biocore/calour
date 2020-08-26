@@ -35,7 +35,7 @@ logger = getLogger(__name__)
 
 
 class RatioExperiment(Experiment):
-    '''This class stores log-ratio data and corresponding analysis methods
+    '''This class stores log-ratio data and corresponding analysis methods.
 
     This is a child class of :class:`.Experiment`.
 
@@ -45,7 +45,7 @@ class RatioExperiment(Experiment):
         The log-ratio table for OTUs or ASVs.
         Samples are in rows and features in columns
         Note: values can be negative or np.nan as this is log-ratio.
-        np.nan indicates ratio is not available for this feature/sample combination
+        np.nan indicates ratio is not applicable between 2 samples for a feature.
     sample_metadata : pandas.DataFrame
         The metadata on the samples
     feature_metadata : pandas.DataFrame
@@ -64,7 +64,7 @@ class RatioExperiment(Experiment):
     data : numpy.ndarray or scipy.sparse.csr_matrix
         The log ratio table for OTUs or ASVs.
         Samples are in row and features in column. values are float (can be negative)
-        with nan indicating ratio for the specific feature does not exist in the sample
+        with np.nan indicating ratio for the specific feature does not exist.
     sample_metadata : pandas.DataFrame
         The metadata on the samples
     feature_metadata : pandas.DataFrame
@@ -94,8 +94,10 @@ class RatioExperiment(Experiment):
         This method accepts exactly the same parameters as input with
         its parent class method and does exactly the sample plotting.
 
-        The only difference is that by default, it uses the diverging 'coolwarm' colormap and bad_color set to white.
-        You can always set it to other colormap/bad_color as explained in :meth:`.Experiment.heatmap`.
+        The only difference is that by default, it uses the diverging
+        colormap 'coolwarm' and `bad_color` parameter is set to white.  You can
+        always set it to other colormap/bad_color as explained in
+        :meth:`.Experiment.heatmap`.
 
         See Also
         --------
@@ -115,7 +117,7 @@ class RatioExperiment(Experiment):
 
     @classmethod
     def from_exp(self, exp, common_field, group_field, value1, value2=None, threshold=5, sample_md_suffix=None):
-        '''Create a RatioExperiment from two groups of samples in an experiment
+        '''Create a RatioExperiment object from two groups of samples in an experiment.
 
         ratios are calculated for each unique value of common_field. For each such value, 2 groups of samples (group1/group2) are created by selecting all samples with value1/value2
         in the group_field. The ratio for the common field value for each feature is calculated by taking the log2 of mean(group1)/mean(group2) for the feature.
@@ -126,25 +128,25 @@ class RatioExperiment(Experiment):
             The experiment to take the 2 groups of samples from.
         common_field: str
             Name of the sample metadata field to calculate the ratio within.
-            For example, to calculate the ratio between 2 timepoints (e.g. before and after treatment) for each individual,
-            common_field with be 'subject_id'
+            For example, to calculate the ratio between 2 timepoints (e.g. before and after treatment) for each subject,
+            common_field would be something like 'subject_id'.
         group_field: str
-            Name of the sample metadata field on which to divide to 2 groups for ratio calculation.
+            Name of the sample metadata field on which to divide samples to 2 groups for ratio calculation.
             For example, to calculate the ratio between before and after treatment for each individual,
-            group_field with be 'treatment'
+            group_field with be 'treatment' that has 'before_treatment' and 'after_treatment'.
         value1 : str or iterable of str
-            Values for field that will be assigned to the first (nominator) sample group. for example 'before_treatment'.
+            Values for field that will be assigned to the first (nominator) sample group. For example 'before_treatment'.
             If more than one sample matches value1 in field group_field (for a given common_field value), use the mean of the frequency
             (of each feature) as the nominator value for the sample group.
-        value2: str or iterable of str or None, optional
-            If not None, values for field that will be assigned to the second (denominator) sample group. for example 'after_treatment'
+        value2: str or iterable of str, default=None
+            If not None, values for field that will be assigned to the second (denominator) sample group. For example 'after_treatment'
             If None, use all samples not in the first sample group as the second sample group.
-            Similar to value1, if more than 1 sample matches, use the mean frequency as the denominator value.
+            Similar to value1, if more than 1 sample matches, use their mean frequency as the denominator value.
         threshold: float or None, optional
             If not None, assign each data value<threshold to threshold. If both nominator and denominator are < threshold,
             the resulting ratio will assigned be np.nan.
             For example, in an AmpliconExperiment, ratios calculated between low read numbers are not reliable. So it is advised to set threshold to approx. 10
-        sample_md_suffix: tuple of (str, str) or None, optional
+        sample_md_suffix: tuple of (str, str), default=None
             The suffix to add to the ratio experiment for each sample metadata column name, indicating if it is from value1 or value2 group.
             If none, append value1 or value2 to the column name respectively.
             In the ratio experiment, since each sample is the ratio of 2 sample groups, the sample metadata can originate from the first or second group. Therefore
