@@ -40,8 +40,6 @@ from pkg_resources import resource_filename
 import numpy as np
 import scipy
 
-from . import Experiment, AmpliconExperiment, MS1Experiment
-
 
 logger = getLogger(__name__)
 
@@ -560,8 +558,6 @@ def register_functions(clss, modules=None):
         modules = ['calour.' + i for i in
                    ['io', 'sorting', 'filtering', 'analysis', 'training', 'transforming',
                     'heatmap.heatmap', 'plotting', 'manipulation', 'database', 'export_html']]
-
-    for cls in clss:
 
     for module_name in modules:
         module = import_module(module_name)
