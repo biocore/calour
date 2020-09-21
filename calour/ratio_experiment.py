@@ -182,7 +182,7 @@ class RatioExperiment(Experiment):
         # used to count the number of samples that have values in both groups
         # we then keep only these columns in the ratio_mat
         found_indices = []
-        for idx, cexp in enumerate(exp.iterate(common_field, axis=0)):
+        for idx, (_, cexp) in enumerate(exp.iterate(common_field, axis=0)):
             # cfield = cexp.sample_metadata[common_field].iloc[0]
             group1 = cexp.filter_samples(group_field, value1)
             group2 = cexp.filter_samples(group_field, value2)
