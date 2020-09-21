@@ -30,6 +30,7 @@ import pandas as pd
 import numpy as np
 import scipy.sparse
 
+from .util import _convert_axis_name
 
 logger = getLogger(__name__)
 
@@ -415,7 +416,8 @@ class Experiment:
                      info=info, description=description, sparse=False)
         return newexp
 
-    def iterate(self, field=None, axis='s'):
+    @_convert_axis_name
+    def iterate(self, field=None, axis=0):
         '''Iterate over all sample or feature groups.
 
         Iterate over all unique values of metadata field. Each
@@ -430,6 +432,10 @@ class Experiment:
             sample or feature.  If not None, iterate over all unique
             values of metadata field, with each iteration yielding an
             Experiment with all samples/features with this value.
+        axis: int or str, optional
+            The axis on which to iterate.
+            0 or 's' to iterate over samples
+            1 or 'f' to iterate over features
 
         Yields
         -------
