@@ -269,6 +269,7 @@ class MS1Experiment(Experiment):
             select = np.logical_or(select, bothok)
 
         logger.info('Total from mz/rt list with no match: %d' % notfound)
+        logger.info('found %d matching features' % np.sum(select))
         if negate:
             select = np.logical_not(select)
         return self.reorder(select, axis='f', inplace=inplace)

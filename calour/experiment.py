@@ -433,8 +433,10 @@ class Experiment:
 
         Yields
         -------
+        str
+            current value of the field (or the _sample_id/_feature_id (for axis='s'/'f' respectively) if field==None)
         Experiment
-            With all samples or features containing each unique value in field (or a single sample if field=None)
+            With all samples or features containing the current value in field (or a single sample if field=None)
 
         '''
         if axis == 0:
@@ -448,4 +450,4 @@ class Experiment:
 
         vals = metadata[field].unique()
         for cval in vals:
-            yield self.filter_by_metadata(field, [cval], axis=axis)
+            yield cval, self.filter_by_metadata(field, [cval], axis=axis)
