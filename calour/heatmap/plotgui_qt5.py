@@ -346,7 +346,7 @@ class ApplicationWindow(QMainWindow):
             return
         data = item.data(QtCore.Qt.UserRole)
         db = data.get('_db_interface', None)
-        logger.debug('Removing %d features from annotation %s' % (features, item.text()))
+        logger.debug('Removing %d features from annotation %s' % (len(features), item.text()))
         err = db.remove_features_from_annotation(features, data)
         if err:
             logger.error('Features not removed from annotation. Error: %s' % err)
