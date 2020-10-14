@@ -12,6 +12,7 @@ Functions
    correlation
    diff_abundance
    diff_abundance_kw
+   diff_abundance_paired
 '''
 
 # ----------------------------------------------------------------------------

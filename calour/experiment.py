@@ -129,7 +129,6 @@ class Experiment:
                 'Duplicate sample IDs exist in positions %s.' % np.where(duplicates)[0])
         duplicates = self.feature_metadata.index.duplicated(keep=False)
         if duplicates.any():
-            print(self.feature_metadata.index)
             raise ValueError(
                 'Duplicate feature IDs exist in positions %s.' % np.where(duplicates)[0])
 
