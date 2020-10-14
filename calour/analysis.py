@@ -318,6 +318,10 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
         Similar to diff_abundance transform parameter. Additional options are:
             'direction': for each pair of samples (a single value in pair_field), for each feature give 0 in lower sample, 1 in higher sample
 
+    Keyword Arguments
+    -----------------
+    %(analysis.diff_abundance.parameters)s
+
     Returns
     -------
     Experiment
