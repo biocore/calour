@@ -32,6 +32,9 @@ class Tests(TestCase):
         self.test2_biom = join(test_data_dir, 'test2.biom')
         self.test2_samp = join(test_data_dir, 'test2.sample')
         self.test2_feat = join(test_data_dir, 'test2.feature')
+        # a simple artificial biom table for paired testing
+        self.test_paired_biom = join(test_data_dir, 'test_paired.biom')
+        self.test_paired_samp = join(test_data_dir, 'test_paired.sample.txt')
         # a dense timeseries (real data)
         self.timeseries_biom = join(test_data_dir, 'timeseries.biom')
         self.timeseries_samp = join(test_data_dir, 'timeseries.sample')
