@@ -276,17 +276,17 @@ class ExperimentTests(Tests):
                           feature_metadata=pd.DataFrame({'ph': [7]}))
 
     def test_iterate(self):
-        groups = [cexp for cexp in self.test1.iterate(axis=0)]
+        groups = [cexp for _, cexp in self.test1.iterate(axis=0)]
         self.assertEqual(len(groups), self.test1.shape[0])
 
-        groups = [cexp for cexp in self.test1.iterate(axis=1)]
+        groups = [cexp for _, cexp in self.test1.iterate(axis=1)]
         self.assertEqual(len(groups), self.test1.shape[1])
 
-        groups = [cexp for cexp in self.test1.iterate(axis=0, field='group')]
+        groups = [(cval, cexp) for cval, cexp in self.test1.iterate(axis=0, field='group')]
         self.assertEqual(len(groups), 3)
-        self.assertEqual(groups[1].shape[0], 9)
-        self.assertEqual(groups[1].sample_metadata['group'].unique(), '2')
-        self.assertEqual(groups[2].shape[0], 1)
+        self.assertEqual(groups[1][1].shape[0], 9)
+        self.assertEqual(groups[1][1].sample_metadata['group'].unique(), groups[1][0])
+        self.assertEqual(groups[2][1].shape[0], 1)
 
 
 if __name__ == "__main__":
