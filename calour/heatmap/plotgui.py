@@ -292,7 +292,7 @@ class PlotGUI(ABC):
         button + shift: select all the features in the rectangle between
         current selection and last selecton.
 
-        button + super: add current selected features to the selected list
+        button + super or button + cmd: add current selected features to the selected list
         '''
         logger.debug(repr(event))
         ax = event.inaxes
@@ -319,7 +319,7 @@ class PlotGUI(ABC):
                 features = np.arange(last_selected_feature, ry + 1, 1)
             self.clear_selection()
             self.update_selection(featurepos=features)
-        elif event.key == 'super':
+        elif event.key == 'super' or event.key == 'cmd':
             self.update_selection(featurepos=[ry])
 
         self.current_select = (rx, ry)
