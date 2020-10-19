@@ -12,6 +12,7 @@ Functions
    correlation
    diff_abundance
    diff_abundance_kw
+   diff_abundance_paired
 '''
 
 # ----------------------------------------------------------------------------
@@ -135,7 +136,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
-def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
+def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', shuffler=None, random_seed=None):
     '''Differential abundance test between 2 groups of samples for all the features.
 
     It uses permutation based nonparametric test and then applies
@@ -182,6 +183,10 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
           alpha (e.g. a feature that appears in only 1 sample can
           obtain a minimal p-value of 0.5 and will therefore be
           removed when say alpha=0.1)
+    shuffler: function or None, optional
+        if None, use shuffling on all samples (using the random_seed supplied)
+        if function, use thi supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
+        Input to the function is the labels (np.array), and the random number generator (np.radnom.Generator), output is the shuffled labels (np.array)
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
         If int, random_seed is the seed used by the random number generator;
@@ -227,7 +232,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     labels = np.zeros(len(cexp.sample_metadata))
     labels[cexp.sample_metadata[field].isin(val1).values] = 1
     logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
-    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, random_seed=random_seed)
+    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, shuffler=shuffler, random_seed=random_seed)
     logger.info('number of higher in {}: {}. number of higher in {} : {}. total {}'.format(
         grp1, np.sum(odif[keep] > 0), grp2, np.sum(odif[keep] < 0), np.sum(keep)))
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals)
@@ -292,6 +297,86 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     logger.info('Found %d significant features' % (np.sum(keep)))
     return _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals)
+
+
+@format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
+def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', random_seed=None, **kwargs):
+    '''Differential abundance test between 2 groups of samples for all the features.
+
+    It uses permutation based nonparametric test and then applies
+    multiple hypothesis correction. The idea is that you compute a
+    defined statistic and compare it to the distribution of the same
+    statistic values computed from many permutations.
+
+    Parameters
+    ----------
+    pair_field: str
+        The sample metadata field on which samples are paired.
+        NOTE:
+        field values with !=2 samples are dropped.
+    transform: str or None, optional
+        Similar to diff_abundance transform parameter. Additional options are:
+            'direction': for each pair of samples (a single value in pair_field), for each feature give 0 in lower sample, 1 in higher sample
+
+    Keyword Arguments
+    -----------------
+    %(analysis.diff_abundance.parameters)s
+
+    Returns
+    -------
+    Experiment
+        A new experiment with only significant features, sorted
+        according to their effect size.  The new experiment contains
+        additional ``feature_metadata`` fields that include:
+
+        * '{}' : the non-adjusted p-values for each feature
+        * '{}' : the FDR-adjusted q-values for each feature
+        * '{}' : the effect size (t-statistic). If it is larger than
+          zero for a given feature, it indicates this feature is
+          increased in the first group of samples (``val1``); if
+          smaller than zero, this feature is decreased in the first
+          group.
+        * '{}' : in which of the 2 sample groups this given feature is increased.
+    '''
+    # keep only paired samples
+    drop_values = []
+    for cval, cexp in exp.iterate(pair_field):
+        if len(cexp.sample_metadata) != 2:
+            logger.info('Value %s has %d samples' % (cval, len(cexp.sample_metadata)))
+            drop_values.append(cval)
+    if len(drop_values) > 0:
+        logger.warning('Dropping %d values with != 2 samples' % len(drop_values))
+        exp = exp.filter_samples(pair_field, drop_values, negate=True)
+
+    if transform == 'direction':
+        # make all pairs to 0/1 (low/high) for each feature
+        exp.sparse = False
+        for cval in exp.sample_metadata[pair_field].unique():
+            cpos = np.where(exp.sample_metadata[pair_field] == cval)[0]
+            eqpos = np.where(exp.data[cpos[0], :] == exp.data[cpos[1], :])[0]
+            neqpos = np.where(exp.data[cpos[0], :] != exp.data[cpos[1], :])[0]
+            maxpos = np.argmax(exp.data[cpos, :][:, neqpos], axis=0)
+            minpos = np.argmin(exp.data[cpos, :][:, neqpos], axis=0)
+            exp.data[cpos[maxpos], neqpos] = 1
+            exp.data[cpos[minpos], neqpos] = 0
+            exp.data[cpos[0], eqpos] = 0.5
+            exp.data[cpos[1], eqpos] = 0.5
+        # no need to do another transform in diff_abundance
+        transform = None
+
+    # create the numpy.random.Generator for the paired shuffler
+    rng = np.random.default_rng(random_seed)
+
+    def _pair_shuffler(labels, rng=rng):
+        clabels = labels.copy()
+        for x in np.arange(start=0, stop=len(labels), step=2):
+            rng.shuffle(clabels[x:x + 2])
+        return clabels
+
+    # sort by pairing (so the pair shuffler will work)
+    exp = exp.sort_samples(pair_field)
+    newexp = exp.diff_abundance(shuffler=_pair_shuffler, random_seed=random_seed, transform=transform, **kwargs)
+    return newexp
 
 
 def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals):

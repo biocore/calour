@@ -93,7 +93,7 @@ def spearman(data, labels):
 
 # new fdr method
 def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
-          alpha=0.1, numperm=1000, fdr_method='dsfdr', random_seed=None):
+          alpha=0.1, numperm=1000, fdr_method='dsfdr', shuffler=None, random_seed=None):
     '''
     calculate the Discrete FDR for the data
 
@@ -135,6 +135,10 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'bhfdr' : Benjamini-Hochberg FDR method
         'byfdr' : Benjamini-Yekutielli FDR method
         'filterBH' : Benjamini-Hochberg FDR method with filtering
+    shuffler: function or None, optional
+        if None, use shuffling on all samples (using the random_seed supplied)
+        if function, use thi supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
+        Input to the function is the labels (np.array), and the random number generator (np.radnom.Generator), output is the shuffled labels (np.array)
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
         If int, random_seed is the seed used by the random number generator;
@@ -157,6 +161,10 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     # create the numpy.random.Generator
     rng = np.random.default_rng(random_seed)
+
+    # create the shuffler if not supplied
+    if shuffler is None:
+        shuffler = rng.permutation
 
     data = data.copy()
 
@@ -208,14 +216,13 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         k1 = 1 / np.sum(labels == 0)
         k2 = 1 / np.sum(labels == 1)
         for cperm in range(numperm):
-            rng.shuffle(labels)
+            labels = shuffler(labels)
             p[labels == 0, cperm] = k1
         p2 = np.ones(p.shape) * k2
         p2[p > 0] = 0
         mean1 = np.dot(data, p)
         mean2 = np.dot(data, p2)
         u = np.abs(mean1 - mean2)
-
     elif method == 'mannwhitney' or method == \
                    'kruwallis' or method == 'stdmeandiff':
         if method == 'mannwhitney':
@@ -229,7 +236,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         t = np.abs(tstat)
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
-            rlabels = rng.permutation(labels)
+            rlabels = shuffler(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
 
@@ -263,7 +270,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         permlabels = np.zeros([len(labels), numperm])
         for cperm in range(numperm):
-            rlabels = rng.permutation(labels)
+            rlabels = shuffler(labels)
             permlabels[:, cperm] = rlabels
         u = np.abs(np.dot(data, permlabels))
 
@@ -289,7 +296,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
             tstat[i] = tstat[i] / (np.std(sample_nonzero) * np.std(label_nonzero) * len(sample_nonzero))
             permlabels = np.zeros([len(label_nonzero), numperm])
             for cperm in range(numperm):
-                rlabels = rng.permutation(label_nonzero)
+                rlabels = shuffler(label_nonzero)
                 permlabels[:, cperm] = rlabels
             u[i, :] = np.abs(np.dot(sample_nonzero, permlabels))
 
@@ -302,7 +309,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         u = np.zeros([numbact, numperm])
         for cperm in range(numperm):
-            rlabels = rng.permutation(labels)
+            rlabels = shuffler(labels)
             rt = method(data, rlabels)
             u[:, cperm] = rt
         u = np.abs(u)

@@ -11,7 +11,7 @@ import unittest
 import numpy as np
 
 import calour as ca
-from calour.analysis import diff_abundance
+from calour.analysis import diff_abundance, diff_abundance_paired
 from calour._testing import Tests
 
 
@@ -20,6 +20,8 @@ class TestAnalysis(Tests):
         super().setUp()
         # load the simple experiment as sparse
         self.test1 = ca.read(self.test1_biom, self.test1_samp, normalize=None)
+        # load the paired testing experiment
+        self.test_paired = ca.read(self.test_paired_biom, self.test_paired_samp, normalize=None)
         # load the complex experiment as sparse with normalizing and removing low read samples
         self.complex = ca.read_amplicon(self.timeseries_biom, self.timeseries_samp,
                                         min_reads=1000, normalize=10000)
@@ -110,6 +112,26 @@ class TestAnalysis(Tests):
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+
+    def test_diff_abundance_paired(self):
+        # Do the paired test (we should get 4 features)
+        dd = diff_abundance_paired(self.test_paired, 'subj', field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        self.assertEqual(len(dd.feature_metadata), 4)
+        expected_ids = ['AG', 'AA', 'TA', 'TT']
+        for cid in expected_ids:
+            self.assertIn(cid, dd.feature_metadata._feature_id)
+        # and the unpaired test (which is less sensitive for this dataset - we should get only 2)
+        dd = diff_abundance(self.test_paired, field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        self.assertEqual(len(dd.feature_metadata), 2)
+        expected_ids = ['AG', 'TT']
+        for cid in expected_ids:
+            self.assertIn(cid, dd.feature_metadata._feature_id)
+        # test with binary transforming the pairs
+        dd = diff_abundance_paired(self.test_paired, 'subj', transform='direction', field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        self.assertEqual(len(dd.feature_metadata), 4)
+        expected_ids = ['AA', 'AG', 'TA', 'TT']
+        for cid in expected_ids:
+            self.assertIn(cid, dd.feature_metadata._feature_id)
 
 
 if __name__ == "__main__":
