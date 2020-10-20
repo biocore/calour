@@ -174,7 +174,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
         if agg == 'mean':
             newdat = cdata.mean(axis=axis)
         elif agg == 'median':
-            newdat = cdata.median(axis=axis)
+            newdat = np.median(cdata, axis=axis)
         elif agg == 'sum':
             newdat = cdata.sum(axis=axis)
         else:
