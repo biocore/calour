@@ -318,7 +318,7 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
         field values with !=2 samples are dropped.
     transform: str or None, optional
         Similar to diff_abundance transform parameter. Additional options are:
-            'direction': for each pair of samples (a single value in pair_field), for each feature give 0 in lower sample, 1 in higher sample
+            'pair_rank': for each group of samples (a single value in pair_field), samples are ranked within the group.
 
     Keyword Arguments
     -----------------
@@ -355,7 +355,7 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
     for pos, (idx, crow) in enumerate(exp.sample_metadata.iterrows()):
         groups[crow[pair_field]].append(pos)
 
-    if transform == 'direction':
+    if transform == 'pair_rank':
         # copy so we don't change the original experiment
         exp = exp.copy()
         # make all pairs to 0/1 (low/high) for each feature
