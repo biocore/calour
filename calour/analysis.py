@@ -24,9 +24,11 @@ Functions
 # ----------------------------------------------------------------------------
 
 from logging import getLogger
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+import scipy as sp
 
 from .experiment import Experiment
 from .util import _to_list, format_docstring
@@ -341,40 +343,41 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
     # keep only paired samples
     drop_values = []
     for cval, cexp in exp.iterate(pair_field):
-        if len(cexp.sample_metadata) != 2:
-            logger.info('Value %s has %d samples' % (cval, len(cexp.sample_metadata)))
+        if len(cexp.sample_metadata) < 2:
+            logger.info('Value %s has only %d samples. dropped' % (cval, len(cexp.sample_metadata)))
             drop_values.append(cval)
     if len(drop_values) > 0:
         logger.warning('Dropping %d values with != 2 samples' % len(drop_values))
         exp = exp.filter_samples(pair_field, drop_values, negate=True)
 
+    # create the groups list for the shuffle function
+    groups = defaultdict(list)
+    for pos, (idx, crow) in enumerate(exp.sample_metadata.iterrows()):
+        groups[crow[pair_field]].append(pos)
+
     if transform == 'direction':
+        # copy so we don't change the original experiment
+        exp = exp.copy()
         # make all pairs to 0/1 (low/high) for each feature
         exp.sparse = False
         for cval in exp.sample_metadata[pair_field].unique():
             cpos = np.where(exp.sample_metadata[pair_field] == cval)[0]
-            eqpos = np.where(exp.data[cpos[0], :] == exp.data[cpos[1], :])[0]
-            neqpos = np.where(exp.data[cpos[0], :] != exp.data[cpos[1], :])[0]
-            maxpos = np.argmax(exp.data[cpos, :][:, neqpos], axis=0)
-            minpos = np.argmin(exp.data[cpos, :][:, neqpos], axis=0)
-            exp.data[cpos[maxpos], neqpos] = 1
-            exp.data[cpos[minpos], neqpos] = 0
-            exp.data[cpos[0], eqpos] = 0.5
-            exp.data[cpos[1], eqpos] = 0.5
+            cdat = exp.data[cpos, :]
+            exp.data[cpos, :] = sp.stats.rankdata(cdat, axis=0)
         # no need to do another transform in diff_abundance
         transform = None
 
     # create the numpy.random.Generator for the paired shuffler
     rng = np.random.default_rng(random_seed)
 
-    def _pair_shuffler(labels, rng=rng):
+    def _pair_shuffler(labels, rng=rng, groups=groups):
         clabels = labels.copy()
-        for x in np.arange(start=0, stop=len(labels), step=2):
-            rng.shuffle(clabels[x:x + 2])
+        for cgroup in groups.values():
+            clabels[cgroup] = rng.permutation(clabels[cgroup])
         return clabels
 
-    # sort by pairing (so the pair shuffler will work)
-    exp = exp.sort_samples(pair_field)
+    # # sort by pairing (so the pair shuffler will work)
+    # exp = exp.sort_samples(pair_field)
     newexp = exp.diff_abundance(shuffler=_pair_shuffler, random_seed=random_seed, transform=transform, **kwargs)
     return newexp
 
