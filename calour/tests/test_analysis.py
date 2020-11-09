@@ -127,9 +127,15 @@ class TestAnalysis(Tests):
         for cid in expected_ids:
             self.assertIn(cid, dd.feature_metadata._feature_id)
         # test with binary transforming the pairs
-        dd = diff_abundance_paired(self.test_paired, 'subj', transform='direction', field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        dd = diff_abundance_paired(self.test_paired, 'subj', transform='pair_rank', field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
         self.assertEqual(len(dd.feature_metadata), 4)
         expected_ids = ['AA', 'AG', 'TA', 'TT']
+        for cid in expected_ids:
+            self.assertIn(cid, dd.feature_metadata._feature_id)
+        # test with more than 2 samples per group
+        dd = diff_abundance_paired(self.test_paired, 'group3', field='group2', val1='1', val2='2', alpha=0.1, random_seed=2020, numperm=1000)
+        self.assertEqual(len(dd.feature_metadata), 4)
+        expected_ids = ['AA', 'AT', 'GG', 'TA']
         for cid in expected_ids:
             self.assertIn(cid, dd.feature_metadata._feature_id)
 
