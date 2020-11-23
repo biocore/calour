@@ -302,7 +302,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
-def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', random_seed=None, **kwargs):
+def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, transform='rankdata', random_seed=None, **kwargs):
     '''Differential abundance test between 2 groups of samples for all the features.
 
     It uses permutation based nonparametric test and then applies
@@ -316,6 +316,13 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
         The sample metadata field on which samples are paired.
         NOTE:
         field values with !=2 samples are dropped.
+    field : str
+        The field from sample metadata to group samples.
+    val1 : str or list of str
+        The values in the `field` column for the first group.
+    val2 : str or list of str or None (optional)
+        The values in the `field` column to select the second group.
+        `None` (default) to compare to all other samples (excluding `val1`).
     transform: str or None, optional
         Similar to diff_abundance transform parameter. Additional options are:
             'pair_rank': for each group of samples (a single value in pair_field), samples are ranked within the group.
@@ -340,21 +347,25 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
           group.
         * '{}' : in which of the 2 sample groups this given feature is increased.
     '''
+    val1 = _to_list(val1)
+    if val2 is not None:
+        val2 = _to_list(val2)
+        exp = exp.filter_samples(field, val1 + val2, negate=False)
+
     # keep only paired samples
     drop_values = []
     for cval, cexp in exp.iterate(pair_field):
         if len(cexp.sample_metadata) < 2:
-            logger.info('Value %s has only %d samples. dropped' % (cval, len(cexp.sample_metadata)))
+            logger.debug('Value %s has only %d samples. dropped' % (cval, len(cexp.sample_metadata)))
             drop_values.append(cval)
     if len(drop_values) > 0:
-        logger.warning('Dropping %d values with != 2 samples' % len(drop_values))
+        logger.info('Dropping %d values with < 2 samples' % len(drop_values))
         exp = exp.filter_samples(pair_field, drop_values, negate=True)
 
     # create the groups list for the shuffle function
     groups = defaultdict(list)
     for pos, (idx, crow) in enumerate(exp.sample_metadata.iterrows()):
         groups[crow[pair_field]].append(pos)
-
     if transform == 'pair_rank':
         # copy so we don't change the original experiment
         exp = exp.copy()
@@ -378,7 +389,7 @@ def diff_abundance_paired(exp: Experiment, pair_field, transform='rankdata', ran
 
     # # sort by pairing (so the pair shuffler will work)
     # exp = exp.sort_samples(pair_field)
-    newexp = exp.diff_abundance(shuffler=_pair_shuffler, random_seed=random_seed, transform=transform, **kwargs)
+    newexp = exp.diff_abundance(shuffler=_pair_shuffler, field=field, val1=val1, val2=val2, random_seed=random_seed, transform=transform, **kwargs)
     return newexp
 
 
