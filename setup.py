@@ -69,7 +69,7 @@ setup(name='calour',
           'statsmodels',
           'ipywidgets',
           'docrep'],
-      extras_require={'test': ["nose", "pep8", "flake8"],
+      extras_require={'test': ["nose", "pep8", "flake8", 'scikit-bio >= 0.5.1'],
                       'coverage': ["coveralls"],
                       'doc': ["Sphinx >= 1.4", "sphinx-autodoc-typehints", "nbsphinx"],
                       'dendrogram': ['scikit-bio >= 0.5.1']
