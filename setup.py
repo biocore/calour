@@ -65,11 +65,12 @@ setup(name='calour',
           'pandas',
           'matplotlib >= 2.0',
           'scikit-learn >= 0.19.1',
-          'scikit-bio >= 0.5.1',
           'biom-format',
           'statsmodels',
           'ipywidgets',
           'docrep'],
       extras_require={'test': ["nose", "pep8", "flake8"],
                       'coverage': ["coveralls"],
-                      'doc': ["Sphinx >= 1.4", "sphinx-autodoc-typehints", "nbsphinx"]})
+                      'doc': ["Sphinx >= 1.4", "sphinx-autodoc-typehints", "nbsphinx"],
+                      'dendrogram': ['scikit-bio >= 0.5.1']
+                      })
