@@ -27,7 +27,7 @@ New features:
 * Clean and improve API documentation.
 
 Other changes:
-* make scikit-bio an optional dependency (needed only when processing dendrograms)
+* make scikit-bio an optional dependency (needed only when processing dendrograms).
 
 ## Version 2019.5.1
 
