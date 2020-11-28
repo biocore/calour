@@ -11,6 +11,7 @@ Incompatible changes:
 * Change parameter names in some functions
 * Rename filter_abundance() to filter_sum(abundance)
 * Other backwards incompatible function API changes and code refactoring.
+* test
 
 New features:
 * Add RatioExperiment for working with ratios between two groups of features
