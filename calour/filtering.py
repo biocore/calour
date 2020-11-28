@@ -207,7 +207,7 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0,
     else:
         select = metadata[field].isin(select).values
 
-    if negate is True:
+    if negate is False:
         select = ~ select
     return exp.reorder(select, axis=axis, inplace=inplace)
 
