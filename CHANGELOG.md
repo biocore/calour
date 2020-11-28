@@ -26,6 +26,9 @@ New features:
 * Add new mechanism to register a function to a class as a method automatically. In order for a function to be registerred to a class, it must be a public function and has type hint of the class type for its first function parameter and return value.
 * Clean and improve API documentation.
 
+Other changes:
+* make scikit-bio an optional dependency (needed only when processing dendrograms)
+
 ## Version 2019.5.1
 
 * Add `reverse` parameter to the sorting functions.
