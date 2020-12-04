@@ -18,7 +18,6 @@ from .. import Experiment
 from ..database import _get_database_class
 from ..util import _to_list, _transition_index
 from .._doc import ds
-from .._dendrogram import plot_tree
 
 
 logger = getLogger(__name__)
@@ -553,6 +552,9 @@ def plot(exp: Experiment, title=None,
     if tree is None:
         gui_obj = _create_plot_gui(exp, gui, databases)
     else:
+        # we import here to make skbio optional dependency
+        from .._dendrogram import plot_tree
+
         gui_obj = _create_plot_gui(exp, gui, databases, tree_size=tree_size)
         # match the exp order to the tree (reorders the features)
         exp, tree = plot_tree(exp, tree, gui_obj.ax_tre)
