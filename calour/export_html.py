@@ -59,7 +59,7 @@ def _list_to_string(cl):
 
 def export_html(exp: Experiment, sample_field=None, feature_field=None, title=None,
                 xticklabel_len=50, cmap=None, clim=(None, None), norm=mpl.colors.LogNorm(),
-                output_file='out', html_template=None, **kwargs):
+                output_file='out', html_template=None, bad_color='black'):
     '''Export an interactive html heatmap for the experiment.
 
     Creates a standalone html file with interactive d3.js heatmap of the experiment and interface to dbBact.
@@ -89,6 +89,8 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
         Name of the output html file (no .html ending - it will be appended).
     html_template : str or None, optional
         Name of the html template to use. None to use the default export_html_template.html template
+    bad_color: str or matplotlib color, optional
+        The heatmap color to use for masked / NaN values
     '''
     import matplotlib.pyplot as plt
 
@@ -106,6 +108,11 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     # init the default colormap
     if cmap is None:
         cmap = plt.rcParams['image.cmap']
+    if isinstance(cmap, str):
+        cmap = plt.get_cmap(cmap)
+    # this set cells of zero value.
+    cmap.set_bad(bad_color)
+
     # plot the heatmap with 1 pixel per feature/sample, no axes/lines
     fig = plt.figure(frameon=False, dpi=300)
     fig.set_size_inches(exp.shape[0] / 300, exp.shape[1] / 300)
