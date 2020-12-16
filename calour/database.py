@@ -73,10 +73,10 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         DBClass = getattr(db_module, class_name)
         cdb = DBClass(exp)
         # test if database version is compatible
-        if min_version > 0:
-            db_version = cdb.version()
-            if db_version < min_version:
-                logger.warning('Please update %s database module. Current version (%f) not supported (minimal version %f).\nFor details see %s' % (dbname, db_version, min_version, module_website))
+        # if min_version > 0:
+        #     db_version = cdb.version()
+        #     if db_version < min_version:
+        #         logger.warning('Please update %s database module. Current version (%f) not supported (minimal version %f).\nFor details see %s' % (dbname, db_version, min_version, module_website))
         return cdb
     # not found, so print available database names
     databases = []
