@@ -24,6 +24,7 @@ Functions
 from logging import getLogger
 from abc import ABC
 import importlib
+from pkg_resources import parse_version
 
 from .util import get_config_value, get_config_file, get_config_sections
 from .experiment import Experiment
@@ -56,7 +57,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
     '''
     class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
     module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
-    min_version = float(get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0'))
+    min_version = get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0')
     module_website = get_config_value('website', section=dbname, config_file_name=config_file_name, fallback='NA')
 
     if class_name is not None and module_name is not None:
@@ -73,10 +74,11 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
         DBClass = getattr(db_module, class_name)
         cdb = DBClass(exp)
         # test if database version is compatible
-        # if min_version > 0:
-        #     db_version = cdb.version()
-        #     if db_version < min_version:
-        #         logger.warning('Please update %s database module. Current version (%f) not supported (minimal version %f).\nFor details see %s' % (dbname, db_version, min_version, module_website))
+        if parse_version(min_version) > parse_version('0.0'):
+            db_version = cdb.version()
+            logger.debug('database: %s , version installed: %s , minimal version: %s' % (dbname, db_version, min_version))
+            if parse_version(db_version) < parse_version(min_version):
+                logger.warning('Please update %s database module. Current version (%s) not supported (minimal version %s).\nFor details see %s' % (dbname, db_version, min_version, module_website))
         return cdb
     # not found, so print available database names
     databases = []
