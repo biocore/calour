@@ -81,4 +81,4 @@ class MockDatabase(Database):
     def version(self):
         '''return the current database version
         '''
-        return 2020.0709
+        return '1.1.3rc1'
