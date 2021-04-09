@@ -28,6 +28,7 @@ from pkg_resources import parse_version
 
 from .util import get_config_value, get_config_file, get_config_sections
 from .experiment import Experiment
+from packaging import version
 
 logger = getLogger(__name__)
 
@@ -57,7 +58,7 @@ def _get_database_class(dbname, exp=None, config_file_name=None):
     '''
     class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
     module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
-    min_version = get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0')
+    min_version = version.parse(get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0'))
     module_website = get_config_value('website', section=dbname, config_file_name=config_file_name, fallback='NA')
 
     if class_name is not None and module_name is not None:
