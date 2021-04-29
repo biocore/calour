@@ -198,6 +198,8 @@ def _read_biom(fp, transpose=True):
         table = biom.parse_table(fp)
     else:
         table = biom.load_table(fp)
+    if transpose:
+        table = table.transpose()
     sid = table.ids(axis='sample')
     fid = table.ids(axis='observation')
     logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
@@ -412,7 +414,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # load the data table
     fmd = None
     if data_file_type == 'biom':
-        sid, fid, data, fmd = _read_biom(data_file)
+        sid, fid, data, fmd = _read_biom(data_file, transpose=sample_in_row)
     elif data_file_type == 'csv':
         sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_file_sep)
     elif data_file_type == 'qiime2':
@@ -504,7 +506,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     # don't do normalize before the possible filtering
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
-               normalize=None, **kwargs)
+               normalize=None, sample_in_row=False, **kwargs)
 
     if 'taxonomy' in exp.feature_metadata.columns:
         exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp, remove_underscore=False)
