@@ -472,7 +472,7 @@
         $('#sequence').html(cid);
         // Get dbBact annotations for selection
         $.ajax({
-          url: 'http://api.dbbact.org/sequences/get_string_annotations',
+          url: 'https://api.dbbact.org/sequences/get_string_annotations',
           type: 'POST',
           data: JSON.stringify({'sequence': cid}),
           dataType: 'json',
@@ -483,11 +483,11 @@
               }
               else {
                 var atext = '';
-                var clink = 'http://dbbact.org/sequence_annotations/' + cid;
+                var clink = 'https://dbbact.org/sequence_annotations/' + cid;
                 var ctext = '<p><a href="' + clink + '" target="_blank">dbBact Summary</a></p>';
                 atext += ctext;
                 for (i = 0; i < data.annotations.length; i++) {
-                    clink = 'http://dbbact.org/annotation_info/' + data.annotations[i].annotationid.toString();
+                    clink = 'https://dbbact.org/annotation_info/' + data.annotations[i].annotationid.toString();
                     ctext = '<a href="' + clink + '" target="_blank">' + data.annotations[i].annotation_string + '</a><br>';
                     atext += ctext;
                 }
