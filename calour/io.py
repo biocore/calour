@@ -73,7 +73,7 @@ def _file_from_zip(tempdir, data_file, internal_data):
         raise ValueError('No data file (%s) in qza file %s. is it the appropriate qiime2 file?' % (internal_data, data_file))
 
 
-def _read_qiime2_zip(fp, transpose=True):
+def _read_qiime2_zip(fp, sample_in_row=False):
     '''Read in a qiime2 qza biom table
 
     NOTE: this function reads2 the qiime2 qza artifacts files using unzip rather than relying on qiime2.
@@ -83,10 +83,9 @@ def _read_qiime2_zip(fp, transpose=True):
     ----------
     fp : str
         file path to the qiime2 (.qza) biom table
-    transpose : bool (True by default)
-        Transpose the table or not. The biom table has samples in
-        column while sklearn and other packages require samples in
-        row. So you should transpose the data table.
+    sample_in_row: bool, optional
+        False (defailt) - samples correspond to columns
+        if True, samples in the biom table are in rows
 
     Returns
     -------
@@ -104,7 +103,7 @@ def _read_qiime2_zip(fp, transpose=True):
     # load the feature table file
     with tempfile.TemporaryDirectory() as tempdir:
         oname = _file_from_zip(tempdir, fp, internal_data='data/feature-table.biom')
-        sid, fid, data, fmd = _read_biom(oname, transpose=transpose)
+        sid, fid, data, fmd = _read_biom(oname, sample_in_row=sample_in_row)
 
     return sid, fid, data, fmd
 
@@ -170,17 +169,16 @@ def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=
     return newexp
 
 
-def _read_biom(fp, transpose=True):
+def _read_biom(fp, sample_in_row=False):
     '''Read in a biom table file.
 
     Parameters
     ----------
     fp : str or file object
         file path to the biom table
-    transpose : bool (True by default)
-        Transpose the table or not. The biom table has samples in
-        column while sklearn and other packages require samples in
-        row. So you should transpose the data table.
+    sample_in_row: bool, optional
+        False (defailt) - samples correspond to columns
+        if True, samples in the biom table are in rows
 
     Returns
     -------
@@ -198,14 +196,16 @@ def _read_biom(fp, transpose=True):
         table = biom.parse_table(fp)
     else:
         table = biom.load_table(fp)
+    if sample_in_row:
+        table = table.transpose()
     sid = table.ids(axis='sample')
     fid = table.ids(axis='observation')
     logger.info('loaded %d samples, %d features' % (len(sid), len(fid)))
     data = table.matrix_data
     feature_md = _get_md_from_biom(table)
 
-    if transpose:
-        data = data.transpose()
+    # Transpose the data. The biom table has samples in columns while sklearn and other packages require samples in rows
+    data = data.transpose()
 
     return sid, fid, data, feature_md
 
@@ -412,7 +412,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # load the data table
     fmd = None
     if data_file_type == 'biom':
-        sid, fid, data, fmd = _read_biom(data_file)
+        sid, fid, data, fmd = _read_biom(data_file, sample_in_row=sample_in_row)
     elif data_file_type == 'csv':
         sid, fid, data = _read_csv(data_file, sample_in_row=sample_in_row, sep=data_file_sep)
     elif data_file_type == 'qiime2':
@@ -504,7 +504,7 @@ def read_amplicon(data_file, sample_metadata_file=None,
 
     # don't do normalize before the possible filtering
     exp = read(data_file, sample_metadata_file, cls=AmpliconExperiment,
-               normalize=None, **kwargs)
+               normalize=None, sample_in_row=False, **kwargs)
 
     if 'taxonomy' in exp.feature_metadata.columns:
         exp.feature_metadata['taxonomy'] = _get_taxonomy_string(exp, remove_underscore=False)
