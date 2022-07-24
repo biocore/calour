@@ -8,6 +8,8 @@ Incompatible changes:
 Bug Fixes:
 * Fix join_metadata_fields() to use axis='s' by default
 * Fix join_experiments() to update exp.info['sample_metadata_md5'] and exp.info['data_md5']
+* Fix join_experiments() to make field parameter optional, enable joining when field already exists in the experiment, and update the doc
+* Fix join_experiments_featurewise() to make field parameter optional, enable joining when field already exists in the experiment, and update the doc
 
 
 ## Version 2020.8.6
