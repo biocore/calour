@@ -31,7 +31,7 @@ import pandas as pd
 import numpy as np
 
 from .experiment import Experiment
-from .util import join_fields
+from .util import join_fields, get_data_md5
 
 
 logger = getLogger(__name__)
@@ -272,6 +272,10 @@ def join_experiments(exp: Experiment, other, field, labels=('exp', 'other'), pre
     idx = [all_features.index(i) for i in other.feature_metadata.index]
     all_data[len(smd1):len(smd), idx] = other.get_data(sparse=False)
     newexp.data = all_data
+
+    # update the md5 hashes for the joined experiment
+    newexp.info['data_md5'] = get_data_md5(newexp.data)
+    newexp.info['sample_metadata_md5'] = exp.info['sample_metadata_md5']
 
     # validate the combined experiment at last
     newexp.validate()

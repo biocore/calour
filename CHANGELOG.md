@@ -7,6 +7,8 @@ Incompatible changes:
 
 Bug Fixes:
 * Fix join_metadata_fields() to use axis='s' by default
+* Fix join_experiments() to update exp.info['sample_metadata_md5'] and exp.info['data_md5']
+
 
 ## Version 2020.8.6
 
