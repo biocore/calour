@@ -1,8 +1,9 @@
 # calour changelog
 
 
-
-
+## Version 2022.7.1
+Bug Fixes:
+* Fix join_metadata() to use axis='s' by default
 
 ## Version 2020.8.6
 
