@@ -2,8 +2,11 @@
 
 
 ## Version 2022.7.1
+Incompatible changes:
+* Change default join_metadata_fields() inplace parameter to False
+
 Bug Fixes:
-* Fix join_metadata() to use axis='s' by default
+* Fix join_metadata_fields() to use axis='s' by default
 
 ## Version 2020.8.6
 

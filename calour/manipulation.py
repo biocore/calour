@@ -75,7 +75,7 @@ def chain(exp: Experiment, steps=[], inplace=False, **kwargs) -> Experiment:
 
 
 def join_metadata_fields(exp: Experiment, field1, field2, new_field=None,
-                         axis=0, inplace=True, **kwargs) -> Experiment:
+                         axis=0, inplace=False, **kwargs) -> Experiment:
     '''Join 2 fields in sample or feature metadata into 1.
 
     Parameters
