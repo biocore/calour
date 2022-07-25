@@ -4,6 +4,7 @@
 ## Version 2022.7.1
 Bug Fixes:
 * Fix join_metadata() to use axis='s' by default
+* Remove normalization check from filter_by_data()
 
 ## Version 2020.8.6
 
