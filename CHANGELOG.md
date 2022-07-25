@@ -5,6 +5,7 @@
 Bug Fixes:
 * Fix join_metadata() to use axis='s' by default
 * Fix heatmap() to copy the colormap to avoid matplotlib depracation warning (modifying the state of a globally registered colormap)
+* Fix experiment read functions to show by default only the summary and first 5 samples without data/without metadata
 
 ## Version 2020.8.6
 
