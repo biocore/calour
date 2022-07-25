@@ -4,6 +4,7 @@
 ## Version 2022.7.1
 Bug Fixes:
 * Fix join_metadata() to use axis='s' by default
+* Fix experiment read functions to show by default only the summary and first 5 samples without data/without metadata
 
 ## Version 2020.8.6
 
