@@ -314,10 +314,14 @@ def _read_metadata(ids, f, kwargs):
         mid, ids2 = set(metadata.index), set(ids)
         diff = mid - ids2
         if diff:
-            logger.warning('These have metadata but do not have data - dropped (%d): %r' % (len(diff), diff))
+            logger.warning('Found %d samples that have metadata but do not have data. These samples have been dropped.' % len(diff))
+            logger.info('First 5 samples without data: %r' % diff[:5])
+            logger.debug('These have metadata but do not have data - dropped (%d): %r' % (len(diff), diff))
         diff = ids2 - mid
         if diff:
-            logger.warning('These have data but do not have metadata: %r' % diff)
+            logger.warning('Found %d samples that have data but do not have metadata.' % len(diff))
+            logger.info('First 5 samples without metadata: %r' % diff[:5])
+            logger.debug('These have data but do not have metadata: %r' % diff)
         # reorder the id in metadata to align with biom
         # metadata = metadata.loc[ids, ]
 

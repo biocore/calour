@@ -10,7 +10,8 @@ Bug Fixes:
 * Fix join_experiments() to update exp.info['sample_metadata_md5'] and exp.info['data_md5']
 * Fix join_experiments() to make field parameter optional, enable joining when field already exists in the experiment, and update the doc
 * Fix join_experiments_featurewise() to make field parameter optional, enable joining when field already exists in the experiment, and update the doc
-
+* Fix join_metadata() to use axis='s' by default
+* Fix experiment read functions to show by default only the summary and first 5 samples without data/without metadata
 
 ## Version 2020.8.6
 
