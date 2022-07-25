@@ -4,6 +4,7 @@
 ## Version 2022.7.1
 Bug Fixes:
 * Fix join_metadata() to use axis='s' by default
+* Fix heatmap() to copy the colormap to avoid matplotlib depracation warning (modifying the state of a globally registered colormap)
 
 ## Version 2020.8.6
 
