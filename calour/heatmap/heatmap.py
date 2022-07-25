@@ -9,6 +9,7 @@
 from logging import getLogger
 import importlib
 import itertools
+import copy
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
@@ -304,6 +305,10 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
         cmap = plt.rcParams['image.cmap']
     if isinstance(cmap, str):
         cmap = plt.get_cmap(cmap)
+
+    # copy the colormap so the changes we make are local
+    cmap = copy.copy(cmap)
+
     # this set cells of zero value.
     cmap.set_bad(bad_color)
 

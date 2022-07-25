@@ -31,7 +31,7 @@ import pandas as pd
 import numpy as np
 
 from .experiment import Experiment
-from .util import join_fields
+from .util import join_fields, get_data_md5
 
 
 logger = getLogger(__name__)
@@ -75,7 +75,7 @@ def chain(exp: Experiment, steps=[], inplace=False, **kwargs) -> Experiment:
 
 
 def join_metadata_fields(exp: Experiment, field1, field2, new_field=None,
-                         axis=0, inplace=True, **kwargs) -> Experiment:
+                         axis=0, inplace=False, **kwargs) -> Experiment:
     '''Join 2 fields in sample or feature metadata into 1.
 
     Parameters
@@ -199,7 +199,7 @@ def aggregate_by_metadata(exp: Experiment, field, agg='mean', axis=0, inplace=Fa
     return exp
 
 
-def join_experiments(exp: Experiment, other, field, labels=('exp', 'other'), prefixes=None) -> Experiment:
+def join_experiments(exp: Experiment, other, field='_calour_original_experiment', labels=('exp', 'other'), prefixes=None) -> Experiment:
     '''Combine two :class:`.Experiment` objects into one.
 
     This assumes the same feature in the 2 joining experiments has
@@ -216,9 +216,10 @@ def join_experiments(exp: Experiment, other, field, labels=('exp', 'other'), pre
         from exp and not from other.
     field : None or str
         Name of the new ``sample_metdata`` field containing the experiment each sample is coming from.
-        If it is None, don't add such column. The values in this column will be "exp" and "other".
+        The values in this column are supplied in the labels parameter.
+        If it is None, don't add such column.
     labels : tuple of (str, str)
-        Only used if `field` is not `None`. Label which experiments each sample is from.
+        Only used if `field` is not `None`. Label which experiment each sample is from.
     prefixes : tuple of (str, str), optional
         Prefix to prepend to the sample_metadata index for identical samples in the 2 experiments.
         Required only if the two experiments share any identical sample ID.
@@ -273,12 +274,16 @@ def join_experiments(exp: Experiment, other, field, labels=('exp', 'other'), pre
     all_data[len(smd1):len(smd), idx] = other.get_data(sparse=False)
     newexp.data = all_data
 
+    # update the md5 hashes for the joined experiment
+    newexp.info['data_md5'] = get_data_md5(newexp.data)
+    newexp.info['sample_metadata_md5'] = exp.info['sample_metadata_md5']
+
     # validate the combined experiment at last
     newexp.validate()
     return newexp
 
 
-def join_experiments_featurewise(exp: Experiment, other, field, labels=('exp', 'other'), prefixes=None) -> Experiment:
+def join_experiments_featurewise(exp: Experiment, other, field='_calour_original_experiment', labels=('exp', 'other'), prefixes=None) -> Experiment:
     '''Combine two :class:`.Experiment` objects into one.
 
     An example of use cases is to combine the 16S and ITS amplicon
@@ -292,11 +297,12 @@ def join_experiments_featurewise(exp: Experiment, other, field, labels=('exp', '
     ----------
     other : :class:`.Experiment`
         The ``Experiment`` object to combine with the current one.
-    field : ``None`` or str
-        Name of the new ``feature_metdata`` field containing the experiment each feature is coming from.
-        If it is None, don't add such column. The values in this column will be "exp" and "other".
+    field : None or str
+        Name of the new ``sample_metdata`` field containing the experiment each sample is coming from.
+        The values in this column are supplied in the labels parameter.
+        If it is None, don't add such column.
     labels : tuple of (str, str)
-        Only used if `field` is not `None`. Label which experiments each features is from.
+        Only used if `field` is not `None`. Label which experiment each sample is from.
     prefixes : tuple of (str, str), optional
         Prefix to prepend to the feature_metadata index for identical feature IDs in the 2 experiments.
         Required only if the two experiments share any identical feature ID.
@@ -346,9 +352,15 @@ def _check_id_overlap_then_concat(df1, df2, prefixes, field, labels):
 
     df = pd.concat([df1, df2], join='outer')
     if field is not None:
-        if field in df.columns:
-            raise ValueError(
-                'Column name %s already exists in the metadata - '
-                'please give a different name' % field)
-        df[field] = [labels[0]] * df1.shape[0] + [labels[1]] * df2.shape[0]
+        if field in df1.columns:
+            vals1 = list(df1[field].values)
+        else:
+            vals1 = [labels[0]] * df1.shape[0]
+
+        if field in df2.columns:
+            vals2 = list(df2[field].values)
+        else:
+            vals2 = [labels[1]] * df2.shape[0]
+
+        df[field] = vals1 + vals2
     return df
