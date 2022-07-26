@@ -248,8 +248,6 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None,
     filter_prevalence
 
     '''
-    if exp.normalized <= 0:
-        logger.warning('Do you forget to normalize your data? It is required before running this function')
     logger.debug('filter_by_data using function %r' % predicate)
 
     if axis == 0:

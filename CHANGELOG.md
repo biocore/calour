@@ -11,6 +11,7 @@ Bug Fixes:
 * Fix join_experiments() to make field parameter optional, enable joining when field already exists in the experiment, and update the doc
 * Fix join_experiments_featurewise() to make field parameter optional, enable joining when field already exists in the experiment, and update the doc
 * Fix join_metadata() to use axis='s' by default
+* Remove normalization check from filter_by_data()
 * Fix heatmap() to copy the colormap to avoid matplotlib depracation warning (modifying the state of a globally registered colormap)
 * Fix experiment read functions to show by default only the summary and first 5 samples without data/without metadata
 
