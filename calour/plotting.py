@@ -204,7 +204,9 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         the background is the bar color (green/red).  None to not show
         the enriched experiments count
     labels_kwargs: dict, optional
-        Additional parameters to pass to see matplolib.axes.Axes.set_yticklabels()
+        Additional parameters to pass to the bar labels rendering. see matplolib.axes.Axes.set_yticklabels()
+    numbers_kwargs: dict or None, optional
+        Additional parameters for the number of enriched experiments labels (inside the bars) fonts. See matplolib.axes.Axes.text(). If None do not display the number of enriched experiments
     **kwargs : dict, optional
         Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)
 
