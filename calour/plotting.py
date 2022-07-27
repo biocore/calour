@@ -95,9 +95,6 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
         name for terms enriched in group1 or group2 respectively, or None to not show legend
     colors: tuple of (str, str) or None (optional)
         Colors for terms enriched in group1 or group2 respectively
-    enriched_exp_color: str or None, optional
-        If not None, the color to show the number of enriched experiments for each term in the bar. Default is white since the background is the bar color (green/red).
-        None to not show the enriched experiments count
     labels_kwargs: dict, optional
         Additional parameters for the axis ticks labels fonts. See matplolib.axes.Axes.set_yticklabels()
     numbers_kwargs: dict or None, optional
@@ -198,11 +195,6 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         Colors for terms enriched in group1 or group2 respectively
     show_legend: bool (optional)
         True to show the color legend, False to hide it
-    enriched_exp_color: str or None, optional
-        If not None, the color to show the number of enriched
-        experiments for each term in the bar. Default is white since
-        the background is the bar color (green/red).  None to not show
-        the enriched experiments count
     labels_kwargs: dict, optional
         Additional parameters to pass to the bar labels rendering. see matplolib.axes.Axes.set_yticklabels()
     numbers_kwargs: dict or None, optional
