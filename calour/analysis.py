@@ -120,6 +120,8 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         labels = np.delete(labels, nanpos)
         data = np.delete(data, nanpos, axis=1)
         logger.warning('NaN values encountered in labels for correlation. Ignoring these samples (%d). %d samples left' % (len(nanpos), len(labels)))
+        if len(labels) == 0:
+            raise ValueError('Field %s does not seem to contain any samples with numeric value' % field)
     # change the method if we have nonzero
     if nonzero:
         if method == 'spearman':
@@ -372,7 +374,7 @@ def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, t
 
     if len(exp.sample_metadata) == 0:
         raise ValueError('No samples with >1 value in pair field left')
-    logger.info('Testing %d samples' % len(exp.sample_metadata))
+    logger.info('%d samples left after removing group value singletons' % len(exp.sample_metadata))
 
     # create the groups list for the shuffle function
     groups = defaultdict(list)
