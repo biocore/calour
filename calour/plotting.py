@@ -30,6 +30,7 @@ from logging import getLogger
 from itertools import cycle, combinations
 
 import numpy as np
+import matplotlib as mpl
 from scipy import stats
 
 from . import Experiment
@@ -69,13 +70,13 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     # note the count number on top of the histogram bars
     for rect, n in zip(patches, counts):
         height = rect.get_height()
-        ax.text(rect.get_x() + rect.get_width()/2, height + 5,
+        ax.text(rect.get_x() + rect.get_width() / 2, height + 5,
                 int(n), ha='center', va='bottom',
                 rotation=90, fontsize=7)
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), enriched_exp_color='white'):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), labels_kwargs={'style': 'italic', 'weight': 'semibold'}, numbers_kwargs={'color': 'white', 'weight': 'bold'}):
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -97,7 +98,10 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     enriched_exp_color: str or None, optional
         If not None, the color to show the number of enriched experiments for each term in the bar. Default is white since the background is the bar color (green/red).
         None to not show the enriched experiments count
-
+    labels_kwargs: dict, optional
+        Additional parameters for the axis ticks labels fonts. See matplolib.axes.Axes.set_yticklabels()
+    numbers_kwargs: dict or None, optional
+        Additional parameters for the number of enriched experiments labels (inside the bars) fonts. See matplolib.axes.Axes.text(). If None do not display the number of enriched experiments
 
     Returns
     -------
@@ -129,36 +133,48 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     if negative > 0:
         use[:negative] = True
 
-    ticks = enriched['term'].values[use]
+    enriched = enriched[use]
+    ticks = enriched['term'].values
     ticks = [x[:max_len] for x in ticks]
     ax.set_yticks(np.arange(negative + positive))
-    ax.set_yticklabels(ticks, style='italic', weight='semibold')
+    ax.set_yticklabels(ticks, **labels_kwargs)
     if labels is not None:
-        ax.set_xlabel('effect size (positive is higher in %s)' % labels[0])
-        ax.legend(labels)
+        font = mpl.font_manager.FontProperties(**labels_kwargs)
+        ax.set_xlabel('effect size (positive is higher in %s)' % labels[0], **labels_kwargs)
+        ax.legend(labels, prop=font, loc='lower right')
 
     # add the number of enriched experiments for each term
-    if enriched_exp_color is not None and 'num_enriched_exps' in enriched:
+    if numbers_kwargs is not None and 'num_enriched_exps' in enriched:
         if positive > 0:
             for idx in np.arange(negative, negative + positive):
                 cnum_enriched = enriched.iloc[idx]['num_enriched_exps']
+                cnum_total = enriched.iloc[idx]['num_total_exps']
                 if cnum_enriched < 0:
+                    # logger.warn('negative cnun_enriched %d' % idx)
                     continue
-                cstr = ' %d/%d' % (cnum_enriched, enriched.iloc[idx]['num_total_exps'])
-                ax.text(0, idx, cstr, horizontalalignment='left', verticalalignment='center', color=enriched_exp_color, fontweight='bold')
+                if cnum_total is None:
+                    logger.warn('term %s does not have num_total_exps' % ticks[idx])
+                    cnum_total = 0
+                cstr = ' %d/%d' % (cnum_enriched, cnum_total)
+                ax.text(0, idx, cstr, horizontalalignment='left', verticalalignment='center', **numbers_kwargs)
         if negative > 0:
             for idx in np.arange(negative):
                 cnum_enriched = enriched.iloc[idx]['num_enriched_exps']
+                cnum_total = enriched.iloc[idx]['num_total_exps']
                 if cnum_enriched < 0:
+                    # logger.warn('negative cnun_enriched %d' % idx)
                     continue
-                cstr = '%d/%d ' % (cnum_enriched, enriched.iloc[idx]['num_total_exps'])
-                ax.text(0, idx, cstr, horizontalalignment='right', verticalalignment='center', color=enriched_exp_color, fontweight='bold')
+                if cnum_total is None:
+                    logger.warn('term %s does not have num_total_exps' % ticks[idx])
+                    cnum_total = 0
+                cstr = '%d/%d ' % (cnum_enriched, cnum_total)
+                ax.text(0, idx, cstr, horizontalalignment='right', verticalalignment='center', **numbers_kwargs)
 
     ax.figure.tight_layout()
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, enriched_exp_color='white', **kwargs):
+def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, labels_kwargs={'style': 'italic', 'weight': 'semibold'}, numbers_kwargs={'color': 'white', 'weight': 'bold'}, **kwargs):
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -187,6 +203,10 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         experiments for each term in the bar. Default is white since
         the background is the bar color (green/red).  None to not show
         the enriched experiments count
+    labels_kwargs: dict, optional
+        Additional parameters to pass to the bar labels rendering. see matplolib.axes.Axes.set_yticklabels()
+    numbers_kwargs: dict or None, optional
+        Additional parameters for the number of enriched experiments labels (inside the bars) fonts. See matplolib.axes.Axes.text(). If None do not display the number of enriched experiments
     **kwargs : dict, optional
         Additional database specific enrichment parameters (see per-database module documentation for .enrichment() method)
 
@@ -225,7 +245,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
         labels = None
 
     # and plot
-    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors, enriched_exp_color=enriched_exp_color)
+    ax2 = exp.plot_enrichment(enriched, max_show=max_show, max_len=max_len, ax=ax, labels=labels, colors=colors, labels_kwargs=labels_kwargs, numbers_kwargs=numbers_kwargs)
 
     return ax2, newexp
 
