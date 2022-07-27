@@ -117,9 +117,9 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     # remove the nans
     nanpos = np.where(np.isnan(labels))[0]
     if len(nanpos) > 0:
-        logger.warning('NaN values encountered in labels for correlation. Ignoring these samples')
         labels = np.delete(labels, nanpos)
         data = np.delete(data, nanpos, axis=1)
+        logger.warning('NaN values encountered in labels for correlation. Ignoring these samples (%d). %d samples left' % (len(nanpos), len(labels)))
     # change the method if we have nonzero
     if nonzero:
         if method == 'spearman':
@@ -233,7 +233,15 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     # prepare the labels.
     labels = np.zeros(len(cexp.sample_metadata))
     labels[cexp.sample_metadata[field].isin(val1).values] = 1
-    logger.info('%d samples with value 1 (%s)' % (np.sum(labels), val1))
+
+    # check if we have samples left in val1 and val2
+    if np.sum(labels) == len(cexp.sample_metadata):
+        raise ValueError('No samples in field: %s found with val2: %s' % (field, grp2))
+    if np.sum(labels) == 0:
+        raise ValueError('No samples in field: %s found with val1: %s' % (field, grp1))
+
+    logger.info('%d samples with value 1 (%s), %d samples with value2 (%s)' % (np.sum(labels), grp1, len(cexp.sample_metadata) - np.sum(labels), grp2))
+
     keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, shuffler=shuffler, random_seed=random_seed)
     logger.info('number of higher in {}: {}. number of higher in {} : {}. total {}'.format(
         grp1, np.sum(odif[keep] > 0), grp2, np.sum(odif[keep] < 0), np.sum(keep)))
@@ -361,6 +369,10 @@ def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, t
     if len(drop_values) > 0:
         logger.info('Dropping %d values with < 2 samples' % len(drop_values))
         exp = exp.filter_samples(pair_field, drop_values, negate=True)
+
+    if len(exp.sample_metadata) == 0:
+        raise ValueError('No samples with >1 value in pair field left')
+    logger.info('Testing %d samples' % len(exp.sample_metadata))
 
     # create the groups list for the shuffle function
     groups = defaultdict(list)
