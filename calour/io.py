@@ -474,6 +474,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
     exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
 
+    logger.info('Loaded %d samples, %d features' % (exp.shape[0], exp.shape[1]))
+
     return exp
 
 
