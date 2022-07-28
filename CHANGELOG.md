@@ -4,6 +4,7 @@
 ## Version 2022.7.1
 Incompatible changes:
 * Change default join_metadata_fields() inplace parameter to False
+* In plot_diff_abundance_enrichment(), plot_enrichment(), Replaced enriched_exp_color parameter with labels_kwargs, numbers_kwargs, to enable better control of the barplot labels
 
 Bug Fixes:
 * Fix join_metadata_fields() to use axis='s' by default

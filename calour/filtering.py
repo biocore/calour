@@ -281,7 +281,11 @@ def filter_by_data(exp: Experiment, predicate, axis=1, field=None,
     if negate is True:
         select = ~ select
 
-    logger.info('After filtering, %s remain.' % np.sum(select))
+    if axis == 0:
+        grp_str = 'samples'
+    else:
+        grp_str = 'features'
+    logger.info('After filtering, %s %s remaining.' % (np.sum(select), grp_str))
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
