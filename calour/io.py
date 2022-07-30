@@ -304,9 +304,13 @@ def _read_metadata(ids, f, kwargs):
             kwargs['dtype'][index_col] = str
         else:
             kwargs['dtype'] = {index_col: str}
+        if 'sep' in kwargs:
+            sep = kwargs.pop('sep')
+        else:
+            sep = '\t'
 
         try:
-            metadata = pd.read_csv(f, sep='\t', **kwargs)
+            metadata = pd.read_csv(f, sep=sep, **kwargs)
         except Exception as err:
             logger.error('Error reading metadata file %r\nError: %s' % (f, err))
             raise err
