@@ -1,5 +1,8 @@
 # calour changelog
+## Version 2022.9.8
 
+Other changes:
+* Add type hints to function return values
 
 ## Version 2022.7.1
 Incompatible changes:

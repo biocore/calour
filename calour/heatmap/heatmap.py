@@ -170,7 +170,7 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_len=16, yticklabel_len=16,
             xticks_max=10, yticks_max=30,
             norm=None, clim=(None, None), cmap='viridis',
-            rect=None, cax=None, ax=None, bad_color='black'):
+            rect=None, cax=None, ax=None, bad_color='black') -> mpl.axes.Axes:
     '''Plot a heatmap for the experiment.
 
     Plot a heatmap for the :attr:`.Experiment.data` with features in row

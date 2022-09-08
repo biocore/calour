@@ -46,7 +46,7 @@ _CALOUR_DIRECTION = '_calour_direction'
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None,
-                numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
+                numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None) -> Experiment:
     '''Find features with correlation to a numeric metadata field.
 
     The permutation based p-values and multiple hypothesis correction is implemented.
@@ -140,7 +140,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
-def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', shuffler=None, random_seed=None):
+def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', shuffler=None, random_seed=None) -> Experiment:
     '''Differential abundance test between 2 groups of samples for all the features.
 
     It uses permutation based nonparametric test and then applies
@@ -252,7 +252,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     return newexp
 
 
-def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None):
+def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None) -> Experiment:
     '''Test the differential abundance between multiple sample groups using the Kruskal Wallis test.
 
     It uses permutation based nonparametric test and then applies
@@ -312,7 +312,7 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
-def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, transform='rankdata', random_seed=None, **kwargs):
+def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, transform='rankdata', random_seed=None, **kwargs) -> Experiment:
     '''Differential abundance test between 2 groups of samples for all the features.
 
     It uses permutation based nonparametric test and then applies
@@ -407,7 +407,7 @@ def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, t
     return newexp
 
 
-def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals):
+def _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals) -> Experiment:
     '''Combine the pvalues and effect size into a new experiment.
 
     Keep only the significant features, sort the features by the effect size

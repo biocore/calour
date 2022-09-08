@@ -66,7 +66,7 @@ def normalize(exp: Experiment, total=10000, axis=0, inplace=False) -> Experiment
         raise ValueError('Normalization total (%s) must be positive' % total)
     if not inplace:
         exp = deepcopy(exp)
-    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1-axis) * total
+    exp.data = preprocessing.normalize(exp.data, norm='l1', axis=1 - axis) * total
     # store the normalization depth into the experiment metadata
     exp.normalized = total
     return exp
@@ -176,7 +176,7 @@ def rescale(exp: Experiment, total=10000, axis=0, inplace=False) -> Experiment:
     '''
     if not inplace:
         exp = deepcopy(exp)
-    current_mean = np.mean(exp.data.sum(axis=1-axis))
+    current_mean = np.mean(exp.data.sum(axis=1 - axis))
     exp.data = exp.data * total / current_mean
     return exp
 
@@ -204,7 +204,7 @@ def standardize(exp: Experiment, axis=0, inplace=False) -> Experiment:
         exp = deepcopy(exp)
     if exp.sparse:
         exp.sparse = False
-    preprocessing.scale(exp.data, axis=1-axis, copy=False)
+    preprocessing.scale(exp.data, axis=1 - axis, copy=False)
     return exp
 
 
@@ -285,7 +285,7 @@ def permute_data(exp: Experiment, normalize=True, inplace=False, random_seed=Non
     return exp
 
 
-def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centralize=False, inplace=False):
+def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centralize=False, inplace=False) -> Experiment:
     """ Performs a clr transform to each sample.
 
     Parameters
@@ -322,7 +322,7 @@ def center_log_ratio(exp: Experiment, method=lambda matrix: matrix + 1, centrali
     return exp
 
 
-def subsample_count(exp: Experiment, total, replace=False, inplace=False, random_seed=None):
+def subsample_count(exp: Experiment, total, replace=False, inplace=False, random_seed=None) -> Experiment:
     """Randomly subsample each sample to the same number of counts.
 
     .. warning:: This function will change the :attr:`Experiment.data`

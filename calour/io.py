@@ -108,7 +108,7 @@ def _read_qiime2_zip(fp, sample_in_row=False):
     return sid, fid, data, fmd
 
 
-def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=None, **kwargs):
+def read_qiime2(fp, sample_metadata_file=None, rep_seq_file=None, taxonomy_file=None, **kwargs) -> Experiment:
     '''Read a qiime2 artifact files into an amplicon experiment.
 
 
@@ -350,7 +350,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          sample_id_proc=None, feature_id_proc=None,
          sample_metadata_kwargs=None, feature_metadata_kwargs=None,
          cls=Experiment,
-         *, normalize):
+         *, normalize) -> Experiment:
     '''Read in an experiment.
 
     .. note:: The order in the sample and feature metadata tables are changed
@@ -485,7 +485,7 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
 
 @ds.with_indent(4)
 def read_amplicon(data_file, sample_metadata_file=None,
-                  *, min_reads, normalize, **kwargs):
+                  *, min_reads, normalize, **kwargs) -> AmpliconExperiment:
     '''Read in an amplicon experiment.
 
     This wraps :func:`read`.
@@ -536,7 +536,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
             data_file_type='mzmine2', sample_in_row=None, direct_ids=None, get_mz_rt_from_feature_id=None,
             use_gnps_id_from_AllFiles=True, cut_sample_id_sep=None,
             mz_rt_sep=None, mz_thresh=0.02, rt_thresh=15,
-            description=None, sparse=False, *, normalize, **kwargs):
+            description=None, sparse=False, *, normalize, **kwargs) -> MS1Experiment:
     '''Read a mass-spec experiment.
 
     Calour supports various ms table formats, with several preset formats (specified by the data_file_type='XXX' parameter),
