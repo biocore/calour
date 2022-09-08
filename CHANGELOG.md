@@ -1,4 +1,5 @@
 # calour changelog
+## Version 2022.9.8
 
 ## Version 2023.4.22
 
@@ -10,6 +11,9 @@ Bug Fixes:
 Other changes:
 * Add type hints to function return values
 * Create Experiment.info dict and populate with md5s if not provided when creating a new experiment
+
+Other changes:
+* Add type hints to function return values
 
 ## Version 2022.7.1
 Incompatible changes:
