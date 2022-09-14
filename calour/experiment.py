@@ -30,7 +30,7 @@ import pandas as pd
 import numpy as np
 import scipy.sparse
 
-from .util import _convert_axis_name, get_dataframe_md5, get_data_md5
+from .util import _convert_axis_name, get_dataframe_md5, get_data_md5, get_dataframe_md5, get_data_md5
 
 logger = getLogger(__name__)
 
@@ -119,7 +119,7 @@ class Experiment:
                     'sample_metadata_md5': get_dataframe_md5(self.sample_metadata),
                     'feature_metadata_file': 'NA',
                     'feature_metadata_md5': get_dataframe_md5(self.feature_metadata)}
-        self.info = info
+        self.info = {} if info is None else info
 
     def validate(self):
         '''Validate the Experiment object.
