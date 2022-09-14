@@ -119,7 +119,7 @@ class Experiment:
                     'sample_metadata_md5': get_dataframe_md5(self.sample_metadata),
                     'feature_metadata_file': 'NA',
                     'feature_metadata_md5': get_dataframe_md5(self.feature_metadata)}
-        self.info = {} if info is None else info
+        self.info = info
 
     def validate(self):
         '''Validate the Experiment object.
