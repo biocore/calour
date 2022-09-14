@@ -13,6 +13,8 @@ import copy
 
 import matplotlib as mpl
 import matplotlib.patches as mpatches
+import matplotlib.axes
+import matplotlib.figure
 import numpy as np
 
 from .. import Experiment
