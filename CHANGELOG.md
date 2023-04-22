@@ -1,4 +1,7 @@
 # calour changelog
+## Version 2023.4.22
+Bug Fixes:
+* update the Experiment.plot() function so works also with matplotlib > 3.7
 ## Version 2022.9.8
 
 Other changes:
