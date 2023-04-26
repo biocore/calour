@@ -96,7 +96,7 @@ def downsample(exp: Experiment, field, axis=0, keep=None,
     return exp.reorder(keep, axis=axis, inplace=inplace)
 
 
-def _balanced_subsample(x, n=None, random_seed=None):
+def _balanced_subsample(x, n=None, random_seed=None) -> np.ndarray:
     '''subsample the array to have equal number count for each unique values.
 
     Parameters
@@ -386,7 +386,7 @@ def is_prevalent(data, axis, cutoff=1, fraction=0.1):
     return res
 
 
-def freq_ratio(data, axis, ratio=19):
+def freq_ratio(data, axis, ratio=19) -> np.ndarray:
     '''Check if frequency ratios is not too big.
 
     Frequency ratio is defined as the frequency of the most prevalent
@@ -427,7 +427,7 @@ def freq_ratio(data, axis, ratio=19):
 
     '''
     if issparse(data):
-        res = np.ones(data.shape[1-axis], dtype='?')
+        res = np.ones(data.shape[1 - axis], dtype='?')
         if axis == 0:
             data = data.T
         for i, x in enumerate(data):

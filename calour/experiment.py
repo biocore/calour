@@ -30,7 +30,7 @@ import pandas as pd
 import numpy as np
 import scipy.sparse
 
-from .util import _convert_axis_name
+from .util import _convert_axis_name, get_dataframe_md5, get_data_md5
 
 logger = getLogger(__name__)
 
@@ -96,7 +96,6 @@ class Experiment:
             feature_metadata = pd.DataFrame(np.arange(data.shape[1]))
         self.feature_metadata = feature_metadata
         self.validate()
-        self.info = {} if info is None else info
         self.description = description
         self.normalized = 0
         # the function calling history list
@@ -111,6 +110,16 @@ class Experiment:
         self.databases = defaultdict(dict)
         for cdatabase in databases:
             self.databases[cdatabase] = {}
+
+        # set the data and metadata md5 if not provided
+        if info is None:
+            info = {'data_file': 'NA',
+                    'data_md5': get_data_md5(self.data),
+                    'sample_metadata_file': 'NA',
+                    'sample_metadata_md5': get_dataframe_md5(self.sample_metadata),
+                    'feature_metadata_file': 'NA',
+                    'feature_metadata_md5': get_dataframe_md5(self.feature_metadata)}
+        self.info = info
 
     def validate(self):
         '''Validate the Experiment object.

@@ -39,6 +39,7 @@ from pkg_resources import resource_filename
 
 import numpy as np
 import scipy
+from pandas.util import hash_pandas_object
 
 
 logger = getLogger(__name__)
@@ -317,6 +318,29 @@ def get_data_md5(data):
     datmd5 = hashlib.md5(data.tobytes())
     datmd5 = datmd5.hexdigest()
     logger.debug('data md5 is: %s' % datmd5)
+    return datmd5
+
+
+def get_dataframe_md5(df):
+    '''get the md5 of the text file.
+
+    Parameters
+    ----------
+    df : pandas.Dataframe
+        The dataframe to encode
+    encoding : str or None, optional
+        encoding of the text file (see python str.encode() ). None to use 'utf-8'
+
+    Returns
+    -------
+    md5: str
+        the md5 of the dataframe
+    '''
+    if df is None:
+        return None
+    logger.debug('getting dataframe md5 for %d rows' % len(df))
+    datmd5 = hashlib.md5(hash_pandas_object(df).values)
+    datmd5 = datmd5.hexdigest()
     return datmd5
 
 
