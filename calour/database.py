@@ -32,172 +32,6 @@ from packaging import version
 logger = getLogger(__name__)
 
 
-def _get_database_class(dbname, exp=None, config_file_name=None):
-    '''Get the database class for the given database name
-
-    Uses the calour config file (calour.config) keys
-
-    Parameters
-    ----------
-    dbname : str
-        the database name. common options are:
-            'dbbact' : the amplicon sequence manual annotation database
-            'spongeworld' : the sponge microbiome database
-            'redbiome' : the qiita automatic amplicon sequence database
-        Names are listed in the calour.config file as section names
-    config_file_name: str or None, optional
-        None (default) to use the default calour condig file.
-        str to use the file names str as the conig file
-
-
-    Returns
-    -------
-    calour.database.Database
-    A ``Database`` class for the requested dbname
-    '''
-    class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
-    module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
-    min_version = version.parse(get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0'))
-    module_website = get_config_value('website', section=dbname, config_file_name=config_file_name, fallback='NA')
-
-    if class_name is not None and module_name is not None:
-        try:
-            # import the database module
-            db_module = importlib.import_module(module_name)
-        except ImportError:
-            module_installation = get_config_value('installation', section=dbname, config_file_name=config_file_name)
-            logger.warning('Database interface %s not installed.\nSkipping.\n'
-                           'You can install the database using:\n%s\n'
-                           'For details see: %s' % (module_name, module_installation, module_website))
-            return None
-        # get the class
-        DBClass = getattr(db_module, class_name)
-        cdb = DBClass(exp)
-        # test if database version is compatible
-        if min_version > version.parse('0.0'):
-            db_version = version.parse(str(cdb.version()))
-            logger.debug('database: %s , version installed: %s , minimal version: %s' % (dbname, db_version, min_version))
-            if db_version < min_version:
-                logger.warning('Please update %s database module. Current version (%s) not supported (minimal version %s).\nFor details see %s' % (dbname, db_version.public, min_version.public, module_website))
-        return cdb
-    # not found, so print available database names
-    databases = []
-    sections = get_config_sections()
-    for csection in sections:
-        class_name = get_config_value('class_name', section=csection, config_file_name=config_file_name)
-        module_name = get_config_value('class_name', section=csection, config_file_name=config_file_name)
-        if class_name is not None and module_name is not None:
-            databases.append(csection)
-    if len(databases) == 0:
-        logger.warning('calour config file %s does not contain any database sections. Skipping' % get_config_file())
-        return None
-    logger.warning('Database %s not found in config file (%s).\nSkipping.\n'
-                   'Current databases in config file: %s' % (dbname, get_config_file(), databases))
-    return None
-
-
-def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None, **kwargs):
-    '''Add a field to the feature metadata, with most common term for each feature
-
-    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment.
-    It adds annotations in-place.
-
-    Parameters
-    ----------
-    use_term_list : list of str or None, optional
-        Use only terms appearing in this list
-        None (default) to use all terms
-    field_name : str, optional
-        Name of feature_metadata field to store the annotatiosn.
-    term_type : str or None, optional
-        type of the annotation summary to get from the database (db specific)
-        None to get default type
-    ignore_exp : list of int or None, optional
-        list of experiments to ignore when adding the terms
-    **kwargs: database specific additional parameters (see database interface get_feature_terms() function for specific terms)
-
-    Returns
-    -------
-    Experiment
-        with feature_metadata field containing the most common database term for each feature
-    '''
-    logger.debug('Adding terms to features for database %s' % dbname)
-    db = _get_database_class(dbname, exp)
-    features = exp.feature_metadata.index.values
-    logger.debug('found %d features' % len(features))
-
-    # get the per feature term scores
-    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp, **kwargs)
-    logger.debug('got %d terms from database' % len(term_list))
-
-    # find the most enriched term (out of the list) for each feature
-    feature_terms = []
-    for cfeature in features:
-        if cfeature not in term_list:
-            feature_terms.append('na')
-            continue
-        if len(term_list[cfeature]) == 0:
-            feature_terms.append('na')
-            continue
-        if use_term_list is None:
-            bterm = max(term_list[cfeature], key=term_list[cfeature].get)
-        else:
-            bterm = 'other'
-            bscore = 0
-            for cterm in use_term_list:
-                if cterm not in term_list[cfeature]:
-                    continue
-                cscore = term_list[cfeature][cterm]
-                if cscore > bscore:
-                    bscore = cscore
-                    bterm = cterm
-        feature_terms.append(bterm)
-    exp.feature_metadata[field_name] = feature_terms
-    return exp
-
-
-def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
-    '''Get the list of enriched annotation terms in features compared to all other features in exp.
-
-    Uses the database specific enrichment analysis method.
-
-    Parameters
-    ----------
-    features : list of str
-        The features to test for enrichment (compared to all other features in exp)
-    dbname : str
-        the database to use for the annotation terms and enrichment analysis
-    *args : tuple
-    **kwargs : dict
-        Additional database specific parameters (see per-database module documentation for .enrichment() method)
-
-    Returns
-    -------
-        pandas.DataFrame with  info about significantly enriched terms. The columns include:
-            * 'feature' : the feature ID (str)
-            * 'pval' : the p-value for the enrichment (float)
-            * 'odif' : the effect size (float)
-            * 'observed' : the number of observations of this term in group1 (int)
-            * 'expected' : the expected (based on all features) number of observations of this term in group1 (float)
-            * 'frac_group1' : fraction of total terms in group 1 which are the specific term (float)
-            * 'frac_group2' : fraction of total terms in group 2 which are the specific term (float)
-            * 'num_group1' : number of total terms in group 1 which are the specific term (float)
-            * 'num_group2' : number of total terms in group 2 which are the specific term (float)
-            * 'description' : the term (str)
-
-        numpy.Array where rows are features (ordered like the dataframe), columns are terms, and value is score
-            for term in feature
-
-        pandas.DataFrame with info about the features used. columns:
-            * 'group' : int, the group (1/2) to which the feature belongs
-            * 'sequence': str
-    '''
-    db = _get_database_class(dbname, exp=exp)
-    if not db.can_do_enrichment:
-        raise ValueError('database %s does not support enrichment analysis' % dbname)
-    return db.enrichment(exp, features, *args, **kwargs)
-
-
 class Database(ABC):
     def __init__(self, exp=None, database_name=None, methods=['get', 'annotate', 'enrichment']):
         '''Initialize the database interface
@@ -444,3 +278,169 @@ class Database(ABC):
         '''
         logger.debug('Generic function for term details')
         return None
+
+
+def _get_database_class(dbname, exp=None, config_file_name=None) -> Database:
+    '''Get the database class for the given database name
+
+    Uses the calour config file (calour.config) keys
+
+    Parameters
+    ----------
+    dbname : str
+        the database name. common options are:
+            'dbbact' : the amplicon sequence manual annotation database
+            'spongeworld' : the sponge microbiome database
+            'redbiome' : the qiita automatic amplicon sequence database
+        Names are listed in the calour.config file as section names
+    config_file_name: str or None, optional
+        None (default) to use the default calour condig file.
+        str to use the file names str as the conig file
+
+
+    Returns
+    -------
+    calour.database.Database
+    A ``Database`` class for the requested dbname
+    '''
+    class_name = get_config_value('class_name', section=dbname, config_file_name=config_file_name)
+    module_name = get_config_value('module_name', section=dbname, config_file_name=config_file_name)
+    min_version = version.parse(get_config_value('min_version', section=dbname, config_file_name=config_file_name, fallback='0.0'))
+    module_website = get_config_value('website', section=dbname, config_file_name=config_file_name, fallback='NA')
+
+    if class_name is not None and module_name is not None:
+        try:
+            # import the database module
+            db_module = importlib.import_module(module_name)
+        except ImportError:
+            module_installation = get_config_value('installation', section=dbname, config_file_name=config_file_name)
+            logger.warning('Database interface %s not installed.\nSkipping.\n'
+                           'You can install the database using:\n%s\n'
+                           'For details see: %s' % (module_name, module_installation, module_website))
+            return None
+        # get the class
+        DBClass = getattr(db_module, class_name)
+        cdb = DBClass(exp)
+        # test if database version is compatible
+        if min_version > version.parse('0.0'):
+            db_version = version.parse(str(cdb.version()))
+            logger.debug('database: %s , version installed: %s , minimal version: %s' % (dbname, db_version, min_version))
+            if db_version < min_version:
+                logger.warning('Please update %s database module. Current version (%s) not supported (minimal version %s).\nFor details see %s' % (dbname, db_version.public, min_version.public, module_website))
+        return cdb
+    # not found, so print available database names
+    databases = []
+    sections = get_config_sections()
+    for csection in sections:
+        class_name = get_config_value('class_name', section=csection, config_file_name=config_file_name)
+        module_name = get_config_value('class_name', section=csection, config_file_name=config_file_name)
+        if class_name is not None and module_name is not None:
+            databases.append(csection)
+    if len(databases) == 0:
+        logger.warning('calour config file %s does not contain any database sections. Skipping' % get_config_file())
+        return None
+    logger.warning('Database %s not found in config file (%s).\nSkipping.\n'
+                   'Current databases in config file: %s' % (dbname, get_config_file(), databases))
+    return None
+
+
+def add_terms_to_features(exp: Experiment, dbname, use_term_list=None, field_name='common_term', term_type=None, ignore_exp=None, **kwargs) -> Experiment:
+    '''Add a field to the feature metadata, with most common term for each feature
+
+    Create a new feature_metadata field, with the most common term (out of term_list) for each feature in experiment.
+    It adds annotations in-place.
+
+    Parameters
+    ----------
+    use_term_list : list of str or None, optional
+        Use only terms appearing in this list
+        None (default) to use all terms
+    field_name : str, optional
+        Name of feature_metadata field to store the annotatiosn.
+    term_type : str or None, optional
+        type of the annotation summary to get from the database (db specific)
+        None to get default type
+    ignore_exp : list of int or None, optional
+        list of experiments to ignore when adding the terms
+    **kwargs: database specific additional parameters (see database interface get_feature_terms() function for specific terms)
+
+    Returns
+    -------
+    Experiment
+        with feature_metadata field containing the most common database term for each feature
+    '''
+    logger.debug('Adding terms to features for database %s' % dbname)
+    db = _get_database_class(dbname, exp)
+    features = exp.feature_metadata.index.values
+    logger.debug('found %d features' % len(features))
+
+    # get the per feature term scores
+    term_list = db.get_feature_terms(features, exp=exp, term_type=term_type, ignore_exp=ignore_exp, **kwargs)
+    logger.debug('got %d terms from database' % len(term_list))
+
+    # find the most enriched term (out of the list) for each feature
+    feature_terms = []
+    for cfeature in features:
+        if cfeature not in term_list:
+            feature_terms.append('na')
+            continue
+        if len(term_list[cfeature]) == 0:
+            feature_terms.append('na')
+            continue
+        if use_term_list is None:
+            bterm = max(term_list[cfeature], key=term_list[cfeature].get)
+        else:
+            bterm = 'other'
+            bscore = 0
+            for cterm in use_term_list:
+                if cterm not in term_list[cfeature]:
+                    continue
+                cscore = term_list[cfeature][cterm]
+                if cscore > bscore:
+                    bscore = cscore
+                    bterm = cterm
+        feature_terms.append(bterm)
+    exp.feature_metadata[field_name] = feature_terms
+    return exp
+
+
+def enrichment(exp: Experiment, features, dbname, *args, **kwargs):
+    '''Get the list of enriched annotation terms in features compared to all other features in exp.
+
+    Uses the database specific enrichment analysis method.
+
+    Parameters
+    ----------
+    features : list of str
+        The features to test for enrichment (compared to all other features in exp)
+    dbname : str
+        the database to use for the annotation terms and enrichment analysis
+    *args : tuple
+    **kwargs : dict
+        Additional database specific parameters (see per-database module documentation for .enrichment() method)
+
+    Returns
+    -------
+        pandas.DataFrame with  info about significantly enriched terms. The columns include:
+            * 'feature' : the feature ID (str)
+            * 'pval' : the p-value for the enrichment (float)
+            * 'odif' : the effect size (float)
+            * 'observed' : the number of observations of this term in group1 (int)
+            * 'expected' : the expected (based on all features) number of observations of this term in group1 (float)
+            * 'frac_group1' : fraction of total terms in group 1 which are the specific term (float)
+            * 'frac_group2' : fraction of total terms in group 2 which are the specific term (float)
+            * 'num_group1' : number of total terms in group 1 which are the specific term (float)
+            * 'num_group2' : number of total terms in group 2 which are the specific term (float)
+            * 'description' : the term (str)
+
+        numpy.Array where rows are features (ordered like the dataframe), columns are terms, and value is score
+            for term in feature
+
+        pandas.DataFrame with info about the features used. columns:
+            * 'group' : int, the group (1/2) to which the feature belongs
+            * 'sequence': str
+    '''
+    db = _get_database_class(dbname, exp=exp)
+    if not db.can_do_enrichment:
+        raise ValueError('database %s does not support enrichment analysis' % dbname)
+    return db.enrichment(exp, features, *args, **kwargs)

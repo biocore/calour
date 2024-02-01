@@ -28,6 +28,7 @@ Functions
 
 from logging import getLogger
 from itertools import cycle, combinations
+from typing import Tuple
 
 import numpy as np
 import matplotlib as mpl
@@ -76,7 +77,7 @@ def plot_hist(exp: Experiment, ax=None, **kwargs):
     return counts, bins, ax
 
 
-def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), labels_kwargs={'style': 'italic', 'weight': 'semibold'}, numbers_kwargs={'color': 'white', 'weight': 'bold'}):
+def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None, labels=('group1', 'group2'), colors=('green', 'red'), labels_kwargs={'style': 'italic', 'weight': 'semibold'}, numbers_kwargs={'color': 'white', 'weight': 'bold'}) -> mpl.axes.Axes:
     '''Plot a horizontal bar plot for enriched terms
 
     Parameters
@@ -171,7 +172,7 @@ def plot_enrichment(exp: Experiment, enriched, max_show=10, max_len=40, ax=None,
     return ax
 
 
-def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, labels_kwargs={'style': 'italic', 'weight': 'semibold'}, numbers_kwargs={'color': 'white', 'weight': 'bold'}, **kwargs):
+def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=None, colors=('green', 'red'), show_legend=True, labels_kwargs={'style': 'italic', 'weight': 'semibold'}, numbers_kwargs={'color': 'white', 'weight': 'bold'}, **kwargs) -> Tuple[mpl.axes.Axes, Experiment]:
     '''Plot the term enrichment of differentially abundant bacteria
 
     Parameters
@@ -242,7 +243,7 @@ def plot_diff_abundance_enrichment(exp: Experiment, max_show=10, max_len=40, ax=
     return ax2, newexp
 
 
-def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0.9, iterations=10, alpha=0.5, linewidth=0.7, ax=None):
+def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0.9, iterations=10, alpha=0.5, linewidth=0.7, ax=None) -> mpl.axes.Axes:
     '''Plot the percentage of core features shared in increasing number of samples.
 
     To see if there is a core feature set shared across most of the samples.
@@ -315,7 +316,7 @@ def plot_core_features(exp: Experiment, field=None, steps=None, cutoff=2, frac=0
     return ax
 
 
-def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_seed=None):
+def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_seed=None) -> np.ndarray:
     '''iteratively compute the fraction of non-zeros in each column after subsampling rows.
 
     Parameters
@@ -369,7 +370,7 @@ def _compute_frac_nonzero(data, steps=None, cutoff=2, frac=0.9, random_seed=None
     return shared
 
 
-def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alpha=0.5, linewidth=0.7, ax=None):
+def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alpha=0.5, linewidth=0.7, ax=None) -> mpl.axes.Axes:
     '''Plot abundance against prevalence.
 
     Prevalence/abundance curve is a chart used to visualize the
@@ -440,7 +441,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None,
                      color_bar_label=True,
                      barx_label_kwargs=None, barx_width=0.3, barx_colors=None,
                      title=None, figsize=(12, 8), legend_size='small',
-                     xtick=False, cmap='Paired'):
+                     xtick=False, cmap='Paired') -> mpl.figure.Figure:
     '''Plot the stacked bar for feature abundances.
 
     Parameters
@@ -548,7 +549,7 @@ def plot_stacked_bar(exp: Experiment, field=None, sample_color_bars=None,
 
 def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
                         transform_x=None, transform_y=None, plot='scatter',
-                        ncols=5, nrows=None, size=2, aspect=1, **kwargs):
+                        ncols=5, nrows=None, size=2, aspect=1, **kwargs) -> mpl.figure.Figure:
     '''This plots an array of scatter plots between each features against the specified sample metadata.
 
     For each panel of scatter plot, the x-axis is the co-variates
@@ -616,7 +617,7 @@ def plot_feature_matrix(exp: Experiment, fields, feature_ids, title_field=None,
     return fig
 
 
-def plot_box(x, y, title='', ax=None, **kwargs):
+def plot_box(x, y, title='', ax=None, **kwargs) -> mpl.axes.Axes:
     '''Plot box plot.
 
     Parameters
@@ -662,7 +663,7 @@ def plot_box(x, y, title='', ax=None, **kwargs):
     return ax
 
 
-def plot_scatter(x, y, title='', ax=None, **kwargs):
+def plot_scatter(x, y, title='', ax=None, **kwargs) -> mpl.axes.Axes:
     '''Plot scatter plot.
 
     Parameters

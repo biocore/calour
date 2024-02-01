@@ -402,11 +402,11 @@ class PlotGUI(ABC):
     def clear_selection(self):
         '''Delete all shown selection lines '''
         for cline in self.selected_samples.values():
-            self.ax_hm.lines.remove(cline)
+            cline.remove()
             logger.debug('remove sample selection %r' % cline)
         self.selected_samples = {}
         for cline in self.selected_features.values():
-            self.ax_hm.lines.remove(cline)
+            cline.remove()
             logger.debug('remove sample selection %r' % cline)
         self.selected_features = {}
 
@@ -430,7 +430,7 @@ class PlotGUI(ABC):
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.ax_hm.lines.remove(self.selected_samples[cpos])
+                    self.selected_samples[cpos].remove()
                     del self.selected_samples[cpos]
         for cpos in featurepos:
             if cpos not in self.selected_features:
@@ -439,7 +439,7 @@ class PlotGUI(ABC):
                 logger.debug('add sample selection %r' % cpos)
             else:
                 if toggle:
-                    self.ax_hm.lines.remove(self.selected_features[cpos])
+                    self.selected_features[cpos].remove()
                     del self.selected_features[cpos]
         self.figure.canvas.draw()
 
