@@ -78,7 +78,7 @@ pip install scikit-bio docrep
 Try to run the command to install the lastest Calour:
 
 ```
-pip install git+git://github.com/biocore/calour.git
+pip install git+https://github.com/biocore/calour.git
 ```
 
 > _**Windows Note**_ If it fails, it probably means you don't have git commands installed. Do the following:
@@ -91,7 +91,7 @@ pip install git+git://github.com/biocore/calour.git
 >
 > ```
 > activate calour
-> pip install git+git://github.com/biocore/calour.git
+> pip install git+https://github.com/biocore/calour.git
 > ```
 
 ## Install database interfaces \(optional\)
@@ -99,7 +99,7 @@ pip install git+git://github.com/biocore/calour.git
 * Install the [dbBact](http://www.dbbact.org) calour interface:
 
   ```
-  pip install git+git://github.com/amnona/dbbact-calour
+  pip install git+https://github.com/amnona/dbbact-calour
   ```
 
 * Install the [phenotype-database](https://doi.org/10.6084/m9.figshare.4272392) calour interface:
@@ -107,12 +107,12 @@ pip install git+git://github.com/biocore/calour.git
   (based on : [Hiding in Plain Sight: Mining Bacterial Species Records for Phenotypic Trait Information](http://msphere.asm.org/content/2/4/e00237-17) - Barberán et al. 2017\)
 
   ```
-  pip install git+git://github.com/amnona/pheno-calour
+  pip install git+https://github.com/amnona/pheno-calour
   ```
 
 * For metabolomics, also install the [GNPS](http://gnps.ucsd.edu/) calour interface:
   ```
-  pip install git+git://github.com/amnona/gnps-calour
+  pip install git+https://github.com/amnona/gnps-calour
   ```
 
 ## Install additional user interfaces \(optional\)
@@ -134,7 +134,7 @@ If you would like to use the graphical user interface, you will need to install
 the GUI interface [EZCalour](https://github.com/amnona/EZCalour):
 
 ```
-pip install git+git://github.com/amnona/EZCalour
+pip install git+https://github.com/amnona/EZCalour
 ```
 
 # Running Calour
