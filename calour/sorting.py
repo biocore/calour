@@ -314,6 +314,7 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean',
 
         * 'log_mean': sort by the mean of the log;
         * 'prevalence': sort by the prevalence;
+        * 'mean': sort by the mean;
 
     inplace : bool, default=False
         False to create a copy. True to modify in place.
@@ -336,7 +337,8 @@ def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean',
             data_subset = exp.data[subset, :]
 
     func = {'log_mean': _log_n_1d,
-            'prevalence': _prevalence_1d}
+            'prevalence': _prevalence_1d,
+            'mean': np.mean}
     key = func.get(key, key)
 
     if exp.sparse:
