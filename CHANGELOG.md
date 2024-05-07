@@ -1,5 +1,9 @@
 # calour changelog
 
+## Version 2024.5.7
+BIG Fixes:
+* Fix exception when performing diff_abundance on columns that are only numeric 
+
 ## Version 2023.4.22
 
 Bug Fixes:
