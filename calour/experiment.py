@@ -30,7 +30,7 @@ import pandas as pd
 import numpy as np
 import scipy.sparse
 
-from .util import _convert_axis_name, get_dataframe_md5, get_data_md5, get_dataframe_md5, get_data_md5
+from .util import _convert_axis_name, get_dataframe_md5, get_data_md5
 
 logger = getLogger(__name__)
 

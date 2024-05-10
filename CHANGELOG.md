@@ -11,10 +11,6 @@ Other changes:
 * Add type hints to function return values
 * Create Experiment.info dict and populate with md5s if not provided when creating a new experiment
 
-Other changes:
-* Add type hints to function return values
-* Create Experiment.info dict and populate with md5s if not provided when creating a new experiment
-
 ## Version 2022.7.1
 Incompatible changes:
 * Change default join_metadata_fields() inplace parameter to False
