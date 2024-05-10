@@ -218,11 +218,11 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
 
     # if val2 is not none, need to get rid of all other samples (not val1/val2)
     val1 = _to_list(val1)
-    grp1 = ','.join(val1)
+    grp1 = ','.join([str(x) for x in val1])
     if val2 is not None:
         val2 = _to_list(val2)
         cexp = exp.filter_samples(field, val1 + val2, negate=False)
-        grp2 = ','.join(val2)
+        grp2 = ','.join([str(x) for x in val2])
         logger.info('%d samples with both values' % cexp.shape[0])
     else:
         cexp = exp
