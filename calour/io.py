@@ -480,8 +480,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
     # initialize the call history
     exp._call_history = []
     # if we have a command history file, load it
-    if command_history_file is not None:
-        old_call_history = read_call_history(command_history_file)
+    if call_history_file is not None:
+        old_call_history = read_call_history(call_history_file)
         exp._call_history.extend(old_call_history)
 
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
