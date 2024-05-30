@@ -485,8 +485,8 @@ def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
         exp._call_history.extend(old_call_history)
 
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
-    exp._call_history.append('{0}({1})'.format('read_amplicon', ','.join(param)))
-
+    exp._call_history.append('{0}({1})'.format('read', ','.join(param)))
+    
     logger.info('Loaded %d samples, %d features' % (exp.shape[0], exp.shape[1]))
 
     return exp
@@ -532,10 +532,6 @@ def read_amplicon(data_file, sample_metadata_file=None,
         exp.filter_by_data('abundance', axis=0, cutoff=min_reads, mean_or_sum='sum', inplace=True)
     if normalize is not None:
         exp.normalize(total=normalize, axis=0, inplace=True)
-
-    # initialize the call history
-    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
-    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
 
     return exp
 
@@ -741,7 +737,7 @@ def read_ms(data_file, sample_metadata_file=None, feature_metadata_file=None, gn
 
     # initialize the call history
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
-    exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
+    exp._call_history.append(['{0}({1})'.format('read_ms', ','.join(param))])
     return exp
 
 
