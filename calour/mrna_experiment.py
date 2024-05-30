@@ -34,7 +34,7 @@ from .util import _get_taxonomy_string, _to_list
 logger = getLogger(__name__)
 
 
-class MRNAExperiment(Experiment):
+class mRNAExperiment(Experiment):
     '''This class stores transcriptomics (mrna) experiment
     Interactive heatmap gene information is obtained through the mrna_calour module
 
