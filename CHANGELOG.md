@@ -1,6 +1,6 @@
 # calour changelog
 
-## Version 2024.5.16
+## Version 2024.5.30
 add mRNAExperiment class for handling rna-seq data. interactive heatmap gene information is via the rna_calour module using Harmonizome server (https://maayanlab.cloud/Harmonizome)
 
 ## Version 2024.5.16
