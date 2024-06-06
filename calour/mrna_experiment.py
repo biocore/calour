@@ -87,7 +87,7 @@ class mRNAExperiment(Experiment):
         super().__init__(*args, databases=('mrna',), **kwargs)
 
     def heatmap(self, *args, **kwargs):
-        '''Plot a heatmap for the amplicon experiment.
+        '''Plot a heatmap for the mrna experiment.
 
         This method accepts exactly the same parameters as input with
         its parent class method and does exactly the sample plotting.
@@ -95,19 +95,25 @@ class mRNAExperiment(Experiment):
         The only difference is that by default, its color scale is **in
         log** as its `norm` parameter is set to
         `matplotlib.colors.LogNorm()`. It makes more sense to show the
-        microbial abundances in color of log scale because they grow
-        exponentially. You can always set it to other scale as
+        gene expression abundances in color of log scale since they cover a wide range of magnitudes.
+        You can always set it to other scale as
         explained in :meth:`.Experiment.heatmap`.
+
+        Parameters
+        ----------
+
+        Keyword Arguments
+        -----------------
+        %(experiment.heatmap.parameters)s
 
         See Also
         --------
         Experiment.heatmap
-
         '''
         # set this default value inside the function instead of on the
         # function API (like the __init__) because we don't wanna to
         # define mpl.colors.LogNorm() on the API; otherwise, vmin and
-        # vmax are set the same once for all AmpliconExperiment
+        # vmax are set the same once for all mRNAExperiment
         # objects (which we don't want) because python initializes
         # the function arguments when it reads in its definition.
 
@@ -118,14 +124,26 @@ class mRNAExperiment(Experiment):
 
     @staticmethod
     def read(**kwargs):
-        '''Load an mRNA transcriptomics experiment
+        '''Load an mRNA transcriptomics experiment. calls calour.io.read() providing the correct class parameter (cls=mRNAExperiment).
+        by default, the mRNAExperiment table is expected to be tab separated (can modify by the setting data_file_sep parameter),
+        and samples are in columns (can modify by setting sample_in_row parameter).
+        By default, the data is not normalized. To normalize the per-sample reads to sum X, set normalize=X.
+        For more details, see 
 
         Parameters
         ----------
 
+        Keyword Arguments
+        -----------------
+        %(io.read.parameters)s
+
         Returns
         -------
         ca.MRNAExperiment
+
+        See Also
+        --------
+        calour.io.read
         '''
         if 'data_file_sep' not in kwargs:
             kwargs['data_file_sep'] = '\t'
@@ -136,5 +154,5 @@ class mRNAExperiment(Experiment):
         if 'normalize' not in kwargs:
             kwargs['normalize'] = None
 
-        dat = read(**kwargs, cls=MRNAExperiment)
+        dat = read(**kwargs, cls=mRNAExperiment)
         return dat
