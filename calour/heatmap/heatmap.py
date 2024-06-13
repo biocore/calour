@@ -412,6 +412,10 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
         label_kwargs = {}
     kwargs = {'color': 'w', 'weight': 'bold', 'size': 6,
               'ha': 'center', 'va': 'center'}
+    if axis == 0:
+        kwargs['rotation'] = 0
+    else:
+        kwargs['rotation'] = 90
     kwargs.update(label_kwargs)
 
     # convert to string and leave it as empty if it is None
@@ -434,12 +438,10 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
                 # plot the color bar along x axis
                 pos = prev - offset, position
                 w, h = i - prev, width
-                rotation = 0
             else:
                 # plot the color bar along y axis
                 pos = position, prev - offset
                 w, h = width, i - prev
-                rotation = 90
             rect = mpatches.Rectangle(
                 pos,               # position
                 w,                 # width (size along x axis)
@@ -454,8 +456,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
                 cy = ry + rect.get_height() / 2.0
 
                 # add the text in the color bars
-                ax.annotate(value, (cx, cy), rotation=rotation,
-                            **kwargs)
+                ax.annotate(value, (cx, cy), **kwargs)
 
         prev = i
 
