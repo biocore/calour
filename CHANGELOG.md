@@ -1,4 +1,6 @@
 # calour changelog
+## Version 2024.6.1
+* Add command_history file to Experiment read and save. When saving, a NAME_history.txt file is created with the command history used to create the Experiment. When loading, can supply a call_history="XXX" parameter to load the call history file into the loaded Experiment.
 
 ## Version 2024.5.30
 add mRNAExperiment class for handling rna-seq data. interactive heatmap gene information is via the rna_calour module using Harmonizome server (https://maayanlab.cloud/Harmonizome)
