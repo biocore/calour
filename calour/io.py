@@ -555,7 +555,7 @@ def read_correlation(prefix, **kwargs) -> CorrelationExperiment:
     exp = read(prefix+'.biom', sample_metadata_file=prefix+'_sample.txt', feature_metadata_file=prefix+'_feature.txt', cls=CorrelationExperiment, **kwargs)
     # and load the q-values table
     logger.debug('Reading correlation matrix %s_qvals.biom' % prefix)
-    exp.qvals = read(prefix+'_qvals.biom', normalize=None)
+    exp.qvals = read(prefix+'_qvals.biom', sample_metadata_file=prefix+'_qvals_sample.txt', feature_metadata_file=prefix+'_qvals_feature.txt', normalize=None)
 
     # initialize the call history
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]

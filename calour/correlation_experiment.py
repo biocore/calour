@@ -174,11 +174,12 @@ class CorrelationExperiment(Experiment):
             file path (suffixes auto added for the 3 files) to save to.
         **kwargs : dict
             Additional arguments to pass to the Experiment.save() function
-        ''' 
+        '''
+        self._sync_qvals()
         super().save(prefix, **kwargs)
         if self.qvals is not None:
-            self.qvals.save_biom(prefix+'_qvals.biom')
-            logger.debug('Saved qvals experiment to %s_qvals.biom' % prefix)
+            self.qvals.save(prefix+'_qvals', **kwargs)
+            logger.debug('Saved qvals experiment to %s_qvals' % prefix)
         else:
             logger.warning('No qvals attached to experiment. qvals experiment not saved')
 
@@ -215,43 +216,6 @@ class CorrelationExperiment(Experiment):
                     pvals[idx1][idx2] = 1
                     corrs[idx1][idx2] = 0
         return corrs,pvals
-
-
-    # def save(self, filename, **kwargs):
-    #     '''Save the correlation experiment to a file
-
-    #     Parameters
-    #     ----------
-    #     filename : str
-    #         The file to save the experiment to
-    #     **kwargs : dict
-    #         Additional arguments to pass to the save
-    #     '''
-    #     super().save(filename, **kwargs)
-    #     if self.qvals is not None:
-    #         self.qvals(filename+'.qvals', **kwargs)
-
-
-    @classmethod
-    def read_correlation(self, filename, **kwargs):
-        '''Read the correlation experiment from a file
-
-        Parameters
-        ----------
-        filename : str
-            The file to read the experiment from
-        **kwargs : dict
-            Additional arguments to pass to the read
-        '''
-        from .io import read
-
-        if 'normalize' not in kwargs:
-            kwargs['normalize'] = None
-
-        exp = read(filename+'.biom', sample_metadata_file=filename+'_sample.txt', feature_metadata_file=filename+'_feature.txt', cls=CorrelationExperiment, **kwargs)
-
-        exp.qvals = read(filename+'_qvals.biom', sample_metadata_file=filename+'_qvals_sample.txt', feature_metadata_file=filename+'_qvals_feature.txt', **kwargs)
-        return exp
 
     # @classmethod
     # def from_dataframes(self, df1: pd.DataFrame, df2: pd.DataFrame = None):
