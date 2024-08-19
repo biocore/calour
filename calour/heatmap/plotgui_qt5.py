@@ -77,7 +77,7 @@ class PlotGUI_QT5(PlotGUI):
         self._display_annotation_in_qlistwidget(annt)
 
     def _update_info_labels(self, sid, fid, abd):
-        self.app_window.w_abund.setText('{:.01f}'.format(abd))
+        self.app_window.w_abund.setText(abd)
         self.app_window.w_fid.setText(str(fid))
         self.app_window.w_sid.setText(str(sid))
         sample_field = str(self.app_window.w_sfield.currentText())

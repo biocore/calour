@@ -187,7 +187,7 @@ class PlotGUI(ABC):
         row, col = self.current_select
         fid = self.exp.feature_metadata.index[col]
         sid = self.exp.sample_metadata.index[row]
-        abd = self.exp.data[row, col]
+        abd = self.exp._get_abundance_info(row, col)
         return sid, fid, abd
 
     def get_database_annotations(self, feature):
