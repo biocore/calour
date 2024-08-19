@@ -217,63 +217,63 @@ class CorrelationExperiment(Experiment):
                     corrs[idx1][idx2] = 0
         return corrs,pvals
 
-    # @classmethod
-    # def from_dataframes(self, df1: pd.DataFrame, df2: pd.DataFrame = None):
-    #     '''Create a CorrelationExperiment from a pandas DataFrame (such as the experiment sample_metadata)
-    #     Calculates the correlations between all dataframe columns
+    @classmethod
+    def from_dataframes(self, df1: pd.DataFrame, df2: pd.DataFrame = None):
+        '''Create a CorrelationExperiment from a pandas DataFrame (such as the experiment sample_metadata)
+        Calculates the correlations between all dataframe columns
 
-    #     Parameters
-    #     ----------
-    #     df1 : pandas.DataFrame
-    #         The first DataFrame to calculate the correlation matrix for
-    #     df2 : pandas.DataFrame
-    #         The second DataFrame to calculate the correlation matrix for
-    #         If None, will use df1
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+            The first DataFrame to calculate the correlation matrix for
+        df2 : pandas.DataFrame
+            The second DataFrame to calculate the correlation matrix for
+            If None, will use df1
 
-    #     Returns
-    #     -------
-    #     CorrelationExperiment
-    #         The correlation experiment
-    #     '''
-    #     if df2 is None:
-    #         df2=df1
-    #     corrs,pvals = self._calculate_corr_matrix(df1, df2)
-    #     new_smd = pd.DataFrame(index=df1.columns)
-    #     new_fmd = pd.DataFrame(index=df2.columns)
-    #     new_smd['SampleID']=new_smd.index.values
-    #     new_fmd['_feature_id']=new_fmd.index.values
-    #     exp=CorrelationExperiment(data=corrs, sample_metadata=new_smd, feature_metadata=new_fmd, qvals=pvals, sparse=False)
-    #     exp=exp.cluster_data(axis='f')
-    #     exp=exp.cluster_data(axis='s')
-    #     return exp
+        Returns
+        -------
+        CorrelationExperiment
+            The correlation experiment
+        '''
+        if df2 is None:
+            df2=df1
+        corrs,pvals = self._calculate_corr_matrix(df1, df2)
+        new_smd = pd.DataFrame(index=df1.columns)
+        new_fmd = pd.DataFrame(index=df2.columns)
+        new_smd['SampleID']=new_smd.index.values
+        new_fmd['_feature_id']=new_fmd.index.values
+        exp=CorrelationExperiment(data=corrs, sample_metadata=new_smd, feature_metadata=new_fmd, qvals=pvals, sparse=False)
+        exp=exp.cluster_data(axis='f')
+        exp=exp.cluster_data(axis='s')
+        return exp
 
-    # @classmethod
-    # def from_data(self, corr, samples, features, qvals):
-    #     '''Create a CorrelationExperiment from a numpy array and metadata
+    @classmethod
+    def from_data(self, corr, samples, features, qvals):
+        '''Create a CorrelationExperiment from a numpy array and metadata
 
-    #     Parameters
-    #     ----------
-    #     corr : numpy.ndarray
-    #         The correlation matrix
-    #     samples : list or pandas.DataFrame
-    #         The sample metadata
-    #     features : list or pandas.DataFrame
-    #         The feature metadata
-    #     qvals : numpy.ndarray
-    #         The q-value matrix for the correlations
+        Parameters
+        ----------
+        corr : numpy.ndarray
+            The correlation matrix
+        samples : list or pandas.DataFrame
+            The sample metadata
+        features : list or pandas.DataFrame
+            The feature metadata
+        qvals : numpy.ndarray
+            The q-value matrix for the correlations
 
-    #     Returns
-    #     -------
-    #     CorrelationExperiment
-    #         The correlation experiment
-    #     '''
-    #     if isinstance(samples, list):
-    #         samples=pd.DataFrame(index=samples)
-    #     if isinstance(features, list):
-    #         features=pd.DataFrame(index=features)
-    #     if 'SampleID' not in samples.columns:
-    #         samples['SampleID']=samples.index.values
-    #     if '_feature_id' not in features.columns:
-    #         features['_feature_id']=features.index.values
+        Returns
+        -------
+        CorrelationExperiment
+            The correlation experiment
+        '''
+        if isinstance(samples, list):
+            samples=pd.DataFrame(index=samples)
+        if isinstance(features, list):
+            features=pd.DataFrame(index=features)
+        if 'SampleID' not in samples.columns:
+            samples['SampleID']=samples.index.values
+        if '_feature_id' not in features.columns:
+            features['_feature_id']=features.index.values
 
-    #     return CorrelationExperiment(data=corr, sample_metadata=samples, feature_metadata=features, qvals=qvals, sparse=False)
+        return CorrelationExperiment(data=corr, sample_metadata=samples, feature_metadata=features, qvals=qvals, sparse=False)
