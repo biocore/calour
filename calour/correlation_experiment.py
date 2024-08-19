@@ -248,7 +248,7 @@ class CorrelationExperiment(Experiment):
         return exp
 
     @classmethod
-    def from_data(self, corr, samples, features, qvals):
+    def from_data(self, corr: np.array, samples: pd.DataFrame, features: pd.DataFrame, qvals: np.array) -> 'CorrelationExperiment':
         '''Create a CorrelationExperiment from a numpy array and metadata
 
         Parameters
