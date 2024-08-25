@@ -51,6 +51,7 @@ class CorrelationExperiment(Experiment):
         The metadata on the features (columns in the matrix, shown in rows in the heatmap)
     qvals : numpy.ndarray or scipy.sparse.csr_matrix or None
         The q-values for the correlation values
+        NOTE: This is not guaranteed to be in the same order as the data matrix (unless _sync_qvals() is called)
     description : str
         name of experiment
     sparse : bool
@@ -91,6 +92,11 @@ class CorrelationExperiment(Experiment):
     Experiment
     '''
     def __init__(self, *args, qvals=None, **kwargs):
+        '''Init the CorrelationExperiment class
+        By default we set sparse=False (as we usually have a dense matrix)
+        '''
+        if 'sparse' not in kwargs:
+            kwargs['sparse'] = False
         super().__init__(*args, **kwargs)
         if qvals is not None:
             if self.data.shape != qvals.shape:
@@ -125,37 +131,85 @@ class CorrelationExperiment(Experiment):
         else:
             qval = self.qvals.data[row, col]
         return '{:.2E}, qval: {:.2f}'.format(self.data[row, col], qval)
-
-    def heatmap(self, show_significance=True, significance_threshold=0.05, significance_plot_params={'color': 'red'},*args, **kwargs):
+    
+    def heatmap(self, significance_plot=['cmap'],significance_threshold=0.05, significance_plot_params={'color': 'red'}, cmap='bwr', *args, **kwargs):
         '''Plot a heatmap for the ratio experiment.
 
         This method accepts the same parameters as input with
         its parent class method.
         In addition, it accepts the following parameters:
-        show_significance : bool, optional
-            If True, the q-values will be plotted on top of the heatmap.
+        significance_plot : list of str, optional
+            The type of significance plot to show. Can be 'cmap' and/or 'x'
         significance_threshold : float, optional
             The threshold for the q-values to be considered significant.
         significance_plot_params : dict, optional
             The parameters to be passed to the plot function for the significance values.
+            If 'cmap' is in the list, use the 'cmap' parameter in significance_plot_params to set the colormap for the significant values.
+            If 'x' is in the list, use the 'significance_plot_params' parameter to set the plot parameters for the significance values.
 
         See Also
         --------
         Experiment.heatmap
 
         '''
+        import matplotlib.pyplot as plt
+        from matplotlib.colors import LinearSegmentedColormap
+
         if 'clim' not in kwargs:
             min_val = np.min(self.get_data()[:])
             max_val = np.max(self.get_data()[:])
             range_val = np.max([np.abs(min_val), np.abs(max_val)])
             kwargs['clim'] = (-range_val, range_val)
-        if 'cmap' not in kwargs:
-            kwargs['cmap'] = 'coolwarm'
 
+        if significance_plot is None or significance_plot == []:
+            if self.qvals is None:
+                raise ValueError('No qvals attached to experiment. Please provide a qvals matrix to plot the significance values or use significance_plot=[] to not plot significance values.')
+        else:
+            self._sync_qvals()
+
+        data_changed = False
+        if 'cmap' in significance_plot:
+            # copy the data
+            old_data = self.get_data(copy=True)
+            data_changed = True
+
+            # eps is added to the data to avoid overlap in the colormaps for significant/non-significant values
+            eps = 1e-7
+            
+            max_val = kwargs['clim'][1]
+            min_val = kwargs['clim'][0]
+            self.data[self.data>max_val]=max_val
+            self.data[self.data<min_val]=min_val
+            self.data = self.data - (max_val + eps)
+
+            qv = self.qvals.get_data(sparse=False)
+            sig_pos = qv < significance_threshold
+            self.data[sig_pos]+= (2*max_val)+eps
+            if 'cmap' in significance_plot_params:
+                cmap_sig = significance_plot_params['cmap']
+                del significance_plot_params['cmap']
+            else:
+                cmap_sig = 'PiYG'
+
+            # create the colormap which is a concatenation of the original colormap and the significant colormap
+            colors_nonsig = plt.get_cmap(cmap)(np.linspace(0, 1, 128))
+            colors_sig = plt.get_cmap(cmap_sig)(np.linspace(0, 1, 128))
+            colors = np.vstack((colors_nonsig, colors_sig))
+            concatenated_cmap = LinearSegmentedColormap.from_list('concatenated_cmap', colors)
+            kwargs['cmap'] = concatenated_cmap
+            # adjust the clim to account for the added values (negative values are for the non-significant values, positive values are for the significant values)
+            kwargs['clim'] = (2*kwargs['clim'][0], 2*kwargs['clim'][1])
+
+        # call the heatmap function from the parent class using the exp object
         ax = super().heatmap(*args, **kwargs)
-        if show_significance:
+
+        # if the data was changed (for the significance plot), revert it back to the original data
+        if data_changed:
+            self.data = old_data
+
+        # add the significant correlations plot
+        if 'x' in significance_plot:
             if self.qvals is not None:
-                self._sync_qvals()
                 qv = self.qvals.get_data(sparse=False)
                 show_pos = np.where(qv < significance_threshold)
                 for i, j in zip(*show_pos):
@@ -218,7 +272,7 @@ class CorrelationExperiment(Experiment):
         return corrs,pvals
 
     @classmethod
-    def from_dataframes(self, df1: pd.DataFrame, df2: pd.DataFrame = None):
+    def from_dataframes(self, df1: pd.DataFrame, df2: pd.DataFrame|None = None):
         '''Create a CorrelationExperiment from a pandas DataFrame (such as the experiment sample_metadata)
         Calculates the correlations between all dataframe columns
 
@@ -249,7 +303,8 @@ class CorrelationExperiment(Experiment):
 
     @classmethod
     def from_data(self, corr: np.array, samples: pd.DataFrame, features: pd.DataFrame, qvals: np.array) -> 'CorrelationExperiment':
-        '''Create a CorrelationExperiment from a numpy array and metadata
+        '''Create a CorrelationExperiment from a numpy array (effect size), numpy array (qvals) and corresponding metadata
+        Similar to the __init__ function, but can take lists as input for the metadata instead of DataFrames
 
         Parameters
         ----------
