@@ -30,7 +30,6 @@ __all__ = ['read', 'read_amplicon', 'read_ms', 'read_qiime2', 'read_correlation'
 
 # add member functions to the class
 register_functions((Experiment, AmpliconExperiment, MS1Experiment, mRNAExperiment, CorrelationExperiment))
-# register_functions((Experiment, AmpliconExperiment, MS1Experiment, mRNAExperiment))
 
 
 # setting False allows other logger to print log.
