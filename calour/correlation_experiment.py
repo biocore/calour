@@ -134,9 +134,9 @@ class CorrelationExperiment(Experiment):
     
     def heatmap(self, significance_plot=['cmap'],significance_threshold=0.05, significance_plot_params={'color': 'red'}, cmap='bwr', *args, **kwargs):
         '''Plot a heatmap for the ratio experiment.
+        The heatmap includes indication for significant correlations. This can be as a different set of colors for the significant correlations or by plotting a marker for the significant correlations.
 
-        This method accepts the same parameters as input with
-        its parent class method.
+        This method accepts the same parameters as input with its parent class method.
         In addition, it accepts the following parameters:
         significance_plot : list of str, optional
             The type of significance plot to show. Can be 'cmap' and/or 'x'
