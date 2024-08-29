@@ -300,35 +300,3 @@ class CorrelationExperiment(Experiment):
         exp=exp.cluster_data(axis='f')
         exp=exp.cluster_data(axis='s')
         return exp
-
-    @classmethod
-    def from_data(self, corr: np.array, samples: pd.DataFrame, features: pd.DataFrame, qvals: np.array) -> 'CorrelationExperiment':
-        '''Create a CorrelationExperiment from a numpy array (effect size), numpy array (qvals) and corresponding metadata
-        Similar to the __init__ function, but can take lists as input for the metadata instead of DataFrames
-
-        Parameters
-        ----------
-        corr : numpy.ndarray
-            The correlation matrix
-        samples : list or pandas.DataFrame
-            The sample metadata
-        features : list or pandas.DataFrame
-            The feature metadata
-        qvals : numpy.ndarray
-            The q-value matrix for the correlations
-
-        Returns
-        -------
-        CorrelationExperiment
-            The correlation experiment
-        '''
-        if isinstance(samples, list):
-            samples=pd.DataFrame(index=samples)
-        if isinstance(features, list):
-            features=pd.DataFrame(index=features)
-        if 'SampleID' not in samples.columns:
-            samples['SampleID']=samples.index.values
-        if '_feature_id' not in features.columns:
-            features['_feature_id']=features.index.values
-
-        return CorrelationExperiment(data=corr, sample_metadata=samples, feature_metadata=features, qvals=qvals, sparse=False)
