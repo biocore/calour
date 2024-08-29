@@ -292,6 +292,9 @@ def heatmap(exp: Experiment, sample_field=None, feature_field=None,
     data = exp.get_data(sparse=False)
     numrows, numcols = exp.shape
 
+    if numrows == 0 or numcols == 0:
+        raise ValueError('Experiment has no data to plot')
+
     if ax is None:
         fig, ax = plt.subplots()
     else:
