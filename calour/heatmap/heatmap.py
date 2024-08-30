@@ -166,7 +166,7 @@ def _set_axis_ticks(ax, which, ticklabels, tickmax, n, kwargs, ticklabel_len, tr
         t.set(**kwargs)
 
 
-@ds.get_sectionsf('heatmap.heatmap')
+@ds.get_sections(base='heatmap.heatmap')
 def heatmap(exp: Experiment, sample_field=None, feature_field=None,
             xticklabel_kwargs=None, yticklabel_kwargs=None,
             xticklabel_len=16, yticklabel_len=16,
@@ -418,7 +418,7 @@ def _ax_bar(ax, values, colors=None, width=0.3, position=0, label=True, label_kw
     values = ['' if i in {None, np.nan} else str(i) for i in values]
     uniques = np.unique(values)
     if colors is None:
-        cmap = mpl.cm.get_cmap('Dark2')
+        cmap = mpl.colormaps['Dark2']
         colors = cmap.colors
         col = dict(zip(uniques, itertools.cycle(colors)))
     else:

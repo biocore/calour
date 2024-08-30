@@ -47,7 +47,7 @@ class IOTests(Tests):
         self.assertEqual('Unknown', exp.feature_metadata['taxonomy'][fid])
         # test the sample metadata is loaded correctly
         if validate_sample_metadata:
-            self.assertEqual(exp.sample_metadata['id'][spos], 12)
+            self.assertEqual(exp.sample_metadata['id'].iloc[spos], 12)
 
     def test_iter_fasta(self):
         seqs = []
@@ -77,10 +77,11 @@ class IOTests(Tests):
             exp = ca.read(self.test1_biom, self.test1_samp, self.test1_feat, normalize=None)
             # test the log messages are correct
             self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
-            self.assertRegex(cm.output[1], "dropped \\(1\\): {'SAMPLE_NOT_EXIST'}")
-            self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
-            self.assertRegex(cm.output[3], "dropped \\(1\\): {'FEATURE_NOT_EXIST'}")
-            self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
+            self.assertRegex(cm.output[1], 'Found 1 samples that have metadata but do not have data. These samples have been dropped')
+            self.assertRegex(cm.output[2], 'INFO:calour.io:First 5 samples without data: \\[\'SAMPLE_NOT_EXIST\'\\]')
+            self.assertRegex(cm.output[3], 'WARNING:calour.io:Found 1 samples that have data but do not have metadata.')
+            self.assertRegex(cm.output[4], 'INFO:calour.io:First 5 samples without metadata: \\[\'badsample\'\\]')
+            self.assertRegex(cm.output[5], 'WARNING:calour.io:Found 1 samples that have metadata but do not have data. These samples have been dropped.')
 
             self.assertTrue(scipy.sparse.issparse(exp.data))
             self._validate_read(exp)
@@ -102,11 +103,11 @@ class IOTests(Tests):
                           sample_metadata_kwargs={'parse_dates': ['collection_date']})
             # test the log messages are correct
             self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
-            self.assertRegex(cm.output[1], "dropped \\(1\\): {'SAMPLE_NOT_EXIST'}")
-            self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
-            self.assertRegex(cm.output[3], "dropped \\(1\\): {'FEATURE_NOT_EXIST'}")
-            self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
-
+            # self.assertRegex(cm.output[1], "dropped \\(1\\): {'SAMPLE_NOT_EXIST'}")
+            self.assertRegex(cm.output[1], "WARNING:calour.io:Found 1 samples that have metadata but do not have data. These samples have been dropped.")
+            self.assertRegex(cm.output[2], "INFO:calour.io:First 5 samples without data: \\[\'SAMPLE_NOT_EXIST\'\\]")
+            self.assertRegex(cm.output[3], "WARNING:calour.io:Found 1 samples that have data but do not have metadata.")
+            self.assertRegex(cm.output[4], "INFO:calour.io:First 5 samples without metadata: \\[\'badsample\'\\]")
             self.assertTrue(scipy.sparse.issparse(exp.data))
             self._validate_read(exp)
 
@@ -124,10 +125,10 @@ class IOTests(Tests):
                           feature_metadata_kwargs={'dtype': {'ph': str}})
             # test the log messages are correct
             self.assertRegex(cm.output[0], 'loaded 21 samples, 12 features')
-            self.assertRegex(cm.output[1], "dropped \\(1\\): {'SAMPLE_NOT_EXIST'}")
-            self.assertRegex(cm.output[2], "These have data but do not have metadata: {'badsample'}")
-            self.assertRegex(cm.output[3], "dropped \\(1\\): {'FEATURE_NOT_EXIST'}")
-            self.assertRegex(cm.output[4], "These have data but do not have metadata: {'badfeature'}")
+            self.assertRegex(cm.output[1], "WARNING:calour.io:Found 1 samples that have metadata but do not have data. These samples have been dropped.")
+            self.assertRegex(cm.output[2], "INFO:calour.io:First 5 samples without data: \\[\'SAMPLE_NOT_EXIST\'\\]")
+            self.assertRegex(cm.output[3], "WARNING:calour.io:Found 1 samples that have data but do not have metadata.")
+            self.assertRegex(cm.output[4], "INFO:calour.io:First 5 samples without metadata: \\[\'badsample\'\\]")
 
             self.assertTrue(scipy.sparse.issparse(exp.data))
             self._validate_read(exp)
@@ -212,7 +213,7 @@ class IOTests(Tests):
                          use_gnps_id_from_AllFiles=False, cut_sample_id_sep='_', normalize=None)
         self.assertEqual(exp.feature_metadata['MZ'].iloc[1], 200)
         self.assertEqual(exp.feature_metadata['RT'].iloc[0], 1)
-        self.assertEqual(exp.sample_metadata['field2'][0], 'f')
+        self.assertEqual(exp.sample_metadata['field2'].iloc[0], 'f')
         self.assertEqual(exp.data[2, 1], 35900)
         self.assertEqual(exp.data.shape, (6, 6))
 

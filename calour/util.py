@@ -35,7 +35,8 @@ from importlib import import_module
 from collections.abc import Sequence
 from logging import getLogger
 from numbers import Real
-from pkg_resources import resource_filename
+# from pkg_resources import resource_filename
+import importlib.resources as pkg_resources
 
 import numpy as np
 import scipy
@@ -244,7 +245,7 @@ def _get_taxonomy_string(exp, sep=';', remove_underscore=True, to_lower=False):
         raise ValueError('No taxonomy field in experiment')
 
     # if it is not a list - just return it
-    if not isinstance(exp.feature_metadata['taxonomy'][0], list):
+    if not isinstance(exp.feature_metadata['taxonomy'].iloc[0], list):
         return list(exp.feature_metadata['taxonomy'].values)
 
     if not remove_underscore:
@@ -359,7 +360,9 @@ def get_config_file():
         config_file_name = os.environ['CALOUR_CONFIG_FILE']
         logger.debug('Using calour config file %s from CALOUR_CONFIG_FILE variable' % config_file_name)
     else:
-        config_file_name = resource_filename(__package__, 'calour.config')
+        config_file = pkg_resources.files('calour').joinpath('calour.config')
+        config_file_name = str(config_file)
+        # config_file_name = resource_filename(__package__, 'calour.config')
     return config_file_name
 
 
