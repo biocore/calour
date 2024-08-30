@@ -1,5 +1,11 @@
 # calour changelog
 
+## Version 2024.8.31
+
+Bug Fixes:
+* Update code and unit tests to work with new version of numpy/pandas/scipy/matplotlib (some of the functions are deprecated in newer versions)
+* Bump requirements for numpy/pandas/scipy/matplotlib/python
+
 ## Version 2024.5.30
 add mRNAExperiment class for handling rna-seq data. interactive heatmap gene information is via the rna_calour module using Harmonizome server (https://maayanlab.cloud/Harmonizome)
 
