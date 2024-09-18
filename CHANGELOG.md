@@ -1,5 +1,12 @@
 # calour changelog
 
+## Version 2024.8.29
+New Features:
+* Support lists for sample_metadata and feature_metadata in Experiment.__init__()
+
+Bug Fixes:
+* Raise error when plotting a heatmap for an empty experiment
+
 ## Version 2024.5.30
 add mRNAExperiment class for handling rna-seq data. interactive heatmap gene information is via the rna_calour module using Harmonizome server (https://maayanlab.cloud/Harmonizome)
 
