@@ -64,9 +64,9 @@ class Experiment:
     data : numpy.ndarray or scipy.sparse.csr_matrix
         The abundance table for OTUs, metabolites, genes, etc. Samples
         are in row and features in column
-    sample_metadata : pandas.DataFrame
+    sample_metadata : pandas.DataFrame or list
         The metadata on the samples
-    feature_metadata : pandas.DataFrame
+    feature_metadata : pandas.DataFrame or list
         The metadata on the features
     shape : tuple of (int, int)
         the dimension of data
@@ -91,6 +91,16 @@ class Experiment:
     def __init__(self, data, sample_metadata, feature_metadata=None, databases=(),
                  info=None, description='', sparse=True):
         self.data = data
+
+        if isinstance(sample_metadata, list):
+            sample_metadata=pd.DataFrame(index=sample_metadata)
+        if isinstance(feature_metadata, list):
+            feature_metadata=pd.DataFrame(index=feature_metadata)
+        if 'SampleID' not in sample_metadata.columns:
+            sample_metadata['SampleID']=sample_metadata.index.values
+        if '_feature_id' not in feature_metadata.columns:
+            feature_metadata['_feature_id']=feature_metadata.index.values
+
         self.sample_metadata = sample_metadata
         if feature_metadata is None:
             feature_metadata = pd.DataFrame(np.arange(data.shape[1]))
