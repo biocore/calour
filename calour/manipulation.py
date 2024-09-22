@@ -346,9 +346,9 @@ def _check_id_overlap_then_concat(df1, df2, prefixes, field, labels):
         prefix1, prefix2 = prefixes
         logger.info('Both experiments contain same sample IDs - adding prefixes')
         if prefix1:
-            df1 = df1.rename(lambda x: '{}_{!s}'.format(prefix1, x))
+            df1.rename(lambda x: '{}_{!s}'.format(prefix1, x), inplace=True)
         if prefix2:
-            df2 = df2.rename(lambda x: '{}_{!s}'.format(prefix2, x))
+            df2.rename(lambda x: '{}_{!s}'.format(prefix2, x), inplace=True)
 
     df = pd.concat([df1, df2], join='outer')
     if field is not None:
