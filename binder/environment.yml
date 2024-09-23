@@ -17,5 +17,5 @@ dependencies:
   - ipywidgets
   - pip
   - pip:
-      - git+git://github.com/biocore/calour.git
-      - git+git://github.com/amnona/dbbact-calour.git
+      - git+https://github.com/biocore/calour.git
+      - git+https://github.com/amnona/dbbact-calour.git
