@@ -73,7 +73,7 @@ class Tests(TestCase):
         self.rat_samp = join(test_data_dir, 'ratio-exp_sample_metadata.txt')
 
     def assert_experiment_equal(self, exp1, exp2, check_history=False, almost_equal=True,
-                                ignore_md_fields=('_calour_original_abundance',)):
+                                ignore_md_fields=('_calour_original_abundance',), ignore_sample_order=False, ignore_feature_order=False):
         '''Test if two experiments are equal
 
         Parameters
@@ -86,9 +86,18 @@ class Tests(TestCase):
             True (default) to test for almost identical, False to test the data matrix for exact identity
         ignore_md_fields : tuple of str or None
             list of metadata fields to ignore in the comparison. Default is ignoring the original read count (when sample loaded)
+        ignore_sample_order : bool, optional
+            False (default) to compare sample metadata in the same order, True to ignore the order
+        ignore_feature_order : bool, optional
+            False (default) to compare feature metadata in the same order, True to ignore the order
         '''
         self.assertIsInstance(exp1, ca.Experiment, 'exp1 not a calour Experiment class')
         self.assertIsInstance(exp2, ca.Experiment, 'exp2 not a calour Experiment class')
+
+        if ignore_sample_order:
+            exp2 = exp2.sort_ids(exp1.sample_metadata.index, axis='s')
+        if ignore_feature_order:
+            exp2 = exp2.sort_ids(exp1.feature_metadata.index, axis='f')
 
         # test the metadata
         sample_columns = exp1.sample_metadata.columns.union(exp1.sample_metadata.columns)
@@ -99,6 +108,7 @@ class Tests(TestCase):
                     sample_columns = sample_columns.delete(sample_columns.get_loc(cignore))
                 if cignore in feature_columns:
                     feature_columns = feature_columns.delete(feature_columns.get_loc(cignore))
+        
         self.assertEqual(len(sample_columns.difference(exp1.sample_metadata.columns)), 0)
         self.assertEqual(len(sample_columns.difference(exp2.sample_metadata.columns)), 0)
         self.assertEqual(len(feature_columns.difference(exp1.feature_metadata.columns)), 0)

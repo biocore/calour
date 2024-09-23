@@ -11,6 +11,8 @@ from unittest import main
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal
+import matplotlib.pyplot as plt
+from matplotlib.collections import PathCollection
 
 import calour as ca
 from calour._testing import Tests
@@ -119,7 +121,7 @@ class PlotTests(Tests):
 
     def test_plot_scatter_matrix(self):
         self.test2 = ca.read(self.test2_biom, self.test2_samp, self.test2_feat, normalize=100)
-        fids = ['AA', 'AT', 'AG', 'AC']
+        fids = self.test2.feature_metadata.index.tolist()[:4]
         fig = self.test2.plot_feature_matrix('ori.order', fids, plot='scatter', ncols=2, nrows=2)
         self.assertEqual(len(fig.axes), 4)
         for ax, fid in zip(fig.axes, fids):
@@ -128,7 +130,12 @@ class PlotTests(Tests):
             xobs = ax.lines[0].get_data()[0]
             xexp = self.test2.sample_metadata['ori.order'].values
             assert_array_almost_equal(xobs, xexp)
-            yobs = ax.get_children()[0].get_offsets()[:, 1]
+            
+            # Find the scatter plot among the axis children
+            scatter = next((child for child in ax.get_children() if isinstance(child, PathCollection)), None)
+            self.assertIsNotNone(scatter, "Scatter plot not found in axis children")
+            
+            yobs = scatter.get_offsets()[:, 1]
             yexp = self.test2[:, fid]
             assert_array_almost_equal(yobs, yexp)
 

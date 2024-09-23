@@ -30,7 +30,7 @@ class TestDendrogram(unittest.TestCase):
         dm = DistanceMatrix.from_iterable([0, 1, 2, 3],
                                           lambda x, y: np.abs(x-y))
         lm = ward(dm.condensed_form())
-        ids = np.arange(4).astype(np.str)
+        ids = np.arange(4).astype(str)
         t = mock.from_linkage_matrix(lm, ids)
 
         t._cache_ntips()
@@ -51,7 +51,7 @@ class TestUnrootedDendrogram(unittest.TestCase):
         x = np.random.rand(10)
         dm = DistanceMatrix.from_iterable(x, lambda x, y: np.abs(x-y))
         lm = ward(dm.condensed_form())
-        ids = np.arange(len(x)).astype(np.str)
+        ids = np.arange(len(x)).astype(str)
         self.tree = TreeNode.from_linkage_matrix(lm, ids)
 
         # initialize tree with branch length and named internal nodes
@@ -110,7 +110,7 @@ class TestUnrootedDendrogram(unittest.TestCase):
                             (-0.69694851846105044, 1.0284925540912822)])
 
         res = pd.DataFrame(t.update_coordinates(1, 0, 0, 2, 1))
-        pdt.assert_frame_equal(res, exp, check_less_precise=True)
+        pdt.assert_frame_equal(res, exp, atol=1e-5)
 
 
 class TestSquareDendrogram(unittest.TestCase):
@@ -122,7 +122,7 @@ class TestSquareDendrogram(unittest.TestCase):
         x = np.random.rand(num_otus)
         dm = DistanceMatrix.from_iterable(x, lambda x, y: np.abs(x-y))
         lm = ward(dm.condensed_form())
-        t = TreeNode.from_linkage_matrix(lm, np.arange(len(x)).astype(np.str))
+        t = TreeNode.from_linkage_matrix(lm, np.arange(len(x)).astype(str))
         self.tree = SquareDendrogram.from_tree(t)
 
         for i, n in enumerate(t.postorder()):

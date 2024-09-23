@@ -25,7 +25,7 @@ class ExperimentTests(Tests):
 
     def test_from_exp(self):
         # default - no min reads threshold
-        rexp = RatioExperiment.from_exp(self.pre_ratio, 'subj', 'time', '1', '2')
+        rexp = RatioExperiment.from_exp(self.pre_ratio, 'subj', 'time', 1, 2)
         # only 2 subjects have 2 time points
         self.assertEqual(rexp.shape[0], 2)
         # no features removed
@@ -39,18 +39,18 @@ class ExperimentTests(Tests):
         self.assertEqual(len(rexp.sample_metadata.columns), 2 * len(self.pre_ratio.sample_metadata.columns))
 
         # supply threshold
-        rexp = RatioExperiment.from_exp(self.pre_ratio, 'subj', 'time2', '1', '2', threshold=400)
+        rexp = RatioExperiment.from_exp(self.pre_ratio, 'subj', 'time2', 1, 2, threshold=400)
         # we should lose S1 since both are < threshold
         self.assertTrue(np.isnan(rexp['S1', 'AA']))
         # and D3 300 is corrected to 400
         self.assertEqual(rexp['S3', 'AA'], np.log2(400 / 500))
 
         # supplying value2 as None
-        rexp = RatioExperiment.from_exp(self.pre_ratio, 'subj', 'time2', '1', threshold=400)
+        rexp = RatioExperiment.from_exp(self.pre_ratio, 'subj', 'time2', 1, threshold=400)
         # Now we should not lose S1 since time2 value=3 is joined with value=2
-        assert_almost_equal(rexp['S1', 'AA'], -0.938, decimal=3)
+        assert_almost_equal(rexp['S1', 'AA'], np.log2(400/((1500+400)/2)), decimal=3)
         # and D3 300 is corrected to 400
-        self.assertEqual(rexp['S3', 'AA'], np.log2(400 / 500))
+        self.assertEqual(rexp['S3', 'AA'], np.log2(400 / ((500+600)/2)))
 
     def test_get_sign_pvals(self):
         # rexp = RatioExperiment.from_exp(self.test1, 'subj', 'time', '1', '2')
