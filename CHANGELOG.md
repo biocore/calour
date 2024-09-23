@@ -1,6 +1,9 @@
 # calour changelog
 
 ## Version 2024.8.31
+New features:
+* add shuffler optional parameter and improved data validation for analysis.correlation()
+
 Bug Fixes:
 * Update code and unit tests to work with new version of numpy/pandas/scipy/matplotlib (some of the functions are deprecated in newer versions)
 * Bump requirements for numpy/pandas/scipy/matplotlib/python

@@ -137,7 +137,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'filterBH' : Benjamini-Hochberg FDR method with filtering
     shuffler: function or None, optional
         if None, use shuffling on all samples (using the random_seed supplied)
-        if function, use thi supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
+        if function, use the supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
         Input to the function is the labels (np.array), and the random number generator (np.radnom.Generator), output is the shuffled labels (np.array)
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
