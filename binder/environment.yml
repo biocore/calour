@@ -15,6 +15,7 @@ dependencies:
   - biom-format
   - statsmodels
   - ipywidgets
+  - ipympl
   - pip
   - pip:
       - git+https://github.com/biocore/calour.git
