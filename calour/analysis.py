@@ -46,7 +46,7 @@ _CALOUR_DIRECTION = '_calour_direction'
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None,
-                numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None) -> Experiment:
+                numperm=1000, alpha=0.1, fdr_method='dsfdr', filter_zeros=True, random_seed=None) -> Experiment:
     '''Find features with correlation to a numeric metadata field.
 
     The permutation based p-values and multiple hypothesis correction is implemented.
@@ -86,6 +86,9 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         * 'bhfdr': Benjamini-Hochberg FDR method
         * 'byfdr' : Benjamini-Yekutielli FDR method
         * 'filterBH' : Benjamini-Hochberg FDR method with filtering
+    filter_zeros : bool, optional
+        True to remove features with 0 abundance in all samples.
+        Should be set to False when working with data that contains negative values (such as log-ratio data)
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
         If int, random_seed is the seed used by the random number generator;
@@ -109,7 +112,11 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
     if field not in exp.sample_metadata.columns:
         raise ValueError('Field %s not in sample_metadata. Possible fields are: %s' % (field, exp.sample_metadata.columns))
 
-    cexp = exp.filter_sum_abundance(0, strict=True)
+    # remove features not present in both groups
+    if filter_zeros:
+        if cexp.data.min() < 0:
+            logger.warning('filter_zeros=True is not recommended for data with negative values. Recommend using filter_zeros=False')
+        cexp = cexp.filter_sum_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
 
@@ -140,7 +147,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
 
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
-def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', shuffler=None, random_seed=None) -> Experiment:
+def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', filter_zeros=True, shuffler=None, random_seed=None) -> Experiment:
     '''Differential abundance test between 2 groups of samples for all the features.
 
     It uses permutation based nonparametric test and then applies
@@ -187,6 +194,9 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
           alpha (e.g. a feature that appears in only 1 sample can
           obtain a minimal p-value of 0.5 and will therefore be
           removed when say alpha=0.1)
+    filter_zeros : bool, optional
+        True to remove features with 0 abundance in all samples.
+        Should be set to False when working with data that contains negative values (such as log-ratio data)
     shuffler: function or None, optional
         if None, use shuffling on all samples (using the random_seed supplied)
         if function, use thi supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
@@ -229,7 +239,10 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
         grp2 = 'NOT %s' % grp1
 
     # remove features not present in both groups
-    cexp = cexp.filter_sum_abundance(0, strict=True)
+    if filter_zeros:
+        if cexp.data.min() < 0:
+            logger.warning('filter_zeros=True is not recommended for data with negative values. Recommend using filter_zeros=False')
+        cexp = cexp.filter_sum_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels.
@@ -252,7 +265,7 @@ def diff_abundance(exp: Experiment, field, val1, val2=None, method='meandiff', t
     return newexp
 
 
-def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None) -> Experiment:
+def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000, alpha=0.1, fdr_method='dsfdr', filter_zeros=True, random_seed=None) -> Experiment:
     '''Test the differential abundance between multiple sample groups using the Kruskal Wallis test.
 
     It uses permutation based nonparametric test and then applies
@@ -271,10 +284,20 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
         * 'normdata' : normalize the data to constant sum per samples
         * 'binarydata' : convert to binary absence/presence
 
+            numperm : int
+        number of permutations to perform
     alpha : float
         the desired FDR control level
-    numperm : int
-        number of permutations to perform
+    fdr_method : str
+        method to compute FDR. Allowed methods include:
+
+        * 'dsfdr': discrete FDR
+        * 'bhfdr': Benjamini-Hochberg FDR method
+        * 'byfdr' : Benjamini-Yekutielli FDR method
+        * 'filterBH' : Benjamini-Hochberg FDR method with filtering
+    filter_zeros : bool, optional
+        True to remove features with 0 abundance in all samples.
+        Should be set to False when working with data that contains negative values (such as log-ratio data)
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
         If int, random_seed is the seed used by the random number generator;
@@ -296,8 +319,11 @@ def diff_abundance_kw(exp: Experiment, field, transform='rankdata', numperm=1000
 
     logger.debug('diff_abundance_kw for field %s' % field)
 
-    # remove features with 0 abundance
-    cexp = exp.filter_sum_abundance(0, strict=True)
+    # remove features not present in both groups
+    if filter_zeros:
+        if cexp.data.min() < 0:
+            logger.warning('filter_zeros=True is not recommended for data with negative values. Recommend using filter_zeros=False')
+        cexp = cexp.filter_sum_abundance(0, strict=True)
 
     data = cexp.get_data(copy=True, sparse=False).transpose()
     # prepare the labels. If correlation method, get the values, otherwise the group
@@ -337,6 +363,7 @@ def diff_abundance_paired(exp: Experiment, pair_field, field, val1, val2=None, t
         Similar to diff_abundance transform parameter. Additional options are:
             'pair_rank': for each group of samples (a single value in pair_field), samples are ranked within the group.
 
+            
     Keyword Arguments
     -----------------
     %(analysis.diff_abundance.parameters)s

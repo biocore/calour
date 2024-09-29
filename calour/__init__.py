@@ -19,7 +19,7 @@ from .util import set_log_level, register_functions
 
 
 __credits__ = "https://github.com/biocore/calour/graphs/contributors"
-__version__ = "2024.5.30"
+__version__ = "2024.9.29"
 
 __all__ = ['read', 'read_amplicon', 'read_ms', 'read_qiime2',
            'Experiment', 'AmpliconExperiment', 'MS1Experiment','mRNAExperiment',
