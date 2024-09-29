@@ -1,4 +1,7 @@
 # calour changelog
+## Version 2024.9.29
+New features:
+* Add filter_zeros parameter to analysis functions (correlation, diff_abundance) to enable working with data containing negative values (such as log-ratios)
 
 ## Version 2024.8.31
 New features:
