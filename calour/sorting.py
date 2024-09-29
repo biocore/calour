@@ -143,7 +143,7 @@ def sort_centroid(exp: Experiment, transform=log_n, inplace=False, **kwargs) -> 
     return exp
 
 
-@ds.get_sectionsf('sorting.cluster_data')
+@ds.get_sections(base='sorting.cluster_data')
 def cluster_data(exp: Experiment, transform=None, axis=1,
                  metric='euclidean', inplace=False, **kwargs) -> Experiment:
     r'''Cluster the samples/features.
@@ -233,7 +233,7 @@ def cluster_features(exp: Experiment, cutoff=0, inplace=False) -> Experiment:
                                axis=1, inplace=True)
 
 
-@ds.get_sectionsf('sorting.sort_by_metadata')
+@ds.get_sections(base='sorting.sort_by_metadata')
 def sort_by_metadata(exp: Experiment, field, axis=0, inplace=False, reverse=False) -> Experiment:
     '''Sort samples or features based on metadata values in the given field.
 
@@ -289,7 +289,7 @@ def sort_samples(exp: Experiment, field, **kwargs) -> Experiment:
     return exp.sort_by_metadata(field=field, axis='s', **kwargs)
 
 
-@ds.get_sectionsf('sorting.sort_by_data')
+@ds.get_sections(base='sorting.sort_by_data')
 def sort_by_data(exp: Experiment, axis=0, subset=None, key='log_mean',
                  inplace=False, reverse=False, **kwargs) -> Experiment:
     '''Sort features based on their values in the data table.

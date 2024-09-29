@@ -75,8 +75,8 @@ class ExperimentTests(Tests):
         self.assertEqual(new.data.shape[1], self.test1.data.shape[1])
 
         # test sample_metadata are correct
-        self.assertEqual(new.sample_metadata['id'][0], 6)
-        self.assertEqual(new.sample_metadata['id'][1], 5)
+        self.assertEqual(new.sample_metadata['id'].iloc[0], 6)
+        self.assertEqual(new.sample_metadata['id'].iloc[1], 5)
 
         # test data are correct
         fid = 'GG'
@@ -207,7 +207,7 @@ class ExperimentTests(Tests):
     def test_to_pandas_sparse(self):
         df = self.test1.to_pandas(sparse=True)
         data = self.test1.get_data(sparse=False)
-        self.assertTrue(pd.api.types.is_sparse(df.iloc[0, :]))
+        self.assertTrue(isinstance(df.dtypes.iloc[0], pd.SparseDtype))
         npt.assert_array_almost_equal(df, data)
 
     def test_from_pands(self):

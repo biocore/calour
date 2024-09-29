@@ -212,7 +212,7 @@ def filter_by_metadata(exp: Experiment, field, select, axis=0,
     return exp.reorder(select, axis=axis, inplace=inplace)
 
 
-@ds.get_sectionsf('filtering.filter_by_data')
+@ds.get_sections(base='filtering.filter_by_data')
 def filter_by_data(exp: Experiment, predicate, axis=1, field=None,
                    negate=False, inplace=False, **kwargs) -> Experiment:
     '''Filter samples or features by the data matrix.

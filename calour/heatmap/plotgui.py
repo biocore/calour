@@ -17,7 +17,7 @@ from .._doc import ds
 logger = getLogger(__name__)
 
 
-@ds.get_sectionsf('PlotGUI')
+@ds.get_sections(base='PlotGUI')
 class PlotGUI(ABC):
     '''abstract base class for heatmap GUI.
 

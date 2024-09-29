@@ -166,7 +166,7 @@ class RatioExperiment(Experiment):
         value1 = _to_list(value1)
         if value2 is None:
             new_field_val += 'Other'
-            value2 = [str(x) for x in set(exp.sample_metadata[group_field].unique()).difference(set(value1))]
+            value2 = [x for x in set(exp.sample_metadata[group_field].unique()).difference(set(value1))]
         else:
             new_field_val += '%s' % value2
             value2 = _to_list(value2)
@@ -174,7 +174,7 @@ class RatioExperiment(Experiment):
         ratio_mat = np.zeros([len(exp.sample_metadata[common_field].unique()), exp.shape[1]])
         # new_sample_metadata = pd.DataFrame()
         if sample_md_suffix is None:
-            sample_md_suffix = (".".join(value1), ".".join(value2))
+            sample_md_suffix = (".".join([str(x) for x in value1]), ".".join([str(x) for x in value2]))
         new_columns = [x + '_%s' % sample_md_suffix[0] for x in exp.sample_metadata.columns]
         new_columns.extend([x + '_%s' % sample_md_suffix[1] for x in exp.sample_metadata.columns])
         new_sample_metadata = pd.DataFrame(columns=new_columns)
@@ -203,7 +203,7 @@ class RatioExperiment(Experiment):
             cmetadata = pd.DataFrame(columns=new_columns)
 
             # the new index for this ratio is the sampleID of the nominator sample
-            csamp_id = group1.sample_metadata['_sample_id'][0]
+            csamp_id = group1.sample_metadata['_sample_id'].iloc[0]
 
             for ccol in group1.sample_metadata.columns:
                 u1 = group1.sample_metadata[ccol].unique()
@@ -218,7 +218,8 @@ class RatioExperiment(Experiment):
                 else:
                     cmetadata.at[csamp_id, ccol + '_%s' % sample_md_suffix[1]] = 'NA (multiple values)'
             # cmetadata.at[group_field] = new_field_val
-            new_sample_metadata = new_sample_metadata.append(cmetadata)
+            new_sample_metadata = pd.concat([new_sample_metadata, cmetadata], ignore_index=False)
+
             found_indices.append(idx)
 
         # keep only samples that were actually added to the ratio_mat
@@ -272,7 +273,7 @@ class RatioExperiment(Experiment):
             # test if we have enough non-zero samples
             if npos[idx] + nneg[idx] >= min_present:
                 # calculate the binomial p-value and effect size for the feature
-                pvals[idx] = scipy.stats.binom_test(cnpos, cnpos + cnneg)
+                pvals[idx] = scipy.stats.binomtest(cnpos, cnpos + cnneg).pvalue
                 esize[idx] = (cnpos - cnneg) / (cnpos + cnneg)
                 keep.append(idx)
         logger.debug('keeping %d features with enough ratios' % len(keep))

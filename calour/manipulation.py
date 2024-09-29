@@ -259,7 +259,7 @@ def join_experiments(exp: Experiment, other, field='_calour_original_experiment'
         if ccol.endswith(suffix):
             expcol = ccol[:-len(suffix)]
             # for the NA cells, fill the column from exp with values from other
-            fmd[expcol].fillna(fmd[ccol], inplace=True)
+            fmd[expcol] = fmd[expcol].fillna(fmd[ccol])
         else:
             keep_cols.append(ccol)
     newexp.feature_metadata = fmd[keep_cols]

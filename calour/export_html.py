@@ -23,7 +23,7 @@ Functions
 from logging import getLogger
 from io import BytesIO
 import urllib
-from pkg_resources import resource_filename
+import importlib.resources as pkg_resources
 
 import numpy as np
 import matplotlib as mpl
@@ -95,8 +95,9 @@ def export_html(exp: Experiment, sample_field=None, feature_field=None, title=No
     import matplotlib.pyplot as plt
 
     if html_template is None:
-        html_template = resource_filename(
-            __package__, 'export_html_template.html')
+        html_template = pkg_resources.files('calour').joinpath('export_html_template.html')
+        html_template = str(html_template)
+
         logger.debug('using default template file %s' % html_template)
 
     logger.debug('export_html heatmap')
