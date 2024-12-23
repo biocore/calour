@@ -1,5 +1,9 @@
 # calour changelog
 
+## Version 2024.12.23
+Bug Fixes:
+* fix problem arising from inexact numpy matrix multiplication that resulted in more stringent dsFDR than requested when using the default 'meandiff' method
+
 ## Version 2024.5.30
 add mRNAExperiment class for handling rna-seq data. interactive heatmap gene information is via the rna_calour module using Harmonizome server (https://maayanlab.cloud/Harmonizome)
 
