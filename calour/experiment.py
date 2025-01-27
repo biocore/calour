@@ -98,8 +98,9 @@ class Experiment:
             feature_metadata=pd.DataFrame(index=feature_metadata)
         if 'SampleID' not in sample_metadata.columns:
             sample_metadata['SampleID']=sample_metadata.index.values
-        if '_feature_id' not in feature_metadata.columns:
-            feature_metadata['_feature_id']=feature_metadata.index.values
+        if feature_metadata is not None:
+            if '_feature_id' not in feature_metadata.columns:
+                feature_metadata['_feature_id']=feature_metadata.index.values
 
         self.sample_metadata = sample_metadata
         if feature_metadata is None:

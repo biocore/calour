@@ -3,6 +3,7 @@
 ## Version 2024.12.23
 Bug Fixes:
 * fix problem arising from inexact numpy matrix multiplication that resulted in more stringent dsFDR than requested when using the default 'meandiff' method
+
 ## Version 2024.8.31
 New features:
 * add shuffler optional parameter and improved data validation for analysis.correlation()
@@ -19,7 +20,6 @@ Bug Fixes:
 * Raise error when plotting a heatmap for an empty experiment
 
 ## Version 2024.8.25
-
 New features:
 * Add CorrelationExperiment class for working with correlation matrices and showing significance in heatmap
 Other changes:
