@@ -9,6 +9,7 @@
 import unittest
 
 import numpy as np
+import pandas.testing as pdt
 
 import calour as ca
 from calour.analysis import diff_abundance, diff_abundance_paired
@@ -46,6 +47,12 @@ class TestAnalysis(Tests):
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+    
+    def test_diff_abundance_fast_vs_slow(self):
+        dd_fast = diff_abundance(self.test1, 'group', val1='1', val2='2', random_seed=2017, method='meandiff')
+        dd_slow = diff_abundance(self.test1, 'group', val1='1', val2='2', random_seed=2017, method=ca.dsfdr.meandiff)
+        # assert whether the XX.feature_metadata DataFrames as equal
+        pdt.assert_frame_equal(dd_fast.feature_metadata, dd_slow.feature_metadata,check_like=True,check_exact=False, atol=1e-2)
 
     def test_diff_abundance_alpha0(self):
         # Test when we should get 0 features (setting FDR level to 0)

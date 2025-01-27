@@ -84,6 +84,24 @@ class AmpliconExperiment(Experiment):
     def __init__(self, *args, databases=('dbbact',), **kwargs):
         super().__init__(*args, databases=databases, **kwargs)
 
+    def _get_abundance_info(self, row:int , col:int):
+        '''Get a string with the abundance information for display in the interactive heatmap
+        For amplicon experiment (that is based on normalized discrete reads), we show the abundance in float format (with 2 decimal points).
+
+        Parameters
+        ----------
+        row : int
+            The row index
+        col : int
+            The column index
+
+        Returns
+        -------
+        str
+            The string with the abundance information
+        '''
+        return '{:.2f}'.format(self.data[row, col])
+
     def heatmap(self, *args, **kwargs):
         '''Plot a heatmap for the amplicon experiment.
 
