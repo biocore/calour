@@ -1,9 +1,5 @@
 # calour changelog
 
-## Version 2024.12.23
-Bug Fixes:
-* fix problem arising from inexact numpy matrix multiplication that resulted in more stringent dsFDR than requested when using the default 'meandiff' method
-
 ## Version 2024.8.31
 New features:
 * add shuffler optional parameter and improved data validation for analysis.correlation()
@@ -18,12 +14,6 @@ New Features:
 
 Bug Fixes:
 * Raise error when plotting a heatmap for an empty experiment
-
-## Version 2024.8.25
-New features:
-* Add CorrelationExperiment class for working with correlation matrices and showing significance in heatmap
-Other changes:
-* Update experiment classes to provide the _get_abundance_info() method for the interactive heatmap (instead of being produced by the heatmap() method). This allows experiment class specific information to be shown in the heatmap abundance field when clicking on a feature/sample.
 
 ## Version 2024.5.30
 add mRNAExperiment class for handling rna-seq data. interactive heatmap gene information is via the rna_calour module using Harmonizome server (https://maayanlab.cloud/Harmonizome)

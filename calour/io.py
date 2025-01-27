@@ -35,7 +35,7 @@ import pandas as pd
 import numpy as np
 import biom
 
-from . import Experiment, AmpliconExperiment, MS1Experiment, CorrelationExperiment
+from . import Experiment, AmpliconExperiment, MS1Experiment
 from .util import get_file_md5, get_data_md5, _get_taxonomy_string
 from ._doc import ds
 from .database import _get_database_class
@@ -527,39 +527,6 @@ def read_amplicon(data_file, sample_metadata_file=None,
     # initialize the call history
     param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
     exp._call_history = ['{0}({1})'.format('read_amplicon', ','.join(param))]
-
-    return exp
-
-
-@ds.with_indent(4)
-def read_correlation(prefix, **kwargs) -> CorrelationExperiment:
-    '''Read a saved correlation experiment.
-    Loads both the original correlation data experiment and the q-values experiment.
-
-    Parameters
-    ----------
-    prefix : str
-        The file to read the experiment from (the names passed to CorrelationExperiment.save)
-    **kwargs : dict
-        Additional arguments to pass to the read
-    '''
-    # store the function parameters for call history
-    fparams = locals()
-
-    # by default, don't normalize the data since it is correlation data
-    if 'normalize' not in kwargs:
-        kwargs['normalize'] = None
-
-    # load the main correlation experiment
-    logger.debug('Reading correlation experiment from %s' % prefix)
-    exp = read(prefix+'.biom', sample_metadata_file=prefix+'_sample.txt', feature_metadata_file=prefix+'_feature.txt', cls=CorrelationExperiment, **kwargs)
-    # and load the q-values table
-    logger.debug('Reading correlation matrix %s_qvals.biom' % prefix)
-    exp.qvals = read(prefix+'_qvals.biom', sample_metadata_file=prefix+'_qvals_sample.txt', feature_metadata_file=prefix+'_qvals_feature.txt', normalize=None)
-
-    # initialize the call history
-    param = ['{0!s}={1!r}'.format(k, v) for k, v in fparams.items()]
-    exp._call_history = ['{0}({1})'.format('read_correlation', ','.join(param))]
 
     return exp
 
