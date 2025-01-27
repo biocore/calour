@@ -98,8 +98,9 @@ class Experiment:
             feature_metadata=pd.DataFrame(index=feature_metadata)
         if 'SampleID' not in sample_metadata.columns:
             sample_metadata['SampleID']=sample_metadata.index.values
-        if '_feature_id' not in feature_metadata.columns:
-            feature_metadata['_feature_id']=feature_metadata.index.values
+        if feature_metadata is not None:
+            if '_feature_id' not in feature_metadata.columns:
+                feature_metadata['_feature_id']=feature_metadata.index.values
 
         self.sample_metadata = sample_metadata
         if feature_metadata is None:
@@ -246,6 +247,24 @@ class Experiment:
         else:
             dat = self.get_data()
         return dat[sample_pos, feature_pos]
+
+    def _get_abundance_info(self, row:int , col:int):
+        '''Get a string with the abundance information for display in the interactive heatmap
+        Can be overwritten with different classes to show additional row/col information
+
+        Parameters
+        ----------
+        row : int
+            The row index
+        col : int
+            The column index
+
+        Returns
+        -------
+        str
+            The string with the abundance information
+        '''
+        return '{:.2E}'.format(self.data[row, col])
 
     def copy(self):
         '''Copy the object (deeply).
