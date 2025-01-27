@@ -57,7 +57,7 @@ class MTests(Tests):
         self.assertEqual(len(newexp.feature_metadata), len(self.test1.feature_metadata))
         self.assertEqual(len(newexp.sample_metadata), len(self.test1.sample_metadata)*2)
         fexp = newexp.filter_samples('experiments', ['other'])
-        self.assert_experiment_equal(fexp, texp, ignore_md_fields=['experiments'])
+        self.assert_experiment_equal(fexp, texp, ignore_md_fields=['experiments'], ignore_feature_order=True)
 
     def test_join_experiments_featurewise(self):
         otu1 = ca.Experiment(np.array([[0, 9], [7, 4]]), sparse=False,

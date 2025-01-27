@@ -137,7 +137,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         'filterBH' : Benjamini-Hochberg FDR method with filtering
     shuffler: function or None, optional
         if None, use shuffling on all samples (using the random_seed supplied)
-        if function, use thi supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
+        if function, use the supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
         Input to the function is the labels (np.array), and the random number generator (np.radnom.Generator), output is the shuffled labels (np.array)
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
@@ -199,30 +199,51 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
         raise ValueError('transform type %s not supported' % transform_type)
 
     numbact = np.shape(data)[0]
-
+    numsamples = np.shape(data)[1]
     labels = labels.copy()
 
-    numbact = np.shape(data)[0]
-    labels = labels.copy()
+    if len(labels) != numsamples:
+        raise ValueError('number of labels (%d) and data samples (%d) do not match' % (len(labels), numsamples))
 
-    logger.debug('start permutation')
+    logger.debug('starting permutations')
     if method == 'meandiff':
         # fast matrix multiplication based calculation
-        method = meandiff
-        tstat = method(data, labels)
-        t = np.abs(tstat)
-        numsamples = np.shape(data)[1]
-        p = np.zeros([numsamples, numperm])
-        k1 = 1 / np.sum(labels == 0)
-        k2 = 1 / np.sum(labels == 1)
-        for cperm in range(numperm):
-            labels = shuffler(labels)
-            p[labels == 0, cperm] = k1
-        p2 = np.ones(p.shape) * k2
-        p2[p > 0] = 0
-        mean1 = np.dot(data, p)
-        mean2 = np.dot(data, p2)
-        u = np.abs(mean1 - mean2)
+
+        # the first column is the original data
+        m0 = np.zeros([numsamples, numperm+1])
+
+        k0 = 1 / np.sum(labels == 0)
+        k1 = 1 / np.sum(labels == 1)
+        for cperm in range(numperm+1):
+            # keep the first column as the original data
+            if cperm > 0:
+                rlabels = shuffler(labels)
+            else:
+                rlabels = labels
+            m0[rlabels == 0, cperm] = k0
+        m1 = np.ones(m0.shape) * k1
+        m1[m0 > 0] = 0
+        mean0 = np.dot(data, m0)
+        mean1 = np.dot(data, m1)
+        u = mean1 - mean0
+
+        tstat = u[:, 0]
+
+        # fix floating point error from martix multiplication for all entries
+        # problem is that mean for permutations that should have same mean, is very close but not identical (due to numpy matrix multiplication)
+        # important for permutation values since we use ranking and need to ignore close values
+        # error is of the order of 1E-9
+        # so we normalize by the max value in each row and then round to 9 digits
+        max_vals = np.max(np.abs(u), axis=1)
+        if np.any(max_vals == 0):
+            raise ValueError('data contains features with 0 values in all samples')
+        u = u / max_vals[:,np.newaxis]
+        u = np.round(u, 9)
+
+        u = np.abs(u)
+        t = u[:, 0]
+        u = u[:, 1:]
+
     elif method == 'mannwhitney' or method == \
                    'kruwallis' or method == 'stdmeandiff':
         if method == 'mannwhitney':
@@ -337,6 +358,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
     # calculate FDR
     if fdr_method == 'dsfdr':
+        logger.debug('calculating dsFDR')
         # sort unique p-values for original test statistics biggest to smallest
         pvals_unique = np.unique(pvals)
         sortp = pvals_unique[np.argsort(-pvals_unique)]
@@ -358,6 +380,7 @@ def dsfdr(data, labels, transform_type='rankdata', method='meandiff',
 
         if not foundit:
             # no good threshold was found
+            logger.debug('no good threshold was found')
             reject = np.repeat([False], numbact)
             return reject, tstat, pvals, qvals
 

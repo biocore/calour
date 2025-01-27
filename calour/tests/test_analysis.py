@@ -9,6 +9,7 @@
 import unittest
 
 import numpy as np
+import pandas.testing as pdt
 
 import calour as ca
 from calour.analysis import diff_abundance, diff_abundance_paired
@@ -46,6 +47,12 @@ class TestAnalysis(Tests):
         self.assertEqual(len(dd.feature_metadata), 7)
         for cid in expected_ids:
             self.assertIn(self.test1.feature_metadata.index[cid], dd.feature_metadata.index)
+    
+    def test_diff_abundance_fast_vs_slow(self):
+        dd_fast = diff_abundance(self.test1, 'group', val1='1', val2='2', random_seed=2017, method='meandiff')
+        dd_slow = diff_abundance(self.test1, 'group', val1='1', val2='2', random_seed=2017, method=ca.dsfdr.meandiff)
+        # assert whether the XX.feature_metadata DataFrames as equal
+        pdt.assert_frame_equal(dd_fast.feature_metadata, dd_slow.feature_metadata,check_like=True,check_exact=False, atol=1e-2)
 
     def test_diff_abundance_alpha0(self):
         # Test when we should get 0 features (setting FDR level to 0)
@@ -115,25 +122,25 @@ class TestAnalysis(Tests):
 
     def test_diff_abundance_paired(self):
         # Do the paired test (we should get 4 features)
-        dd = diff_abundance_paired(self.test_paired, 'subj', field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        dd = diff_abundance_paired(self.test_paired, 'subj', field='group', val1=1, val2=2, alpha=0.1, random_seed=2020)
         self.assertEqual(len(dd.feature_metadata), 4)
         expected_ids = ['AG', 'AA', 'TA', 'TT']
         for cid in expected_ids:
             self.assertIn(cid, dd.feature_metadata._feature_id)
         # and the unpaired test (which is less sensitive for this dataset - we should get only 2)
-        dd = diff_abundance(self.test_paired, field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        dd = diff_abundance(self.test_paired, field='group', val1=1, val2=2, alpha=0.1, random_seed=2020)
         self.assertEqual(len(dd.feature_metadata), 2)
         expected_ids = ['AG', 'TT']
         for cid in expected_ids:
             self.assertIn(cid, dd.feature_metadata._feature_id)
         # test with binary transforming the pairs
-        dd = diff_abundance_paired(self.test_paired, 'subj', transform='pair_rank', field='group', val1='1', val2='2', alpha=0.1, random_seed=2020)
+        dd = diff_abundance_paired(self.test_paired, 'subj', transform='pair_rank', field='group', val1=1, val2=2, alpha=0.1, random_seed=2020)
         self.assertEqual(len(dd.feature_metadata), 4)
         expected_ids = ['AA', 'AG', 'TA', 'TT']
         for cid in expected_ids:
             self.assertIn(cid, dd.feature_metadata._feature_id)
         # test with more than 2 samples per group
-        dd = diff_abundance_paired(self.test_paired, 'group3', field='group2', val1='1', val2='2', alpha=0.1, random_seed=2020, numperm=1000)
+        dd = diff_abundance_paired(self.test_paired, 'group3', field='group2', val1=1, val2=2, alpha=0.1, random_seed=2020, numperm=1000)
         self.assertEqual(len(dd.feature_metadata), 4)
         expected_ids = ['AA', 'AT', 'GG', 'TA']
         for cid in expected_ids:

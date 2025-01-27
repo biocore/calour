@@ -343,7 +343,7 @@ def _read_metadata(ids, f, kwargs):
     return metadata
 
 
-@ds.get_sectionsf('io.read')
+@ds.get_sections(base='io.read')
 def read(data_file, sample_metadata_file=None, feature_metadata_file=None,
          description='', sparse=True,
          data_file_type='biom', data_file_sep=',', sample_in_row=False,

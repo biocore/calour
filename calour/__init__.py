@@ -8,7 +8,7 @@
 
 from logging.config import fileConfig
 
-from pkg_resources import resource_filename
+import importlib.resources as pkg_resources
 
 from .experiment import Experiment
 from .amplicon_experiment import AmpliconExperiment
@@ -33,4 +33,6 @@ register_functions((Experiment, AmpliconExperiment, MS1Experiment, mRNAExperimen
 
 
 # setting False allows other logger to print log.
-fileConfig(resource_filename(__package__, 'log.cfg'), disable_existing_loggers=False)
+log_cfg = pkg_resources.files('calour').joinpath('log.cfg')
+with log_cfg.open('r') as config_file:
+    fileConfig(config_file, disable_existing_loggers=False)

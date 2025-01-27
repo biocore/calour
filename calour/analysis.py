@@ -46,7 +46,7 @@ _CALOUR_DIRECTION = '_calour_direction'
 
 @format_docstring(_CALOUR_PVAL, _CALOUR_QVAL, _CALOUR_STAT, _CALOUR_DIRECTION)
 def correlation(exp: Experiment, field, method='spearman', nonzero=False, transform=None,
-                numperm=1000, alpha=0.1, fdr_method='dsfdr', random_seed=None) -> Experiment:
+                numperm=1000, alpha=0.1, fdr_method='dsfdr', shuffler=None,random_seed=None) -> Experiment:
     '''Find features with correlation to a numeric metadata field.
 
     The permutation based p-values and multiple hypothesis correction is implemented.
@@ -69,8 +69,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         Note: setting nonzero to True slows down the calculation
         Note: can be set to True only using 'spearman' or 'pearson', not using a custom function
     transform : str or None
-        transformation to apply to the data before caluculating the statistic.
-
+        transformation to apply to the data before caluculating the statistic:
         * 'rankdata' : rank transfrom each OTU reads
         * 'log2data' : calculate log2 for each OTU using minimal cutoff of 2
         * 'normdata' : normalize the data to constant sum per samples
@@ -81,11 +80,14 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         number of permutations to perform
     fdr_method : str
         method to compute FDR. Allowed methods include:
-
         * 'dsfdr': discrete FDR
         * 'bhfdr': Benjamini-Hochberg FDR method
         * 'byfdr' : Benjamini-Yekutielli FDR method
         * 'filterBH' : Benjamini-Hochberg FDR method with filtering
+    shuffler: function or None, optional
+        if None, use shuffling on all samples (using the random_seed supplied)
+        if function, use the supplied function to shuffle to labels for random iteration. Can be used for paired shuffling, etc.
+        Input to the function is the labels (np.array), and the random number generator (np.radnom.Generator), output is the shuffled labels (np.array) 
     random_seed : int, np.radnom.Generator instance or None, optional, default=None
         set the random number generator seed for the random permutations
         If int, random_seed is the seed used by the random number generator;
@@ -122,6 +124,9 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         logger.warning('NaN values encountered in labels for correlation. Ignoring these samples (%d). %d samples left' % (len(nanpos), len(labels)))
         if len(labels) == 0:
             raise ValueError('Field %s does not seem to contain any samples with numeric value' % field)
+        if len(labels) == 1:
+            raise ValueError('Field %s contains only one unique value. Cannot calculate correlation.' % field)
+
     # change the method if we have nonzero
     if nonzero:
         if method == 'spearman':
@@ -131,7 +136,7 @@ def correlation(exp: Experiment, field, method='spearman', nonzero=False, transf
         else:
             raise ValueError('Cannot use nonzero=True on methods except "pearson" or "spearman"')
     # find the significant features
-    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, random_seed=random_seed)
+    keep, odif, pvals, qvals = dsfdr.dsfdr(data, labels, method=method, transform_type=transform, alpha=alpha, numperm=numperm, fdr_method=fdr_method, shuffler=shuffler, random_seed=random_seed)
     logger.info('Positive correlated features : %d. Negative correlated features : %d. total %d'
                 % (np.sum(odif[keep] > 0), np.sum(odif[keep] < 0), np.sum(keep)))
     newexp = _new_experiment_from_pvals(cexp, exp, keep, odif, pvals, qvals)

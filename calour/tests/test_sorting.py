@@ -121,7 +121,7 @@ class STests(Tests):
         self.assertEqual(exp.shape, self.test1.shape)
 
     def test_sort_abundance_subgroup(self):
-        exp = self.test1.sort_abundance(subgroup={'id': ['2']}, key=np.mean)
+        exp = self.test1.sort_abundance(subgroup={'id': [2]}, key=np.mean)
         new_ids = ['AC', 'TT', 'GA', 'GT', 'badfeature', 'AG', 'AA', 'TA', 'AT', 'TG', 'GG', 'TC']
         self.assertListEqual(exp.feature_metadata.index.tolist(), new_ids)
         self.assertEqual(exp.shape, self.test1.shape)
@@ -139,8 +139,8 @@ class STests(Tests):
         new = self.test1.sort_ids(['S6', 'S5'], axis=0)
 
         # test sample_metadata are correct
-        self.assertEqual(new.sample_metadata['id'][0], 6)
-        self.assertEqual(new.sample_metadata['id'][1], 5)
+        self.assertEqual(new.sample_metadata['id'].iloc[0], 6)
+        self.assertEqual(new.sample_metadata['id'].iloc[1], 5)
 
         # test data are correct
         fid = 'GG'

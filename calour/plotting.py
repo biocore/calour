@@ -428,7 +428,7 @@ def plot_abund_prevalence(exp: Experiment, field, log=True, min_abund=0.01, alph
 
     ax.set_ylabel('prevalence')
     if log is True:
-        ax.set_xscale("log", nonposx='mask')
+        ax.set_xscale("log")
         ax.set_xlabel('log(abundance)')
     else:
         ax.set_xlabel('abundance')
